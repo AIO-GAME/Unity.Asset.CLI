@@ -1,0 +1,46 @@
+{
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.tuyoogame.yooasset",
+      "expression": "",
+      "define": "SUPPORT_YOOASSET"
+    },
+    {
+      "name": "com.cysharp.unitask",
+      "expression": "",
+      "define": "SUPPORT_UNITASK"
+    },
+    {
+      "name": "com.demigiant.dotween",
+      "expression": "",
+      "define": "SUPPORT_DOTWEEN"
+    },
+    {
+      "name": "com.unity.textmeshpro",
+      "expression": "",
+      "define": "SUPPORT_TEXTMESHPRO"
+    }
+  ],
+  "allowUnsafeCode": true,
+  "autoReferenced": true,
+  "rootNamespace": "AIO",
+  "excludePlatforms": [],
+  "noEngineReferences": false,
+  "references": [
+    "UniTask",
+    "UniTask.Addressables",
+    "UniTask.DOTween",
+    "UniTask.Linq",
+    "UniTask.YooAsset",
+    "UniTask.TextMeshPro",
+    "YooAsset",
+    "Unity.TextMeshPro",
+    "DOTween.Modules"
+  ],
+  "overrideReferences": true,
+  "includePlatforms": [],
+  "name": "AIO.Asset.Runtime",
+  "precompiledReferences": [
+  ]
+}
