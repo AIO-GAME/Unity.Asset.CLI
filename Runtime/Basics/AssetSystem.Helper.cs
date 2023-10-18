@@ -103,11 +103,8 @@ namespace AIO
         }
 
         /// <summary>
-        /// 平台
+        /// 运行平台
         /// </summary>
-        public static RuntimePlatform Platform
-        {
-            get { return Application.platform; }
-        }
+        public static RuntimePlatform Platform => Application.platform;
     }
 }

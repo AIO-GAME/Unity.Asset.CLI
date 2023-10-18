@@ -7,7 +7,6 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
@@ -24,7 +23,8 @@ namespace AIO
         /// <param name="cb">回调</param>
         public static async void LoadSubAssets<TObject>(string location, Action<TObject[]> cb) where TObject : Object
         {
-            cb?.Invoke(await Proxy.LoadSubAssetsTask<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location));
+            cb?.Invoke(
+                await Proxy.LoadSubAssetsTask<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location));
         }
 
         /// <summary>
@@ -34,7 +34,9 @@ namespace AIO
         /// <param name="cb">回调</param>
         public static async void LoadSubAssets(string location, Action<Object[]> cb)
         {
-            cb?.Invoke(await Proxy.LoadSubAssetsTask<Object>(Parameter.LoadPathToLower ? location.ToLower() : location));
+            cb?.Invoke(await Proxy.LoadSubAssetsTask<Object>(Parameter.LoadPathToLower
+                ? location.ToLower()
+                : location));
         }
 
         /// <summary>
@@ -272,7 +274,8 @@ namespace AIO
             bool suspendLoad = false,
             int priority = 100)
         {
-            cb?.Invoke(await Proxy.LoadSceneTask(Parameter.LoadPathToLower ? location.ToLower() : location, sceneMode, suspendLoad, priority));
+            cb?.Invoke(await Proxy.LoadSceneTask(Parameter.LoadPathToLower ? location.ToLower() : location, sceneMode,
+                suspendLoad, priority));
         }
 
         /// <summary>
@@ -290,7 +293,8 @@ namespace AIO
             bool suspendLoad = false,
             int priority = 100)
         {
-            return Proxy.LoadSceneCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb, sceneMode, suspendLoad, priority);
+            return Proxy.LoadSceneCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb, sceneMode,
+                suspendLoad, priority);
         }
 
         /// <summary>
@@ -306,7 +310,8 @@ namespace AIO
             bool suspendLoad = true,
             int priority = 100)
         {
-            return Proxy.LoadSceneTask(Parameter.LoadPathToLower ? location.ToLower() : location, sceneMode, suspendLoad, priority);
+            return Proxy.LoadSceneTask(Parameter.LoadPathToLower ? location.ToLower() : location, sceneMode,
+                suspendLoad, priority);
         }
 
         #endregion

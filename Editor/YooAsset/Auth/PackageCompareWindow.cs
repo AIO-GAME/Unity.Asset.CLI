@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if SUPPORT_YOOASSET
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -137,3 +138,5 @@ namespace YooAsset.Editor
         }
     }
 }
+
+#endif

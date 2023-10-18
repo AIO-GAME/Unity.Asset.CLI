@@ -43,7 +43,8 @@ namespace AIO
         /// <returns><see cref="UnityEngine.GameObject"/></returns>
         public static async void InstGameObject(string location, Transform parent, Action<GameObject> cb)
         {
-            cb?.Invoke(await Proxy.InstGameObjectTask(Parameter.LoadPathToLower ? location.ToLower() : location, parent));
+            cb?.Invoke(
+                await Proxy.InstGameObjectTask(Parameter.LoadPathToLower ? location.ToLower() : location, parent));
         }
 
         /// <summary>

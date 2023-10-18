@@ -5,6 +5,7 @@
 |||✩ - - - - - |*/
 
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using AIO.UEngine;
 
@@ -30,18 +31,34 @@ namespace AIO
         /// <summary>
         /// 系统初始化
         /// </summary>
-        public static async Task Initialize<T>(ASConfig config) where T : AssetProxy, new()
+        [DebuggerNonUserCode]
+        public static Task Initialize<T>(ASConfig config) where T : AssetProxy, new()
         {
-            IsInitialized = false;
-            Parameter = config;
-            Proxy = Activator.CreateInstance<T>();
-            await Proxy.Initialize();
-            IsInitialized = true;
+            return Initialize(Activator.CreateInstance<T>(), config);
         }
 
         /// <summary>
         /// 系统初始化
         /// </summary>
+        [DebuggerNonUserCode]
+        public static Task Initialize<T>(T proxy) where T : AssetProxy
+        {
+            return Initialize(proxy, new ASConfig());
+        }
+
+        /// <summary>
+        /// 系统初始化
+        /// </summary>
+        [DebuggerNonUserCode]
+        public static Task Initialize<T>() where T : AssetProxy, new()
+        {
+            return Initialize(Activator.CreateInstance<T>(), new ASConfig());
+        }
+
+        /// <summary>
+        /// 系统初始化
+        /// </summary>
+        [DebuggerNonUserCode]
         public static async Task Initialize<T>(T proxy, ASConfig config) where T : AssetProxy
         {
             IsInitialized = false;
@@ -49,28 +66,6 @@ namespace AIO
             Proxy = proxy;
             await Proxy.Initialize();
             IsInitialized = true;
-        }
-
-        /// <summary>
-        /// 系统初始化
-        /// </summary>
-        public static async Task Initialize<T>(T proxy) where T : AssetProxy
-        {
-            IsInitialized = false;
-            Parameter = new ASConfig();
-            Proxy = proxy;
-            await Proxy.Initialize();
-            IsInitialized = true;
-        }
-
-        /// <summary>
-        /// 系统初始化
-        /// </summary>
-        public static Task Initialize<T>() where T : AssetProxy, new()
-        {
-            Parameter = new ASConfig();
-            Proxy = Activator.CreateInstance<T>();
-            return Proxy.Initialize();
         }
 
         /// <summary>

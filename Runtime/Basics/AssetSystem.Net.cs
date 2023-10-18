@@ -16,50 +16,46 @@ namespace AIO
 {
     public partial class AssetSystem
     {
+        /// <summary>
+        /// 检测网络请求
+        /// </summary>
+        /// <returns>Ture:成功 False:异常</returns>
         private static bool LoadCheckNet(UnityWebRequest operation)
         {
 #if UNITY_2020_1_OR_NEWER
             switch (operation.result)
             {
                 case UnityWebRequest.Result.InProgress:
-                    Debug.LogError("请求正在进行中");
-                    break;
+                    Debug.LogError($"{ERROR_NET}请求正在进行中");
+                    return false;
                 case UnityWebRequest.Result.ConnectionError:
-                    Debug.LogError("无法连接到服务器");
-                    break;
+                    Debug.LogError($"{ERROR_NET}无法连接到服务器");
+                    return false;
                 case UnityWebRequest.Result.ProtocolError:
-                    Debug.LogError("服务器返回响应错误");
-                    break;
+                    Debug.LogError($"{ERROR_NET}服务器返回响应错误");
+                    return false;
                 case UnityWebRequest.Result.DataProcessingError:
-                    Debug.LogError("数据处理异常");
-                    break;
-                default:
-                    Debug.LogError("未知错误");
-                    break;
-                case UnityWebRequest.Result.Success:
-                    break;
+                    Debug.LogError($"{ERROR_NET}数据处理异常");
+                    return false;
             }
 
             if (operation.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError(operation.error);
+                Debug.LogError($"{ERROR_NET_UNKNOWN}{operation.result} -> {operation.error}");
                 return false;
             }
 #else
-        if (operation.isHttpError || operation.isNetworkError)
-        {
-            UnityEngine.Debug.LogError(operation.error);
-            return false;
-        }
-#endif
-
-            if (!operation.isDone)
+            if (operation.isHttpError || operation.isNetworkError)
             {
-                Debug.LogError("请求未完成");
+                Debug.LogError(operation.error);
+                Debug.Log($"{ERROR_NET_UNKNOWN} {operation.error}");
                 return false;
             }
+#endif
 
-            return true;
+            if (operation.isDone) return true;
+            Debug.LogError($"{ERROR_NET}请求未完成");
+            return false;
         }
 
         #region Async
