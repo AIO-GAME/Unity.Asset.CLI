@@ -1,0 +1,26 @@
+{
+  "name": "com.aio.asset",
+  "displayName": "AIO Unity Asset",
+  "version": "0.1.2",
+  "license": "MIT",
+  "description": "AIO Unity Asset Manager",
+  "category": "Runtime",
+  "documentationUrl": "https://git.code.tencent.com/UnityLibs/com.self.package",
+  "changelogUrl": "https://git.code.tencent.com/UnityLibs/com.self.package/commits/master",
+  "licensesUrl": "https://git.code.tencent.com/UnityLibs/com.self.package/blob/master/LICENSE",
+  "author": {
+    "name": "XiNan",
+    "email": "1398581458@qq.com",
+    "url": "https://xinansky.com"
+  },
+  "relatedPackages": {},
+  "type": "library",
+  "repository": {
+    "type": "git",
+    "url": "https://git.code.tencent.com/UnityLibs/com.self.package.git"
+  },
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.2"
+  },
+  "unity": "2019.4"
+}
