@@ -20,7 +20,8 @@
     "url": "https://git.code.tencent.com/UnityLibs/com.self.package.git"
   },
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "3.0.2"
+    "com.unity.nuget.newtonsoft-json": "3.0.2",
+    "com.self.package": "0.1.2"
   },
   "unity": "2019.4"
 }
