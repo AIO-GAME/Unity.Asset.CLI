@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.0.2",
-    "com.self.package": "0.1.2"
+    "com.self.package": "https://git.code.tencent.com/UnityLibs/com.self.package.git@d0672214e4aaa4151f9b70c9cab7503ed668c65d"
   },
   "unity": "2019.4"
 }
