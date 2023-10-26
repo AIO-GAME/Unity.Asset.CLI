@@ -1,27 +1,24 @@
 {
-  "name": "com.aio.asset",
-  "displayName": "AIO Unity Asset",
-  "version": "0.1.2",
+  "name": "com.aio.cli.asset",
+  "displayName": "AIO Unity CLI Asset",
+  "description": "AIO Unity CLI Asset",
+  "version": "1.0.1",
+  "unity": "2019.1",
+  "unityRelease": "0f1",
   "license": "MIT",
-  "description": "AIO Unity Asset Manager",
-  "category": "Runtime",
-  "documentationUrl": "https://git.code.tencent.com/UnityLibs/com.self.package",
-  "changelogUrl": "https://git.code.tencent.com/UnityLibs/com.self.package/commits/master",
-  "licensesUrl": "https://git.code.tencent.com/UnityLibs/com.self.package/blob/master/LICENSE",
-  "author": {
-    "name": "XiNan",
-    "email": "1398581458@qq.com",
-    "url": "https://xinansky.com"
-  },
-  "relatedPackages": {},
-  "type": "library",
+  "documentationUrl": "https://github.com/AIO-GAME/Common.wiki.git",
+  "changelogUrl": "https://github.com/AIO-GAME/Common/commits/main",
+  "licensesUrl": "https://github.com/AIO-GAME/Common/blob/main/LICENSE.md",
   "repository": {
     "type": "git",
     "url": "https://git.code.tencent.com/UnityLibs/com.self.package.git"
   },
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "3.0.2",
-    "com.self.package": "https://git.code.tencent.com/UnityLibs/com.self.package.git@d0672214e4aaa4151f9b70c9cab7503ed668c65d"
+    "com.aio.package": "1.0.1-preview"
   },
-  "unity": "2019.4"
+  "author": {
+    "name": "AIO-GAME",
+    "email": "xinansky99@foxmail.com",
+    "url": "https://github.com/AIO-GAME"
+  }
 }
