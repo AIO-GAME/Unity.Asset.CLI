@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using YooAsset;
@@ -32,7 +33,8 @@ namespace AIO.UEngine.YooAsset
                 if (package.IsNeedDownloadFromRemote(location))
                 {
                     var info = package.GetAssetInfo(location);
-                    if (info is null) throw new SystemException(string.Format("无法获取资源信息 [{0} : {1}]", package.PackageName, location));
+                    if (info is null)
+                        throw new SystemException(string.Format("无法获取资源信息 [{0} : {1}]", package.PackageName, location));
                     var operation = package.CreateBundleDownloader(info, 10, 1, 60);
                     RegisterEvent(location, operation);
                     operation.BeginDownload();
@@ -41,7 +43,8 @@ namespace AIO.UEngine.YooAsset
                     {
                         case EOperationStatus.Succeed: break;
                         default:
-                            throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}", package.PackageName, package.GetPackageVersion(), location, operation.Error));
+                            throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}",
+                                package.PackageName, package.GetPackageVersion(), location, operation.Error));
                     }
                 }
 
@@ -61,7 +64,8 @@ namespace AIO.UEngine.YooAsset
         private static IEnumerator GetAutoPakcageCO(string packagename, string location, Action<YAssetPackage> cb)
         {
 #if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Coroutine : [{0} : {1}]", packagename, location);
+            if (AssetSystem.Parameter.OutputLog)
+                Debug.LogFormat("Load Assets Coroutine : [{0} : {1}]", packagename, location);
 #endif
             if (!Dic.TryGetValue(packagename, out var package))
                 throw new SystemException(string.Format("目标资源包不存在 [{0} : {1}]", packagename, location));
@@ -69,7 +73,8 @@ namespace AIO.UEngine.YooAsset
             if (package.IsNeedDownloadFromRemote(location))
             {
                 var info = package.GetAssetInfo(location);
-                if (info is null) throw new SystemException(string.Format("无法获取资源信息 [{0} : {1}]", packagename, location));
+                if (info is null)
+                    throw new SystemException(string.Format("无法获取资源信息 [{0} : {1}]", packagename, location));
                 var operation = package.CreateBundleDownloader(info, 10, 1, 60);
                 RegisterEvent(location, operation);
                 operation.BeginDownload();
@@ -127,7 +132,8 @@ namespace AIO.UEngine.YooAsset
         private static YAssetPackage GetAutoPakcageSync(string packagename, string location)
         {
 #if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Sync : [{0} : {1}]", packagename, location);
+            if (AssetSystem.Parameter.OutputLog)
+                Debug.LogFormat("Load Assets Sync : [{0} : {1}]", packagename, location);
 #endif
             if (!Dic.TryGetValue(packagename, out var package))
                 throw new SystemException(string.Format("目标资源包不存在 [{0} : {1}]", packagename, location));
@@ -136,7 +142,8 @@ namespace AIO.UEngine.YooAsset
                 throw new SystemException(string.Format("不支持同步加载远程资源 [{0} : {1}]", package.PackageName, location));
 
             if (!package.CheckLocationValid(location))
-                throw new SystemException(string.Format("[{0} : {1}] 传入地址验证无效 {2}", package.PackageName, package.GetPackageVersion(), location));
+                throw new SystemException(string.Format("[{0} : {1}] 传入地址验证无效 {2}", package.PackageName,
+                    package.GetPackageVersion(), location));
 
             return package;
         }
@@ -190,7 +197,8 @@ namespace AIO.UEngine.YooAsset
         private static async Task<YAssetPackage> GetAutoPakcageTask(string packagename, string location)
         {
 #if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Async : [{0} : {1}]", packagename, location);
+            if (AssetSystem.Parameter.OutputLog)
+                Debug.LogFormat("Load Assets Async : [{0} : {1}]", packagename, location);
 #endif
             if (!Dic.TryGetValue(packagename, out var package))
                 throw new SystemException($"目标资源包不存在 [{packagename} : {location}]");
@@ -207,17 +215,20 @@ namespace AIO.UEngine.YooAsset
                 {
                     case EOperationStatus.Succeed: break;
                     default:
-                        throw new SystemException($"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                        throw new SystemException(
+                            $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                 }
             }
 
             if (!package.CheckLocationValid(location))
-                throw new SystemException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+                throw new SystemException(
+                    $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
 
             return package;
         }
 
-        private static Dictionary<string, OperationHandleBase> ReferenceOPHandle { get; set; } = new Dictionary<string, OperationHandleBase>();
+        private static Dictionary<string, OperationHandleBase> ReferenceOPHandle { get; set; } =
+            new Dictionary<string, OperationHandleBase>();
 
         private static T GetHandle<T>(string location) where T : OperationHandleBase
         {
@@ -240,24 +251,36 @@ namespace AIO.UEngine.YooAsset
             AddHandle(location.Address, operation);
         }
 
+        private static MethodInfo ReleaseInternal
+        {
+            get
+            {
+                if (_ReleaseInternal is null)
+                {
+                    _ReleaseInternal = typeof(OperationHandleBase).GetMethod("ReleaseInternal",
+                        BindingFlags.Instance | BindingFlags.NonPublic);
+                }
+
+                return _ReleaseInternal;
+            }
+        }
+
+        private static MethodInfo _ReleaseInternal;
+
         public static void FreeHandle(string location)
         {
-            if (ReferenceOPHandle.TryGetValue(location, out var value))
-            {
-                value.ReleaseInternal();
-                ReferenceOPHandle.Remove(location);
-            }
+            if (!ReferenceOPHandle.TryGetValue(location, out var value)) return;
+            ReleaseInternal?.Invoke(value, null);
+            ReferenceOPHandle.Remove(location);
         }
 
         public static void FreeHandle(IEnumerable<string> locations)
         {
             foreach (var location in locations)
             {
-                if (ReferenceOPHandle.TryGetValue(location, out var value))
-                {
-                    value.ReleaseInternal();
-                    ReferenceOPHandle.Remove(location);
-                }
+                if (!ReferenceOPHandle.TryGetValue(location, out var value)) continue;
+                ReleaseInternal?.Invoke(value, null);
+                ReferenceOPHandle.Remove(location);
             }
         }
 
@@ -271,18 +294,16 @@ namespace AIO.UEngine.YooAsset
             FreeHandle(location.Address);
         }
 
-
         public static void Destroy()
         {
-            if (isInitialize)
-            {
-                foreach (var item in ReferenceOPHandle.Keys.ToArray())
-                    ReferenceOPHandle[item].ReleaseInternal();
-                ReferenceOPHandle.Clear();
+            if (!isInitialize) return;
 
-                YooAssets.Destroy();
-                isInitialize = false;
-            }
+            foreach (var item in ReferenceOPHandle.Keys.ToArray())
+                ReleaseInternal?.Invoke(ReferenceOPHandle[item], null);
+            ReferenceOPHandle.Clear();
+
+            YooAssets.Destroy();
+            isInitialize = false;
         }
     }
 }
