@@ -2,19 +2,19 @@
   "name": "com.aio.cli.asset",
   "displayName": "AIO Unity CLI Asset",
   "description": "AIO Unity CLI Asset",
-  "version": "1.0.1",
+  "version": "1.0.0-preview",
   "unity": "2019.1",
   "unityRelease": "0f1",
   "license": "MIT",
-  "documentationUrl": "https://github.com/AIO-GAME/Common.wiki.git",
-  "changelogUrl": "https://github.com/AIO-GAME/Common/commits/main",
-  "licensesUrl": "https://github.com/AIO-GAME/Common/blob/main/LICENSE.md",
+  "documentationUrl": "https://github.com/AIO-GAME/Unity.Asset.CLI#readme",
+  "changelogUrl": "https://github.com/AIO-GAME/Unity.Asset.CLI/commits/main",
+  "licensesUrl": "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/LICENSE.md",
   "repository": {
     "type": "git",
-    "url": "https://git.code.tencent.com/UnityLibs/com.self.package.git"
+    "url": "https://github.com/AIO-GAME/Unity.Asset.CLI.git"
   },
   "dependencies": {
-    "com.aio.package": "1.0.1-preview"
+    "com.aio.package": "1.0.9-preview"
   },
   "author": {
     "name": "AIO-GAME",
