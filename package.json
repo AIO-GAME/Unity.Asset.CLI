@@ -19,9 +19,7 @@
   "relatedPackages": {
     "com.aio.package": "1.0.9-preview"
   },
-  "upmCi": {
-    "footprint": "2279493b9acd323ab758f64369634dc0daf0dbac"
-  },  
+  "keywords": ["Asset", "YooAsset", "Unity Asset", "Resource"],
   "author": {
     "name": "AIO-GAME",
     "email": "xinansky99@foxmail.com",
