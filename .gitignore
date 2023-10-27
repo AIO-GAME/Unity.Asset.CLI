@@ -1,4 +1,4 @@
-*.meta
+!*.meta
 *.log
 *.DS_Store
 *.sln
