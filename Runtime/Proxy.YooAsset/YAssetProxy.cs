@@ -6,6 +6,7 @@
 
 #if SUPPORT_YOOASSET
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -85,12 +86,12 @@ namespace AIO.UEngine
             return yAssetFlow;
         }
 
-        public override async Task Initialize()
+        public override IEnumerator Initialize()
         {
             YAssetSystem.GetParameter += GetParameter;
             YAssetSystem.GetPackages += GetPackages;
             YAssetSystem.Initialize();
-            await YAssetSystem.LoadTask();
+            yield return YAssetSystem.LoadTask();
         }
 
         public override void Dispose()

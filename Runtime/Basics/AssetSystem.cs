@@ -5,6 +5,7 @@
 |||✩ - - - - - |*/
 
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using AIO.UEngine;
@@ -32,7 +33,7 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode]
-        public static Task Initialize<T>(ASConfig config) where T : AssetProxy, new()
+        public static IEnumerator Initialize<T>(ASConfig config) where T : AssetProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), config);
         }
@@ -41,7 +42,7 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode]
-        public static Task Initialize<T>(T proxy) where T : AssetProxy
+        public static IEnumerator Initialize<T>(T proxy) where T : AssetProxy
         {
             return Initialize(proxy, new ASConfig());
         }
@@ -50,7 +51,7 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode]
-        public static Task Initialize<T>() where T : AssetProxy, new()
+        public static IEnumerator Initialize<T>() where T : AssetProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), new ASConfig());
         }
@@ -59,12 +60,12 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode]
-        public static async Task Initialize<T>(T proxy, ASConfig config) where T : AssetProxy
+        public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : AssetProxy
         {
             IsInitialized = false;
             Parameter = config;
             Proxy = proxy;
-            await Proxy.Initialize();
+            yield return Proxy.Initialize();
             IsInitialized = true;
         }
 

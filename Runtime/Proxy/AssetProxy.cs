@@ -5,6 +5,7 @@
 |||✩ - - - - - |*/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace AIO.UEngine
         /// <summary>
         /// 初始化
         /// </summary>
-        public abstract Task Initialize();
+        public abstract IEnumerator Initialize();
 
         /// <summary>
         /// 释放资源句柄

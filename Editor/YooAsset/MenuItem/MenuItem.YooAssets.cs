@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AIO.UEngine;
-using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
@@ -100,7 +99,7 @@ namespace AIO.UEditor
                 if (hashtable.Value.Count <= 0) continue;
                 var filename = hashtable.Key.ToString();
                 var filePath = Path.Combine(BundlesConfigInfo.FullName, string.Concat(filename, ".json"));
-                File.WriteAllText(filePath, JsonConvert.SerializeObject(hashtable.Value.Values.ToArray()));
+                File.WriteAllText(filePath, AHelper.Json.Serialize(hashtable.Value.Values.ToArray()));
             }
         }
 

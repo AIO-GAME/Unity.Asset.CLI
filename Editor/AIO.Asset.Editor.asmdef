@@ -1,6 +1,5 @@
 {
     "name": "AIO.Asset.Editor",
-    "rootNamespace": "AIO",
     "references": [
         "UniTask",
         "UniTask.Addressables",
@@ -12,7 +11,10 @@
         "YooAsset.Editor",
         "Unity.TextMeshPro",
         "AIO.Asset.Runtime",
-        "DOTween.Modules"
+        "DOTween.Modules",
+        "Unity.Addressables",
+        "Unity.Addressables.Editor",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -41,6 +43,11 @@
             "name": "com.unity.textmeshpro",
             "expression": "",
             "define": "SUPPORT_TEXTMESHPRO"
+        },
+        {
+            "name": "com.unity.addressables",
+            "expression": "",
+            "define": "SUPPORT_WHOOTHOT"
         }
     ],
     "noEngineReferences": false

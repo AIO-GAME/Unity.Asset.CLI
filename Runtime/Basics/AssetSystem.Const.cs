@@ -12,7 +12,6 @@
         /// </summary>
         internal const string ASSET_SYSTEM_NAME = nameof(AssetSystem);
 
-
         /// <summary>
         /// 资源管理系统 错误异常
         /// </summary>

@@ -50,7 +50,7 @@ openupm 中国版
 ~~~
 Name: package.openupm.cn
 URL: https://package.openupm.cn
-Scope(s): com.aio.package
+Scope(s): com.aio.cli.asset
 ~~~
 
 openupm 国际版
@@ -58,7 +58,7 @@ openupm 国际版
 ~~~
 Name: package.openupm.com
 URL: https://package.openupm.com
-Scope(s): com.aio.package
+Scope(s): com.aio.cli.asset
 ~~~
 
 </details>
@@ -71,7 +71,7 @@ Scope(s): com.aio.package
 openupm-cli
 
 ~~~
-openupm add com.aio.package
+openupm add com.aio.cli.asset
 ~~~
 
 </details>
