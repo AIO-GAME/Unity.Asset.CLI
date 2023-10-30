@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 using Rol.Game;
+using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 

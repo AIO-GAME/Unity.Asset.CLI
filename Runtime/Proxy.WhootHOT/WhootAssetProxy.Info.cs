@@ -16,13 +16,7 @@ namespace Rol.Game
         /// <returns></returns>
         public override IASDownloader GetDownloader()
         {
-            // var dic = new Dictionary<string, YAssetPackage>();
-            // if (GetPackages == null) return new YASDownloader(dic);
-            //
-            // foreach (var item in GetPackages.Invoke())
-            //     dic.Add(item.Name, YAssetSystem.GetPackage(item.Name));
-            // return new YASDownloader(dic);
-            return null;
+            throw new NotImplementedException();
         }
 
         /// <summary>

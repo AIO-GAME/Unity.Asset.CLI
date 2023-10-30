@@ -5,7 +5,10 @@ namespace Rol.Game
 {
     public class SettingAddress
     {
+#if UNITY_EDITOR
+
         internal static PathAddressConfig PathConfig => PathAddressConfig.Instance;
+
 
         public static void GetPathAddress(string file, out string address, out string labels, out string group,
             out CacheLevel cacheLevel)
@@ -29,6 +32,7 @@ namespace Rol.Game
             labels = config.labelFormat;
             cacheLevel = config.cacheLevel;
         }
+#endif
     }
 }
 #endif

@@ -1,4 +1,6 @@
 ﻿#if SUPPORT_WHOOTHOT
+#if UNITY_EDITOR
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -266,4 +268,6 @@ namespace Rol.Game
         }
     }
 }
+#endif
+
 #endif

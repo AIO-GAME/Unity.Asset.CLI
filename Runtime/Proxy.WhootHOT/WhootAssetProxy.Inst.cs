@@ -20,7 +20,7 @@ namespace Rol.Game
             throw new NotImplementedException();
         }
 
-        public override async Task<GameObject> InstGameObjectTask(string location, Transform parent = null)
+        public override Task<GameObject> InstGameObjectTask(string location, Transform parent = null)
         {
             throw new NotImplementedException();
         }

@@ -1,21 +1,21 @@
-﻿
-#if SUPPORT_WHOOTHOT
+﻿#if SUPPORT_WHOOTHOT
 using System.Collections;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
 using UnityEditor;
-
 using UnityEngine;
 
 public class ImportAssetPostHook : AssetPostprocessor
 {
-    private static void OnPostProcessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+    private static void OnPostProcessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets,
+        string[] movedFromAssetPaths)
     {
         foreach (string str in importedAssets)
         {
             Debug.Log("Reimported Asset: " + str);
         }
-        
+
         foreach (string str in deletedAssets)
         {
             Debug.Log("Deleted Asset: " + str);
@@ -27,4 +27,6 @@ public class ImportAssetPostHook : AssetPostprocessor
         }
     }
 }
+#endif
+
 #endif
