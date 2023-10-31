@@ -19,9 +19,9 @@ namespace AIO.UEngine
         public override IASDownloader GetDownloader()
         {
             var dic = new Dictionary<string, YAssetPackage>();
-            if (GetPackages == null) return new YASDownloader(dic);
+            if (EventPackages == null) return new YASDownloader(dic);
 
-            foreach (var item in GetPackages.Invoke())
+            foreach (var item in EventPackages.Invoke())
                 dic.Add(item.Name, YAssetSystem.GetPackage(item.Name));
             return new YASDownloader(dic);
         }
@@ -53,21 +53,6 @@ namespace AIO.UEngine
         public override bool IsNeedDownloadFromRemote(in string location)
         {
             return YAssetSystem.IsNeedDownloadFromRemote(location);
-        }
-
-        /// <summary>
-        /// 根据资源标签获取资源信息
-        /// </summary>
-        /// <param name="tag">资源标签</param>
-        public override ICollection<string> GetAssetInfos(in string tag)
-        {
-            var list2 = new List<string>();
-            foreach (var info in YAssetSystem.GetAssetInfos(tag))
-            {
-                list2.Add(info.Address);
-            }
-
-            return list2;
         }
 
         /// <summary>

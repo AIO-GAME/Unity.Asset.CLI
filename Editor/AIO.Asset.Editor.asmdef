@@ -14,7 +14,9 @@
         "DOTween.Modules",
         "Unity.Addressables",
         "Unity.Addressables.Editor",
-        "Unity.ResourceManager"
+        "Unity.ResourceManager",
+        "AIO.Core.Runtime",
+        "AIO.Core.Editor"
     ],
     "includePlatforms": [
         "Editor"

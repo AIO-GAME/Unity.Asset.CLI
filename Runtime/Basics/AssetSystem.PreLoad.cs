@@ -4,6 +4,7 @@
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
+using System.Diagnostics;
 using UnityEngine;
 
 namespace AIO
@@ -15,6 +16,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <typeparam name="TObject">资源类型</typeparam>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void PreLoadSubAssets<TObject>(string location) where TObject : Object
         {
             Proxy.PreLoadSubAssets<TObject>(location);
@@ -24,6 +26,7 @@ namespace AIO
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void PreLoadSubAssets(string location)
         {
             Proxy.PreLoadSubAssets<Object>(location);
@@ -34,6 +37,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <typeparam name="TObject">资源类型</typeparam>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void PreLoadAsset<TObject>(string location) where TObject : Object
         {
             Proxy.PreLoadAsset<TObject>(location);
@@ -43,6 +47,7 @@ namespace AIO
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void PreLoadAsset(string location)
         {
             Proxy.PreLoadAsset<Object>(location);
@@ -52,6 +57,7 @@ namespace AIO
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void PreLoadRaw(string location)
         {
             Proxy.PreLoadRaw(location);

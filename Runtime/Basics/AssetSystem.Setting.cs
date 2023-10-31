@@ -1,6 +1,6 @@
 ﻿namespace AIO
 {
-    public class AssetSystem_Setting
+    public partial class AssetSystem
     {
         
     }

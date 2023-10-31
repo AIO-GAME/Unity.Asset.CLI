@@ -32,7 +32,8 @@ namespace AIO.UEditor.YooAsset
                 Extension == ".amr" ||
                 Extension == ".midi" ||
                 Extension == ".aiff" ||
-                Extension == ".mpeg";
+                Extension == ".mpeg"||
+                Extension == ".mixer";
         }
     }
 }

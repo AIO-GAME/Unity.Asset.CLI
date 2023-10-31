@@ -20,7 +20,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(location);
+                var package = await GetAutoPackageTask(location);
                 if (package is null) return;
 
                 operation = package.LoadSubAssetsAsync<TObject>(location);
@@ -34,7 +34,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(location);
+                var package = await GetAutoPackageTask(location);
                 if (package is null) return;
 
                 operation = package.LoadAssetAsync<TObject>(location);
@@ -48,7 +48,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(location);
+                var package = await GetAutoPackageTask(location);
                 if (package is null) return;
 
                 operation = package.LoadRawFileAsync(location);

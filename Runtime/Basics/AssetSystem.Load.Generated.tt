@@ -29,6 +29,7 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -47,6 +48,7 @@ namespace AIO
         /// 同步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static <#= typeName #> Load<#= aliasName #>(string location)
         {
             return Proxy.LoadAssetSync<<#= typeName #>>(Parameter.LoadPathToLower ? location.ToLower() : location);
@@ -57,6 +59,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> cb)
         {
             cb.Invoke(await Proxy.LoadAssetTask<<#= typeName #>>(Parameter.LoadPathToLower ? location.ToLower() : location));
@@ -66,6 +69,7 @@ namespace AIO
         /// 异步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static Task<<#= typeName #>> Load<#= aliasName #>Task(string location)
         {
             return Proxy.LoadAssetTask<<#= typeName #>>(Parameter.LoadPathToLower ? location.ToLower() : location);
@@ -76,6 +80,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Load<#= aliasName #>CO(string location, Action<<#= typeName #>> cb)
         {
             return Proxy.LoadAssetCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb);

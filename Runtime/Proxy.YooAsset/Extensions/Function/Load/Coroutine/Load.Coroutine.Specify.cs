@@ -25,7 +25,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -53,7 +53,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -93,7 +93,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -127,7 +127,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -162,7 +162,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -202,7 +202,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -237,7 +237,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -271,7 +271,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -318,7 +318,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                     throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", packagename, location, sceneMode));
 
@@ -354,7 +354,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                     throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", packagename, location, sceneMode));
 
@@ -385,7 +385,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -419,7 +419,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -453,7 +453,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -487,7 +487,7 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPakcageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);

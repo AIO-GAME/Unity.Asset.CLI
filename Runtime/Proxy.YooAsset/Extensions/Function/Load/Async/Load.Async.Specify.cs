@@ -23,7 +23,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -48,7 +48,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -84,7 +84,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -115,7 +115,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -147,7 +147,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -183,7 +183,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -215,7 +215,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -246,7 +246,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -290,7 +290,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SceneOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
@@ -321,7 +321,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SceneOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
@@ -347,7 +347,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -378,7 +378,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -409,7 +409,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -440,7 +440,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPakcageTask(packagename, location);
+                var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);

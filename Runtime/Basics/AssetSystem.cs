@@ -22,17 +22,19 @@ namespace AIO
         /// <summary>
         /// 资源热更新配置
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static ASConfig Parameter { get; private set; }
 
         /// <summary>
         /// 是否已经初始化
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static bool IsInitialized { get; private set; }
 
         /// <summary>
         /// 系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize<T>(ASConfig config) where T : AssetProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), config);
@@ -41,7 +43,7 @@ namespace AIO
         /// <summary>
         /// 系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize<T>(T proxy) where T : AssetProxy
         {
             return Initialize(proxy, new ASConfig());
@@ -50,7 +52,7 @@ namespace AIO
         /// <summary>
         /// 系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize<T>() where T : AssetProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), new ASConfig());
@@ -59,7 +61,7 @@ namespace AIO
         /// <summary>
         /// 系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : AssetProxy
         {
             IsInitialized = false;
@@ -73,6 +75,7 @@ namespace AIO
         /// 销毁资源管理系统
         /// </summary>
         /// <returns></returns>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static Task Destroy()
         {
             Proxy.Dispose();

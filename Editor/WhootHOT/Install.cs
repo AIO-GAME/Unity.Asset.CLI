@@ -55,19 +55,18 @@ namespace AIO.Editor
         {
             var Root = Directory.GetParent(Application.dataPath);
             if (Root is null) throw new Exception("Application.dataPath is null");
-            var Packages = new DirectoryInfo(Path.Combine(Root.FullName, "Packages"));
             try
             {
-                var target = Path.Combine(Packages.FullName, "com.unity.addressables");
-                if (Directory.Exists(target))
-                {
-                    EditorUtility.DisplayProgressBar("com.unity.addressables", "uninstall", 0);
-                    await PrPlatform.Folder.Del(target);
-                    EditorUtility.ClearProgressBar();
-                    AssetDatabase.Refresh();
-                    CompilationPipeline.RequestScriptCompilation();
-                }
-                else EditorUtility.ClearProgressBar();
+                EditorUtility.DisplayProgressBar("com.unity.addressables", "uninstall", 0);
+                var target = Path.Combine(Root.FullName, "Packages", "com.unity.addressables");
+                if (Directory.Exists(target)) await PrPlatform.Folder.Del(target);
+
+                target = Path.Combine(Root.FullName, "Library", "com.unity.addressables");
+                if (Directory.Exists(target)) await PrPlatform.Folder.Del(target);
+
+                EditorUtility.ClearProgressBar();
+                AssetDatabase.Refresh();
+                CompilationPipeline.RequestScriptCompilation();
             }
             catch (Exception e)
             {

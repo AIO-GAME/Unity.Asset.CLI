@@ -9,7 +9,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using AIO.UEngine.YooAsset;
 using UnityEditor;
 using UnityEngine;
@@ -19,13 +18,15 @@ namespace AIO.UEngine
 {
     public partial class YAssetProxy : AssetProxy
     {
-        public static event Func<ICollection<AssetsPackageConfig>> GetPackages;
+        public static event Func<ICollection<AssetsPackageConfig>> EventPackages;
 
         public static event Func<IQueryServices> GetQueryServices;
 
         public static event Func<AssetsPackageConfig, IRemoteServices> GetRemoteServices;
 
-        private YAssetParameters GetParameter(YAssetPackage package)
+        public static event Func<YAssetPackage, YAssetParameters> EventParameter;
+
+        private static YAssetParameters GetParameter(YAssetPackage package)
         {
             YAssetParameters yAssetFlow;
             switch (AssetSystem.Parameter.ASMode)
@@ -88,16 +89,18 @@ namespace AIO.UEngine
 
         public override IEnumerator Initialize()
         {
-            YAssetSystem.GetParameter += GetParameter;
-            YAssetSystem.GetPackages += GetPackages;
+            EventParameter += GetParameter;
+            YAssetSystem.GetParameter += EventParameter;
+            YAssetSystem.GetPackages += EventPackages;
             YAssetSystem.Initialize();
-            yield return YAssetSystem.LoadTask();
+            yield return YAssetSystem.LoadCO();
         }
 
         public override void Dispose()
         {
-            YAssetSystem.GetPackages -= GetPackages;
-            YAssetSystem.GetParameter -= GetParameter;
+            EventParameter -= GetParameter;
+            YAssetSystem.GetPackages -= EventPackages;
+            YAssetSystem.GetParameter -= EventParameter;
             YAssetSystem.Destroy();
         }
     }

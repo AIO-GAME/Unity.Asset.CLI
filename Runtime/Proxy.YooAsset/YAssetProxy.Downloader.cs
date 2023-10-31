@@ -57,7 +57,7 @@ namespace AIO.UEngine
 
             private IDictionary<string, YAssetPackage> Packages;
 
-            private Dictionary<string, DownloaderOperation> DownloaderOperationss;
+            private Dictionary<string, DownloaderOperation> DownloaderOperations;
 
             private Dictionary<string, int> DownloadCountList;
 
@@ -71,7 +71,7 @@ namespace AIO.UEngine
 
                 VersionOperations = new Dictionary<string, UpdatePackageVersionOperation>();
                 ManifestOperations = new Dictionary<string, UpdatePackageManifestOperation>();
-                DownloaderOperationss = new Dictionary<string, DownloaderOperation>();
+                DownloaderOperations = new Dictionary<string, DownloaderOperation>();
 
                 DownloadBytesList = new Dictionary<string, long>();
                 DownloadCountList = new Dictionary<string, int>();
@@ -83,6 +83,7 @@ namespace AIO.UEngine
             /// <param name="downloadingMaxNumber"> 同时下载的最大数量 </param>
             /// <param name="failedTryAgain"> 失败后重试次数 </param>
             /// <param name="timeout"> 超时时间 </param>
+            /// <returns>Ture:需要下载 False:不需要下载</returns>
             public bool CreateDownloader(
                 int downloadingMaxNumber = 50,
                 int failedTryAgain = 2,
@@ -112,7 +113,7 @@ namespace AIO.UEngine
                     Debug.LogFormat("创建补丁下载器，准备下载更新当前资源版本所有的资源包文件 [{0} -> {1} ] 文件数量 : {2} , 包体大小 : {3}",
                         asset.Config, version,
                         operation.TotalDownloadCount, operation.TotalDownloadBytes);
-                    DownloaderOperationss.Add(name, operation);
+                    DownloaderOperations.Add(name, operation);
                 }
 
                 return Packages.Count > 0;
@@ -123,7 +124,7 @@ namespace AIO.UEngine
                 if (Packages.Count <= 0) return;
                 AssetSystem.InvokeNotify(EASEventType.BeginDownload, string.Empty);
                 var tasks = new List<Task>();
-                foreach (var operation in DownloaderOperationss)
+                foreach (var operation in DownloaderOperations)
                 {
                     var key = operation.Key;
 
@@ -141,7 +142,7 @@ namespace AIO.UEngine
                         if (isSucceed) AssetSystem.InvokeNotify(EASEventType.DownlandPackageSuccess, key);
                         else
                             AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
-                                DownloaderOperationss[key].Error);
+                                DownloaderOperations[key].Error);
                     }
 
                     operation.Value.OnDownloadOverCallback = OnUpdateDownloadOver;
@@ -156,7 +157,7 @@ namespace AIO.UEngine
                     tasks.Add(operation.Value.Task);
                 }
 #if UNITY_WEBGL
-            foreach (var task in tasks) await task;
+                foreach (var task in tasks) await task;
 #else
                 await Task.WhenAll(tasks);
 #endif
@@ -182,6 +183,8 @@ namespace AIO.UEngine
                     {
                         case EOperationStatus.Succeed:
                             break;
+                        case EOperationStatus.None:
+                        case EOperationStatus.Failed:
                         default:
                             Debug.LogErrorFormat("[{0} -> {1} : {2}] -> {3}", asset.Config.Name, version,
                                 opManifest.Status, opManifest.Error);
@@ -218,7 +221,7 @@ namespace AIO.UEngine
                 }
 
 #if UNITY_WEBGL
-            if (tasks.Count > 0) { foreach (var task in tasks) await task; }
+                if (tasks.Count > 0) { foreach (var task in tasks) await task; }
 #else
                 if (tasks.Count > 0) await Task.WhenAll(tasks.ToArray());
 #endif
@@ -232,6 +235,8 @@ namespace AIO.UEngine
                             if (version != opVersion.Value.PackageVersion)
                                 package.Config.Version = opVersion.Value.PackageVersion;
                             break;
+                        case EOperationStatus.None:
+                        case EOperationStatus.Failed:
                         default:
                             // 如果获取远端资源版本失败，说明当前网络无连接。
                             // 在正常开始游戏之前，需要验证本地清单内容的完整性。
@@ -257,7 +262,7 @@ namespace AIO.UEngine
                 Packages = null;
                 VersionOperations = null;
                 ManifestOperations = null;
-                DownloaderOperationss = null;
+                DownloaderOperations = null;
                 DownloadBytesList = null;
                 DownloadCountList = null;
             }

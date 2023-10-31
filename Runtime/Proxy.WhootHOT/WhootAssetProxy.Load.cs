@@ -8,7 +8,6 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
-using Rol.Game;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -94,9 +93,9 @@ namespace Rol.Game
         /// <param name="cb">回调</param>
         public override IEnumerator LoadAssetCO<TObject>(string location, Action<TObject> cb)
         {
-            var go = ResourceManager.LoadAsset<TObject>(location);
-            yield return go;
-            cb?.Invoke(go.Result);
+            var handle = Addressables.LoadAssetAsync<TObject>(location);
+            yield return handle;
+            cb?.Invoke(handle.Result);
         }
 
         /// <summary>
@@ -107,7 +106,9 @@ namespace Rol.Game
         /// <param name="cb">回调</param>
         public override IEnumerator LoadAssetCO(string location, Type type, Action<Object> cb)
         {
-            throw new NotImplementedException();
+            var handle = Addressables.LoadAssetAsync<Object>(location);
+            yield return handle;
+            cb?.Invoke(handle.Result);
         }
 
         /// <summary>
@@ -135,9 +136,11 @@ namespace Rol.Game
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public override Task<TObject> LoadAssetTask<TObject>(string location)
+        public override async Task<TObject> LoadAssetTask<TObject>(string location)
         {
-            throw new NotImplementedException();
+            var handle = Addressables.LoadAssetAsync<TObject>(location);
+            await handle.Task;
+            return handle.Result;
         }
 
         /// <summary>
@@ -145,9 +148,11 @@ namespace Rol.Game
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
-        public override Task<Object> LoadAssetTask(string location, Type type)
+        public override async Task<Object> LoadAssetTask(string location, Type type)
         {
-            throw new NotImplementedException();
+            var handle = Addressables.LoadAssetAsync<Object>(location);
+            await handle.Task;
+            return handle.Result;
         }
 
         #endregion
@@ -165,8 +170,9 @@ namespace Rol.Game
         public override IEnumerator LoadSceneCO(string location, Action<Scene> cb,
             LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, int priority = 100)
         {
-            var go = ResourceManager.LoadScene(location, sceneMode);
-            yield return go;
+            var handle = Addressables.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            yield return handle;
+            cb?.Invoke(handle.Result.Scene);
         }
 
         /// <summary>
@@ -176,13 +182,15 @@ namespace Rol.Game
         /// <param name="sceneMode">场景加载模式</param>
         /// <param name="suspendLoad">场景加载到90%自动挂起</param>
         /// <param name="priority">优先级</param>
-        public override Task<Scene> LoadSceneTask(
+        public override async Task<Scene> LoadSceneTask(
             string location,
             LoadSceneMode sceneMode = LoadSceneMode.Single,
             bool suspendLoad = true,
             int priority = 100)
         {
-            throw new NotImplementedException();
+            var handle = Addressables.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            await handle.Task;
+            return handle.Result.Scene;
         }
 
         #endregion

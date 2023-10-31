@@ -1,10 +1,11 @@
-﻿using System;
+﻿#if SUPPORT_WHOOTHOT
+
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using AIO;
 using AIO.UEngine;
-
-#if SUPPORT_WHOOTHOT
+using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace Rol.Game
 {
@@ -29,12 +30,12 @@ namespace Rol.Game
 
         public override void UnloadUnusedAssets()
         {
-            throw new NotImplementedException();
+            Addressables.CleanBundleCache();
         }
 
         public override void ForceUnloadALLAssets()
         {
-            throw new NotImplementedException();
+            Addressables.ClearResourceLocators();
         }
 
         #region 资源信息
@@ -45,16 +46,7 @@ namespace Rol.Game
         /// <param name="location">资源的定位地址</param>
         public override bool IsNeedDownloadFromRemote(in string location)
         {
-            return false;
-        }
-
-        /// <summary>
-        /// 根据资源标签获取资源信息
-        /// </summary>
-        /// <param name="tag">资源标签</param>
-        public override ICollection<string> GetAssetInfos(in string tag)
-        {
-            return Array.Empty<string>();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -72,7 +64,7 @@ namespace Rol.Game
         /// <param name="location">资源的定位地址</param>
         public override bool CheckLocationValid(in string location)
         {
-            return false;
+            throw new NotImplementedException();
         }
 
         /// <summary>

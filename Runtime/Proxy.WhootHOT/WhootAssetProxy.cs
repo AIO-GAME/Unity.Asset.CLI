@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Threading.Tasks;
-using AIO.UEngine;
-
+﻿
 #if SUPPORT_WHOOTHOT
+using System.Collections;
+using AIO.UEngine;
+using UnityEngine.AddressableAssets;
 
 namespace Rol.Game
 {

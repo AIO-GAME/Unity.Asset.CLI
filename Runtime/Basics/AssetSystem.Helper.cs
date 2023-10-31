@@ -5,6 +5,7 @@
 |||✩ - - - - - |*/
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,6 +18,7 @@ namespace AIO
         /// <summary>
         /// 资源回收（卸载引用计数为零的资源）
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IASDownloader GetDownloader()
         {
             return Proxy.GetDownloader();
@@ -25,6 +27,7 @@ namespace AIO
         /// <summary>
         /// 资源回收（卸载引用计数为零的资源）
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void UnloadUnusedAssets()
         {
             Proxy.UnloadUnusedAssets();
@@ -33,6 +36,7 @@ namespace AIO
         /// <summary>
         /// 强制回收所有资源
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void ForceUnloadALLAssets()
         {
             Proxy.UnloadUnusedAssets();
@@ -43,6 +47,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源定位地址</param>
         /// <returns>Ture:有效 False:无效</returns>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static bool CheckLocationValid(string location)
         {
             return Proxy.CheckLocationValid(location);
@@ -52,6 +57,7 @@ namespace AIO
         /// 是否需要从远端更新下载
         /// </summary>
         /// <param name="location">资源的定位地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static bool IsNeedDownloadFromRemote(string location)
         {
             return Proxy.IsNeedDownloadFromRemote(location);
@@ -61,11 +67,13 @@ namespace AIO
         /// 释放资源句柄
         /// </summary>
         /// <param name="location">资源地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void FreeHandle(string location)
         {
             Proxy.FreeHandle(location);
         }
 
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void FreeHandle(IEnumerable<string> locations)
         {
             foreach (var location in locations) Proxy.FreeHandle(location);

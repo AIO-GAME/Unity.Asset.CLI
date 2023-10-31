@@ -18,16 +18,14 @@ namespace AIO.UEngine.YooAsset
 {
     internal static partial class YAssetSystem
     {
-        private static IEnumerator GetAutoPakcageCO(AssetInfo location, Action<YAssetPackage> cb)
+        private static IEnumerator GetAutoPackageCO(AssetInfo location, Action<YAssetPackage> cb)
         {
-            yield return GetAutoPakcageCO(location.Address, cb);
+            yield return GetAutoPackageCO(location.Address, cb);
         }
 
-        private static IEnumerator GetAutoPakcageCO(string location, Action<YAssetPackage> cb)
+        private static IEnumerator GetAutoPackageCO(string location, Action<YAssetPackage> cb)
         {
-#if UNITY_EDITOR
             if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Coroutine : [auto : {0}]", location);
-#endif
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
                 if (package.IsNeedDownloadFromRemote(location))
@@ -42,6 +40,8 @@ namespace AIO.UEngine.YooAsset
                     switch (operation.Status)
                     {
                         case EOperationStatus.Succeed: break;
+                        case EOperationStatus.None:
+                        case EOperationStatus.Failed:
                         default:
                             throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}",
                                 package.PackageName, package.GetPackageVersion(), location, operation.Error));
@@ -56,12 +56,12 @@ namespace AIO.UEngine.YooAsset
 #endif
         }
 
-        private static IEnumerator GetAutoPakcageCO(string packagename, AssetInfo location, Action<YAssetPackage> cb)
+        private static IEnumerator GetAutoPackageCO(string packagename, AssetInfo location, Action<YAssetPackage> cb)
         {
-            yield return GetAutoPakcageCO(packagename, location.Address, cb);
+            yield return GetAutoPackageCO(packagename, location.Address, cb);
         }
 
-        private static IEnumerator GetAutoPakcageCO(string packagename, string location, Action<YAssetPackage> cb)
+        private static IEnumerator GetAutoPackageCO(string packagename, string location, Action<YAssetPackage> cb)
         {
 #if UNITY_EDITOR
             if (AssetSystem.Parameter.OutputLog)
@@ -82,6 +82,8 @@ namespace AIO.UEngine.YooAsset
                 switch (operation.Status)
                 {
                     case EOperationStatus.Succeed: break;
+                    case EOperationStatus.None:
+                    case EOperationStatus.Failed:
                     default:
                         throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}",
                             package.PackageName,
@@ -100,12 +102,12 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(package);
         }
 
-        private static YAssetPackage GetAutoPakcageSync(AssetInfo location)
+        private static YAssetPackage GetAutoPackageSync(AssetInfo location)
         {
-            return GetAutoPakcageSync(location.Address);
+            return GetAutoPackageSync(location.Address);
         }
 
-        private static YAssetPackage GetAutoPakcageSync(string location)
+        private static YAssetPackage GetAutoPackageSync(string location)
         {
 #if UNITY_EDITOR
             if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Sync : [auto : {0}]", location);
@@ -124,12 +126,12 @@ namespace AIO.UEngine.YooAsset
 #endif
         }
 
-        private static YAssetPackage GetAutoPakcageSync(string packagename, AssetInfo location)
+        private static YAssetPackage GetAutoPackageSync(string packagename, AssetInfo location)
         {
-            return GetAutoPakcageSync(packagename, location.Address);
+            return GetAutoPackageSync(packagename, location.Address);
         }
 
-        private static YAssetPackage GetAutoPakcageSync(string packagename, string location)
+        private static YAssetPackage GetAutoPackageSync(string packagename, string location)
         {
 #if UNITY_EDITOR
             if (AssetSystem.Parameter.OutputLog)
@@ -148,12 +150,12 @@ namespace AIO.UEngine.YooAsset
             return package;
         }
 
-        private static Task<YAssetPackage> GetAutoPakcageTask(AssetInfo location)
+        private static Task<YAssetPackage> GetAutoPackageTask(AssetInfo location)
         {
-            return GetAutoPakcageTask(location.Address);
+            return GetAutoPackageTask(location.Address);
         }
 
-        private static async Task<YAssetPackage> GetAutoPakcageTask(string location)
+        private static async Task<YAssetPackage> GetAutoPackageTask(string location)
         {
 #if UNITY_EDITOR
             if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Async : [auto : {0}]", location);
@@ -189,12 +191,12 @@ namespace AIO.UEngine.YooAsset
 #endif
         }
 
-        private static Task<YAssetPackage> GetAutoPakcageTask(string packagename, AssetInfo location)
+        private static Task<YAssetPackage> GetAutoPackageTask(string packagename, AssetInfo location)
         {
-            return GetAutoPakcageTask(packagename, location.Address);
+            return GetAutoPackageTask(packagename, location.Address);
         }
 
-        private static async Task<YAssetPackage> GetAutoPakcageTask(string packagename, string location)
+        private static async Task<YAssetPackage> GetAutoPackageTask(string packagename, string location)
         {
 #if UNITY_EDITOR
             if (AssetSystem.Parameter.OutputLog)

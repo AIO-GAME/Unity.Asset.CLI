@@ -19,7 +19,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadAssetSync<GameObject>(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -34,7 +34,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadAssetSync<GameObject>(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -55,7 +55,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadSubAssetsSync<TObject>(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -75,7 +75,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadSubAssetsSync(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -96,7 +96,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadSubAssetsSync(location, type);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -116,7 +116,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadAssetSync(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -137,7 +137,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadAssetSync<TObject>(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -158,7 +158,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadAssetAsync(location, type);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -178,7 +178,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadRawFileSync(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -198,7 +198,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadRawFileSync(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -218,7 +218,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadRawFileSync(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -238,7 +238,7 @@ namespace AIO.UEngine.YooAsset
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPakcageSync(packagename, location);
+                var package = GetAutoPackageSync(packagename, location);
                 if (package is null) return null;
                 operation = package.LoadRawFileSync(location);
                 if (!LoadCheckOPSync(operation)) return null;

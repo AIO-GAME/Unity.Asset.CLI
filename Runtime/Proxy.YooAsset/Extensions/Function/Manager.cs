@@ -166,7 +166,7 @@ namespace AIO.UEngine.YooAsset
             }
 
 #if UNITY_WEBGL
-        foreach (var task in tasks) await task;
+            foreach (var task in tasks) await task;
 #else
             if (tasks.Count > 0) await ATask.WhenAll(tasks);
 #endif

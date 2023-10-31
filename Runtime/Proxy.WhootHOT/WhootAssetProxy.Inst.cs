@@ -9,7 +9,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using UnityEngine.AddressableAssets;
 
 namespace Rol.Game
 {
@@ -20,16 +20,18 @@ namespace Rol.Game
             throw new NotImplementedException();
         }
 
-        public override Task<GameObject> InstGameObjectTask(string location, Transform parent = null)
+        public override async Task<GameObject> InstGameObjectTask(string location, Transform parent = null)
         {
-            throw new NotImplementedException();
+            var handle = Addressables.InstantiateAsync(location, parent);
+            await handle.Task;
+            return handle.Result;
         }
 
         public override IEnumerator InstGameObjectCO(string location, Action<GameObject> cb, Transform parent = null)
         {
-            var go = ResourceManager.LoadAsset<GameObject>(location);
-            yield return go;
-            cb?.Invoke(Object.Instantiate(go.Result, parent));
+            var handle = Addressables.InstantiateAsync(location, parent);
+            yield return handle;
+            cb?.Invoke(handle.Result);
         }
     }
 }
