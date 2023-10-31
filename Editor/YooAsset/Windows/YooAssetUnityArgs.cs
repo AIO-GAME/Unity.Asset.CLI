@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if SUPPORT_YOOASSET
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -151,3 +152,4 @@ namespace AIO.UEditor.Build
         }
     }
 }
+#endif

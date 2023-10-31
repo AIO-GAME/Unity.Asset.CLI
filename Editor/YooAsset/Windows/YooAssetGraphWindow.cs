@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if SUPPORT_YOOASSET
+using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor.Build
@@ -33,3 +34,4 @@ namespace AIO.UEditor.Build
         }
     }
 }
+#endif
