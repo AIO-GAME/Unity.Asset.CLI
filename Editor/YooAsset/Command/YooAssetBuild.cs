@@ -83,35 +83,46 @@ namespace AIO.UEditor
         {
             Debug.Log(AHelper.Json.Serialize(command));
 
-            var buildParameters = new BuildParameters();
-            buildParameters.BuildTarget = command.ActiveTarget;
-            buildParameters.BuildPipeline = command.BuildPipeline;
-            buildParameters.BuildMode = command.BuildMode;
-            buildParameters.PackageName = command.BuildPackage;
-            buildParameters.CompressOption = command.CompressOption;
-            buildParameters.OutputNameStyle = command.OutputNameStyle;
-            buildParameters.SharedPackRule = new ZeroRedundancySharedPackRule();
-            buildParameters.CopyBuildinFileOption = command.CopyBuildinFileOption;
-            buildParameters.CopyBuildinFileTags = command.CopyBuildinFileTags;
-            buildParameters.VerifyBuildingResult = command.VerifyBuildingResult;
-            buildParameters.PackageVersion = command.PackageVersion;
-            buildParameters.BuildOutputRoot = command.OutputRoot;
-            buildParameters.StreamingAssetsRoot = Application.streamingAssetsPath;
-            buildParameters.DisableWriteTypeTree = false;
+            var buildParameters = new BuildParameters
+            {
+                BuildTarget = command.ActiveTarget,
+                BuildPipeline = command.BuildPipeline,
+                BuildMode = command.BuildMode,
+                PackageName = command.BuildPackage,
+                CompressOption = command.CompressOption,
+                OutputNameStyle = command.OutputNameStyle,
+                SharedPackRule = new ZeroRedundancySharedPackRule(),
+                CopyBuildinFileOption = command.CopyBuildinFileOption,
+                CopyBuildinFileTags = command.CopyBuildinFileTags,
+                VerifyBuildingResult = command.VerifyBuildingResult,
+                PackageVersion = command.PackageVersion,
+                BuildOutputRoot = command.OutputRoot,
+                StreamingAssetsRoot = Application.streamingAssetsPath,
+                DisableWriteTypeTree = false
+            };
 
             if (string.IsNullOrEmpty(command.EncyptionClassName))
                 buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
 
             if (command.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
             {
-                buildParameters.SBPParameters = new BuildParameters.SBPBuildParameters();
-                buildParameters.SBPParameters.WriteLinkXML = true;
+                buildParameters.SBPParameters = new BuildParameters.SBPBuildParameters
+                {
+                    WriteLinkXML = true
+                };
             }
 
             var builder = new AssetBundleBuilder();
             var buildResult = builder.Run(buildParameters);
-            if (buildResult.Success) EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
-            MenuItem_YooAssets.CreateConfig();
+            if (buildResult.Success)
+            {
+                EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
+                MenuItem_YooAssets.CreateConfig();
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
+            }
         }
     }
 }

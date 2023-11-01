@@ -25,11 +25,10 @@ namespace AIO.UEditor.Build
             SettingGraphicRect.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
         }
 
-        protected override void OnGUI()
+        protected override void OnDraw()
         {
             SettingGraphicRect.RectData = new Rect(0, 10, CurrentWidth, CurrentHeight - 30);
             SettingGraphicRect.Draw();
-            SettingGraphicRect.OnOpenEvent();
             DrawVersion(Setting.Version);
         }
     }

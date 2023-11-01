@@ -59,7 +59,7 @@ namespace AIO.UEditor.Build
                 EHelper.Prefs.LoadJson(typeof(YooAssetGraphicRect).FullName,
                     new Dictionary<BuildTarget, YooAssetUnityArgs>());
 
-            var content = EHelper.Prefs.LoadJson<YooAssetBuildCommand>(nameof(YooAssetBuildCommand),
+            var content = EHelper.Prefs.LoadJson(nameof(YooAssetBuildCommand),
                 new YooAssetBuildCommand
                 {
                     CopyBuildinFileOption = ECopyBuildinFileOption.None,
@@ -67,7 +67,7 @@ namespace AIO.UEditor.Build
                 });
             Commond = content;
 #if UNITY_2021_1_OR_NEWER
-                Command.BuildPipeline = EBuildPipeline.ScriptableBuildPipeline;
+            Command.BuildPipeline = EBuildPipeline.ScriptableBuildPipeline;
 #else
             Commond.BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
 #endif
@@ -76,7 +76,7 @@ namespace AIO.UEditor.Build
                 .Select(package => package.PackageName).ToArray();
             YooAssetEncryptions = EditorTools.GetAssignableTypes(typeof(IEncryptionServices));
             YooAssetEncryptions.Insert(0, null);
-            YooAssetEncryptionsName = new String[YooAssetEncryptions.Count];
+            YooAssetEncryptionsName = new string[YooAssetEncryptions.Count];
             for (var i = 0; i < YooAssetEncryptions.Count; i++)
             {
                 YooAssetEncryptionsName[i] =
@@ -94,9 +94,9 @@ namespace AIO.UEditor.Build
 
         protected void OnDrawYooAsset()
         {
-            GELayout.VHorizontal(() =>
+            using (GELayout.VHorizontal())
             {
-                Commond.OutputRoot = GELayout.Field("输出路径", Commond.OutputRoot);
+                GELayout.Label("输出路径", GTOption.Width(true));
                 if (GELayout.Button("Select", GTOption.Width(50)))
                     Commond.OutputRoot = EditorUtility.OpenFolderPanel("请选择导出路径", Commond.OutputRoot, "");
 
@@ -105,7 +105,12 @@ namespace AIO.UEditor.Build
                     PrPlatform.Open.Path(Commond.OutputRoot).Async();
                     return;
                 }
-            });
+            }
+
+            using (GELayout.VHorizontal())
+            {
+                Commond.OutputRoot = GELayout.Field(Commond.OutputRoot);
+            }
 
             if (string.IsNullOrEmpty(Commond.OutputRoot)) return;
 
@@ -113,14 +118,14 @@ namespace AIO.UEditor.Build
 
             Commond.BuildMode = GELayout.Popup("构建模式", Commond.BuildMode);
 
-            GELayout.VHorizontal(() =>
+            using (GELayout.VHorizontal())
             {
                 Commond.PackageVersion = GELayout.Field("构建版本", Commond.PackageVersion);
                 if (GELayout.Button("刷新", GTOption.Width(50)))
                 {
                     Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                 }
-            });
+            }
 
             YooAssetPackagesIndex = GELayout.Popup("构建包名", YooAssetPackagesIndex, YooAssetPackages);
 
@@ -176,7 +181,7 @@ namespace AIO.UEditor.Build
                 EngineeringPathPath[BuildTarget].VersionIndex = GELayout.Popup(
                     EngineeringPathPath[BuildTarget].VersionIndex,
                     YooAssetUnityArgs.Versions, GTOption.Width(50));
-                
+
                 if (GELayout.Button("Select", GTOption.Width(50)))
                 {
                     EngineeringPathPath[BuildTarget].OutputRoot = EditorUtility.OpenFolderPanel("项目导出工程路径",
@@ -201,7 +206,7 @@ namespace AIO.UEditor.Build
 
             if (YooAssetPackageNames.Count > 0)
             {
-                GELayout.VHorizontal(() =>
+                using (GELayout.VHorizontal())
                 {
                     YooAssetPackageIndex = GELayout.Popup("工程包名", YooAssetPackageIndex, YooAssetPackageNames);
                     if (GELayout.Button("Add", GTOption.Width(50)))
@@ -224,19 +229,19 @@ namespace AIO.UEditor.Build
                             YooAssetPackageNames.RemoveAt(YooAssetPackageIndex);
                         }
                     }
-                });
+                }
             }
 
             if (!AHelper.IO.ExistsFolder(EngineeringPathPath[BuildTarget].OutputRoot)) return;
 
             if (YooAssetPackageTarget.Count > 0)
             {
-                GELayout.Vertical(() =>
+                using (GELayout.Vertical())
                 {
                     for (var i = YooAssetPackageTarget.Count - 1; i >= 0; --i)
                     {
                         var j = YooAssetPackageTarget.Count - i - 1;
-                        GELayout.VHorizontal(() =>
+                        using (GELayout.VHorizontal())
                         {
                             if (GELayout.Button(YooAssetPackageTarget[j], GTOption.Width(150)))
                             {
@@ -256,9 +261,9 @@ namespace AIO.UEditor.Build
                                 YooAssetPackageTarget.RemoveAt(j);
                                 return;
                             }
-                        });
+                        }
                     }
-                });
+                }
             }
         }
 
@@ -298,7 +303,7 @@ namespace AIO.UEditor.Build
         public void OnDrawRight(float widthHalf, float widthQuarter)
         {
             GELayout.Label("YooAsset 命令合集", GEStyle.DDHeaderStyle, GTOption.Height(25));
-            GELayout.VHorizontal(() =>
+            using (GELayout.VHorizontal())
             {
                 if (GELayout.Button("构建", widthQuarter, 30))
                 {
@@ -310,32 +315,34 @@ namespace AIO.UEditor.Build
                     return;
                 }
 
-                if (!AHelper.IO.ExistsFolder(BuildInFilePlatform)) return;
-                if (GELayout.Button("组合资源包\nStreamingAssets", widthQuarter, 30))
+                if (AHelper.IO.ExistsFolder(BuildInFilePlatform))
                 {
-                    var dic = YooAssetPackageTarget.ToDictionary(
-                        target => target,
-                        target => YooAssetPackageVersionTarget[target][YooAssetPackageTargetIndex[target]]);
-                    EngineeringPathPath[BuildTarget]
-                        .BuiltUpToStreamingAssets(BuildTarget, BuildInFilePlatform, dic);
-                    Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                    return;
-                }
+                    if (GELayout.Button("组合资源包\nStreamingAssets", widthQuarter, 30))
+                    {
+                        var dic = YooAssetPackageTarget.ToDictionary(
+                            target => target,
+                            target => YooAssetPackageVersionTarget[target][YooAssetPackageTargetIndex[target]]);
+                        EngineeringPathPath[BuildTarget]
+                            .BuiltUpToStreamingAssets(BuildTarget, BuildInFilePlatform, dic);
+                        Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                        return;
+                    }
 
-                if (!AHelper.IO.ExistsFolder(EngineeringPathPath[BuildTarget].OutputRoot)) return;
-                if (YooAssetPackageTarget.Count == 0) return;
-                if (GELayout.Button("组合资源包\n目标工程", widthQuarter, 30))
-                {
-                    var dic = YooAssetPackageTarget.ToDictionary(
-                        target => target,
-                        target => YooAssetPackageVersionTarget[target][YooAssetPackageTargetIndex[target]]);
-                    EngineeringPathPath[BuildTarget].BuiltUp(BuildTarget, BuildInFilePlatform, dic);
-                    Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                    return;
+                    if (AHelper.IO.ExistsFolder(EngineeringPathPath[BuildTarget].OutputRoot) &&
+                        YooAssetPackageTarget.Count == 0)
+                    {
+                        if (GELayout.Button("组合资源包\n目标工程", widthQuarter, 30))
+                        {
+                            var dic = YooAssetPackageTarget.ToDictionary(
+                                target => target,
+                                target => YooAssetPackageVersionTarget[target][YooAssetPackageTargetIndex[target]]);
+                            EngineeringPathPath[BuildTarget].BuiltUp(BuildTarget, BuildInFilePlatform, dic);
+                            Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                            return;
+                        }
+                    }
                 }
-            });
-
-            if (!AHelper.IO.ExistsFolder(BuildInFilePlatform)) return;
+            }
         }
 
         public override void SaveData()
