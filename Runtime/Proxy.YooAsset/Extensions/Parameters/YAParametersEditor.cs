@@ -12,12 +12,14 @@ namespace AIO.UEngine.YooAsset
 
         protected override InitializeParameters GetParameters()
         {
-            var initParameters = new EditorSimulateModeParameters();
-            initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;
-            initParameters.SimulateManifestFilePath = string.Empty;
-            initParameters.DecryptionServices = DecryptionServices;
-            initParameters.BuildinRootDirectory = string.Empty;
-            initParameters.SandboxRootDirectory = string.Empty;
+            var initParameters = new EditorSimulateModeParameters
+            {
+                LoadingMaxTimeSlice = LoadingMaxTimeSlice,
+                SimulateManifestFilePath = string.Empty,
+                DecryptionServices = DecryptionServices,
+                BuildinRootDirectory = string.Empty,
+                SandboxRootDirectory = string.Empty
+            };
             return initParameters;
         }
     }

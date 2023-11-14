@@ -6,7 +6,7 @@ using UnityEngine;
 
 #if !SUPPORT_YOOASSET
 
-namespace AIO.Editor
+namespace AIO.UEditor
 {
     internal static partial class Install
     {
@@ -63,7 +63,7 @@ namespace AIO.Editor
     }
 }
 #else
-namespace AIO.Editor
+namespace AIO.UEditor
 {
     internal static partial class UnInstall
     {

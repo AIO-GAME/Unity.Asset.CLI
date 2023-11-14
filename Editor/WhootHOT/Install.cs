@@ -5,7 +5,7 @@ using UnityEditor.Compilation;
 using UnityEngine;
 
 #if !SUPPORT_WHOOTHOT
-namespace AIO.Editor
+namespace AIO.UEditor
 {
     internal static partial class Install
     {
@@ -46,7 +46,7 @@ namespace AIO.Editor
 
 #else
 
-namespace AIO.Editor
+namespace AIO.UEditor
 {
     internal static partial class UnInstall
     {
