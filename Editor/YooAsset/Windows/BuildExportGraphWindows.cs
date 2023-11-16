@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using YooAsset;
@@ -55,6 +56,9 @@ namespace AIO.UEditor.Build
             YooAssetPackageTargetIndex = new Dictionary<string, int>();
             YooAssetPackageVersionTarget = new Dictionary<string, List<string>>();
 
+            ServerIP = EHelper.Prefs.LoadString<YooAssetGraphicRect>(nameof(ServerIP));
+            User = EHelper.Prefs.LoadString<YooAssetGraphicRect>(nameof(User));
+            Password = EHelper.Prefs.LoadString<YooAssetGraphicRect>(nameof(Password));
             LocalStoragePath = EHelper.Prefs.LoadString<YooAssetGraphicRect>(nameof(LocalStoragePath));
             EngineeringPathPath = EHelper.Prefs.LoadJson(typeof(YooAssetGraphicRect).FullName,
                 new Dictionary<BuildTarget, YooAssetUnityArgs>());
@@ -285,6 +289,27 @@ namespace AIO.UEditor.Build
             GELayout.Space();
         }
 
+        private async void Upload()
+        {
+            using (var handle = AHandle.FTP.Create(ServerIP, User, Password, "Bundles"))
+            {
+                await handle.InitAsync();
+                var args = new ProgressArgs();
+                args.OnProgress = progress =>
+                {
+                    EditorUtility.DisplayProgressBar("Upload FTP", $"progress:{progress}",
+                        progress.Progress / 100f);
+                };
+                args.OnError = error =>
+                {
+                    EditorUtility.DisplayDialog("Upload FTP", error.Message, "OK");
+                    EditorUtility.ClearProgressBar();
+                };
+                args.OnComplete = EditorUtility.ClearProgressBar;
+                await handle.UploadFolderAsync(Commond.OutputRoot, "", args);
+            }
+        }
+
         private void Command1()
         {
             using (GELayout.VHorizontal())
@@ -292,18 +317,15 @@ namespace AIO.UEditor.Build
                 GELayout.Label("Upload FTP", GEStyle.DDHeaderStyle, GTOption.Height(25));
                 if (GELayout.Button("Upload", GTOption.Width(50), GTOption.Height(25)))
                 {
-                    var ftp = AHandle.FTP.Create(FTPHost, FTPUser, FTPPassword);
-                    ftp.TimeOut = 10000;
-                    ftp.UploadFolder("", "");
-                    ftp.Dispose();
+                    Upload();
                 }
             }
 
             using (GELayout.Vertical())
             {
-                FTPHost = GELayout.Field("Host", FTPHost);
-                FTPUser = GELayout.Field("User", FTPUser);
-                FTPPassword = GELayout.Field("Password", FTPPassword);
+                ServerIP = GELayout.Field("Host", ServerIP);
+                User = GELayout.Field("User", User);
+                Password = GELayout.Field("Password", Password);
             }
 
             GELayout.Space();
@@ -425,13 +447,16 @@ namespace AIO.UEditor.Build
             GELayout.Space();
         }
 
-        private string FTPHost;
-        private string FTPUser;
-        private string FTPPassword;
+        private string ServerIP;
+        private string User;
+        private string Password;
         private string LocalStoragePath;
 
         public override void SaveData()
         {
+            EHelper.Prefs.SaveString<YooAssetGraphicRect>(nameof(ServerIP), ServerIP);
+            EHelper.Prefs.SaveString<YooAssetGraphicRect>(nameof(User), User);
+            EHelper.Prefs.SaveString<YooAssetGraphicRect>(nameof(Password), Password);
             EHelper.Prefs.SaveString<YooAssetGraphicRect>(nameof(LocalStoragePath), LocalStoragePath);
             EHelper.Prefs.SaveJson(typeof(YooAssetGraphicRect).FullName, EngineeringPathPath);
             EHelper.Prefs.SaveJson(nameof(YooAssetBuildCommand), Commond);
