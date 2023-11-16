@@ -31,7 +31,7 @@ namespace AIO.UEngine.YooAsset
         /// 内置文件的根路径
         /// 注意：当参数为空的时候会使用默认的根目录。
         /// </summary>
-        public string BuildinRootDirectory { get; set; } = string.Empty;
+        public string BuildInRootDirectory { get; set; } = string.Empty;
 
         /// <summary>
         /// 沙盒文件的根路径

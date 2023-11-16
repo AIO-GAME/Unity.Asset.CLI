@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using AIO.UEngine;
@@ -19,6 +20,16 @@ namespace AIO
     {
         private static AssetProxy Proxy;
 
+        /// <summary>
+        /// 资源包配置事件
+        /// </summary>
+        public static event Func<ICollection<AssetsPackageConfig>> EventPackages;
+
+        /// <summary>
+        /// 资源包配置
+        /// </summary>
+        public static ICollection<AssetsPackageConfig> PackageConfigs => EventPackages?.Invoke();
+        
         /// <summary>
         /// 资源热更新配置
         /// </summary>

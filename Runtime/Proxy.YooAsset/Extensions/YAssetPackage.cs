@@ -147,7 +147,7 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         public string GetPackageVersion()
         {
-            return Package.GetPackageVersion();
+            return Package?.GetPackageVersion();
         }
 
         /// <summary>

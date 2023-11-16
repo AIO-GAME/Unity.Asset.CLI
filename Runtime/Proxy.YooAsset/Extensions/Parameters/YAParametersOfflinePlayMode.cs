@@ -19,7 +19,7 @@ namespace AIO.UEngine.YooAsset
             initParameters.DecryptionServices = DecryptionServices;
             initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;
             initParameters.DownloadFailedTryAgain = DownloadFailedTryAgain;
-            initParameters.BuildinRootDirectory = BuildinRootDirectory;
+            initParameters.BuildinRootDirectory = BuildInRootDirectory;
             initParameters.SandboxRootDirectory = SandboxRootDirectory;
             initParameters.DecryptionServices = DecryptionServices;
             initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;

@@ -5,6 +5,7 @@
 |||✩ - - - - - |*/
 
 using System.Diagnostics;
+using System.IO;
 
 namespace AIO.UEngine
 {
@@ -59,6 +60,17 @@ namespace AIO.UEngine
             AppendTimeTicks = true;
             LoadPathToLower = true;
             OutputLog = true;
+        }
+
+        /// <summary>
+        /// 获取远程资源包地址
+        /// </summary>
+        /// <param name="fileName">文件名</param>
+        /// <param name="package">包名</param>
+        /// <param name="version">版本</param>
+        public string GetRemoteURL(string fileName, string package, string version)
+        {
+            return Path.Combine(URL, AssetSystem.PlatformNameStr, package, version, fileName);
         }
     }
 }

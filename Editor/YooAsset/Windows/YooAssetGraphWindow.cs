@@ -31,6 +31,11 @@ namespace AIO.UEditor.Build
             SettingGraphicRect.Draw();
             DrawVersion(Setting.Version);
         }
+
+        protected override void OnDisable()
+        {
+            SettingGraphicRect.Dispose();
+        }
     }
 }
 #endif

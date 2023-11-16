@@ -1,11 +1,15 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using AIO.UEngine;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -16,12 +20,26 @@ namespace AIO
     public static partial class AssetSystem
     {
         /// <summary>
-        /// 资源回收（卸载引用计数为零的资源）
+        /// 获取下载器
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
         public static IASDownloader GetDownloader()
         {
             return Proxy.GetDownloader();
+        }
+
+        /// <summary>
+        /// 下载远端资源
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static async Task Downloader()
+        {
+            if (Parameter.ASMode != EASMode.Remote) return;
+            var handle = GetDownloader();
+            var flow = await handle.UpdatePackageManifestTask();
+            if (flow) flow = await handle.UpdatePackageVersionTask();
+            if (flow) flow = handle.CreateDownloader();
+            if (flow) await handle.BeginDownload();
         }
 
         /// <summary>
@@ -94,7 +112,7 @@ namespace AIO
                 {
                     case RuntimePlatform.WindowsPlayer:
                     case RuntimePlatform.WindowsEditor:
-                        return "StandaloneWindows";
+                        return "StandaloneWindows64";
                     case RuntimePlatform.OSXPlayer:
                     case RuntimePlatform.OSXEditor:
                         return "StandaloneOSX";
@@ -114,5 +132,18 @@ namespace AIO
         /// 运行平台
         /// </summary>
         public static RuntimePlatform Platform => Application.platform;
+
+        /// <summary>
+        /// 获取远端资源包列表
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<ICollection<AssetsPackageConfig>> GetRemotePackageList(string url)
+        {
+            if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
+            var remote = Path.Combine(url, "Version", string.Concat(PlatformNameStr, ".json"));
+            var config = await AHelper.Net.HTTP.GetAsync(remote);
+            var table = AHelper.Json.Deserialize<ICollection<AssetsPackageConfig>>(config);
+            return table;
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         public static string GetPackageVersionDefault()
         {
-            return DefaultPackage.GetPackageVersion();
+            return DefaultPackage?.GetPackageVersion();
         }
 
         /// <summary>

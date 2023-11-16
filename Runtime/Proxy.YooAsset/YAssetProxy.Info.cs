@@ -19,9 +19,9 @@ namespace AIO.UEngine
         public override IASDownloader GetDownloader()
         {
             var dic = new Dictionary<string, YAssetPackage>();
-            if (EventPackages == null) return new YASDownloader(dic);
-
-            foreach (var item in EventPackages.Invoke())
+            var config = AssetSystem.PackageConfigs;
+            if (config is null) return new YASDownloader(dic);
+            foreach (var item in config)
                 dic.Add(item.Name, YAssetSystem.GetPackage(item.Name));
             return new YASDownloader(dic);
         }

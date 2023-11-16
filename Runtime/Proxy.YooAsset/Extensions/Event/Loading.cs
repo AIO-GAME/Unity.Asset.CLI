@@ -151,11 +151,6 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 资源加载器 - 列表
-        /// </summary>
-        public static event Func<ICollection<AssetsPackageConfig>> GetPackages;
-
-        /// <summary>
         /// 资源加载器 - 参数
         /// </summary>
         public static event Func<YAssetPackage, YAssetParameters> GetParameter;

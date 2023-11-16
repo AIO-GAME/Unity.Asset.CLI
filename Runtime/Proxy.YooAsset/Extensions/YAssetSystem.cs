@@ -77,11 +77,10 @@ namespace AIO.UEngine.YooAsset
             Config.Packages.Clear();
             Dic.Clear();
 
-            if (GetPackages != null)
-            {
-                foreach (var package in GetPackages.Invoke()) Config.Packages.Add(package);
-            }
-
+            var packageConfigs = AssetSystem.PackageConfigs;
+            if (packageConfigs != null)
+                foreach (var package in packageConfigs)
+                    Config.Packages.Add(package);
 
             foreach (var item in Config.Packages)
             {

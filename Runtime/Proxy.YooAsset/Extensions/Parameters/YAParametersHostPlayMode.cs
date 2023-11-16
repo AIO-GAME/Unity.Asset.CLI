@@ -27,7 +27,7 @@ namespace AIO.UEngine.YooAsset
             initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;
             initParameters.DownloadFailedTryAgain = DownloadFailedTryAgain;
             initParameters.QueryServices = QueryServices;
-            initParameters.BuildinRootDirectory = BuildinRootDirectory;
+            initParameters.BuildinRootDirectory = BuildInRootDirectory;
             initParameters.SandboxRootDirectory = SandboxRootDirectory;
             initParameters.RemoteServices = RemoteServices;
             return initParameters;
