@@ -224,7 +224,6 @@ namespace AIO.UEditor.Build
 
         public void UpdateTarget()
         {
-            SaveData();
             YooAssetPackageVersionTarget.Clear();
             YooAssetPackageTarget.Clear();
             YooAssetPackageTargetIndex.Clear();
@@ -235,6 +234,9 @@ namespace AIO.UEditor.Build
                 .Replace('/', Path.DirectorySeparatorChar);
             YooAssetPackageNames = AHelper.IO.GetFoldersName(BuildInFilePlatform).ToList();
             Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+
+            EHelper.Prefs.SaveJson(typeof(YooAssetGraphicRect).FullName, EngineeringPathPath);
+            EHelper.Prefs.SaveJson(nameof(YooAssetBuildCommand), Commond);
         }
 
         protected override void OnDrawRight(Rect rect)
@@ -295,18 +297,25 @@ namespace AIO.UEditor.Build
             {
                 await handle.InitAsync();
                 var args = new ProgressArgs();
-                args.OnProgress = progress =>
-                {
-                    EditorUtility.DisplayProgressBar("Upload FTP", $"progress:{progress}",
-                        progress.Progress / 100f);
-                };
+                // args.OnProgress = progress =>
+                // {
+                //     if (EditorUtility.DisplayCancelableProgressBar("Upload FTP", $"progress:{progress}",
+                //             progress.Progress / 100f))
+                //     {
+                //         args.Cancel();
+                //     }
+                // };
                 args.OnError = error =>
                 {
-                    EditorUtility.DisplayDialog("Upload FTP", error.Message, "OK");
+                    Debug.LogException(error);
                     EditorUtility.ClearProgressBar();
                 };
-                args.OnComplete = EditorUtility.ClearProgressBar;
-                await handle.UploadFolderAsync(Commond.OutputRoot, "", args);
+                args.OnComplete = () =>
+                {
+                    EditorUtility.ClearProgressBar();
+                    EditorUtility.DisplayDialog("Upload FTP", "Upload FTP Complete", "OK");
+                };
+                await handle.UploadFolderAsync(Commond.OutputRoot.Replace('\\', '/'), args);
             }
         }
 
@@ -338,9 +347,10 @@ namespace AIO.UEditor.Build
                 GELayout.Label("Local Storage", GEStyle.DDHeaderStyle, GTOption.Height(25));
                 if (GELayout.Button("Move", GTOption.Width(50), GTOption.Height(25)))
                 {
-                    var source = Path.Combine(Commond.OutputRoot).Replace('/', Path.DirectorySeparatorChar);
-                    var target = Path.Combine(LocalStoragePath).Replace('/', Path.DirectorySeparatorChar);
-                    if (AHelper.IO.ExistsFolder(target)) AHelper.IO.DeleteFolder(target);
+                    var source = Commond.OutputRoot.Trim('/', '\\');
+                    var target = LocalStoragePath.Trim('/', '\\');
+                    if (AHelper.IO.ExistsFolder(target))
+                        AHelper.IO.DeleteFolder(target, SearchOption.AllDirectories, true);
                     PrPlatform.Folder.Copy(target, source).Async();
                 }
 

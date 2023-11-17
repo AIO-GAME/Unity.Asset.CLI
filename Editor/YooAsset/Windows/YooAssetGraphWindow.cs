@@ -15,10 +15,6 @@ namespace AIO.UEditor.Build
 
         private YooAssetGraphicRect SettingGraphicRect;
 
-        protected override void OnAwake()
-        {
-        }
-
         protected override void OnActivation()
         {
             SettingGraphicRect = new YooAssetGraphicRect();
@@ -32,7 +28,7 @@ namespace AIO.UEditor.Build
             DrawVersion(Setting.Version);
         }
 
-        protected override void OnDisable()
+        protected override void OnDispose()
         {
             SettingGraphicRect.Dispose();
         }
