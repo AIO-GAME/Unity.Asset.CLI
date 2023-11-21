@@ -37,11 +37,11 @@ namespace AIO.UEngine
             var BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, "BuildinFiles");
             var SandboxRootDirectory =
 #if UNITY_EDITOR
-                Path.Combine(Application.persistentDataPath, "BuildinFiles");
+                string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
+                    Path.DirectorySeparatorChar, "Sandbox", Path.DirectorySeparatorChar,
+                    EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
-                        string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
-                        Path.DirectorySeparatorChar, "Sandbox", Path.DirectorySeparatorChar,
-                        EditorUserBuildSettings.activeBuildTarget.ToString());
+                Path.Combine(Application.persistentDataPath, "BuildinFiles");
 #endif
 
             YAssetParameters yAssetFlow;

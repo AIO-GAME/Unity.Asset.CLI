@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AIO.UEditor.Build
 {
-    [GWindow("YooAsset Tool", "YooAsset 工具集")]
+    [GWindow("YooAsset Tool", "YooAsset 工具集", MinSizeWidth = 1000)]
     public class YooAssetGraphWindow : GraphicWindow
     {
         [MenuItem("YooAsset/工具集")]

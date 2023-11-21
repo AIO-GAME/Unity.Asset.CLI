@@ -29,10 +29,10 @@ namespace AIO
         }
 
         /// <summary>
-        /// 下载远端资源
+        /// 预下载全部远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static async Task Downloader()
+        public static async Task DownloadPre()
         {
             if (Parameter.ASMode != EASMode.Remote) return;
             var handle = GetDownloader();
@@ -40,6 +40,18 @@ namespace AIO
             if (flow) flow = await handle.UpdatePackageVersionTask();
             if (flow) flow = handle.CreateDownloader();
             if (flow) await handle.BeginDownload();
+        }
+
+        /// <summary>
+        /// 动态下载远端资源
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static async Task DownloadDynamic()
+        {
+            if (Parameter.ASMode != EASMode.Remote) return;
+            var handle = GetDownloader();
+            var flow = await handle.UpdatePackageManifestTask();
+            if (flow) await handle.UpdatePackageVersionTask();
         }
 
         /// <summary>

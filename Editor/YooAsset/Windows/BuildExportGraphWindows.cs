@@ -297,14 +297,14 @@ namespace AIO.UEditor.Build
             {
                 await handle.InitAsync();
                 var args = new ProgressArgs();
-                // args.OnProgress = progress =>
-                // {
-                //     if (EditorUtility.DisplayCancelableProgressBar("Upload FTP", $"progress:{progress}",
-                //             progress.Progress / 100f))
-                //     {
-                //         args.Cancel();
-                //     }
-                // };
+                args.OnProgress = progress =>
+                {
+                    if (EditorUtility.DisplayCancelableProgressBar("Upload FTP", progress.ToString(),
+                            progress.Progress / 100f))
+                    {
+                        args.Cancel();
+                    }
+                };
                 args.OnError = error =>
                 {
                     Debug.LogException(error);
@@ -315,7 +315,7 @@ namespace AIO.UEditor.Build
                     EditorUtility.ClearProgressBar();
                     EditorUtility.DisplayDialog("Upload FTP", "Upload FTP Complete", "OK");
                 };
-                await handle.UploadFolderAsync(Commond.OutputRoot.Replace('\\', '/'), args);
+                await handle.UploadDirAsync(Commond.OutputRoot, args);
             }
         }
 
@@ -352,6 +352,19 @@ namespace AIO.UEditor.Build
                     if (AHelper.IO.ExistsFolder(target))
                         AHelper.IO.DeleteFolder(target, SearchOption.AllDirectories, true);
                     PrPlatform.Folder.Copy(target, source).Async();
+                }
+
+                if (GELayout.Button("Link", GTOption.Width(50), GTOption.Height(25)))
+                {
+                    var source = Commond.OutputRoot.Trim('/', '\\');
+                    var target = LocalStoragePath.Trim('/', '\\');
+                    IExecutor executor = null;
+                    if (AHelper.IO.ExistsFolder(target))
+                        executor = PrPlatform.Folder.Del(target);
+                    var symbolic = executor is null
+                        ? PrPlatform.Folder.Symbolic(target, source)
+                        : executor.Link(PrPlatform.Folder.Symbolic(target, source));
+                    symbolic.Async();
                 }
 
                 if (GELayout.Button("Select", GTOption.Width(50), GTOption.Height(25)))
