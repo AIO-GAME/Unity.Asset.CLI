@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -48,10 +48,7 @@ namespace AIO.UEngine
             /// <summary>
             /// 下载进度
             /// </summary>
-            public double Progress
-            {
-                get { return CurrentDownloadBytes / (double)TotalDownloadBytes; }
-            }
+            public double Progress => CurrentDownloadBytes / (double)TotalDownloadBytes;
 
             private Dictionary<string, UpdatePackageManifestOperation> ManifestOperations;
 
@@ -80,14 +77,8 @@ namespace AIO.UEngine
             /// <summary>
             /// 创建补丁下载器 异步
             /// </summary>
-            /// <param name="downloadingMaxNumber"> 同时下载的最大数量 </param>
-            /// <param name="failedTryAgain"> 失败后重试次数 </param>
-            /// <param name="timeout"> 超时时间 </param>
             /// <returns>Ture:需要下载 False:不需要下载</returns>
-            public bool CreateDownloader(
-                int downloadingMaxNumber = 50,
-                int failedTryAgain = 2,
-                int timeout = 60)
+            public bool CreateDownloader()
             {
                 if (Packages.Count <= 0) return false;
                 DownloadBytesList.Clear();
@@ -96,7 +87,10 @@ namespace AIO.UEngine
                     var asset = Packages[name];
                     if (asset.Config.IsSidePlayWithDownload) continue;
                     var version = asset.Config.Version;
-                    var operation = asset.CreateResourceDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+                    var operation = asset.CreateResourceDownloader(
+                        AssetSystem.Parameter.LoadingMaxTimeSlice,
+                        AssetSystem.Parameter.DownloadFailedTryAgain,
+                        AssetSystem.Parameter.Timeout);
                     if (operation.TotalDownloadCount <= 0)
                     {
                         Debug.LogFormat("[{0} : {1}] 无需下载更新当前资源包", asset.Config, version);
@@ -167,7 +161,7 @@ namespace AIO.UEngine
             /// <summary>
             /// 向网络端请求并更新补丁清单 异步
             /// </summary>
-            public async Task<bool> UpdatePackageManifestTask(int timeout = 60)
+            public async Task<bool> UpdatePackageManifestTask()
             {
                 AssetSystem.InvokeNotify(EASEventType.UpdatePackageManifest, string.Empty);
                 if (Packages.Count <= 0) return false;
@@ -175,8 +169,9 @@ namespace AIO.UEngine
                 {
                     var version = asset.Config.Version;
                     Debug.LogFormat("向网络端请求并更新补丁清单 -> [{0} -> {1}] ", asset.Config.Name, version);
-                    var opManifest =
-                        asset.UpdatePackageManifestAsync(version, AssetSystem.Parameter.AutoSaveVersion, timeout);
+                    var opManifest = asset.UpdatePackageManifestAsync(version,
+                        AssetSystem.Parameter.AutoSaveVersion,
+                        AssetSystem.Parameter.Timeout);
                     ManifestOperations.Add(asset.Config.Name, opManifest);
                     await opManifest.Task;
                     switch (opManifest.Status)
@@ -199,12 +194,11 @@ namespace AIO.UEngine
             /// <summary>
             /// 异步向网络端请求最新的资源版本
             /// </summary>
-            /// <param name="timeout">超时时间</param>
             /// <returns>
             /// Ture: 有更新
             /// False: 无更新
             /// </returns>
-            public async Task<bool> UpdatePackageVersionTask(int timeout = 60)
+            public async Task<bool> UpdatePackageVersionTask()
             {
                 AssetSystem.InvokeNotify(EASEventType.UpdatePackageVersion, string.Empty);
                 if (Packages.Count <= 0) return false;
@@ -214,7 +208,9 @@ namespace AIO.UEngine
                     Debug.LogFormat("向网络端请求最新的资源版本 -> [{0} -> Local : {1}]", asset.PackageName, asset.Config.Version);
                     if (asset.Mode == EPlayMode.HostPlayMode)
                     {
-                        var opVersion = asset.UpdatePackageVersionAsync(AssetSystem.Parameter.AppendTimeTicks, timeout);
+                        var opVersion = asset.UpdatePackageVersionAsync(
+                            AssetSystem.Parameter.AppendTimeTicks,
+                            AssetSystem.Parameter.Timeout);
                         VersionOperations.Add(asset.Config.Name, opVersion);
                         tasks.Add(opVersion.Task);
                     }

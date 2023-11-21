@@ -48,33 +48,26 @@ namespace AIO.UEngine
             switch (AssetSystem.Parameter.ASMode)
             {
                 case EASMode.Remote:
-                    var QueryServices = EventQueryServices == null
-                        ? new ResolverQueryServices()
-                        : EventQueryServices.Invoke();
-
-                    var RemoteServices = EventRemoteServices is null
-                        ? new ResolverRemoteServices(package.Config)
-                        : EventRemoteServices?.Invoke(package.Config);
-
-#if UNITY_WEBGL
-                    yAssetFlow = new YAParametersWebGLMode
-#else
-                    yAssetFlow = new YAssetParametersHostPlayMode
-#endif
+                    yAssetFlow = new YAssetParametersRemote(AssetSystem.Parameter)
                     {
-                        QueryServices = QueryServices,
-                        RemoteServices = RemoteServices,
                         BuildInRootDirectory = BuildInRootDirectory,
                         SandboxRootDirectory = SandboxRootDirectory,
+                        QueryServices = EventQueryServices == null
+                            ? new ResolverQueryServices()
+                            : EventQueryServices.Invoke(),
+
+                        RemoteServices = EventRemoteServices is null
+                            ? new ResolverRemoteServices(package.Config)
+                            : EventRemoteServices?.Invoke(package.Config),
                     };
                     break;
                 case EASMode.Editor: // 编辑器模式
 #if UNITY_EDITOR
-                    yAssetFlow = new YAssetHandleEditor();
+                    yAssetFlow = new YAssetHandleEditor(AssetSystem.Parameter);
                     break;
 #endif
                 case EASMode.Local:
-                    yAssetFlow = new YAssetParametersOfflinePlayMode
+                    yAssetFlow = new YAssetParametersLocal(AssetSystem.Parameter)
                     {
                         BuildInRootDirectory = BuildInRootDirectory,
                         SandboxRootDirectory = SandboxRootDirectory,

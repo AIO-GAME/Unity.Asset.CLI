@@ -149,13 +149,24 @@ namespace AIO
         /// 获取远端资源包列表
         /// </summary>
         /// <returns></returns>
-        public static async Task<ICollection<AssetsPackageConfig>> GetRemotePackageList(string url)
+        public static async Task<AssetsPackageConfig[]> GetRemotePackageList(string url)
         {
             if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
             var remote = Path.Combine(url, "Version", string.Concat(PlatformNameStr, ".json"));
             var config = await AHelper.Net.HTTP.GetAsync(remote);
-            var table = AHelper.Json.Deserialize<ICollection<AssetsPackageConfig>>(config);
-            return table;
+            return AHelper.Json.Deserialize<AssetsPackageConfig[]>(config);
         }
+        
+        
+        /// <summary>
+        /// 是否已经加载
+        /// </summary>
+        /// <param name="location">寻址地址</param>
+        /// <returns>Ture 已经加载 False 未加载</returns>
+        public static bool IsAlreadyLoad(string location)
+        {
+            return Proxy.IsAlreadyLoad(location);
+        }
+
     }
 }

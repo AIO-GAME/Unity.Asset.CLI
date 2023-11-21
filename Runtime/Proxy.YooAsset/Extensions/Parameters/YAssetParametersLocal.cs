@@ -6,9 +6,14 @@ namespace AIO.UEngine.YooAsset
     /// <summary>
     /// 离线模式
     /// </summary>
-    internal class YAssetParametersOfflinePlayMode : YAssetParameters
+    internal class YAssetParametersLocal : YAssetParameters
     {
-        public YAssetParametersOfflinePlayMode() : base(EPlayMode.OfflinePlayMode)
+        public YAssetParametersLocal() : base(EPlayMode.OfflinePlayMode)
+        {
+            Parameters = GetParameters();
+        }
+
+        public YAssetParametersLocal(ASConfig config) : base(EPlayMode.OfflinePlayMode, config)
         {
             Parameters = GetParameters();
         }

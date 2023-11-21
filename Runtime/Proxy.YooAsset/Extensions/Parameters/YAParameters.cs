@@ -45,6 +45,12 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         public int DownloadFailedTryAgain { get; set; } = 10;
 
+        protected YAssetParameters(EPlayMode mode, ASConfig config) : this(mode)
+        {
+            DownloadFailedTryAgain = config.DownloadFailedTryAgain;
+            LoadingMaxTimeSlice = config.LoadingMaxTimeSlice;
+        }
+
         protected YAssetParameters(EPlayMode mode)
         {
             Mode = mode;

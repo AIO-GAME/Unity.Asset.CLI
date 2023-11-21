@@ -39,5 +39,12 @@ namespace AIO.UEngine
         /// 释放资源句柄
         /// </summary>
         public abstract void Dispose();
+
+        /// <summary>
+        /// 是否已经加载
+        /// </summary>
+        /// <param name="location">寻址地址</param>
+        /// <returns>Ture 已经加载 False 未加载</returns>
+        public abstract bool IsAlreadyLoad(string location);
     }
 }

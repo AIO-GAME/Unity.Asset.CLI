@@ -47,18 +47,13 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         private static string DefaultPackageName { get; set; }
 
-        /// <summary>
-        /// 边玩边下
-        /// </summary>
-        public static bool EnableSidePlayWithDownload { get; set; }
-
         public static YAssetPackage GetPackage(in string key)
         {
             Dic.TryGetValue(key, out var value);
             return value;
         }
 
-        private static bool isInitialize = false;
+        private static bool isInitialize;
 
         public static void Initialize()
         {

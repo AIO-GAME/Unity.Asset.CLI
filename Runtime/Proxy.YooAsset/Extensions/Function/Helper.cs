@@ -33,8 +33,10 @@ namespace AIO.UEngine.YooAsset
                     var info = package.GetAssetInfo(location);
                     if (info is null)
                         throw new SystemException(string.Format("无法获取资源信息 [{0} : {1}]", package.PackageName, location));
-                    var operation = package.CreateBundleDownloader(info, 10, 1, 60);
-                    RegisterEvent(location, operation);
+                    var operation = package.CreateBundleDownloader(info, AssetSystem.Parameter.LoadingMaxTimeSlice,
+                        AssetSystem.Parameter.DownloadFailedTryAgain,
+                        AssetSystem.Parameter.Timeout);
+                    RegisterEvent(package.PackageName, location, operation);
                     operation.BeginDownload();
                     yield return operation;
                     switch (operation.Status)
@@ -75,8 +77,10 @@ namespace AIO.UEngine.YooAsset
                 var info = package.GetAssetInfo(location);
                 if (info is null)
                     throw new SystemException(string.Format("无法获取资源信息 [{0} : {1}]", packagename, location));
-                var operation = package.CreateBundleDownloader(info, 10, 1, 60);
-                RegisterEvent(location, operation);
+                var operation = package.CreateBundleDownloader(info, AssetSystem.Parameter.LoadingMaxTimeSlice,
+                    AssetSystem.Parameter.DownloadFailedTryAgain,
+                    AssetSystem.Parameter.Timeout);
+                RegisterEvent(package.PackageName, location, operation);
                 operation.BeginDownload();
                 yield return operation;
                 switch (operation.Status)
@@ -162,24 +166,26 @@ namespace AIO.UEngine.YooAsset
 #endif
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
-                if (package.IsNeedDownloadFromRemote(location))
+                if (!package.IsNeedDownloadFromRemote(location)) return package;
+
+                var info = package.GetAssetInfo(location);
+                if (info is null) throw new SystemException(string.Format("无法获取资源信息 {0}", location));
+                var operation = package.CreateBundleDownloader(info,
+                    AssetSystem.Parameter.LoadingMaxTimeSlice,
+                    AssetSystem.Parameter.DownloadFailedTryAgain,
+                    AssetSystem.Parameter.Timeout);
+                RegisterEvent(package.PackageName, location, operation);
+                operation.BeginDownload();
+                await operation.Task;
+                switch (operation.Status)
                 {
-                    var info = package.GetAssetInfo(location);
-                    if (info is null) throw new SystemException(string.Format("无法获取资源信息 {0}", location));
-                    var operation = package.CreateBundleDownloader(info, 10, 1, 60);
-                    RegisterEvent(location, operation);
-                    operation.BeginDownload();
-                    await operation.Task;
-                    switch (operation.Status)
-                    {
-                        case EOperationStatus.Succeed: break;
-                        default:
-                            throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}",
-                                package.PackageName,
-                                package.GetPackageVersion(),
-                                location,
-                                operation.Error));
-                    }
+                    case EOperationStatus.Succeed: break;
+                    default:
+                        throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}",
+                            package.PackageName,
+                            package.GetPackageVersion(),
+                            location,
+                            operation.Error));
                 }
 
                 return package;
@@ -209,8 +215,10 @@ namespace AIO.UEngine.YooAsset
             {
                 var info = package.GetAssetInfo(location);
                 if (info is null) throw new SystemException($"无法获取资源信息 [{packagename} : {location}]");
-                var operation = package.CreateBundleDownloader(info, 10, 1, 60);
-                RegisterEvent(location, operation);
+                var operation = package.CreateBundleDownloader(info, AssetSystem.Parameter.LoadingMaxTimeSlice,
+                    AssetSystem.Parameter.DownloadFailedTryAgain,
+                    AssetSystem.Parameter.Timeout);
+                RegisterEvent(package.PackageName, location, operation);
                 operation.BeginDownload();
                 await operation.Task;
                 switch (operation.Status)
@@ -232,6 +240,16 @@ namespace AIO.UEngine.YooAsset
         private static Dictionary<string, OperationHandleBase> ReferenceOPHandle { get; set; } =
             new Dictionary<string, OperationHandleBase>();
 
+        /// <summary>
+        /// 是否已经加载
+        /// </summary>
+        /// <param name="location">寻址地址</param>
+        /// <returns>Ture 已经加载 False 未加载</returns>
+        public static bool IsAlreadyLoad(string location)
+        {
+            return ReferenceOPHandle.ContainsKey(location);
+        }
+        
         private static T GetHandle<T>(string location) where T : OperationHandleBase
         {
             if (ReferenceOPHandle.ContainsKey(location)) return (T)ReferenceOPHandle[location];

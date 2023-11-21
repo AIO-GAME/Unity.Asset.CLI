@@ -16,6 +16,11 @@ namespace AIO.UEngine
 {
     public partial class YAssetProxy
     {
+        public override bool IsAlreadyLoad(string location)
+        {
+            return YAssetSystem.IsAlreadyLoad(location);
+        }
+
         #region 子资源加载
 
         /// <summary>

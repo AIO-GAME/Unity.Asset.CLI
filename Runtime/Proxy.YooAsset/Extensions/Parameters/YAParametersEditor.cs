@@ -10,6 +10,11 @@ namespace AIO.UEngine.YooAsset
             Parameters = GetParameters();
         }
 
+        public YAssetHandleEditor(ASConfig mode) : base(EPlayMode.EditorSimulateMode, mode)
+        {
+            Parameters = GetParameters();
+        }
+
         protected override InitializeParameters GetParameters()
         {
             var initParameters = new EditorSimulateModeParameters

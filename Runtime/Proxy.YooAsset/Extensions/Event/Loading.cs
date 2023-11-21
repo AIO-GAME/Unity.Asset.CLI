@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -109,11 +110,12 @@ namespace AIO.UEngine.YooAsset
                 if (!AssetSystem.HasEvent_OnDownloading()) return;
                 if (operations.ContainsKey(local))
                 {
-                    UnityEngine.Debug.LogErrorFormat("当前资源正在下载中: {0}", local);
+                    Debug.LogErrorFormat("当前资源正在下载中: {0}", local);
                     return;
                 }
 
-                void OnDownloadProgressCallback(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes, long currentDownloadBytes)
+                void OnDownloadProgressCallback(int totalDownloadCount, int currentDownloadCount,
+                    long totalDownloadBytes, long currentDownloadBytes)
                 {
                     CurrentDownloaadeCountList[local] = currentDownloadCount;
                     TotalDownloadCountList[local] = totalDownloadCount;
@@ -145,9 +147,18 @@ namespace AIO.UEngine.YooAsset
 
         private static LoadingInfo loadingInfo = new LoadingInfo();
 
-        private static void RegisterEvent(string local, DownloaderOperation operation)
+        internal static void RegisterEvent(string package, string location, DownloaderOperation operation)
         {
-            loadingInfo.RegisterEvent(local, operation);
+            var record = new AssetSystem.SequenceRecord()
+            {
+                Name = package,
+                Location = location,
+                Time = DateTime.Now,
+                Bytes = operation.TotalDownloadBytes,
+                Count = operation.TotalDownloadCount
+            };
+            AssetSystem.AddSequenceRecord(record);
+            loadingInfo.RegisterEvent(location, operation);
         }
 
         /// <summary>
