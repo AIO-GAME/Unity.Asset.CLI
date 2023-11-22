@@ -249,7 +249,7 @@ namespace AIO.UEngine.YooAsset
         {
             return ReferenceOPHandle.ContainsKey(location);
         }
-        
+
         private static T GetHandle<T>(string location) where T : OperationHandleBase
         {
             if (ReferenceOPHandle.ContainsKey(location)) return (T)ReferenceOPHandle[location];
@@ -263,12 +263,14 @@ namespace AIO.UEngine.YooAsset
 
         private static void AddHandle<T>(string location, T operation) where T : OperationHandleBase
         {
-            if (!ReferenceOPHandle.ContainsKey(location)) ReferenceOPHandle.Add(location, operation);
+            if (operation is null) return;
+            ReferenceOPHandle.Set(location, operation);
         }
 
         private static void AddHandle<T>(AssetInfo location, T operation) where T : OperationHandleBase
         {
-            AddHandle(location.Address, operation);
+            if (operation is null) return;
+            ReferenceOPHandle.Set(location.Address, operation);
         }
 
         private static MethodInfo ReleaseInternal

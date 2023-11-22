@@ -23,58 +23,58 @@ namespace AIO.UEngine
         /// <summary>
         /// 资源加载模式
         /// </summary>
-        public EASMode ASMode { get; set; }
+        public EASMode ASMode;
 
         /// <summary>
         /// 热更新资源包服务器地址
         /// </summary>
-        public string URL { get; set; }
+        public string URL;
 
         /// <summary>
         /// 自动激活清单
         /// </summary>
-        public bool AutoSaveVersion { get; set; }
+        public bool AutoSaveVersion;
 
         /// <summary>
         /// URL请求附加时间搓
         /// </summary>
-        public bool AppendTimeTicks { get; set; }
+        public bool AppendTimeTicks;
 
         /// <summary>
         /// 加载路径转小写
         /// </summary>
-        public bool LoadPathToLower { get; set; }
+        public bool LoadPathToLower;
 
         /// <summary>
         /// 自动序列记录
         /// </summary>
-        public bool AutoSequenceRecord { get; set; }
+        public bool AutoSequenceRecord;
 
         /// <summary>
         /// 序列记录远端路径
         /// </summary>
-        public string SequenceRecordRemotePath { get; set; }
+        public string SequenceRecordRemotePath;
 
         /// <summary>
         /// 输出日志
         /// </summary>
-        public bool OutputLog { get; set; }
+        public bool OutputLog;
 
         /// <summary>
         /// 下载失败尝试次数
         /// 注意：默认值为MaxValue
         /// </summary>
-        public int DownloadFailedTryAgain { get; set; } = 10;
+        public int DownloadFailedTryAgain;
 
         /// <summary>
         /// 资源加载的最大数量
         /// </summary>
-        public int LoadingMaxTimeSlice { get; set; } = 2048;
+        public int LoadingMaxTimeSlice;
 
         /// <summary>
         /// 超时时间
         /// </summary>
-        public int Timeout { get; set; } = 60;
+        public int Timeout;
 
         /// <summary>
         /// 资源包配置

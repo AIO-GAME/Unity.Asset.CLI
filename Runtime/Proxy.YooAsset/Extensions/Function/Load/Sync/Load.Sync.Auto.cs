@@ -154,12 +154,12 @@ namespace AIO.UEngine.YooAsset
             {
                 var package = GetAutoPackageSync(location);
                 if (package is null) return null;
-                operation = package.LoadAssetAsync(location, type);
+                operation = package.LoadAssetSync(location, type);
                 if (!LoadCheckOPSync(operation)) return null;
                 AddHandle(location, operation);
             }
 
-            return operation.AssetObject;
+            return operation?.AssetObject;
         }
 
         /// <summary>

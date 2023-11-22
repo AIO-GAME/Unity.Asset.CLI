@@ -52,10 +52,15 @@ namespace AIO
             public string Location;
 
             /// <summary>
+            /// 资源路径
+            /// </summary>
+            public string AssetPath;
+
+            /// <summary>
             /// 记录时间
             /// </summary>
             public DateTime Time;
-            
+
             /// <summary>
             /// 记录大小
             /// </summary>
@@ -118,9 +123,12 @@ namespace AIO
             IsInitialized = true;
 #if !UNITY_WEBGL
             if (Parameter.AutoSequenceRecord)
+            {
                 SequenceRecordQueue = File.Exists(SequenceRecordPath)
                     ? AHelper.IO.ReadJsonUTF8<Queue<SequenceRecord>>(SequenceRecordPath)
                     : new Queue<SequenceRecord>();
+                if (SequenceRecordQueue is null) SequenceRecordQueue = new Queue<SequenceRecord>();
+            }
 #endif
         }
 

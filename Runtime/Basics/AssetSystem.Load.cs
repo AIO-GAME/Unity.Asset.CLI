@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -190,6 +191,104 @@ namespace AIO
         public static IEnumerator LoadAssetCO<TObject>(string location, Action<TObject> cb) where TObject : Object
         {
             return Proxy.LoadAssetCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb);
+        }
+
+        public interface IAsyncHandle : IEnumerator, IDisposable
+        {
+            /// <summary>
+            /// 是否已经完成
+            /// </summary>
+            bool IsDone { get; }
+
+            /// <summary>
+            /// 处理进度
+            /// </summary>
+            float Progress { get; }
+        }
+
+        public interface IAsyncHandle<T> : IAsyncHandle where T : Object
+        {
+            T Result { get; }
+
+            TaskAwaiter<T> GetAwaiter();
+        }
+
+        internal class LoadAssetHandleCo<T> : IAsyncHandle<T> where T : Object
+        {
+            private IEnumerator CO => _CO ?? (_CO = Proxy.LoadAssetCO<T>(Location, OnCompletedCo));
+            private IEnumerator _CO;
+
+            internal readonly string Location;
+
+            public bool IsDone { get; set; }
+
+            public T Result { get; set; }
+
+            public float Progress { get; private set; }
+
+            private void OnCompletedCo(T asset)
+            {
+                Progress = 1;
+                Result = asset;
+                IsDone = true;
+            }
+
+            private void OnCompletedTask()
+            {
+                Progress = 1;
+                Result = Awaiter.GetResult();
+                IsDone = true;
+            }
+
+            public LoadAssetHandleCo(string location)
+            {
+                Location = location;
+                IsDone = false;
+                Progress = 0;
+                Result = null;
+                _CO = null;
+            }
+
+            bool IEnumerator.MoveNext()
+            {
+                return CO.MoveNext();
+            }
+
+            void IEnumerator.Reset()
+            {
+                Progress = 0;
+                IsDone = false;
+                CO?.Reset();
+            }
+
+            object IEnumerator.Current => CO.Current;
+
+            private TaskAwaiter<T> Awaiter;
+
+            public TaskAwaiter<T> GetAwaiter()
+            {
+                var Task = Proxy.LoadAssetTask<T>(Location);
+                Awaiter = Task.GetAwaiter();
+                Awaiter.OnCompleted(OnCompletedTask);
+                return Awaiter;
+            }
+
+            void IDisposable.Dispose()
+            {
+                _CO = null;
+                Result = null;
+            }
+        }
+
+        /// <summary>
+        /// 异步加载资源对象
+        /// </summary>
+        /// <typeparam name="TObject">资源类型</typeparam>
+        /// <param name="location">资源的定位地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IAsyncHandle<TObject> LoadAssetCO<TObject>(string location) where TObject : Object
+        {
+            return new LoadAssetHandleCo<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
         }
 
         /// <summary>

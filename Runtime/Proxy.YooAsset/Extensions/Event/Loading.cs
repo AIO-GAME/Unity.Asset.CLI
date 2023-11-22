@@ -155,7 +155,8 @@ namespace AIO.UEngine.YooAsset
                 Location = location,
                 Time = DateTime.Now,
                 Bytes = operation.TotalDownloadBytes,
-                Count = operation.TotalDownloadCount
+                Count = operation.TotalDownloadCount,
+                AssetPath = GetAssetInfo(package, location).AssetPath
             };
             AssetSystem.AddSequenceRecord(record);
             loadingInfo.RegisterEvent(location, operation);

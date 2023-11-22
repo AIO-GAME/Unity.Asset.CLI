@@ -1,21 +1,20 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-23
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
 #if SUPPORT_YOOASSET
+
 using System;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
 using YooAsset;
-using Object = UnityEngine.Object;
 
 namespace AIO.UEngine.YooAsset
 {
     internal partial class YAssetSystem
     {
-        public static async void PreLoadSubAssets<TObject>(string location) where TObject : Object
+        public static async Task PreLoadSubAssets(string location, Type type)
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
@@ -23,27 +22,25 @@ namespace AIO.UEngine.YooAsset
                 var package = await GetAutoPackageTask(location);
                 if (package is null) return;
 
-                operation = package.LoadSubAssetsAsync<TObject>(location);
+                operation = package.LoadSubAssetsAsync(location, type);
                 if (!await LoadCheckOPTask(operation)) return;
                 AddHandle(location, operation);
             }
         }
 
-        public static async void PreLoadAsset<TObject>(string location) where TObject : Object
+        public static async Task PreLoadAsset(string location, Type type)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = await GetAutoPackageTask(location);
-                if (package is null) return;
+            if (!(operation is null)) return;
+            var package = await GetAutoPackageTask(location);
+            if (package is null) return;
 
-                operation = package.LoadAssetAsync<TObject>(location);
-                if (!await LoadCheckOPTask(operation)) return;
-                AddHandle(location, operation);
-            }
+            operation = package.LoadAssetAsync(location, type);
+            if (!await LoadCheckOPTask(operation)) return;
+            AddHandle(location, operation);
         }
 
-        public static async void PreLoadRaw(string location)
+        public static async Task PreLoadRaw(string location)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)

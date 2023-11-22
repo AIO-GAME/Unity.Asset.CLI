@@ -140,15 +140,13 @@ namespace AIO.UEngine.YooAsset
         public static async Task<Object> LoadAssetTask(string location, Type type)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = await GetAutoPackageTask(location);
-                if (package is null) return null;
-                operation = package.LoadAssetAsync(location, type);
-                if (!await LoadCheckOPTask(operation)) return null;
-                AddHandle(location, operation);
-            }
-
+            if (!(operation is null)) return operation.AssetObject;
+            
+            var package = await GetAutoPackageTask(location);
+            if (package is null) return null;
+            operation = package.LoadAssetAsync(location, type);
+            if (!await LoadCheckOPTask(operation)) return null;
+            AddHandle(location, operation);
             return operation.AssetObject;
         }
 
@@ -192,10 +190,14 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 var package = await GetAutoPackageTask(location);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
+                if (package is null)
+                    throw new Exception(
+                        string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                if (!await LoadCheckOPTask(operation)) throw new Exception(string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                if (!await LoadCheckOPTask(operation))
+                    throw new Exception(
+                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
                 AddHandle(location, operation);
             }
 
@@ -219,10 +221,14 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 var package = await GetAutoPackageTask(location);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
+                if (package is null)
+                    throw new Exception(
+                        string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                if (!await LoadCheckOPTask(operation)) throw new Exception(string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                if (!await LoadCheckOPTask(operation))
+                    throw new Exception(
+                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
                 AddHandle(location, operation);
             }
 

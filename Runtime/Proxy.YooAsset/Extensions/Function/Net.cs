@@ -125,7 +125,6 @@ namespace AIO.UEngine.YooAsset
             return asset.CreateResourceDownloader(tags, downloadingMaxNumber, failedTryAgain, timeout);
         }
 
-
         /// <summary>
         /// 创建资源下载器，用于下载当前资源版本所有的资源包文件
         /// </summary>

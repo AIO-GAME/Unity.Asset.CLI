@@ -101,6 +101,9 @@ namespace AIO
         public static void FreeHandle(string location)
         {
             Proxy.FreeHandle(location);
+#if UNITY_EDITOR
+            UnityEngine.Debug.LogFormat("Asset System FreeHandle Release : {0}", location);
+#endif
         }
 
         [DebuggerNonUserCode, DebuggerHidden]
@@ -156,8 +159,8 @@ namespace AIO
             var config = await AHelper.Net.HTTP.GetAsync(remote);
             return AHelper.Json.Deserialize<AssetsPackageConfig[]>(config);
         }
-        
-        
+
+
         /// <summary>
         /// 是否已经加载
         /// </summary>
@@ -165,8 +168,7 @@ namespace AIO
         /// <returns>Ture 已经加载 False 未加载</returns>
         public static bool IsAlreadyLoad(string location)
         {
-            return Proxy.IsAlreadyLoad(location);
+            return Proxy.IsAlreadyLoad(Parameter.LoadPathToLower ? location.ToLower() : location);
         }
-
     }
 }
