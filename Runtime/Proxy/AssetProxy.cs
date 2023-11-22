@@ -5,6 +5,7 @@
 |||✩ - - - - - |*/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -32,11 +33,18 @@ namespace AIO.UEngine
         /// <summary>
         /// 初始化
         /// </summary>
-        public abstract Task Initialize();
+        public abstract IEnumerator Initialize();
 
         /// <summary>
         /// 释放资源句柄
         /// </summary>
         public abstract void Dispose();
+
+        /// <summary>
+        /// 是否已经加载
+        /// </summary>
+        /// <param name="location">寻址地址</param>
+        /// <returns>Ture 已经加载 False 未加载</returns>
+        public abstract bool IsAlreadyLoad(string location);
     }
 }

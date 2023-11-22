@@ -105,24 +105,20 @@ namespace AIO
         /// <summary>
         /// 更新资源包版本信息
         /// </summary>
-        /// <param name="timeout">超时时间</param>
         /// <returns>Ture:有新版本 False:无需更新</returns>
-        Task<bool> UpdatePackageVersionTask(int timeout = 60);
+        Task<bool> UpdatePackageVersionTask();
 
         /// <summary>
         /// 向网络端请求并更新补丁清单
         /// </summary>
         /// <returns>Ture:有新版本 False:无需更新</returns>
-        Task<bool> UpdatePackageManifestTask(int timeout = 60);
+        Task<bool> UpdatePackageManifestTask();
 
         /// <summary>
         /// 创建下载器
         /// </summary>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
         /// <returns>Ture:有新版本 False:无需更新</returns>
-        bool CreateDownloader(int downloadingMaxNumber = 50, int failedTryAgain = 2, int timeout = 60);
+        bool CreateDownloader();
 
         /// <summary>
         /// 开始下载

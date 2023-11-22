@@ -1,10 +1,14 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
-using UnityEngine;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using AIO.UEngine;
+using Object = UnityEngine.Object;
 
 namespace AIO
 {
@@ -15,18 +19,20 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <typeparam name="TObject">资源类型</typeparam>
-        public static void PreLoadSubAssets<TObject>(string location) where TObject : Object
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static Task PreLoadSubAssets<TObject>(string location) where TObject : Object
         {
-            Proxy.PreLoadSubAssets<TObject>(location);
+            return Proxy.PreLoadSubAssets<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
         }
 
         /// <summary>
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        public static void PreLoadSubAssets(string location)
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static Task PreLoadSubAssets(string location)
         {
-            Proxy.PreLoadSubAssets<Object>(location);
+            return Proxy.PreLoadSubAssets<Object>(Parameter.LoadPathToLower ? location.ToLower() : location);
         }
 
         /// <summary>
@@ -34,27 +40,43 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <typeparam name="TObject">资源类型</typeparam>
-        public static void PreLoadAsset<TObject>(string location) where TObject : Object
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static Task PreLoadAsset<TObject>(string location) where TObject : Object
         {
-            Proxy.PreLoadAsset<TObject>(location);
+            return Proxy.PreLoadAsset<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
         }
 
         /// <summary>
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        public static void PreLoadAsset(string location)
+        /// <param name="type">资源类型</param>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static Task PreLoadAsset(string location, Type type)
         {
-            Proxy.PreLoadAsset<Object>(location);
+            return Proxy.PreLoadAsset(Parameter.LoadPathToLower ? location.ToLower() : location, type);
         }
 
         /// <summary>
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        public static void PreLoadRaw(string location)
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static Task PreLoadRaw(string location)
         {
-            Proxy.PreLoadRaw(location);
+            return Proxy.PreLoadRaw(Parameter.LoadPathToLower ? location.ToLower() : location);
+        }
+
+        /// <summary>
+        /// 预加载记录
+        /// </summary>
+        public static async Task DownloadPreRecord(ProgressArgs progressArgs = default)
+        {
+            if (Parameter.ASMode != EASMode.Remote) return;
+            var handle = GetDownloader();
+            var flow = await handle.UpdatePackageManifestTask();
+            if (flow) flow = await handle.UpdatePackageVersionTask();
+            if (flow) await Proxy.PreRecord(SequenceRecordQueue, progressArgs);
         }
     }
 }

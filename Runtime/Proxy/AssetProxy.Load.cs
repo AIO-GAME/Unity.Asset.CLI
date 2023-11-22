@@ -1,11 +1,12 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -22,7 +23,8 @@ namespace AIO.UEngine
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public abstract IEnumerator LoadSubAssetsCO<TObject>(string location, Action<TObject[]> cb) where TObject : Object;
+        public abstract IEnumerator LoadSubAssetsCO<TObject>(string location, Action<TObject[]> cb)
+            where TObject : Object;
 
         /// <summary>
         /// 异步加载子资源对象
@@ -120,7 +122,8 @@ namespace AIO.UEngine
         /// <param name="sceneMode">场景加载模式</param>
         /// <param name="suspendLoad">场景加载到90%自动挂起</param>
         /// <param name="priority">优先级</param>
-        public abstract IEnumerator LoadSceneCO(string location, Action<Scene> cb, LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, int priority = 100);
+        public abstract IEnumerator LoadSceneCO(string location, Action<Scene> cb,
+            LoadSceneMode sceneMode = LoadSceneMode.Single, bool suspendLoad = false, int priority = 100);
 
         /// <summary>
         /// 异步加载场景
@@ -183,20 +186,47 @@ namespace AIO.UEngine
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <typeparam name="TObject">资源类型</typeparam>
-        public abstract void PreLoadSubAssets<TObject>(string location) where TObject : Object;
+        /// <param name="type">资源类型</param>
+        public abstract Task PreLoadSubAssets(string location, Type type);
 
         /// <summary>
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <typeparam name="TObject">资源类型</typeparam>
-        public abstract void PreLoadAsset<TObject>(string location) where TObject : Object;
+        public Task PreLoadSubAssets<TObject>(string location) where TObject : Object
+        {
+            return PreLoadSubAssets(location, typeof(TObject));
+        }
 
         /// <summary>
         /// 预加载资源
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        public abstract void PreLoadRaw(string location);
+        /// <param name="type">资源类型</param>
+        public abstract Task PreLoadAsset(string location, Type type);
+
+        /// <summary>
+        /// 预加载资源
+        /// </summary>
+        /// <param name="location">资源的定位地址</param>
+        /// <typeparam name="TObject">资源类型</typeparam>
+        public Task PreLoadAsset<TObject>(string location) where TObject : Object
+        {
+            return PreLoadAsset(location, typeof(TObject));
+        }
+
+        /// <summary>
+        /// 预加载资源
+        /// </summary>
+        /// <param name="location">资源的定位地址</param>
+        public abstract Task PreLoadRaw(string location);
+
+        /// <summary>
+        /// 预加载记录
+        /// </summary>
+        public abstract Task PreRecord(
+            Queue<AssetSystem.SequenceRecord> recordQueue,
+            ProgressArgs progressArgs = default);
     }
 }

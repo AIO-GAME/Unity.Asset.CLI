@@ -6,9 +6,8 @@
 
 #if SUPPORT_YOOASSET
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.IO;
-using System.Threading.Tasks;
 using AIO.UEngine.YooAsset;
 using UnityEditor;
 using UnityEngine;
@@ -18,85 +17,82 @@ namespace AIO.UEngine
 {
     public partial class YAssetProxy : AssetProxy
     {
-        public static event Func<ICollection<AssetsPackageConfig>> GetPackages;
+        /// <summary>
+        /// 获取内置查询服务
+        /// </summary>
+        public static event Func<IQueryServices> EventQueryServices;
 
-        public static event Func<IQueryServices> GetQueryServices;
+        /// <summary>
+        /// 获取远程查询服务
+        /// </summary>
+        public static event Func<AssetsPackageConfig, IRemoteServices> EventRemoteServices;
 
-        public static event Func<AssetsPackageConfig, IRemoteServices> GetRemoteServices;
+        /// <summary>
+        /// 获取参数配置
+        /// </summary>
+        public static event Func<YAssetPackage, YAssetParameters> EventParameter;
 
-        private YAssetParameters GetParameter(YAssetPackage package)
+        private static YAssetParameters GetParameter(YAssetPackage package)
         {
+            var BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, "BuildinFiles");
+            var SandboxRootDirectory =
+#if UNITY_EDITOR
+                string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
+                    Path.DirectorySeparatorChar, "Sandbox", Path.DirectorySeparatorChar,
+                    EditorUserBuildSettings.activeBuildTarget.ToString());
+#else
+                Path.Combine(Application.persistentDataPath, "BuildinFiles");
+#endif
+
             YAssetParameters yAssetFlow;
             switch (AssetSystem.Parameter.ASMode)
             {
                 case EASMode.Remote:
-#if UNITY_WEBGL
-                    yAssetFlow = new YAParametersWebGLMode
+                    yAssetFlow = new YAssetParametersRemote(AssetSystem.Parameter)
                     {
-                        QueryServices =
- GetQueryServices == null ? new ResolverQueryServices() : GetQueryServices.Invoke(),
-                        RemoteServices = GetRemoteServices?.Invoke(package.Config),
-                        BuildinRootDirectory = Path.Combine(Application.streamingAssetsPath, "BuildinFiles"),
-#if UNITY_EDITOR
-                        SandboxRootDirectory = Application.dataPath.Replace("Assets", "Sandbox"),
-#else
-                        SandboxRootDirectory = Path.Combine(Application.persistentDataPath, "BuildinFiles"),
-#endif
-                    };
-#else
-                    yAssetFlow = new YAssetParametersHostPlayMode
-                    {
-                        QueryServices = GetQueryServices == null
+                        BuildInRootDirectory = BuildInRootDirectory,
+                        SandboxRootDirectory = SandboxRootDirectory,
+                        QueryServices = EventQueryServices == null
                             ? new ResolverQueryServices()
-                            : GetQueryServices.Invoke(),
-                        RemoteServices = GetRemoteServices?.Invoke(package.Config),
-                        BuildinRootDirectory = Path.Combine(Application.streamingAssetsPath, "BuildinFiles"),
-#if UNITY_EDITOR
-                        SandboxRootDirectory = Path.Combine(Application.dataPath.Replace("Assets", "Sandbox"),
-                            EditorUserBuildSettings.activeBuildTarget.ToString()),
-#else
-                        SandboxRootDirectory = Path.Combine(Application.persistentDataPath, "BuildinFiles"),
-#endif
+                            : EventQueryServices.Invoke(),
+
+                        RemoteServices = EventRemoteServices is null
+                            ? new ResolverRemoteServices(package.Config)
+                            : EventRemoteServices?.Invoke(package.Config),
                     };
-#endif
                     break;
                 case EASMode.Editor: // 编辑器模式
 #if UNITY_EDITOR
-                    yAssetFlow = new YAssetHandleEditor();
+                    yAssetFlow = new YAssetHandleEditor(AssetSystem.Parameter);
                     break;
 #endif
                 case EASMode.Local:
-                    yAssetFlow = new YAssetParametersOfflinePlayMode
+                    yAssetFlow = new YAssetParametersLocal(AssetSystem.Parameter)
                     {
-                        BuildinRootDirectory = Path.Combine(Application.streamingAssetsPath, "BuildinFiles"),
-#if UNITY_EDITOR
-                        SandboxRootDirectory = Path.Combine(Application.dataPath.Replace("Assets", "Sandbox"),
-                            EditorUserBuildSettings.activeBuildTarget.ToString()),
-#else
-                        SandboxRootDirectory = Path.Combine(Application.persistentDataPath, "BuildinFiles"),
-#endif
+                        BuildInRootDirectory = BuildInRootDirectory,
+                        SandboxRootDirectory = SandboxRootDirectory,
                     };
                     break;
                 default:
-                    throw new Exception("EnableHotUpdate is not support");
+                    throw new Exception("enable hot update is not support");
             }
 
-            if (yAssetFlow is null) throw new Exception("Asset Parameters is null");
+            if (yAssetFlow is null) throw new Exception("asset parameters is null");
             return yAssetFlow;
         }
 
-        public override async Task Initialize()
+        public override IEnumerator Initialize()
         {
-            YAssetSystem.GetParameter += GetParameter;
-            YAssetSystem.GetPackages += GetPackages;
+            if (EventParameter is null) EventParameter += GetParameter;
+            YAssetSystem.GetParameter += EventParameter;
             YAssetSystem.Initialize();
-            await YAssetSystem.LoadTask();
+            yield return YAssetSystem.LoadCO();
         }
 
         public override void Dispose()
         {
-            YAssetSystem.GetPackages -= GetPackages;
-            YAssetSystem.GetParameter -= GetParameter;
+            YAssetSystem.GetParameter -= EventParameter;
+            EventParameter = null;
             YAssetSystem.Destroy();
         }
     }

@@ -1,7 +1,7 @@
-﻿namespace AIO.UEngine
-{
-    using System;
+﻿using System;
 
+namespace AIO.UEngine
+{
     [Serializable]
     public class AssetsPackageConfig
     {
@@ -27,8 +27,13 @@
 
         public override string ToString()
         {
-            return string.Format("Name : {0} , Version : {1} , IsDefault : {2} , IsSidePlayWithDownload : {3}", Name,
-                Version, IsDefault, IsSidePlayWithDownload);
+            return string.Format(
+                "Name : {0} , Version : {1} , IsDefault : {2} , IsSidePlayWithDownload : {3}",
+                Name,
+                Version,
+                IsDefault,
+                IsSidePlayWithDownload
+            );
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan 
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -7,15 +7,23 @@
 #if SUPPORT_YOOASSET
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine.YooAsset;
 using UnityEngine.SceneManagement;
+using YooAsset;
 using Object = UnityEngine.Object;
 
 namespace AIO.UEngine
 {
     public partial class YAssetProxy
     {
+        public override bool IsAlreadyLoad(string location)
+        {
+            return YAssetSystem.IsAlreadyLoad(location);
+        }
+
         #region 子资源加载
 
         /// <summary>
@@ -185,75 +193,106 @@ namespace AIO.UEngine
 
         #region 原生文件
 
-        /// <summary>
-        /// 同步加载原生文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
         public override string LoadRawFileTextSync(string location)
         {
             return YAssetSystem.LoadRawFileText(location);
         }
 
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
         public override Task<string> LoadRawFileTextTask(string location)
         {
             return YAssetSystem.LoadRawFileTextTask(location);
         }
 
-        /// <summary>
-        /// 同步加载原生文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
         public override byte[] LoadRawFileDataSync(string location)
         {
             return YAssetSystem.LoadRawFileData(location);
         }
 
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
         public override Task<byte[]> LoadRawFileDataTask(string location)
         {
             return YAssetSystem.LoadRawFileDataTask(location);
         }
 
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         public override IEnumerator LoadRawFileDataCO(string location, Action<byte[]> cb)
         {
             return YAssetSystem.LoadRawFileDataCO(location, cb);
         }
 
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         public override IEnumerator LoadRawFileTextCO(string location, Action<string> cb)
         {
             return YAssetSystem.LoadRawFileTextCO(location, cb);
         }
 
-        public override void PreLoadSubAssets<TObject>(string location)
+        public override Task PreLoadSubAssets(string location, Type type)
         {
-            YAssetSystem.PreLoadSubAssets<TObject>(location);
+            return YAssetSystem.PreLoadSubAssets(location, type);
         }
 
-        public override void PreLoadAsset<TObject>(string location)
+        public override Task PreLoadAsset(string location, Type type)
         {
-            YAssetSystem.PreLoadAsset<TObject>(location);
+            return YAssetSystem.PreLoadAsset(location, type);
         }
 
-        public override void PreLoadRaw(string location)
+        public override Task PreLoadRaw(string location)
         {
-            YAssetSystem.PreLoadRaw(location);
+            return YAssetSystem.PreLoadRaw(location);
+        }
+
+        public override async Task PreRecord(Queue<AssetSystem.SequenceRecord> recordQueue,
+            ProgressArgs progressArgs = default)
+        {
+            if (recordQueue is null) return;
+            var operations = new Dictionary<string, ResourceDownloaderOperation>();
+            var list = new Dictionary<string, List<AssetInfo>>();
+            foreach (var item in recordQueue)
+            {
+                var info = YAssetSystem.GetAssetInfo(item.Name, item.Location);
+                if (!list.ContainsKey(item.Name)) list.Add(item.Name, new List<AssetInfo>());
+                list[item.Name].Add(info);
+            }
+
+            foreach (var item in list)
+            {
+                var operation = YAssetSystem.CreateBundleDownloader(
+                    item.Key,
+                    item.Value.ToArray(),
+                    AssetSystem.Parameter.LoadingMaxTimeSlice,
+                    AssetSystem.Parameter.DownloadFailedTryAgain);
+                operations.Add(item.Key, operation);
+                progressArgs.Total += operation.TotalDownloadBytes;
+            }
+
+#if UNITY_WEBGL
+#endif
+
+            var downloadBytesList = new Dictionary<string, long>();
+            foreach (var operation in operations)
+            {
+                operation.Value.OnDownloadErrorCallback += (assetInfo, exception) =>
+                {
+                    progressArgs.OnError?.Invoke(
+                        new Exception($"Asset Download Error : {assetInfo} -> {assetInfo} : {exception}"));
+                };
+                operation.Value.OnStartDownloadFileCallback += (assetInfo, sizeBytes) =>
+                {
+                    progressArgs.CurrentInfo = assetInfo;
+                };
+                operation.Value.OnDownloadProgressCallback += (
+                    totalDownloadCount,
+                    currentDownloadCount,
+                    totalDownloadBytes,
+                    currentDownloadBytes
+                ) =>
+                {
+                    downloadBytesList[operation.Key] = currentDownloadBytes;
+                    progressArgs.Current = downloadBytesList.Values.Sum();
+                };
+
+                operation.Value.BeginDownload();
+                await operation.Value.Task;
+            }
+
+            progressArgs.OnComplete?.Invoke();
         }
 
         #endregion
