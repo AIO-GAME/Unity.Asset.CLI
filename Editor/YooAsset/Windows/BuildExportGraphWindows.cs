@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using YooAsset;
@@ -71,7 +70,7 @@ namespace AIO.UEditor.Build
                 });
             Commond = content;
 #if UNITY_2021_1_OR_NEWER
-            Command.BuildPipeline = EBuildPipeline.ScriptableBuildPipeline;
+            Commond.BuildPipeline = EBuildPipeline.ScriptableBuildPipeline;
 #else
             Commond.BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
 #endif

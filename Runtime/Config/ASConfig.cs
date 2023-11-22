@@ -4,6 +4,7 @@
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
+using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
@@ -179,10 +180,14 @@ namespace AIO.UEngine
             var config = CreateInstance<ASConfig>();
             config.ASMode = EASMode.Editor;
             config.URL = "";
-            config.AutoSaveVersion = true;
-            config.AppendTimeTicks = true;
-            config.LoadPathToLower = true;
+            config.LoadPathToLower = false;
+            config.AutoSaveVersion = false;
+            config.AppendTimeTicks = false;
             config.OutputLog = false;
+            config.AutoSequenceRecord = false;
+            config.Packages = Array.Empty<AssetsPackageConfig>();
+            if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
+                Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
             AssetDatabase.CreateAsset(config, "Assets/Resources/ASConfig.asset");
             return config;
 #else
