@@ -39,7 +39,6 @@ namespace AIO.UEngine.YooAsset
         public YAssetPackage(AssetsPackageConfig config)
         {
             Config = config;
-
             Package = YooAssets.TryGetPackage(Config.Name) ?? YooAssets.CreatePackage(Config.Name);
             if (Config.IsDefault) YooAssets.SetDefaultPackage(Package);
         }
@@ -64,7 +63,8 @@ namespace AIO.UEngine.YooAsset
                 {
                     if (parameters.Parameters is EditorSimulateModeParameters simulateModeParameters)
                     {
-                        simulateModeParameters.SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(Config.Name);
+                        simulateModeParameters.SimulateManifestFilePath =
+                            EditorSimulateModeHelper.SimulateBuild(Config.Name);
                         return Package.InitializeAsync(simulateModeParameters);
                     }
 
@@ -75,7 +75,8 @@ namespace AIO.UEngine.YooAsset
                 {
                     if (parameters.Parameters is HostPlayModeParameters Parameters)
                     {
-                        if (Parameters.RemoteServices is null) throw new Exception($"Assets System {Mode} RemoteServices is null");
+                        if (Parameters.RemoteServices is null)
+                            throw new Exception($"Assets System {Mode} RemoteServices is null");
                         return Package.InitializeAsync(Parameters);
                     }
 
@@ -85,7 +86,8 @@ namespace AIO.UEngine.YooAsset
                 {
                     if (parameters.Parameters is WebPlayModeParameters Parameters)
                     {
-                        if (Parameters.RemoteServices is null) throw new Exception($"Assets System {Mode} RemoteServices is null");
+                        if (Parameters.RemoteServices is null)
+                            throw new Exception($"Assets System {Mode} RemoteServices is null");
                         return Package.InitializeAsync(Parameters);
                     }
 
@@ -119,7 +121,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="packageVersion">更新的包裹版本</param>
         /// <param name="autoSaveVersion">更新成功后自动保存版本号，作为下次初始化的版本。</param>
         /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, bool autoSaveVersion = true, int timeout = 60)
+        public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion,
+            bool autoSaveVersion = true, int timeout = 60)
         {
             return Package.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
         }
@@ -153,17 +156,11 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 资源回收（卸载引用计数为零的资源）
         /// </summary>
-        public void UnloadUnusedAssets()
+        /// <param name="isForce">是否强制回收</param>
+        public void UnloadUnusedAssets(bool isForce = false)
         {
-            Package.UnloadUnusedAssets();
-        }
-
-        /// <summary>
-        /// 强制回收所有资源
-        /// </summary>
-        public void ForceUnloadAllAssets()
-        {
-            Package.ForceUnloadAllAssets();
+            if (isForce) Package.ForceUnloadAllAssets();
+            else Package.UnloadUnusedAssets();
         }
 
         #region 资源信息
@@ -174,7 +171,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="location">资源的定位地址</param>
         public bool IsNeedDownloadFromRemote(string location)
         {
-            return Package.IsNeedDownloadFromRemote(location);
+            return AssetSystem.Parameter.ASMode == EASMode.Remote && Package.IsNeedDownloadFromRemote(location);
         }
 
         /// <summary>
@@ -183,7 +180,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="assetInfo">资源的定位地址</param>
         public bool IsNeedDownloadFromRemote(AssetInfo assetInfo)
         {
-            return Package.IsNeedDownloadFromRemote(assetInfo);
+            return AssetSystem.Parameter.ASMode == EASMode.Remote && Package.IsNeedDownloadFromRemote(assetInfo);
         }
 
         /// <summary>
@@ -435,9 +432,11 @@ namespace AIO.UEngine.YooAsset
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber,
+            int failedTryAgain, int timeout = 60)
         {
-            return Package.CreateResourceDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
+            return Package.CreateResourceDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain,
+                timeout);
         }
 
         /// <summary>
@@ -447,7 +446,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber,
+            int failedTryAgain, int timeout = 60)
         {
             return Package.CreateResourceDownloader(tags, downloadingMaxNumber, failedTryAgain, timeout);
         }
@@ -458,7 +458,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain,
+            int timeout = 60)
         {
             return Package.CreateResourceDownloader(downloadingMaxNumber, failedTryAgain, timeout);
         }
@@ -470,7 +471,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber,
+            int failedTryAgain, int timeout = 60)
         {
             return Package.CreateBundleDownloader(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
         }
@@ -482,9 +484,11 @@ namespace AIO.UEngine.YooAsset
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo assetInfos, int downloadingMaxNumber,
+            int failedTryAgain, int timeout = 60)
         {
-            return Package.CreateBundleDownloader(new AssetInfo[] { assetInfos }, downloadingMaxNumber, failedTryAgain, timeout);
+            return Package.CreateBundleDownloader(new AssetInfo[] { assetInfos }, downloadingMaxNumber, failedTryAgain,
+                timeout);
         }
 
         #endregion
@@ -508,7 +512,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnpacker(string[] tags, int unpackingMaxNumber, int failedTryAgain)
+        public ResourceUnpackerOperation CreateResourceUnpacker(string[] tags, int unpackingMaxNumber,
+            int failedTryAgain)
         {
             return Package.CreateResourceUnpacker(tags, unpackingMaxNumber, failedTryAgain);
         }
@@ -519,7 +524,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnpacker(IEnumerable<string> tags, int unpackingMaxNumber, int failedTryAgain)
+        public ResourceUnpackerOperation CreateResourceUnpacker(IEnumerable<string> tags, int unpackingMaxNumber,
+            int failedTryAgain)
         {
             return Package.CreateResourceUnpacker(tags.ToArray(), unpackingMaxNumber, failedTryAgain);
         }

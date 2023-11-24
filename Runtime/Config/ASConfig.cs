@@ -1,7 +1,6 @@
 ﻿/*|✩ - - - - - |||
 |||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
 using System;
@@ -120,7 +119,10 @@ namespace AIO.UEngine
             switch (ASMode)
             {
                 case EASMode.Remote:
-                    Packages = await AssetSystem.GetRemotePackageList(URL);
+                    if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
+                    var remote = Path.Combine(URL, "Version", string.Concat(AssetSystem.PlatformNameStr, ".json"));
+                    var config = await AHelper.Net.HTTP.GetAsync(remote);
+                    Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(config);
                     if (string.IsNullOrEmpty(SequenceRecordRemotePath)) return;
                     await AHelper.Net.HTTP.DownloadAsync(SequenceRecordRemotePath, AssetSystem.SequenceRecordPath);
                     break;

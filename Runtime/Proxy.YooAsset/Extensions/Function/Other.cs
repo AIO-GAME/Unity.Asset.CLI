@@ -1,8 +1,5 @@
 ﻿#if SUPPORT_YOOASSET
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
@@ -21,44 +18,28 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         public static string GetPackageVersion(string package)
         {
-            if (!Dic.TryGetValue(package, out var asset)) return null;
-            return asset.GetPackageVersion();
+            return !Dic.TryGetValue(package, out var asset) ? null : asset.GetPackageVersion();
         }
 
         /// <summary>
         /// 资源回收（卸载引用计数为零的资源）
         /// </summary>
-        public static void UnloadUnusedAssets(string package)
+        /// <param name="package">指定包名</param>
+        /// <param name="isForce">是否强制回收</param>
+        public static void UnloadUnusedAssets(string package, bool isForce = false)
         {
             if (!Dic.TryGetValue(package, out var asset)) return;
-            asset.UnloadUnusedAssets();
+            asset.UnloadUnusedAssets(isForce);
         }
 
         /// <summary>
         /// 资源回收（卸载引用计数为零的资源）
         /// </summary>
-        public static void UnloadUnusedALLAssets()
+        /// <param name="isForce">是否强制回收</param>
+        public static void UnloadUnusedALLAssets(bool isForce = false)
         {
             foreach (var key in Dic.Keys.ToArray())
-                Dic[key].UnloadUnusedAssets();
-        }
-
-        /// <summary>
-        /// 强制回收所有资源
-        /// </summary>
-        public static void ForceUnloadALLAssets()
-        {
-            foreach (var key in Dic.Keys.ToArray())
-                Dic[key].ForceUnloadAllAssets();
-        }
-
-        /// <summary>
-        /// 强制回收所有资源
-        /// </summary>
-        public static void ForceUnloadAssets(string package)
-        {
-            if (!Dic.TryGetValue(package, out var asset)) return;
-            asset.ForceUnloadAllAssets();
+                Dic[key].UnloadUnusedAssets(isForce);
         }
     }
 }

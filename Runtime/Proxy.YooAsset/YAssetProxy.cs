@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -20,7 +20,12 @@ namespace AIO.UEngine
         /// <summary>
         /// 获取内置查询服务
         /// </summary>
-        public static event Func<IQueryServices> EventQueryServices;
+        public static event Func<IBuildinQueryServices> EventQueryServices;
+
+        /// <summary>
+        /// 获取内置查询服务
+        /// </summary>
+        public static event Func<IDeliveryQueryServices> EventDeliveryQueryServices;
 
         /// <summary>
         /// 获取远程查询服务
@@ -52,6 +57,10 @@ namespace AIO.UEngine
                     {
                         BuildInRootDirectory = BuildInRootDirectory,
                         SandboxRootDirectory = SandboxRootDirectory,
+                        DeliveryQueryServices = EventDeliveryQueryServices == null
+                            ? new ResolverDeliveryQueryServices()
+                            : EventDeliveryQueryServices.Invoke(),
+
                         QueryServices = EventQueryServices == null
                             ? new ResolverQueryServices()
                             : EventQueryServices.Invoke(),

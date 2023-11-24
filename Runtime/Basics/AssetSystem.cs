@@ -20,69 +20,6 @@ namespace AIO
     /// </summary>
     public static partial class AssetSystem
     {
-        private static AssetProxy Proxy;
-
-        /// <summary>
-        /// 资源包配置
-        /// </summary>
-        public static ICollection<AssetsPackageConfig> PackageConfigs => Parameter.Packages;
-
-        /// <summary>
-        /// 资源热更新配置
-        /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static ASConfig Parameter { get; private set; }
-
-        /// <summary>
-        /// 是否已经初始化
-        /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static bool IsInitialized { get; private set; }
-
-        public struct SequenceRecord
-        {
-            /// <summary>
-            /// 资源包名
-            /// </summary>
-            public string Name;
-
-            /// <summary>
-            /// 资源包寻址路径
-            /// </summary>
-            public string Location;
-
-            /// <summary>
-            /// 资源路径
-            /// </summary>
-            public string AssetPath;
-
-            /// <summary>
-            /// 记录时间
-            /// </summary>
-            public DateTime Time;
-
-            /// <summary>
-            /// 记录大小
-            /// </summary>
-            public long Bytes;
-
-            /// <summary>
-            /// 记录数量
-            /// </summary>
-            public int Count;
-        }
-
-        /// <summary>
-        /// 序列记录队列
-        /// </summary>
-        private static Queue<SequenceRecord> SequenceRecordQueue;
-
-        /// <summary>
-        /// 序列记录路径
-        /// </summary>
-        internal static readonly string SequenceRecordPath =
-            Path.Combine(Application.persistentDataPath, "aio.asset.record.json");
-
         /// <summary>
         /// 系统初始化
         /// </summary>
@@ -90,6 +27,32 @@ namespace AIO
         public static IEnumerator Initialize<T>(ASConfig config) where T : AssetProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), config);
+        }
+
+        /// <summary>
+        /// 系统初始化
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IEnumerator Initialize(ASConfig config)
+        {
+#if SUPPORT_YOOASSET
+            Proxy = new YAssetProxy();
+#else
+            throw new Exception("Not Found Other Asset Proxy! Please Input Asset Proxy!");
+#endif
+            IsInitialized = false;
+            Parameter = config;
+            yield return Proxy.Initialize();
+            IsInitialized = true;
+#if !UNITY_WEBGL
+            if (Parameter.AutoSequenceRecord)
+            {
+                SequenceRecordQueue = File.Exists(SequenceRecordPath)
+                    ? AHelper.IO.ReadJsonUTF8<Queue<SequenceRecord>>(SequenceRecordPath)
+                    : new Queue<SequenceRecord>();
+                if (SequenceRecordQueue is null) SequenceRecordQueue = new Queue<SequenceRecord>();
+            }
+#endif
         }
 
         /// <summary>

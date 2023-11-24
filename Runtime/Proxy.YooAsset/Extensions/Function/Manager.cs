@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-15
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -73,11 +73,10 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         public static IEnumerator ClearCacheResourceCO()
         {
-            var tasks = new List<IEnumerator>();
-            foreach (var item in Dic.Keys.ToArray())
-            {
-                tasks.Add(Dic[item].ClearUnusedCacheFilesAsync());
-            }
+            var tasks = Dic.Keys.ToArray()
+                .Select(item => Dic[item].ClearUnusedCacheFilesAsync())
+                .Cast<IEnumerator>()
+                .ToList();
 
             foreach (var task in tasks) yield return task;
         }

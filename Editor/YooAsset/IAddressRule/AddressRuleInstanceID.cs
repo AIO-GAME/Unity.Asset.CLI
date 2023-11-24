@@ -1,5 +1,5 @@
 ﻿/*|==========|*|
-|*|Author:   |*| -> XINAN
+|*|Author:   |*| -> xi nan
 |*|Date:     |*| -> 2023-05-24
 |*|==========|*/
 #if SUPPORT_YOOASSET

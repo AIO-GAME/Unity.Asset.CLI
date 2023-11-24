@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -34,14 +34,9 @@ namespace AIO.UEngine
             YAssetSystem.FreeHandle(location);
         }
 
-        public override void UnloadUnusedAssets()
+        public override void FreeHandle(IEnumerable<string> locations)
         {
-            YAssetSystem.UnloadUnusedALLAssets();
-        }
-
-        public override void ForceUnloadALLAssets()
-        {
-            YAssetSystem.ForceUnloadALLAssets();
+            YAssetSystem.FreeHandle(locations);
         }
 
         #region 资源信息

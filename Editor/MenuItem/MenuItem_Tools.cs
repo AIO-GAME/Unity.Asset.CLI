@@ -1,5 +1,5 @@
 ﻿/*|==========|*|
-|*|Author:   |*| -> XINAN
+|*|Author:   |*| -> xi nan
 |*|Date:     |*| -> 2023-05-31
 |*|==========|*/
 
@@ -11,6 +11,6 @@ namespace AIO.UEditor
 {
     public static partial class MenuItem_Tools
     {
- 
+
     }
 }

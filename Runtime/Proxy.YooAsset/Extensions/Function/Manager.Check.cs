@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-11
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -18,22 +18,20 @@ using ATaskObject = Cysharp.Threading.Tasks.UniTask<UnityEngine.Object>;
 using ATaskGameObject = Cysharp.Threading.Tasks.UniTask<UnityEngine.GameObject>;
 using ATaskObjectArray = Cysharp.Threading.Tasks.UniTask<UnityEngine.Object[]>;
 using ATaskScene = Cysharp.Threading.Tasks.UniTask<UnityEngine.SceneManagement.Scene>;
-using ATaskString = Cysharp.Threading.Tasks.UniTask<System.String>;
+using ATaskString = Cysharp.Threading.Tasks.UniTask<string>;
 using ATaskByteArray = Cysharp.Threading.Tasks.UniTask<System.Byte[]>;
 using ATaskBoolean = Cysharp.Threading.Tasks.UniTask<System.Boolean>;
 #else
-using System.Threading.Tasks;
 using ATask = System.Threading.Tasks.Task;
 using ATaskObject = System.Threading.Tasks.Task<UnityEngine.Object>;
 using ATaskGameObject = System.Threading.Tasks.Task<UnityEngine.GameObject>;
 using ATaskObjectArray = System.Threading.Tasks.Task<UnityEngine.Object[]>;
 using ATaskScene = System.Threading.Tasks.Task<UnityEngine.SceneManagement.Scene>;
-using ATaskString = System.Threading.Tasks.Task<System.String>;
+using ATaskString = System.Threading.Tasks.Task<string>;
 using ATaskByteArray = System.Threading.Tasks.Task<System.Byte[]>;
 using ATaskBoolean = System.Threading.Tasks.Task<System.Boolean>;
 #endif
 #if YOOASSET
-using UnityEngine.Networking;
 using UnityEngine;
 using System;
 using System.Collections;

@@ -15,21 +15,21 @@
         /// <summary>
         /// 资源管理系统 错误异常
         /// </summary>
-        internal const string ERROR = nameof(AssetSystem) + " Error : ";
+        internal const string ERROR = ASSET_SYSTEM_NAME + " Error : ";
+
+        /// <summary>
+        /// 资源管理系统 未知错误异常
+        /// </summary>
+        internal const string ERROR_UNKNOWN = ASSET_SYSTEM_NAME + "Error Unknown  : ";
 
         /// <summary>
         /// 资源管理系统 错误异常
         /// </summary>
-        internal const string ERROR_NET = nameof(AssetSystem) + " Error Net : ";
+        internal const string ERROR_NET = ASSET_SYSTEM_NAME + " Error Net : ";
 
         /// <summary>
         /// 资源管理系统 未知错误异常
         /// </summary>
-        internal const string ERROR_UNKNOWN = nameof(AssetSystem) + "Error Unknown  : ";
-
-        /// <summary>
-        /// 资源管理系统 未知错误异常
-        /// </summary>
-        internal const string ERROR_NET_UNKNOWN = nameof(AssetSystem) + "Error Unknown Net : ";
+        internal const string ERROR_NET_UNKNOWN = ASSET_SYSTEM_NAME + "Error Unknown Net : ";
     }
 }

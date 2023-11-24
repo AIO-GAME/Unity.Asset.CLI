@@ -8,7 +8,7 @@ namespace AIO.UEngine.YooAsset
     /// <summary>
     /// 内置文件查询服务类
     /// </summary>
-    public class ResolverQueryServices : IQueryServices
+    public class ResolverQueryServices : IBuildinQueryServices
     {
         public bool QueryStreamingAssets(string packageName, string fileName)
         {

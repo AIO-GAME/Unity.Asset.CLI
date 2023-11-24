@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-15
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -7,6 +7,8 @@
 #if SUPPORT_YOOASSET
 
 using System;
+using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YooAsset;
@@ -18,7 +20,8 @@ namespace AIO.UEngine.YooAsset
     {
         #region 实例化GameObject
 
-        public static async void InstGameObject(string packagename, string location, Transform parent, Action<GameObject> cb)
+        public static async void InstGameObject(string packagename, string location, Transform parent,
+            Action<GameObject> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
@@ -79,7 +82,8 @@ namespace AIO.UEngine.YooAsset
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static async void LoadSubAssets<TObject>(string packagename, string location, Action<TObject[]> cb) where TObject : Object
+        public static async void LoadSubAssets<TObject>(string packagename, string location, Action<TObject[]> cb)
+            where TObject : Object
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
@@ -178,7 +182,8 @@ namespace AIO.UEngine.YooAsset
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static async void LoadAsset<TObject>(string packagename, string location, Action<TObject> cb) where TObject : Object
+        public static async void LoadAsset<TObject>(string packagename, string location, Action<TObject> cb)
+            where TObject : Object
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
@@ -291,10 +296,14 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 var package = await GetAutoPackageTask(packagename, location);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
+                if (package is null)
+                    throw new Exception(
+                        string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                if (!await LoadCheckOPTask(operation)) throw new Exception(string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                if (!await LoadCheckOPTask(operation))
+                    throw new Exception(
+                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
                 AddHandle(location, operation);
             }
 
@@ -322,13 +331,18 @@ namespace AIO.UEngine.YooAsset
             if (operation is null)
             {
                 var package = await GetAutoPackageTask(packagename, location);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
+                if (package is null)
+                    throw new Exception(
+                        string.Format("场景配置 异常错误:{0} {1} {2}", packagename, location, sceneMode));
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                if (!await LoadCheckOPTask(operation)) throw new Exception(string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                if (!await LoadCheckOPTask(operation))
+                    throw new Exception(
+                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
                 AddHandle(location, operation);
             }
 
+            operation.ActivateScene();
             cb?.Invoke(operation.SceneObject);
         }
 
@@ -461,6 +475,31 @@ namespace AIO.UEngine.YooAsset
         }
 
         #endregion
+
+        public static async void UnLoadScene(string location, Action onUnLoadComplete = null)
+        {
+            var operation = GetHandle<SceneOperationHandle>(location);
+            if (operation is null) return;
+            var op = operation.UnloadAsync();
+            await op.Task;
+            onUnLoadComplete?.Invoke();
+        }
+
+        public static async Task UnLoadSceneTask(string location)
+        {
+            var operation = GetHandle<SceneOperationHandle>(location);
+            if (operation is null) return;
+            var op = operation.UnloadAsync();
+            await op.Task;
+        }
+
+        public static IEnumerator UnLoadSceneCO(string location, Action cb = null)
+        {
+            var operation = GetHandle<SceneOperationHandle>(location);
+            if (operation is null) yield break;
+            yield return operation.UnloadAsync();
+            cb?.Invoke();
+        }
     }
 }
 #endif

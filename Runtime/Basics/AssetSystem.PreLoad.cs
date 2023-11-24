@@ -67,16 +67,5 @@ namespace AIO
             return Proxy.PreLoadRaw(Parameter.LoadPathToLower ? location.ToLower() : location);
         }
 
-        /// <summary>
-        /// 预加载记录
-        /// </summary>
-        public static async Task DownloadPreRecord(ProgressArgs progressArgs = default)
-        {
-            if (Parameter.ASMode != EASMode.Remote) return;
-            var handle = GetDownloader();
-            var flow = await handle.UpdatePackageManifestTask();
-            if (flow) flow = await handle.UpdatePackageVersionTask();
-            if (flow) await Proxy.PreRecord(SequenceRecordQueue, progressArgs);
-        }
     }
 }

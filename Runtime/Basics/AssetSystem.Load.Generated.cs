@@ -2,7 +2,7 @@
 
 
 /*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> Automatic Generate
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/

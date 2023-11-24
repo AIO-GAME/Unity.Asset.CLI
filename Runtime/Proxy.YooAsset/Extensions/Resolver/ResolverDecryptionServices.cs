@@ -20,7 +20,7 @@ namespace AIO.UEngine.YooAsset
             throw new NotImplementedException();
         }
 
-        public System.IO.Stream LoadFromStream(DecryptFileInfo fileInfo)
+        public Stream LoadFromStream(DecryptFileInfo fileInfo)
         {
             return new ResolverBundleStream(fileInfo.FilePath, FileMode.Open);
         }

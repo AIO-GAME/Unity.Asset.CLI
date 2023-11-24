@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-15
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -43,16 +43,6 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载子资源对象
         /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadSubAssetsDefaultCO(AssetInfo location, Action<Object[]> cb)
-        {
-            yield return LoadSubAssetsCO(DefaultPackageName, location, cb);
-        }
-
-        /// <summary>
-        /// 异步加载子资源对象
-        /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         /// <param name="cb">回调</param>
@@ -88,16 +78,6 @@ namespace AIO.UEngine.YooAsset
             yield return LoadAssetCO(DefaultPackageName, location, type, cb);
         }
 
-        /// <summary>
-        /// 异步加载资源对象
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadAssetDefaultCO(AssetInfo location, Action<Object> cb)
-        {
-            yield return LoadAssetCO(DefaultPackageName, location, cb);
-        }
-
         #endregion
 
         #region 场景加载
@@ -120,37 +100,9 @@ namespace AIO.UEngine.YooAsset
             yield return LoadSceneCO(cb, DefaultPackageName, location, sceneMode, suspendLoad, priority);
         }
 
-        /// <summary>
-        /// 异步加载场景
-        /// </summary>
-        /// <param name="location">场景的定位地址</param>
-        /// <param name="sceneMode">场景加载模式</param>
-        /// <param name="suspendLoad">场景加载到90%自动挂起</param>
-        /// <param name="priority">优先级</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadSceneDefaultCO(
-            Action<Scene> cb,
-            AssetInfo location,
-            LoadSceneMode sceneMode = LoadSceneMode.Single,
-            bool suspendLoad = false,
-            int priority = 100)
-        {
-            yield return LoadSceneCO(cb, DefaultPackageName, location, sceneMode, suspendLoad, priority);
-        }
-
         #endregion
 
         #region 原生文件
-
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadRawFileDataDefaultCO(AssetInfo location, Action<byte[]> cb)
-        {
-            yield return LoadRawFileDataCO(DefaultPackageName, location, cb);
-        }
 
         /// <summary>
         /// 异步加载原生文件
@@ -160,16 +112,6 @@ namespace AIO.UEngine.YooAsset
         public static IEnumerator LoadRawFileDataDefaultCO(string location, Action<byte[]> cb)
         {
             yield return LoadRawFileDataCO(DefaultPackageName, location, cb);
-        }
-
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadRawFileTextDefaultCO(AssetInfo location, Action<string> cb)
-        {
-            yield return LoadRawFileTextCO(DefaultPackageName, location, cb);
         }
 
         /// <summary>

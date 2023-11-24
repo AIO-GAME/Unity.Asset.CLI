@@ -76,5 +76,27 @@ namespace AIO.UEditor.YooAsset
             return data.AssetPath.Replace(data.CollectPath + "/", Path.GetFileName(data.CollectPath) + "/");
         }
     }
+
+    [DisplayName("Root Collect = 定位地址")]
+    public class AddressRuleRelativeRootCollect : IAddressRule
+    {
+        string IAddressRule.GetAssetAddress(AddressRuleData data)
+        {
+            var suffix = Path.GetExtension(data.AssetPath);
+            var assetPath = data.AssetPath.Remove(data.AssetPath.Length - suffix.Length, suffix.Length);
+            return assetPath.Replace(data.CollectPath + "/", Path.GetFileName(data.CollectPath) + "/");
+        }
+    }
+    
+    [DisplayName("Root Collect = 定位地址 (全小写)")]
+    public class AddressRuleRelativeRootCollectToLower : IAddressRule
+    {
+        string IAddressRule.GetAssetAddress(AddressRuleData data)
+        {
+            var suffix = Path.GetExtension(data.AssetPath);
+            var assetPath = data.AssetPath.Remove(data.AssetPath.Length - suffix.Length, suffix.Length);
+            return assetPath.Replace(data.CollectPath + "/", Path.GetFileName(data.CollectPath) + "/").ToLower();
+        }
+    }
 }
 #endif

@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-15
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -116,39 +116,6 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载子资源对象
         /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadSubAssetsCO(AssetInfo location, Action<Object[]> cb)
-        {
-            var operation = GetHandle<SubAssetsOperationHandle>(location);
-            if (operation is null)
-            {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                operation = package.LoadSubAssetsAsync(location);
-                var check = false;
-                yield return LoadCheckOPCO(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                AddHandle(location, operation);
-            }
-
-            cb?.Invoke(operation.AllAssetObjects);
-        }
-
-        /// <summary>
-        /// 异步加载子资源对象
-        /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         /// <param name="cb">回调</param>
@@ -252,39 +219,6 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(operation.AssetObject);
         }
 
-        /// <summary>
-        /// 异步加载资源对象
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadAssetCO(AssetInfo location, Action<Object> cb)
-        {
-            var operation = GetHandle<AssetOperationHandle>(location);
-            if (operation is null)
-            {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                operation = package.LoadAssetAsync(location);
-                var check = false;
-                yield return LoadCheckOPCO(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                AddHandle(location, operation);
-            }
-
-            cb?.Invoke(operation.AssetObject);
-        }
-
         #endregion
 
         #region 场景加载
@@ -364,39 +298,6 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadRawFileDataCO(AssetInfo location, Action<byte[]> cb)
-        {
-            var operation = GetHandle<RawFileOperationHandle>(location);
-            if (operation is null)
-            {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                operation = package.LoadRawFileAsync(location);
-                var check = false;
-                yield return LoadCheckOPCO(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                AddHandle(location, operation);
-            }
-
-            cb?.Invoke(operation.GetRawFileData());
-        }
-
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
         public static IEnumerator LoadRawFileDataCO(string location, Action<byte[]> cb)
@@ -425,39 +326,6 @@ namespace AIO.UEngine.YooAsset
             }
 
             cb?.Invoke(operation.GetRawFileData());
-        }
-
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadRawFileTextCO(AssetInfo location, Action<string> cb)
-        {
-            var operation = GetHandle<RawFileOperationHandle>(location);
-            if (operation is null)
-            {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                operation = package.LoadRawFileAsync(location);
-                var check = false;
-                yield return LoadCheckOPCO(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                AddHandle(location, operation);
-            }
-
-            cb?.Invoke(operation.GetRawFileText());
         }
 
         /// <summary>

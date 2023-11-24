@@ -1,12 +1,14 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using AIO.UEngine;
 
 namespace AIO
 {
@@ -124,5 +126,77 @@ namespace AIO
         /// 开始下载
         /// </summary>
         Task BeginDownload();
+    }
+
+    internal class ASDownloaderEmpty : IASDownloader
+    {
+        public double Progress => 1;
+        public long TotalDownloadBytes => 0;
+        public long CurrentDownloadBytes => 0;
+        public int TotalDownloadCount => 0;
+        public int CurrentDownloadCount => 0;
+        public Task<bool> UpdatePackageVersionTask() => Task.FromResult(false);
+        public Task<bool> UpdatePackageManifestTask() => Task.FromResult(false);
+        public bool CreateDownloader() => false;
+        public Task BeginDownload() => Task.CompletedTask;
+
+        public void Dispose()
+        {
+        }
+    }
+
+    public partial class AssetSystem
+    {
+        /// <summary>
+        /// 预加载记录
+        /// </summary>
+        public static async Task DownloadPreRecord(ProgressArgs progressArgs = default)
+        {
+            if (Parameter.ASMode != EASMode.Remote) return;
+            var handle = GetDownloader();
+            var flow = await handle.UpdatePackageManifestTask();
+            if (flow) flow = await handle.UpdatePackageVersionTask();
+            Log($"【资源下载】 {(flow ? "有新版本" : "无需更新")}");
+            if (flow) await Proxy.PreRecord(SequenceRecordQueue, progressArgs);
+        }
+
+        /// <summary>
+        /// 获取下载器
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IASDownloader GetDownloader()
+        {
+            return Parameter.ASMode != EASMode.Remote
+                ? new ASDownloaderEmpty()
+                : Proxy.GetDownloader();
+        }
+
+        /// <summary>
+        /// 预下载全部远端资源
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static async Task DownloadPre()
+        {
+            if (Parameter.ASMode != EASMode.Remote) return;
+            var handle = GetDownloader();
+            var flow = await handle.UpdatePackageManifestTask();
+            if (flow) flow = await handle.UpdatePackageVersionTask();
+            if (flow) flow = handle.CreateDownloader();
+            Log($"【资源下载】 {(flow ? "有新版本" : "无需更新")}");
+            if (flow) await handle.BeginDownload();
+        }
+
+        /// <summary>
+        /// 动态下载远端资源
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static async Task DownloadDynamic()
+        {
+            if (Parameter.ASMode != EASMode.Remote) return;
+            var handle = GetDownloader();
+            var flow = await handle.UpdatePackageManifestTask();
+            if (flow) await handle.UpdatePackageVersionTask();
+            Log($"【资源下载】 {(flow ? "有新版本" : "无需更新")}");
+        }
     }
 }

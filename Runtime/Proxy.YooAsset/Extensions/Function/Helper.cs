@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-21
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -11,13 +11,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using UnityEngine;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
     internal static partial class YAssetSystem
     {
+        #region CO
+
         private static IEnumerator GetAutoPackageCO(AssetInfo location, Action<YAssetPackage> cb)
         {
             yield return GetAutoPackageCO(location.Address, cb);
@@ -25,37 +26,36 @@ namespace AIO.UEngine.YooAsset
 
         private static IEnumerator GetAutoPackageCO(string location, Action<YAssetPackage> cb)
         {
-            if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Coroutine : [auto : {0}]", location);
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
                 if (package.IsNeedDownloadFromRemote(location))
                 {
                     var info = package.GetAssetInfo(location);
                     if (info is null)
-                        throw new SystemException(string.Format("无法获取资源信息 [{0} : {1}]", package.PackageName, location));
-                    var operation = package.CreateBundleDownloader(info, AssetSystem.Parameter.LoadingMaxTimeSlice,
-                        AssetSystem.Parameter.DownloadFailedTryAgain,
-                        AssetSystem.Parameter.Timeout);
-                    RegisterEvent(package.PackageName, location, operation);
-                    operation.BeginDownload();
-                    yield return operation;
-                    switch (operation.Status)
+                        AssetSystem.LogException("无法获取资源信息 [{0} : {1}]", package.PackageName, location);
+                    else
                     {
-                        case EOperationStatus.Succeed: break;
-                        case EOperationStatus.None:
-                        case EOperationStatus.Failed:
-                        default:
-                            throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}",
-                                package.PackageName, package.GetPackageVersion(), location, operation.Error));
+                        var operation = package.CreateBundleDownloader(info,
+                            AssetSystem.Parameter.LoadingMaxTimeSlice,
+                            AssetSystem.Parameter.DownloadFailedTryAgain,
+                            AssetSystem.Parameter.Timeout);
+                        RegisterEvent(package.PackageName, location, operation);
+                        operation.BeginDownload();
+                        yield return operation;
+                        if (operation.Status != EOperationStatus.Succeed)
+                        {
+                            AssetSystem.LogException("获取远端资源失败 [{0} : {1}] {2} -> {3}", package.PackageName,
+                                package.GetPackageVersion(), location, operation.Error);
+                        }
                     }
                 }
 
                 cb?.Invoke(package);
                 yield break;
             }
-#if UNITY_EDITOR
-            throw new SystemException(string.Format("资源查找失败 [auto : {0}]", location));
-#endif
+
+            cb?.Invoke(null);
+            AssetSystem.LogException("资源查找失败 [auto : {0}]", location);
         }
 
         private static IEnumerator GetAutoPackageCO(string packagename, AssetInfo location, Action<YAssetPackage> cb)
@@ -65,46 +65,45 @@ namespace AIO.UEngine.YooAsset
 
         private static IEnumerator GetAutoPackageCO(string packagename, string location, Action<YAssetPackage> cb)
         {
-#if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog)
-                Debug.LogFormat("Load Assets Coroutine : [{0} : {1}]", packagename, location);
-#endif
+            AssetSystem.LogFormat("Load Assets Coroutine : [{0} : {1}]", packagename, location);
             if (!Dic.TryGetValue(packagename, out var package))
-                throw new SystemException(string.Format("目标资源包不存在 [{0} : {1}]", packagename, location));
+            {
+                AssetSystem.LogException("目标资源包不存在 [{0} : {1}]", packagename, location);
+                yield break;
+            }
 
             if (package.IsNeedDownloadFromRemote(location))
             {
                 var info = package.GetAssetInfo(location);
-                if (info is null)
-                    throw new SystemException(string.Format("无法获取资源信息 [{0} : {1}]", packagename, location));
-                var operation = package.CreateBundleDownloader(info, AssetSystem.Parameter.LoadingMaxTimeSlice,
-                    AssetSystem.Parameter.DownloadFailedTryAgain,
-                    AssetSystem.Parameter.Timeout);
-                RegisterEvent(package.PackageName, location, operation);
-                operation.BeginDownload();
-                yield return operation;
-                switch (operation.Status)
+                if (info is null) AssetSystem.LogException("无法获取资源信息 [{0} : {1}]", packagename, location);
+                else
                 {
-                    case EOperationStatus.Succeed: break;
-                    case EOperationStatus.None:
-                    case EOperationStatus.Failed:
-                    default:
-                        throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}",
-                            package.PackageName,
-                            package.GetPackageVersion(),
-                            location,
-                            operation.Error));
+                    var operation = package.CreateBundleDownloader(info,
+                        AssetSystem.Parameter.LoadingMaxTimeSlice,
+                        AssetSystem.Parameter.DownloadFailedTryAgain,
+                        AssetSystem.Parameter.Timeout);
+                    RegisterEvent(package.PackageName, location, operation);
+                    operation.BeginDownload();
+                    yield return operation;
+                    if (operation.Status != EOperationStatus.Succeed)
+                    {
+                        AssetSystem.LogException("资源获取失败 [{0} : {1}] {2} -> {3}", package.PackageName,
+                            package.GetPackageVersion(), location, operation.Error);
+                    }
                 }
             }
 
-            if (!package.CheckLocationValid(location))
-                throw new SystemException(string.Format("[{0} : {1}] 传入地址验证无效 {2}",
-                    package.PackageName,
-                    package.GetPackageVersion(),
-                    location));
-
-            cb?.Invoke(package);
+            if (package.CheckLocationValid(location)) cb?.Invoke(package);
+            else
+            {
+                AssetSystem.LogException("[{0} : {1}] 传入地址验证无效 {2}", package.PackageName, package.GetPackageVersion(),
+                    location);
+                cb?.Invoke(null);
+            }
         }
+
+        #endregion
+
 
         private static YAssetPackage GetAutoPackageSync(AssetInfo location)
         {
@@ -113,21 +112,16 @@ namespace AIO.UEngine.YooAsset
 
         private static YAssetPackage GetAutoPackageSync(string location)
         {
-#if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Sync : [auto : {0}]", location);
-#endif
+            AssetSystem.LogFormat("Load Assets Sync : [auto : {0}]", location);
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
                 if (package.IsNeedDownloadFromRemote(location))
-                    throw new SystemException($"不支持同步加载远程资源 [{package.PackageName} : {location}]");
-
+                    AssetSystem.LogException($"不支持同步加载远程资源 [{package.PackageName} : {location}]");
                 return package;
             }
-#if UNITY_EDITOR
-            throw new SystemException($"资源查找失败 [auto : {location}]");
-#else
+
+            AssetSystem.LogException($"资源查找失败 [auto : {location}]");
             return null;
-#endif
         }
 
         private static YAssetPackage GetAutoPackageSync(string packagename, AssetInfo location)
@@ -137,19 +131,22 @@ namespace AIO.UEngine.YooAsset
 
         private static YAssetPackage GetAutoPackageSync(string packagename, string location)
         {
-#if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog)
-                Debug.LogFormat("Load Assets Sync : [{0} : {1}]", packagename, location);
-#endif
+            AssetSystem.LogFormat("Load Assets Sync : [{0} : {1}]", packagename, location);
             if (!Dic.TryGetValue(packagename, out var package))
-                throw new SystemException(string.Format("目标资源包不存在 [{0} : {1}]", packagename, location));
+            {
+                AssetSystem.LogException(string.Format("目标资源包不存在 [{0} : {1}]", packagename, location));
+                return null;
+            }
 
             if (package.IsNeedDownloadFromRemote(location))
-                throw new SystemException(string.Format("不支持同步加载远程资源 [{0} : {1}]", package.PackageName, location));
+                AssetSystem.LogException(string.Format("不支持同步加载远程资源 [{0} : {1}]", package.PackageName, location));
 
             if (!package.CheckLocationValid(location))
-                throw new SystemException(string.Format("[{0} : {1}] 传入地址验证无效 {2}", package.PackageName,
+            {
+                AssetSystem.LogException(string.Format("[{0} : {1}] 传入地址验证无效 {2}", package.PackageName,
                     package.GetPackageVersion(), location));
+                return null;
+            }
 
             return package;
         }
@@ -161,9 +158,7 @@ namespace AIO.UEngine.YooAsset
 
         private static async Task<YAssetPackage> GetAutoPackageTask(string location)
         {
-#if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("Load Assets Async : [auto : {0}]", location);
-#endif
+            AssetSystem.LogFormat("Load Assets Async : [auto : {0}]", location);
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
                 if (!package.IsNeedDownloadFromRemote(location)) return package;
@@ -177,24 +172,14 @@ namespace AIO.UEngine.YooAsset
                 RegisterEvent(package.PackageName, location, operation);
                 operation.BeginDownload();
                 await operation.Task;
-                switch (operation.Status)
-                {
-                    case EOperationStatus.Succeed: break;
-                    default:
-                        throw new SystemException(string.Format("资源获取失败 [{0} : {1}] {2} -> {3}",
-                            package.PackageName,
-                            package.GetPackageVersion(),
-                            location,
-                            operation.Error));
-                }
-
+                if (operation.Status == EOperationStatus.Succeed) return package;
+                AssetSystem.LogException("资源获取失败 [{0} : {1}] {2} -> {3}", package.PackageName,
+                    package.GetPackageVersion(), location, operation.Error);
                 return package;
             }
-#if UNITY_EDITOR
-            throw new SystemException($@"资源查找失败 [auto : {location}]");
-#else
+
+            AssetSystem.LogException($@"资源查找失败 [auto : {location}]");
             return null;
-#endif
         }
 
         private static Task<YAssetPackage> GetAutoPackageTask(string packagename, AssetInfo location)
@@ -204,39 +189,41 @@ namespace AIO.UEngine.YooAsset
 
         private static async Task<YAssetPackage> GetAutoPackageTask(string packagename, string location)
         {
-#if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog)
-                Debug.LogFormat("Load Assets Async : [{0} : {1}]", packagename, location);
-#endif
+            AssetSystem.LogFormat("Load Assets Async : [{0} : {1}]", packagename, location);
             if (!Dic.TryGetValue(packagename, out var package))
-                throw new SystemException($"目标资源包不存在 [{packagename} : {location}]");
+            {
+                AssetSystem.LogException($"目标资源包不存在 [{packagename} : {location}]");
+                return null;
+            }
 
             if (package.IsNeedDownloadFromRemote(location))
             {
                 var info = package.GetAssetInfo(location);
-                if (info is null) throw new SystemException($"无法获取资源信息 [{packagename} : {location}]");
-                var operation = package.CreateBundleDownloader(info, AssetSystem.Parameter.LoadingMaxTimeSlice,
-                    AssetSystem.Parameter.DownloadFailedTryAgain,
-                    AssetSystem.Parameter.Timeout);
-                RegisterEvent(package.PackageName, location, operation);
-                operation.BeginDownload();
-                await operation.Task;
-                switch (operation.Status)
+                if (info is null) AssetSystem.LogException($"无法获取资源信息 [{packagename} : {location}]");
+                else
                 {
-                    case EOperationStatus.Succeed: break;
-                    default:
-                        throw new SystemException(
+                    var operation = package.CreateBundleDownloader(info,
+                        AssetSystem.Parameter.LoadingMaxTimeSlice,
+                        AssetSystem.Parameter.DownloadFailedTryAgain,
+                        AssetSystem.Parameter.Timeout);
+                    RegisterEvent(package.PackageName, location, operation);
+                    operation.BeginDownload();
+                    await operation.Task;
+                    if (operation.Status != EOperationStatus.Succeed)
+                        AssetSystem.LogException(
                             $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                 }
             }
 
-            if (!package.CheckLocationValid(location))
-                throw new SystemException(
-                    $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+            if (package.CheckLocationValid(location)) return package;
 
-            return package;
+            AssetSystem.LogException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+            return null;
         }
 
+        /// <summary>
+        /// 引用计数
+        /// </summary>
         private static Dictionary<string, OperationHandleBase> ReferenceOPHandle { get; set; } =
             new Dictionary<string, OperationHandleBase>();
 
@@ -248,29 +235,6 @@ namespace AIO.UEngine.YooAsset
         public static bool IsAlreadyLoad(string location)
         {
             return ReferenceOPHandle.ContainsKey(location);
-        }
-
-        private static T GetHandle<T>(string location) where T : OperationHandleBase
-        {
-            if (ReferenceOPHandle.ContainsKey(location)) return (T)ReferenceOPHandle[location];
-            return null;
-        }
-
-        private static T GetHandle<T>(AssetInfo location) where T : OperationHandleBase
-        {
-            return GetHandle<T>(location.Address);
-        }
-
-        private static void AddHandle<T>(string location, T operation) where T : OperationHandleBase
-        {
-            if (operation is null) return;
-            ReferenceOPHandle.Set(location, operation);
-        }
-
-        private static void AddHandle<T>(AssetInfo location, T operation) where T : OperationHandleBase
-        {
-            if (operation is null) return;
-            ReferenceOPHandle.Set(location.Address, operation);
         }
 
         private static MethodInfo ReleaseInternal
@@ -288,33 +252,6 @@ namespace AIO.UEngine.YooAsset
         }
 
         private static MethodInfo _ReleaseInternal;
-
-        public static void FreeHandle(string location)
-        {
-            if (!ReferenceOPHandle.TryGetValue(location, out var value)) return;
-            ReleaseInternal?.Invoke(value, null);
-            ReferenceOPHandle.Remove(location);
-        }
-
-        public static void FreeHandle(IEnumerable<string> locations)
-        {
-            foreach (var location in locations)
-            {
-                if (!ReferenceOPHandle.TryGetValue(location, out var value)) continue;
-                ReleaseInternal?.Invoke(value, null);
-                ReferenceOPHandle.Remove(location);
-            }
-        }
-
-        public static void FreeHandle(IEnumerable<AssetInfo> locations)
-        {
-            foreach (var location in locations) FreeHandle(location.Address);
-        }
-
-        public static void FreeHandle(AssetInfo location)
-        {
-            FreeHandle(location.Address);
-        }
 
         public static void Destroy()
         {
