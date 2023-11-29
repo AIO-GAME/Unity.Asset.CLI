@@ -53,7 +53,7 @@ namespace AIO.UEngine.YooAsset
 
         private static IEnumerator GetAutoPackageCO(string location, Action<YAssetPackage> cb)
         {
-            if (location.EndsWith('/') || location.EndsWith('\\'))
+            if (location.EndsWith("/") || location.EndsWith("\\"))
             {
                 cb?.Invoke(null);
                 AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
@@ -96,7 +96,7 @@ namespace AIO.UEngine.YooAsset
 
         private static IEnumerator GetAutoPackageCO(string packagename, string location, Action<YAssetPackage> cb)
         {
-            if (location.EndsWith('/') || location.EndsWith('\\'))
+            if (location.EndsWith("/") || location.EndsWith("\\"))
             {
                 cb?.Invoke(null);
                 AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
@@ -146,7 +146,7 @@ namespace AIO.UEngine.YooAsset
 
         private static YAssetPackage GetAutoPackageSync(string location)
         {
-            if (location.EndsWith('/') || location.EndsWith('\\'))
+            if (location.EndsWith("/") || location.EndsWith("\\"))
             {
                 AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
                 return null;
@@ -171,7 +171,7 @@ namespace AIO.UEngine.YooAsset
 
         private static YAssetPackage GetAutoPackageSync(string packagename, string location)
         {
-            if (location.EndsWith('/') || location.EndsWith('\\'))
+            if (location.EndsWith("/") || location.EndsWith("\\"))
             {
                 AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
                 return null;
@@ -205,7 +205,7 @@ namespace AIO.UEngine.YooAsset
 
         private static async Task<YAssetPackage> GetAutoPackageTask(string location)
         {
-            if (location.EndsWith('/') || location.EndsWith('\\'))
+            if (location.EndsWith("/") || location.EndsWith("\\"))
             {
                 AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
                 return null;
@@ -238,7 +238,7 @@ namespace AIO.UEngine.YooAsset
 
         private static async Task<YAssetPackage> GetAutoPackageTask(string packagename, string location)
         {
-            if (location.EndsWith('/') || location.EndsWith('\\'))
+            if (location.EndsWith("/") || location.EndsWith("\\"))
             {
                 AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
                 return null;
