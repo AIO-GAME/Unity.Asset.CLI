@@ -239,21 +239,24 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
-            if (operation is null)
+            if (operation != null)
             {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
-
-                operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                var check = false;
-                yield return LoadCheckOPCO(operation, error => check = error);
-                if (!check)
-                    throw new Exception(
-                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
-                AddHandle(location, operation);
+                yield return operation.UnloadAsync();
+                FreeHandle(location);
             }
 
+            YAssetPackage package = null;
+            yield return GetAutoPackageCO(location, ya => package = ya);
+            if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
+
+            operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            var check = false;
+            yield return LoadCheckOPCO(operation, error => check = error);
+            if (!check)
+                throw new Exception(
+                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+            AddHandle(location, operation);
+            operation.ActivateScene();
             cb?.Invoke(operation.SceneObject);
         }
 
@@ -273,21 +276,23 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
-            if (operation is null)
+            if (operation != null)
             {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
-
-                operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                var check = false;
-                yield return LoadCheckOPCO(operation, error => check = error);
-                if (!check)
-                    throw new Exception(
-                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
-                AddHandle(location, operation);
+                yield return operation.UnloadAsync();
+                FreeHandle(location);
             }
+            YAssetPackage package = null;
+            yield return GetAutoPackageCO(location, ya => package = ya);
+            if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
 
+            operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            var check = false;
+            yield return LoadCheckOPCO(operation, error => check = error);
+            if (!check)
+                throw new Exception(
+                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+            AddHandle(location, operation);
+            operation.ActivateScene();
             cb?.Invoke(operation.SceneObject);
         }
 

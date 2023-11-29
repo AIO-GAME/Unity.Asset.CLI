@@ -31,10 +31,8 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static void UnloadAsset(string location)
         {
-            Proxy.FreeHandle(location);
-#if UNITY_EDITOR
-            LogFormat("Asset System FreeHandle Release : {0}", location);
-#endif
+            Proxy?.FreeHandle(SettingToLocalPath(location));
+            LogFormat("Asset System Free Asset Handle Release : {0}", location);
         }
 
         /// <summary>
@@ -44,7 +42,10 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static void UnloadAsset(IEnumerable<string> locations)
         {
-            Proxy.FreeHandle(locations);
+            foreach (var location in locations)
+            {
+                Proxy.FreeHandle(SettingToLocalPath(location));
+            }
         }
 
         /// <summary>
@@ -55,7 +56,8 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator UnloadSceneCO(string location, Action onLoadComplete)
         {
-            return Proxy.UnloadSceneCO(location, onLoadComplete);
+            LogFormat("Asset System Free Scene Handle Release : {0}", location);
+            return Proxy.UnloadSceneCO(SettingToLocalPath(location), onLoadComplete);
         }
 
         /// <summary>
@@ -65,7 +67,8 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task UnloadSceneTask(string location)
         {
-            return Proxy.UnloadSceneTask(location);
+            LogFormat("Asset System Free Scene Handle Release : {0}", location);
+            return Proxy.UnloadSceneTask(SettingToLocalPath(location));
         }
     }
 }

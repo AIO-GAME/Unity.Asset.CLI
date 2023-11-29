@@ -15,7 +15,7 @@ namespace AIO.UEngine
         /// 获取下载器
         /// </summary>
         /// <returns></returns>
-        public abstract IASDownloader GetDownloader();
+        public abstract IASDownloader GetDownloader(IProgressEvent progress = null);
 
         /// <summary>
         /// 释放资源句柄

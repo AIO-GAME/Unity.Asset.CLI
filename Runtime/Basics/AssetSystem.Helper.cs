@@ -90,49 +90,50 @@ namespace AIO
         /// <param name="location">资源定位地址</param>
         private static string SettingToLocalPath(string location)
         {
+            if (string.IsNullOrEmpty(location)) return string.Empty;
             return Parameter.LoadPathToLower ? location.ToLower() : location;
         }
 
         #region LOG
 
-        [Conditional("UNITY_EDITOR")]
+        //      [Conditional("UNITY_EDITOR")]
         internal static void LogException(Exception e)
         {
             if (Parameter.OutputLog) Debug.LogException(e);
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //      [Conditional("UNITY_EDITOR")]
         internal static void LogException(string e)
         {
             if (Parameter.OutputLog) Debug.LogException(new SystemException(e));
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //      [Conditional("UNITY_EDITOR")]
         internal static void LogException(string format, params object[] args)
         {
             if (Parameter.OutputLog)
                 Debug.LogException(new SystemException(string.Format(format, args)));
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //      [Conditional("UNITY_EDITOR")]
         internal static void Log(string e)
         {
             if (Parameter.OutputLog) Debug.Log(e);
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //      [Conditional("UNITY_EDITOR")]
         internal static void LogFormat(string format, params object[] args)
         {
             if (Parameter.OutputLog) Debug.LogFormat(format, args);
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //      [Conditional("UNITY_EDITOR")]
         internal static void LogError(string e)
         {
             if (Parameter.OutputLog) Debug.LogError(e);
         }
 
-        [Conditional("UNITY_EDITOR")]
+        //      [Conditional("UNITY_EDITOR")]
         internal static void LogErrorFormat(string format, params object[] args)
         {
             if (Parameter.OutputLog) Debug.LogErrorFormat(format, args);

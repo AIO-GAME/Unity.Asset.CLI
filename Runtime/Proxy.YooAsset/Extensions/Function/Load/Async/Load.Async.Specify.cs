@@ -293,12 +293,19 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
+            if (operation != null)
+            {
+                var handle = operation.UnloadAsync();
+                await handle.Task;
+                FreeHandle(location);
+            }
+
             if (operation is null)
             {
                 var package = await GetAutoPackageTask(packagename, location);
                 if (package is null)
                     throw new Exception(
-                        string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
+                        string.Format("场景配置 异常错误:{0} {1} {2}", packagename, location, sceneMode));
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
                 if (!await LoadCheckOPTask(operation))
@@ -328,6 +335,13 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
+            if (operation != null)
+            {
+                var handle = operation.UnloadAsync();
+                await handle.Task;
+                FreeHandle(location);
+            }
+
             if (operation is null)
             {
                 var package = await GetAutoPackageTask(packagename, location);

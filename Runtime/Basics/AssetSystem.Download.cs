@@ -5,6 +5,8 @@
 |||✩ - - - - - |*/
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -20,7 +22,7 @@ namespace AIO
         /// <summary>
         /// 网络错误
         /// </summary>
-        [Description("网络错误")] NetWorkError,
+        [Description("网络错误")] NetWorkError = 0,
 
         /// <summary>
         /// 找不到指定文件
@@ -73,30 +75,7 @@ namespace AIO
     /// </summary>
     public interface IASNetLoading
     {
-        /// <summary>
-        /// 当前下载进度
-        /// </summary>
-        double Progress { get; }
-
-        /// <summary>
-        /// 总下载大小
-        /// </summary>
-        long TotalDownloadBytes { get; }
-
-        /// <summary>
-        /// 当前下载大小
-        /// </summary>
-        long CurrentDownloadBytes { get; }
-
-        /// <summary>
-        /// 总下载数量
-        /// </summary>
-        int TotalDownloadCount { get; }
-
-        /// <summary>
-        /// 当前下载数量
-        /// </summary>
-        int CurrentDownloadCount { get; }
+        IProgressHandle Progress { get; }
     }
 
     /// <summary>
@@ -105,40 +84,92 @@ namespace AIO
     public interface IASDownloader : IASNetLoading, IDisposable
     {
         /// <summary>
+        /// 是否运行继续流程
+        /// </summary>
+        bool Flow { get; }
+
+        /// <summary>
         /// 更新资源包版本信息
         /// </summary>
         /// <returns>Ture:有新版本 False:无需更新</returns>
-        Task<bool> UpdatePackageVersionTask();
+        Task UpdatePackageVersionTask();
 
         /// <summary>
         /// 向网络端请求并更新补丁清单
         /// </summary>
         /// <returns>Ture:有新版本 False:无需更新</returns>
-        Task<bool> UpdatePackageManifestTask();
+        Task UpdatePackageManifestTask();
 
         /// <summary>
-        /// 创建下载器
+        /// 下载序列列表文件
         /// </summary>
-        /// <returns>Ture:有新版本 False:无需更新</returns>
-        bool CreateDownloader();
+        Task DownloadRecordTask(AssetSystem.SequenceRecordQueue queue);
 
         /// <summary>
         /// 开始下载
         /// </summary>
-        Task BeginDownload();
+        Task DownloadTask();
+
+        /// <summary>
+        /// 更新资源包版本信息
+        /// </summary>
+        /// <returns>Ture:有新版本 False:无需更新</returns>
+        IEnumerator UpdatePackageVersionCO();
+
+        /// <summary>
+        /// 向网络端请求并更新补丁清单
+        /// </summary>
+        /// <returns>Ture:有新版本 False:无需更新</returns>
+        IEnumerator UpdatePackageManifestCO();
+
+        /// <summary>
+        /// 开始下载
+        /// </summary>
+        IEnumerator DownloadCO();
+
+        /// <summary>
+        /// 下载序列列表文件
+        /// </summary>
+        IEnumerator DownloadRecordCO(AssetSystem.SequenceRecordQueue queue);
     }
 
-    internal class ASDownloaderEmpty : IASDownloader
+    internal struct ASDownloaderEmpty : IASDownloader
     {
-        public double Progress => 1;
-        public long TotalDownloadBytes => 0;
-        public long CurrentDownloadBytes => 0;
-        public int TotalDownloadCount => 0;
-        public int CurrentDownloadCount => 0;
-        public Task<bool> UpdatePackageVersionTask() => Task.FromResult(false);
-        public Task<bool> UpdatePackageManifestTask() => Task.FromResult(false);
-        public bool CreateDownloader() => false;
-        public Task BeginDownload() => Task.CompletedTask;
+        public IProgressHandle Progress { get; }
+
+        public bool Flow => false;
+
+        public ASDownloaderEmpty(IProgressEvent iEvent = null)
+        {
+            Progress = new AProgress(iEvent);
+        }
+
+        public Task UpdatePackageVersionTask() => Task.CompletedTask;
+        public Task UpdatePackageManifestTask() => Task.CompletedTask;
+        public Task DownloadRecordTask(AssetSystem.SequenceRecordQueue queue) => Task.CompletedTask;
+
+        public Task DownloadTask() => Task.CompletedTask;
+        public Task DownloadRecordTask() => Task.CompletedTask;
+
+        public IEnumerator UpdatePackageVersionCO()
+        {
+            yield break;
+        }
+
+        public IEnumerator UpdatePackageManifestCO()
+        {
+            yield break;
+        }
+
+        public IEnumerator DownloadCO()
+        {
+            yield break;
+        }
+
+        public IEnumerator DownloadRecordCO(AssetSystem.SequenceRecordQueue queue)
+        {
+            yield break;
+        }
 
         public void Dispose()
         {
@@ -148,55 +179,58 @@ namespace AIO
     public partial class AssetSystem
     {
         /// <summary>
-        /// 预加载记录
-        /// </summary>
-        public static async Task DownloadPreRecord(ProgressArgs progressArgs = default)
-        {
-            if (Parameter.ASMode != EASMode.Remote) return;
-            var handle = GetDownloader();
-            var flow = await handle.UpdatePackageManifestTask();
-            if (flow) flow = await handle.UpdatePackageVersionTask();
-            Log($"【资源下载】 {(flow ? "有新版本" : "无需更新")}");
-            if (flow) await Proxy.PreRecord(SequenceRecordQueue, progressArgs);
-        }
-
-        /// <summary>
         /// 获取下载器
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IASDownloader GetDownloader()
+        public static IASDownloader GetDownloader(IProgressEvent progress = null)
         {
             return Parameter.ASMode != EASMode.Remote
-                ? new ASDownloaderEmpty()
-                : Proxy.GetDownloader();
+                ? new ASDownloaderEmpty(progress)
+                : Proxy.GetDownloader(progress);
+        }
+
+        /// <summary>
+        /// 预加载记录
+        /// </summary>
+        public static IEnumerator DownloadPreRecord(IProgressEvent progress = null)
+        {
+            if (Parameter.ASMode != EASMode.Remote) yield break;
+            var handle = GetDownloader(progress);
+            yield return handle.UpdatePackageManifestCO();
+            yield return handle.UpdatePackageVersionCO();
+            Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
+            if (!handle.Flow) yield break;
+            yield return handle.DownloadRecordCO(SequenceRecords);
+            Log($"【资源下载】 预下载序列列表完成");
         }
 
         /// <summary>
         /// 预下载全部远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static async Task DownloadPre()
+        public static IEnumerator DownloadPre(IProgressEvent progress = null)
         {
-            if (Parameter.ASMode != EASMode.Remote) return;
-            var handle = GetDownloader();
-            var flow = await handle.UpdatePackageManifestTask();
-            if (flow) flow = await handle.UpdatePackageVersionTask();
-            if (flow) flow = handle.CreateDownloader();
-            Log($"【资源下载】 {(flow ? "有新版本" : "无需更新")}");
-            if (flow) await handle.BeginDownload();
+            if (Parameter.ASMode != EASMode.Remote) yield break;
+            var handle = GetDownloader(progress);
+            yield return handle.UpdatePackageManifestCO();
+            yield return handle.UpdatePackageVersionCO();
+            Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
+            if (!handle.Flow) yield break;
+            yield return handle.DownloadCO();
+            Log($"【资源下载】 {(handle.Flow ? "下载完成" : "下载失败")}");
         }
 
         /// <summary>
         /// 动态下载远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static async Task DownloadDynamic()
+        public static IEnumerator DownloadDynamic(IProgressEvent progress = null)
         {
-            if (Parameter.ASMode != EASMode.Remote) return;
-            var handle = GetDownloader();
-            var flow = await handle.UpdatePackageManifestTask();
-            if (flow) await handle.UpdatePackageVersionTask();
-            Log($"【资源下载】 {(flow ? "有新版本" : "无需更新")}");
+            if (Parameter.ASMode != EASMode.Remote) yield break;
+            var handle = GetDownloader(progress);
+            yield return handle.UpdatePackageManifestCO();
+            yield return handle.UpdatePackageVersionCO();
+            Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
         }
     }
 }

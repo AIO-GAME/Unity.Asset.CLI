@@ -149,19 +149,28 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
-            if (operation is null)
+            if (operation != null)
             {
-                var package = await GetAutoPackageTask(location);
-                if (package is null)
-                    throw new Exception(
-                        string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
-
-                operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                if (!await LoadCheckOPTask(operation))
-                    throw new Exception(
-                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
-                AddHandle(location, operation);
+                var handle = operation.UnloadAsync();
+                await handle.Task;
+                FreeHandle(location);
             }
+
+            var package = await GetAutoPackageTask(location);
+            if (package is null)
+            {
+                AssetSystem.LogException("场景配置 异常错误:{0} {1}", location, sceneMode);
+                return SceneManager.GetActiveScene();
+            }
+
+            operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            if (!await LoadCheckOPTask(operation))
+            {
+                AssetSystem.LogException("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode);
+                return SceneManager.GetActiveScene();
+            }
+
+            AddHandle(location, operation);
 
             return operation.SceneObject;
         }

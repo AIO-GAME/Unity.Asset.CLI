@@ -238,63 +238,6 @@ namespace AIO.UEngine
             return YAssetSystem.PreLoadRaw(location);
         }
 
-        public override async Task PreRecord(Queue<AssetSystem.SequenceRecord> recordQueue,
-            ProgressArgs progressArgs = default)
-        {
-            if (recordQueue is null) return;
-            var operations = new Dictionary<string, ResourceDownloaderOperation>();
-            var list = new Dictionary<string, List<AssetInfo>>();
-            foreach (var item in recordQueue)
-            {
-                var info = YAssetSystem.GetAssetInfo(item.Name, item.Location);
-                if (!list.ContainsKey(item.Name)) list.Add(item.Name, new List<AssetInfo>());
-                list[item.Name].Add(info);
-            }
-
-            foreach (var item in list)
-            {
-                var operation = YAssetSystem.CreateBundleDownloader(
-                    item.Key,
-                    item.Value.ToArray(),
-                    AssetSystem.Parameter.LoadingMaxTimeSlice,
-                    AssetSystem.Parameter.DownloadFailedTryAgain);
-                operations.Add(item.Key, operation);
-                progressArgs.Total += operation.TotalDownloadBytes;
-            }
-
-#if UNITY_WEBGL
-#endif
-
-            var downloadBytesList = new Dictionary<string, long>();
-            foreach (var operation in operations)
-            {
-                operation.Value.OnDownloadErrorCallback += (assetInfo, exception) =>
-                {
-                    progressArgs.OnError?.Invoke(
-                        new Exception($"Asset Download Error : {assetInfo} -> {assetInfo} : {exception}"));
-                };
-                operation.Value.OnStartDownloadFileCallback += (assetInfo, sizeBytes) =>
-                {
-                    progressArgs.CurrentInfo = assetInfo;
-                };
-                operation.Value.OnDownloadProgressCallback += (
-                    totalDownloadCount,
-                    currentDownloadCount,
-                    totalDownloadBytes,
-                    currentDownloadBytes
-                ) =>
-                {
-                    downloadBytesList[operation.Key] = currentDownloadBytes;
-                    progressArgs.Current = downloadBytesList.Values.Sum();
-                };
-
-                operation.Value.BeginDownload();
-                await operation.Value.Task;
-            }
-
-            progressArgs.OnComplete?.Invoke();
-        }
-
         #endregion
     }
 }

@@ -103,12 +103,7 @@ namespace AIO.UEditor
         public string OutputRoot = string.Empty;
 
         [Argument(C_BUILD_PIPELINE, EArgLabel.Enum)]
-        public EBuildPipeline BuildPipeline =
-#if UNITY_2021_3_OR_NEW
-            EBuildPipeline.BuiltinBuildPipeline;
-#else
-            EBuildPipeline.ScriptableBuildPipeline;
-#endif
+        public EBuildPipeline BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
     }
 }
 #endif

@@ -5,15 +5,8 @@
 |*|============|*/
 
 #if SUPPORT_YOOASSET
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using YooAsset;
-using Debug = UnityEngine.Debug;
 
 namespace AIO.UEngine.YooAsset
 {
@@ -33,17 +26,20 @@ namespace AIO.UEngine.YooAsset
         private static void AddHandle<T>(string location, T operation) where T : OperationHandleBase
         {
             if (operation is null) return;
-            ReferenceOPHandle.Set(location, operation);
+            if (string.IsNullOrEmpty(location)) return;
+            ReferenceOPHandle[location] = operation;
         }
 
         private static void AddHandle<T>(AssetInfo location, T operation) where T : OperationHandleBase
         {
             if (operation is null) return;
-            ReferenceOPHandle.Set(location.Address, operation);
+            if (location is null) return;
+            ReferenceOPHandle[location.Address] = operation;
         }
 
         public static void FreeHandle(string location)
         {
+            if (string.IsNullOrEmpty(location)) return;
             if (!ReferenceOPHandle.TryGetValue(location, out var value)) return;
             ReleaseInternal?.Invoke(value, null);
             ReferenceOPHandle.Remove(location);
@@ -53,6 +49,7 @@ namespace AIO.UEngine.YooAsset
         {
             foreach (var location in locations)
             {
+                if (string.IsNullOrEmpty(location)) continue;
                 if (!ReferenceOPHandle.TryGetValue(location, out var value)) continue;
                 ReleaseInternal?.Invoke(value, null);
                 ReferenceOPHandle.Remove(location);

@@ -7,7 +7,6 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using AIO.UEngine;
 using Object = UnityEngine.Object;
 
 namespace AIO
@@ -22,7 +21,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadSubAssets<TObject>(string location) where TObject : Object
         {
-            return Proxy.PreLoadSubAssets<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.PreLoadSubAssets<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -32,7 +31,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadSubAssets(string location)
         {
-            return Proxy.PreLoadSubAssets<Object>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.PreLoadSubAssets<Object>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadAsset<TObject>(string location) where TObject : Object
         {
-            return Proxy.PreLoadAsset<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.PreLoadAsset<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -54,7 +53,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadAsset(string location, Type type)
         {
-            return Proxy.PreLoadAsset(Parameter.LoadPathToLower ? location.ToLower() : location, type);
+            return Proxy.PreLoadAsset(SettingToLocalPath(location), type);
         }
 
         /// <summary>
@@ -64,8 +63,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadRaw(string location)
         {
-            return Proxy.PreLoadRaw(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.PreLoadRaw(SettingToLocalPath(location));
         }
-
     }
 }

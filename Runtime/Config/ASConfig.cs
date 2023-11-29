@@ -51,11 +51,6 @@ namespace AIO.UEngine
         public bool AutoSequenceRecord;
 
         /// <summary>
-        /// 序列记录远端路径
-        /// </summary>
-        public string SequenceRecordRemotePath;
-
-        /// <summary>
         /// 输出日志
         /// </summary>
         public bool OutputLog;
@@ -121,10 +116,8 @@ namespace AIO.UEngine
                 case EASMode.Remote:
                     if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
                     var remote = Path.Combine(URL, "Version", string.Concat(AssetSystem.PlatformNameStr, ".json"));
-                    var config = await AHelper.Net.HTTP.GetAsync(remote);
+                    var config = await AHelper.Net.HTTP.GetAsync(string.Concat(remote, "?t=", DateTime.Now.Ticks));
                     Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(config);
-                    if (string.IsNullOrEmpty(SequenceRecordRemotePath)) return;
-                    await AHelper.Net.HTTP.DownloadAsync(SequenceRecordRemotePath, AssetSystem.SequenceRecordPath);
                     break;
                 default:
 #if UNITY_EDITOR && SUPPORT_YOOASSET
@@ -164,10 +157,10 @@ namespace AIO.UEngine
         /// </summary>
         public static ASConfig GetOrCreate()
         {
-            foreach (var item in Resources.LoadAll<ASConfig>(""))
+            foreach (var item in Resources.LoadAll<ASConfig>("ASConfig"))
             {
-                if (item != null)
-                    return item;
+                if (item is null) continue;
+                return item;
             }
 
 #if UNITY_EDITOR
