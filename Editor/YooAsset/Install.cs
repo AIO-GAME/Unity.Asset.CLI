@@ -21,7 +21,7 @@ namespace AIO.UEditor
                 EditorUtility.DisplayProgressBar("插件", "正在安装插件", 0);
                 var result = await PrGit.Clone.Tag(
                     Path.Combine(Packages.FullName),
-                    "https://github.com/tuyoogame/YooAsset.git", "1.5.3-preview");
+                    "https://github.com/tuyoogame/YooAsset.git", "1.5.7");
                 if (result.ExitCode != 0)
                 {
                     EditorUtility.ClearProgressBar();

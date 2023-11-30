@@ -72,15 +72,6 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载子资源对象
         /// </summary>
-        /// <param name="location">资源信息</param>
-        public static ATaskObjectArray LoadSubAssetsDefaultTask(AssetInfo location)
-        {
-            return LoadSubAssetsTask(DefaultPackageName, location);
-        }
-
-        /// <summary>
-        /// 异步加载子资源对象
-        /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         public static ATaskObjectArray LoadSubAssetsDefaultTask(string location, Type type)
@@ -116,15 +107,6 @@ namespace AIO.UEngine.YooAsset
             return LoadAssetTask(DefaultPackageName, location, type);
         }
 
-        /// <summary>
-        /// 异步加载资源对象
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        public static ATaskObject LoadAssetDefaultTask(AssetInfo location)
-        {
-            return LoadAssetTask(DefaultPackageName, location);
-        }
-
         #endregion
 
         #region 场景加载
@@ -145,34 +127,9 @@ namespace AIO.UEngine.YooAsset
             return LoadSceneTask(DefaultPackageName, location, sceneMode, suspendLoad, priority);
         }
 
-        /// <summary>
-        /// 异步加载场景
-        /// </summary>
-        /// <param name="location">场景的定位地址</param>
-        /// <param name="sceneMode">场景加载模式</param>
-        /// <param name="suspendLoad">场景加载到90%自动挂起</param>
-        /// <param name="priority">优先级</param>
-        public static ATaskScene LoadSceneDefaultTask(
-            AssetInfo location,
-            LoadSceneMode sceneMode = LoadSceneMode.Single,
-            bool suspendLoad = false,
-            int priority = 100)
-        {
-            return LoadSceneTask(DefaultPackageName, location, sceneMode, suspendLoad, priority);
-        }
-
         #endregion
 
         #region 原生文件
-
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        public static ATaskByteArray LoadRawFileDataDefaultTask(AssetInfo location)
-        {
-            return LoadRawFileDataTask(DefaultPackageName, location);
-        }
 
         /// <summary>
         /// 异步加载原生文件
@@ -181,15 +138,6 @@ namespace AIO.UEngine.YooAsset
         public static ATaskByteArray LoadRawFileDataDefaultTask(string location)
         {
             return LoadRawFileDataTask(DefaultPackageName, location);
-        }
-
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        public static ATaskString LoadRawFileTextDefaultTask(AssetInfo location)
-        {
-            return LoadRawFileTextTask(DefaultPackageName, location);
         }
 
         /// <summary>

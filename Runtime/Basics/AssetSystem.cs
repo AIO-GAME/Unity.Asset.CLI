@@ -8,10 +8,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 using AIO.UEngine;
-using UnityEngine;
 
 namespace AIO
 {
@@ -20,69 +18,6 @@ namespace AIO
     /// </summary>
     public static partial class AssetSystem
     {
-        private static AssetProxy Proxy;
-
-        /// <summary>
-        /// 资源包配置
-        /// </summary>
-        public static ICollection<AssetsPackageConfig> PackageConfigs => Parameter.Packages;
-
-        /// <summary>
-        /// 资源热更新配置
-        /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static ASConfig Parameter { get; private set; }
-
-        /// <summary>
-        /// 是否已经初始化
-        /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static bool IsInitialized { get; private set; }
-
-        public struct SequenceRecord
-        {
-            /// <summary>
-            /// 资源包名
-            /// </summary>
-            public string Name;
-
-            /// <summary>
-            /// 资源包寻址路径
-            /// </summary>
-            public string Location;
-
-            /// <summary>
-            /// 资源路径
-            /// </summary>
-            public string AssetPath;
-
-            /// <summary>
-            /// 记录时间
-            /// </summary>
-            public DateTime Time;
-
-            /// <summary>
-            /// 记录大小
-            /// </summary>
-            public long Bytes;
-
-            /// <summary>
-            /// 记录数量
-            /// </summary>
-            public int Count;
-        }
-
-        /// <summary>
-        /// 序列记录队列
-        /// </summary>
-        private static Queue<SequenceRecord> SequenceRecordQueue;
-
-        /// <summary>
-        /// 序列记录路径
-        /// </summary>
-        internal static readonly string SequenceRecordPath =
-            Path.Combine(Application.persistentDataPath, "aio.asset.record.json");
-
         /// <summary>
         /// 系统初始化
         /// </summary>
@@ -90,6 +25,30 @@ namespace AIO
         public static IEnumerator Initialize<T>(ASConfig config) where T : AssetProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), config);
+        }
+
+        public static ICollection<string> GetAssetInfos(string tag)
+        {
+            return Proxy.GetAssetInfos(tag);
+        }
+
+        public static ICollection<string> GetAssetInfos(IEnumerable<string> tag)
+        {
+            return Proxy.GetAssetInfos(tag);
+        }
+
+        /// <summary>
+        /// 系统初始化
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IEnumerator Initialize(ASConfig config)
+        {
+#if SUPPORT_YOOASSET
+            Proxy = new YAssetProxy();
+#else
+            throw new Exception("Not Found Other Asset Proxy! Please Input Asset Proxy!");
+#endif
+            yield return Initialize(Proxy, config);
         }
 
         /// <summary>
@@ -120,16 +79,10 @@ namespace AIO
             Parameter = config;
             Proxy = proxy;
             yield return Proxy.Initialize();
+            SequenceRecords = new SequenceRecordQueue();
+            yield return SequenceRecords.LoadAsync();
+            yield return DownloadDynamic();
             IsInitialized = true;
-#if !UNITY_WEBGL
-            if (Parameter.AutoSequenceRecord)
-            {
-                SequenceRecordQueue = File.Exists(SequenceRecordPath)
-                    ? AHelper.IO.ReadJsonUTF8<Queue<SequenceRecord>>(SequenceRecordPath)
-                    : new Queue<SequenceRecord>();
-                if (SequenceRecordQueue is null) SequenceRecordQueue = new Queue<SequenceRecord>();
-            }
-#endif
         }
 
         /// <summary>
@@ -139,9 +92,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static void AddSequenceRecord(SequenceRecord record)
         {
-#if !UNITY_WEBGL
-            if (Parameter.AutoSequenceRecord) SequenceRecordQueue.Enqueue(record);
-#endif
+            SequenceRecords.Add(record);
         }
 
         /// <summary>
@@ -152,13 +103,7 @@ namespace AIO
         public static async Task Destroy()
         {
             Proxy.Dispose();
-#if !UNITY_WEBGL
-            if (Parameter.AutoSequenceRecord)
-            {
-                await AHelper.IO.WriteJsonUTF8Async(SequenceRecordPath, SequenceRecordQueue);
-                SequenceRecordQueue = null;
-            }
-#endif
+            SequenceRecords.Dispose();
         }
     }
 }

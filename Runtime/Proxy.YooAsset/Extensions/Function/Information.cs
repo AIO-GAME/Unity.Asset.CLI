@@ -14,17 +14,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="location">资源的定位地址</param>
         public static bool IsNeedDownloadFromRemote(string name, string location)
         {
-            if (!Dic.TryGetValue(name, out var asset)) return false;
-            return asset.IsNeedDownloadFromRemote(location);
-        }
-
-        /// <summary>
-        /// 是否需要从远端更新下载
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
-        public static bool IsNeedDownloadFromRemote(string location)
-        {
-            return (from package in Dic.Values where package.CheckLocationValid(location) select package.IsNeedDownloadFromRemote(location)).FirstOrDefault();
+            if (AssetSystem.Parameter.ASMode != EASMode.Remote) return false;
+            return Dic.TryGetValue(name, out var asset) && asset.IsNeedDownloadFromRemote(location);
         }
 
         /// <summary>
@@ -34,8 +25,20 @@ namespace AIO.UEngine.YooAsset
         /// <param name="assetInfo">资源的定位地址</param>
         public static bool IsNeedDownloadFromRemote(string name, AssetInfo assetInfo)
         {
-            if (!Dic.TryGetValue(name, out var asset)) return false;
-            return asset.IsNeedDownloadFromRemote(assetInfo);
+            if (AssetSystem.Parameter.ASMode != EASMode.Remote) return false;
+            return Dic.TryGetValue(name, out var asset) && asset.IsNeedDownloadFromRemote(assetInfo);
+        }
+
+        /// <summary>
+        /// 是否需要从远端更新下载
+        /// </summary>
+        /// <param name="location">资源的定位地址</param>
+        public static bool IsNeedDownloadFromRemote(string location)
+        {
+            if (AssetSystem.Parameter.ASMode != EASMode.Remote) return false;
+            return (from package in Dic.Values
+                where package.CheckLocationValid(location)
+                select package.IsNeedDownloadFromRemote(location)).FirstOrDefault();
         }
 
         /// <summary>
@@ -53,10 +56,11 @@ namespace AIO.UEngine.YooAsset
         /// 获取资源信息列表
         /// </summary>
         /// <param name="tag">资源标签</param>
-        public static ICollection<AssetInfo> GetAssetInfos(ICollection<string> tag)
+        public static ICollection<AssetInfo> GetAssetInfos(IEnumerable<string> tag)
         {
             var list = new List<AssetInfo>();
-            foreach (var asset in Dic.Values) list.AddRange(asset.GetAssetInfos(tag.ToArray()));
+            var tags = tag.ToArray();
+            foreach (var asset in Dic.Values) list.AddRange(asset.GetAssetInfos(tags));
             return list;
         }
 
@@ -67,8 +71,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tag">资源标签</param>
         public static AssetInfo[] GetAssetInfos(string name, string tag)
         {
-            if (!Dic.TryGetValue(name, out var asset)) return null;
-            return asset.GetAssetInfos(tag);
+            return !Dic.TryGetValue(name, out var asset) ? null : asset.GetAssetInfos(tag);
         }
 
         /// <summary>
@@ -78,8 +81,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         public static AssetInfo[] GetAssetInfos(string name, string[] tags)
         {
-            if (!Dic.TryGetValue(name, out var asset)) return null;
-            return asset.GetAssetInfos(tags);
+            return !Dic.TryGetValue(name, out var asset) ? null : asset.GetAssetInfos(tags);
         }
 
         /// <summary>
@@ -89,8 +91,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="location">资源的定位地址</param>
         public static AssetInfo GetAssetInfo(string name, string location)
         {
-            if (!Dic.TryGetValue(name, out var asset)) return null;
-            return asset.GetAssetInfo(location);
+            return !Dic.TryGetValue(name, out var asset) ? null : asset.GetAssetInfo(location);
         }
 
         /// <summary>
@@ -113,8 +114,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="location">资源的定位地址</param>
         public static bool CheckLocationValid(string name, string location)
         {
-            if (!Dic.TryGetValue(name, out var asset)) return false;
-            return asset.CheckLocationValid(location);
+            return Dic.TryGetValue(name, out var asset) && asset.CheckLocationValid(location);
         }
 
         /// <summary>

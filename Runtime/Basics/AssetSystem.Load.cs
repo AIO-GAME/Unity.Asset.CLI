@@ -27,7 +27,7 @@ namespace AIO
         public static async void LoadSubAssets<TObject>(string location, Action<TObject[]> cb) where TObject : Object
         {
             cb?.Invoke(
-                await Proxy.LoadSubAssetsTask<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location));
+                await Proxy.LoadSubAssetsTask<TObject>(SettingToLocalPath(location)));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static async void LoadSubAssets(string location, Type type, Action<Object[]> cb)
         {
-            cb?.Invoke(await Proxy.LoadSubAssetsTask(Parameter.LoadPathToLower ? location.ToLower() : location, type));
+            cb?.Invoke(await Proxy.LoadSubAssetsTask(SettingToLocalPath(location), type));
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator LoadSubAssetsCO<TObject>(string location, Action<TObject[]> cb) where TObject : Object
         {
-            return Proxy.LoadSubAssetsCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb);
+            return Proxy.LoadSubAssetsCO(SettingToLocalPath(location), cb);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator LoadSubAssetsCO(string location, Type type, Action<Object[]> cb)
         {
-            return Proxy.LoadSubAssetsCO(Parameter.LoadPathToLower ? location.ToLower() : location, type, cb);
+            return Proxy.LoadSubAssetsCO(SettingToLocalPath(location), type, cb);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static TObject[] LoadSubAssets<TObject>(string location) where TObject : Object
         {
-            return Proxy.LoadSubAssetsSync<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadSubAssetsSync<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Object[] LoadSubAssets(string location, Type type)
         {
-            return Proxy.LoadSubAssetsSync(Parameter.LoadPathToLower ? location.ToLower() : location, type);
+            return Proxy.LoadSubAssetsSync(SettingToLocalPath(location), type);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Object[] LoadSubAssets(string location)
         {
-            return Proxy.LoadSubAssetsSync(Parameter.LoadPathToLower ? location.ToLower() : location, typeof(Object));
+            return Proxy.LoadSubAssetsSync(SettingToLocalPath(location), typeof(Object));
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<TObject[]> LoadSubAssetsTask<TObject>(string location) where TObject : Object
         {
-            return Proxy.LoadSubAssetsTask<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadSubAssetsTask<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<Object[]> LoadSubAssetsTask(string location, Type type)
         {
-            return Proxy.LoadSubAssetsTask(Parameter.LoadPathToLower ? location.ToLower() : location, type);
+            return Proxy.LoadSubAssetsTask(SettingToLocalPath(location), type);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<Object[]> LoadSubAssetsTask(string location)
         {
-            return Proxy.LoadSubAssetsTask(Parameter.LoadPathToLower ? location.ToLower() : location, typeof(Object));
+            return Proxy.LoadSubAssetsTask(SettingToLocalPath(location), typeof(Object));
         }
 
         #endregion
@@ -155,7 +155,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static async void LoadAsset<TObject>(string location, Action<TObject> cb) where TObject : Object
         {
-            cb?.Invoke(await Proxy.LoadAssetTask<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location));
+            cb?.Invoke(await Proxy.LoadAssetTask<TObject>(SettingToLocalPath(location)));
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static async void LoadAsset(string location, Action<Object> cb)
         {
-            cb?.Invoke(await Proxy.LoadAssetTask<Object>(Parameter.LoadPathToLower ? location.ToLower() : location));
+            cb?.Invoke(await Proxy.LoadAssetTask<Object>(SettingToLocalPath(location)));
         }
 
         /// <summary>
@@ -178,19 +178,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static async void LoadAsset(string location, Type type, Action<Object> cb)
         {
-            cb?.Invoke(await Proxy.LoadAssetTask(Parameter.LoadPathToLower ? location.ToLower() : location, type));
-        }
-
-        /// <summary>
-        /// 异步加载资源对象
-        /// </summary>
-        /// <typeparam name="TObject">资源类型</typeparam>
-        /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator LoadAssetCO<TObject>(string location, Action<TObject> cb) where TObject : Object
-        {
-            return Proxy.LoadAssetCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb);
+            cb?.Invoke(await Proxy.LoadAssetTask(SettingToLocalPath(location), type));
         }
 
         public interface IAsyncHandle : IEnumerator, IDisposable
@@ -226,11 +214,14 @@ namespace AIO
 
             public float Progress { get; private set; }
 
+            public Action<T> OnCompleted;
+
             private void OnCompletedCo(T asset)
             {
                 Progress = 1;
                 Result = asset;
                 IsDone = true;
+                OnCompleted?.Invoke(Result);
             }
 
             private void OnCompletedTask()
@@ -238,11 +229,13 @@ namespace AIO
                 Progress = 1;
                 Result = Awaiter.GetResult();
                 IsDone = true;
+                OnCompleted?.Invoke(Result);
             }
 
-            public LoadAssetHandleCo(string location)
+            public LoadAssetHandleCo(string location, Action<T> onCompleted = null)
             {
                 Location = location;
+                OnCompleted = onCompleted;
                 IsDone = false;
                 Progress = 0;
                 Result = null;
@@ -288,7 +281,20 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IAsyncHandle<TObject> LoadAssetCO<TObject>(string location) where TObject : Object
         {
-            return new LoadAssetHandleCo<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return new LoadAssetHandleCo<TObject>(SettingToLocalPath(location));
+        }
+
+        /// <summary>
+        /// 异步加载资源对象
+        /// </summary>
+        /// <typeparam name="TObject">资源类型</typeparam>
+        /// <param name="location">资源的定位地址</param>
+        /// <param name="cb">回调</param>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IAsyncHandle<TObject> LoadAssetCO<TObject>(string location, Action<TObject> cb)
+            where TObject : Object
+        {
+            return new LoadAssetHandleCo<TObject>(SettingToLocalPath(location), cb);
         }
 
         /// <summary>
@@ -299,7 +305,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator LoadAssetCO(string location, Action<Object> cb)
         {
-            return Proxy.LoadAssetCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb);
+            return Proxy.LoadAssetCO(SettingToLocalPath(location), cb);
         }
 
         /// <summary>
@@ -311,7 +317,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator LoadAssetCO(string location, Type type, Action<Object> cb)
         {
-            return Proxy.LoadAssetCO(Parameter.LoadPathToLower ? location.ToLower() : location, type, cb);
+            return Proxy.LoadAssetCO(SettingToLocalPath(location), type, cb);
         }
 
         /// <summary>
@@ -322,7 +328,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static TObject LoadAsset<TObject>(string location) where TObject : Object
         {
-            return Proxy.LoadAssetSync<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadAssetSync<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -333,7 +339,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Object LoadAsset(string location, Type type)
         {
-            return Proxy.LoadAssetSync(Parameter.LoadPathToLower ? location.ToLower() : location, type);
+            return Proxy.LoadAssetSync(SettingToLocalPath(location), type);
         }
 
         /// <summary>
@@ -343,7 +349,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Object LoadAsset(string location)
         {
-            return Proxy.LoadAssetSync(Parameter.LoadPathToLower ? location.ToLower() : location, typeof(Object));
+            return Proxy.LoadAssetSync(SettingToLocalPath(location), typeof(Object));
         }
 
         /// <summary>
@@ -354,7 +360,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<TObject> LoadAssetTask<TObject>(string location) where TObject : Object
         {
-            return Proxy.LoadAssetTask<TObject>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadAssetTask<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -365,7 +371,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<Object> LoadAssetTask(string location, Type type)
         {
-            return Proxy.LoadAssetTask(Parameter.LoadPathToLower ? location.ToLower() : location, type);
+            return Proxy.LoadAssetTask(SettingToLocalPath(location), type);
         }
 
         /// <summary>
@@ -375,7 +381,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<Object> LoadAssetTask(string location)
         {
-            return Proxy.LoadAssetTask(Parameter.LoadPathToLower ? location.ToLower() : location, typeof(Object));
+            return Proxy.LoadAssetTask(SettingToLocalPath(location), typeof(Object));
         }
 
         #endregion
@@ -398,7 +404,7 @@ namespace AIO
             bool suspendLoad = false,
             int priority = 100)
         {
-            cb?.Invoke(await Proxy.LoadSceneTask(Parameter.LoadPathToLower ? location.ToLower() : location, sceneMode,
+            cb?.Invoke(await Proxy.LoadSceneTask(SettingToLocalPath(location), sceneMode,
                 suspendLoad, priority));
         }
 
@@ -418,7 +424,7 @@ namespace AIO
             bool suspendLoad = false,
             int priority = 100)
         {
-            return Proxy.LoadSceneCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb, sceneMode,
+            return Proxy.LoadSceneCO(SettingToLocalPath(location), cb, sceneMode,
                 suspendLoad, priority);
         }
 
@@ -436,7 +442,7 @@ namespace AIO
             bool suspendLoad = true,
             int priority = 100)
         {
-            return Proxy.LoadSceneTask(Parameter.LoadPathToLower ? location.ToLower() : location, sceneMode,
+            return Proxy.LoadSceneTask(SettingToLocalPath(location), sceneMode,
                 suspendLoad, priority);
         }
 
@@ -451,7 +457,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static string LoadRawFileText(string location)
         {
-            return Proxy.LoadRawFileTextSync(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadRawFileTextSync(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -462,7 +468,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static async void LoadRawFileText(string location, Action<string> cb)
         {
-            cb?.Invoke(await Proxy.LoadRawFileTextTask(Parameter.LoadPathToLower ? location.ToLower() : location));
+            cb?.Invoke(await Proxy.LoadRawFileTextTask(SettingToLocalPath(location)));
         }
 
         /// <summary>
@@ -472,7 +478,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<string> LoadRawFileTextTask(string location)
         {
-            return Proxy.LoadRawFileTextTask(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadRawFileTextTask(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -483,7 +489,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static async void LoadRawFileData(string location, Action<byte[]> cb)
         {
-            cb?.Invoke(await Proxy.LoadRawFileDataTask(Parameter.LoadPathToLower ? location.ToLower() : location));
+            cb?.Invoke(await Proxy.LoadRawFileDataTask(SettingToLocalPath(location)));
         }
 
         /// <summary>
@@ -493,7 +499,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static byte[] LoadRawFileData(string location)
         {
-            return Proxy.LoadRawFileDataSync(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadRawFileDataSync(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -503,7 +509,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<byte[]> LoadRawFileDataTask(string location)
         {
-            return Proxy.LoadRawFileDataTask(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadRawFileDataTask(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -514,7 +520,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator LoadRawFileDataCO(string location, Action<byte[]> cb)
         {
-            return Proxy.LoadRawFileDataCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb);
+            return Proxy.LoadRawFileDataCO(SettingToLocalPath(location), cb);
         }
 
         /// <summary>
@@ -525,7 +531,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator LoadRawFileTextCO(string location, Action<string> cb)
         {
-            return Proxy.LoadRawFileTextCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb);
+            return Proxy.LoadRawFileTextCO(SettingToLocalPath(location), cb);
         }
 
         #endregion

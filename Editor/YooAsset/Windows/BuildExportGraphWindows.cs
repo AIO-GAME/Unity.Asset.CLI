@@ -266,7 +266,6 @@ namespace AIO.UEditor.Build
                     Commond.ActiveTarget = BuildTarget;
                     YooAssetBuild.ArtBuild(Commond);
                     Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                    return;
                 }
 
                 if (AHelper.IO.ExistsFolder(BuildInFilePlatform))
@@ -281,7 +280,6 @@ namespace AIO.UEditor.Build
                                 target => YooAssetPackageVersionTarget[target][YooAssetPackageTargetIndex[target]]);
                             EngineeringPathPath[BuildTarget].BuiltUp(BuildTarget, BuildInFilePlatform, dic);
                             Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                            return;
                         }
                     }
                 }
@@ -295,24 +293,25 @@ namespace AIO.UEditor.Build
             using (var handle = AHandle.FTP.Create(ServerIP, User, Password, "Bundles"))
             {
                 await handle.InitAsync();
-                var args = new ProgressArgs();
-                args.OnProgress = progress =>
+                var args = new AProgressEvent
                 {
-                    if (EditorUtility.DisplayCancelableProgressBar("Upload FTP", progress.ToString(),
-                            progress.Progress / 100f))
+                    OnProgress = progress =>
                     {
-                        args.Cancel();
+                        if (EditorUtility.DisplayCancelableProgressBar("Upload FTP", progress.ToString(),
+                                progress.Progress / 100f))
+                        {
+                        }
+                    },
+                    OnError = error =>
+                    {
+                        Debug.LogException(error);
+                        EditorUtility.ClearProgressBar();
+                    },
+                    OnComplete = () =>
+                    {
+                        EditorUtility.ClearProgressBar();
+                        EditorUtility.DisplayDialog("Upload FTP", "Upload FTP Complete", "OK");
                     }
-                };
-                args.OnError = error =>
-                {
-                    Debug.LogException(error);
-                    EditorUtility.ClearProgressBar();
-                };
-                args.OnComplete = () =>
-                {
-                    EditorUtility.ClearProgressBar();
-                    EditorUtility.DisplayDialog("Upload FTP", "Upload FTP Complete", "OK");
                 };
                 await handle.UploadDirAsync(Commond.OutputRoot, args);
             }

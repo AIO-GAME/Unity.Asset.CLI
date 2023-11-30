@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -18,7 +18,7 @@ namespace AIO
         /// <summary>
         /// 资源正在下载
         /// </summary>
-        public static event Action<IASNetLoading> OnEventDownloading;
+        public static event Action<IProgressHandle> OnEventDownloading;
 
         internal static void InvokeNotify(EASEventType eventType, string message)
         {
@@ -30,7 +30,7 @@ namespace AIO
             return OnEventDownloading != null;
         }
 
-        internal static void InvokeDownloading<T>(T loading) where T : IASNetLoading
+        internal static void InvokeDownloading<T>(T loading) where T : IProgressHandle
         {
             OnEventDownloading?.Invoke(loading);
         }

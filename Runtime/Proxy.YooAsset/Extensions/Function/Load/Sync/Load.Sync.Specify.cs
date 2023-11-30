@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-11
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -69,26 +69,6 @@ namespace AIO.UEngine.YooAsset
         /// 同步加载子资源对象
         /// </summary>
         /// <param name="packagename">包名</param>
-        /// <param name="location">资源信息</param>
-        public static Object[] LoadSubAssets(in string packagename, in AssetInfo location)
-        {
-            var operation = GetHandle<SubAssetsOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = GetAutoPackageSync(packagename, location);
-                if (package is null) return null;
-                operation = package.LoadSubAssetsSync(location);
-                if (!LoadCheckOPSync(operation)) return null;
-                AddHandle(location, operation);
-            }
-
-            return operation.AllAssetObjects;
-        }
-
-        /// <summary>
-        /// 同步加载子资源对象
-        /// </summary>
-        /// <param name="packagename">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         public static Object[] LoadSubAssets(in string packagename, in string location, in Type type)
@@ -104,26 +84,6 @@ namespace AIO.UEngine.YooAsset
             }
 
             return operation.AllAssetObjects;
-        }
-
-        /// <summary>
-        /// 同步加载资源对象
-        /// </summary>
-        /// <param name="packagename">包名</param>
-        /// <param name="location">资源信息</param>
-        public static Object LoadAsset(in string packagename, in AssetInfo location)
-        {
-            var operation = GetHandle<AssetOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = GetAutoPackageSync(packagename, location);
-                if (package is null) return null;
-                operation = package.LoadAssetSync(location);
-                if (!LoadCheckOPSync(operation)) return null;
-                AddHandle(location, operation);
-            }
-
-            return operation.AssetObject;
         }
 
         /// <summary>
@@ -172,26 +132,6 @@ namespace AIO.UEngine.YooAsset
         /// 同步加载原生文件
         /// </summary>
         /// <param name="packagename">包名</param>
-        /// <param name="location">资源信息</param>
-        public static string LoadRawFileText(in string packagename, in AssetInfo location)
-        {
-            var operation = GetHandle<RawFileOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = GetAutoPackageSync(packagename, location);
-                if (package is null) return null;
-                operation = package.LoadRawFileSync(location);
-                if (!LoadCheckOPSync(operation)) return null;
-                AddHandle(location, operation);
-            }
-
-            return operation.GetRawFileText();
-        }
-
-        /// <summary>
-        /// 同步加载原生文件
-        /// </summary>
-        /// <param name="packagename">包名</param>
         /// <param name="location">资源的定位地址</param>
         public static string LoadRawFileText(in string packagename, in string location)
         {
@@ -206,26 +146,6 @@ namespace AIO.UEngine.YooAsset
             }
 
             return operation.GetRawFileText();
-        }
-
-        /// <summary>
-        /// 同步加载原生文件
-        /// </summary>
-        /// <param name="packagename">包名</param>
-        /// <param name="location">资源信息</param>
-        public static byte[] LoadRawFileData(in string packagename, in AssetInfo location)
-        {
-            var operation = GetHandle<RawFileOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = GetAutoPackageSync(packagename, location);
-                if (package is null) return null;
-                operation = package.LoadRawFileSync(location);
-                if (!LoadCheckOPSync(operation)) return null;
-                AddHandle(location, operation);
-            }
-
-            return operation.GetRawFileData();
         }
 
         /// <summary>

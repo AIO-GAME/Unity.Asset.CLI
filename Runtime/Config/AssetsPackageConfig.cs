@@ -23,7 +23,7 @@ namespace AIO.UEngine
         /// <summary>
         /// 资源包动态下载加载
         /// </summary>
-        public bool IsSidePlayWithDownload = false;
+        public bool IsSidePlayWithDownload ;
 
         public override string ToString()
         {

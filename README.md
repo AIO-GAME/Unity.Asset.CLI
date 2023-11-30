@@ -12,6 +12,7 @@
 <a href="https://github.com/AIO-GAME/Unity.Asset.CLI/issues"><img alt="" src="https://img.shields.io/github/issues/AIO-GAME/Unity.Asset.CLI"></a>
 <a href="https://www.codetriage.com/aio-game/unity.asset.cli"><img alt="" src="https://www.codetriage.com/aio-game/unity.asset.cli/badges/users.svg"></a>
 <a href="https://github.com/AIO-GAME/Unity.Asset.CLI/tags"><img alt="" src="https://img.shields.io/github/package-json/version/AIO-GAME/Unity.Asset.CLI"></a>
+<a href="https://openupm.com/packages/com.aio.cli.asset/"><img src="https://img.shields.io/npm/v/com.aio.cli.asset?label=openupm&amp;registry_uri=https://package.openupm.com" /></a>
 </p>
 
 ## ⚙ Install

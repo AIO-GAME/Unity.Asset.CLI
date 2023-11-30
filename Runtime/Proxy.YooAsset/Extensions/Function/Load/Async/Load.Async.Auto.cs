@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-21
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -15,7 +15,6 @@ namespace AIO.UEngine.YooAsset
 {
     internal partial class YAssetSystem
     {
-
         public static async void InstGameObject(string location, Transform parent, Action<GameObject> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
@@ -276,15 +275,21 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
-            if (operation is null)
+            if (operation != null)
             {
-                var package = await GetAutoPackageTask(location);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
-
-                operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                if (!await LoadCheckOPTask(operation)) throw new Exception(string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
-                AddHandle(location, operation);
+                var handle = operation.UnloadAsync();
+                await handle.Task;
+                FreeHandle(location);
             }
+
+            var package = await GetAutoPackageTask(location);
+            if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
+
+            operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            if (!await LoadCheckOPTask(operation))
+                throw new Exception(
+                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+            AddHandle(location, operation);
 
             cb?.Invoke(operation.SceneObject);
         }
@@ -305,15 +310,23 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
-            if (operation is null)
+            if (operation != null)
             {
-                var package = await GetAutoPackageTask(location);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", package.PackageName, location, sceneMode));
-
-                operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                if (!await LoadCheckOPTask(operation)) throw new Exception(string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
-                AddHandle(location, operation);
+                var handle = operation.UnloadAsync();
+                await handle.Task;
+                FreeHandle(location);
             }
+
+            var package = await GetAutoPackageTask(location);
+            if (package is null)
+                throw new Exception(
+                    string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
+
+            operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            if (!await LoadCheckOPTask(operation))
+                throw new Exception(
+                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+            AddHandle(location, operation);
 
             cb?.Invoke(operation.SceneObject);
         }

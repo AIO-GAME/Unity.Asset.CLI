@@ -221,12 +221,5 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         public abstract Task PreLoadRaw(string location);
-
-        /// <summary>
-        /// 预加载记录
-        /// </summary>
-        public abstract Task PreRecord(
-            Queue<AssetSystem.SequenceRecord> recordQueue,
-            ProgressArgs progressArgs = default);
     }
 }

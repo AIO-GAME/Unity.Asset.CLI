@@ -24,7 +24,6 @@ namespace AIO.UEditor
 
         private List<AssetsPackageConfig> _packages;
         private bool FoldoutAutoRecord = true;
-        private Queue<AssetSystem.SequenceRecord> RecordQueue;
         private string RecordQueueSizeStr = "0 bytes";
 
         protected override void OnActivation()
@@ -81,27 +80,34 @@ namespace AIO.UEditor
 
                     if (Target.AutoSequenceRecord)
                     {
-                        using (new EditorGUILayout.HorizontalScope(GEStyle.DropzoneStyle))
+                        if (EditorApplication.isPlaying)
                         {
-                            GELayout.Label("序列记录远端地址");
-                            if (!string.IsNullOrEmpty(Target.SequenceRecordRemotePath))
+                            using (new EditorGUILayout.HorizontalScope(GEStyle.DropzoneStyle))
                             {
-                                if (GELayout.Button("Open")) Application.OpenURL(Target.SequenceRecordRemotePath);
+                                GELayout.LabelPrefix("序列记录");
+                                if (!string.IsNullOrEmpty(AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Target)))
+                                {
+                                    if (GELayout.Button("Open"))
+                                        Application.OpenURL(AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Target));
+
+                                    if (GELayout.Button("Upload FTP"))
+                                    {
+                                        AHandle.FTP.Create("", "", "").UploadFile(
+                                            AssetSystem.SequenceRecordQueue.LOCAL_PATH);
+                                    }
+                                }
                             }
                         }
-
-                        Target.SequenceRecordRemotePath =
-                            GELayout.AreaText(Target.SequenceRecordRemotePath, GUILayout.Height(50));
 
                         FoldoutAutoRecord = GELayout.VFoldout($"序列记录 Size {RecordQueueSizeStr}", FoldoutAutoRecord);
                         if (FoldoutAutoRecord)
                         {
-                            if (RecordQueue != null)
+                            if (AssetSystem.SequenceRecords != null)
                             {
                                 using (GELayout.Vertical())
                                 {
                                     var index = 0;
-                                    foreach (var record in RecordQueue)
+                                    foreach (var record in AssetSystem.SequenceRecords)
                                     {
                                         GELayout.Label(
                                             $"{++index} : {record.Name} -> {record.Location} : {record.AssetPath} ");
@@ -115,17 +121,16 @@ namespace AIO.UEditor
                             {
                                 GELayout.Button("Update", UpdateRecordQueue);
 
-                                if (File.Exists(AssetSystem.SequenceRecordPath))
+                                if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
                                 {
-                                    GELayout.Button(" Open ", OpenSequenceRecordPath);
-                                    if (GELayout.Button("Clear "))
+                                    if (GELayout.Button("Open Local"))
                                     {
-                                        RecordQueue.Clear();
-                                        var sandbox = Path.Combine(Directory.GetParent(Application.dataPath).FullName,
-                                            "Sandbox");
-                                        if (Directory.Exists(sandbox))
-                                            AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
-                                        AHelper.IO.DeleteFile(AssetSystem.SequenceRecordPath);
+                                        Application.OpenURL(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
+                                    }
+
+                                    if (GELayout.Button("Delete Local"))
+                                    {
+                                        AHelper.IO.DeleteFile(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                                     }
                                 }
                             }
@@ -150,20 +155,12 @@ namespace AIO.UEditor
             }
         }
 
-        private static void OpenSequenceRecordPath()
-        {
-            Application.OpenURL(AssetSystem.SequenceRecordPath);
-        }
-
         private void UpdateRecordQueue()
         {
-            RecordQueue = File.Exists(AssetSystem.SequenceRecordPath)
-                ? AHelper.IO.ReadJsonUTF8<Queue<AssetSystem.SequenceRecord>>(AssetSystem
-                    .SequenceRecordPath)
-                : new Queue<AssetSystem.SequenceRecord>();
-
-            if (RecordQueue is null) RecordQueue = new Queue<AssetSystem.SequenceRecord>();
-            RecordQueueSizeStr = RecordQueue.Sum(record => record.Bytes).ToConverseStringFileSize();
+            if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH)) // 如果在编辑器下存在本地记录则加载
+                AssetSystem.SequenceRecords.Records = AHelper.IO.ReadJsonUTF8<Queue<AssetSystem.SequenceRecord>>(
+                    AssetSystem.SequenceRecordQueue.LOCAL_PATH);
+            RecordQueueSizeStr = AssetSystem.SequenceRecords.Sum(record => record.Bytes).ToConverseStringFileSize();
         }
 
         private async void Update()

@@ -8,12 +8,17 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 内置资源查询服务接口
         /// </summary>
-        public IQueryServices QueryServices { get; set; }
+        public IBuildinQueryServices QueryServices { get; set; }
 
         /// <summary>
         /// 远端资源地址查询服务类
         /// </summary>
         public IRemoteServices RemoteServices { get; set; }
+
+        /// <summary>
+        /// 分发资源查询服务接口
+        /// </summary>
+        public IDeliveryQueryServices DeliveryQueryServices { get; set; }
 
         public YAssetParametersRemote() : base(MODE)
         {
@@ -47,7 +52,8 @@ namespace AIO.UEngine.YooAsset
             initParameters.DecryptionServices = DecryptionServices;
             initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;
             initParameters.DownloadFailedTryAgain = DownloadFailedTryAgain;
-            initParameters.QueryServices = QueryServices;
+            initParameters.BuildinQueryServices = QueryServices;
+            initParameters.DeliveryQueryServices = DeliveryQueryServices;
             initParameters.BuildinRootDirectory = BuildInRootDirectory;
             initParameters.SandboxRootDirectory = SandboxRootDirectory;
             initParameters.RemoteServices = RemoteServices;

@@ -1,7 +1,6 @@
 ﻿/*|✩ - - - - - |||
 |||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
 using System;
@@ -50,11 +49,6 @@ namespace AIO.UEngine
         /// 自动序列记录
         /// </summary>
         public bool AutoSequenceRecord;
-
-        /// <summary>
-        /// 序列记录远端路径
-        /// </summary>
-        public string SequenceRecordRemotePath;
 
         /// <summary>
         /// 输出日志
@@ -120,9 +114,10 @@ namespace AIO.UEngine
             switch (ASMode)
             {
                 case EASMode.Remote:
-                    Packages = await AssetSystem.GetRemotePackageList(URL);
-                    if (string.IsNullOrEmpty(SequenceRecordRemotePath)) return;
-                    await AHelper.Net.HTTP.DownloadAsync(SequenceRecordRemotePath, AssetSystem.SequenceRecordPath);
+                    if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
+                    var remote = Path.Combine(URL, "Version", string.Concat(AssetSystem.PlatformNameStr, ".json"));
+                    var config = await AHelper.Net.HTTP.GetAsync(string.Concat(remote, "?t=", DateTime.Now.Ticks));
+                    Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(config);
                     break;
                 default:
 #if UNITY_EDITOR && SUPPORT_YOOASSET
@@ -162,10 +157,10 @@ namespace AIO.UEngine
         /// </summary>
         public static ASConfig GetOrCreate()
         {
-            foreach (var item in Resources.LoadAll<ASConfig>(""))
+            foreach (var item in Resources.LoadAll<ASConfig>("ASConfig"))
             {
-                if (item != null)
-                    return item;
+                if (item is null) continue;
+                return item;
             }
 
 #if UNITY_EDITOR

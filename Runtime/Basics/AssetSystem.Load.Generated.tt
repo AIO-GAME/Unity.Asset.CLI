@@ -1,9 +1,8 @@
-﻿<#@ template debug="false" hostspecific="true" language="C#" linePragmas="true" visibility="public" #>
+﻿<#@ template debug="false" hostspecific="false" language="C#" linePragmas="true" visibility="public"#>
 <#@ output extension=".cs" encoding="utf-8" #>
 <#@ import namespace="System"#>
 <#@ import namespace="System.Collections"#>
 <#@ import namespace="System.Collections.Generic" #>
-
 <#
     var types = new (string typeName, string aliasName)[]
     {
@@ -22,7 +21,7 @@
 #>
 
 /*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> Automatic Generate
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -51,7 +50,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static <#= typeName #> Load<#= aliasName #>(string location)
         {
-            return Proxy.LoadAssetSync<<#= typeName #>>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadAssetSync<<#= typeName #>>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -62,7 +61,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> cb)
         {
-            cb.Invoke(await Proxy.LoadAssetTask<<#= typeName #>>(Parameter.LoadPathToLower ? location.ToLower() : location));
+            cb.Invoke(await Proxy.LoadAssetTask<<#= typeName #>>(SettingToLocalPath(location)));
         }
 
         /// <summary>
@@ -72,7 +71,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task<<#= typeName #>> Load<#= aliasName #>Task(string location)
         {
-            return Proxy.LoadAssetTask<<#= typeName #>>(Parameter.LoadPathToLower ? location.ToLower() : location);
+            return Proxy.LoadAssetTask<<#= typeName #>>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -83,7 +82,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Load<#= aliasName #>CO(string location, Action<<#= typeName #>> cb)
         {
-            return Proxy.LoadAssetCO(Parameter.LoadPathToLower ? location.ToLower() : location, cb);
+            return Proxy.LoadAssetCO(SettingToLocalPath(location), cb);
         }
 
        #endregion

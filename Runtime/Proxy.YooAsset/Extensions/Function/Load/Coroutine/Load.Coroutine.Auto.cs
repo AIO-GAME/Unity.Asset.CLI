@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-15
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -44,7 +44,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke(operation.InstantiateSync(parent));
+            cb?.Invoke( operation.InstantiateSync(parent));
         }
 
         public static IEnumerator InstGameObjectCO(string location, Action<GameObject> cb)
@@ -72,7 +72,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke(operation.InstantiateSync());
+            cb?.Invoke( operation.InstantiateSync());
         }
 
         #endregion
@@ -110,40 +110,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke(operation.GetSubAssetObjects<TObject>());
-        }
-
-        /// <summary>
-        /// 异步加载子资源对象
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadSubAssetsCO(AssetInfo location, Action<Object[]> cb)
-        {
-            var operation = GetHandle<SubAssetsOperationHandle>(location);
-            if (operation is null)
-            {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                operation = package.LoadSubAssetsAsync(location);
-                var check = false;
-                yield return LoadCheckOPCO(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                AddHandle(location, operation);
-            }
-
-            cb?.Invoke(operation.AllAssetObjects);
+            cb?.Invoke( operation.GetSubAssetObjects<TObject>());
         }
 
         /// <summary>
@@ -252,39 +219,6 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(operation.AssetObject);
         }
 
-        /// <summary>
-        /// 异步加载资源对象
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadAssetCO(AssetInfo location, Action<Object> cb)
-        {
-            var operation = GetHandle<AssetOperationHandle>(location);
-            if (operation is null)
-            {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                operation = package.LoadAssetAsync(location);
-                var check = false;
-                yield return LoadCheckOPCO(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                AddHandle(location, operation);
-            }
-
-            cb?.Invoke(operation.AssetObject);
-        }
-
         #endregion
 
         #region 场景加载
@@ -305,21 +239,24 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
-            if (operation is null)
+            if (operation != null)
             {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
-
-                operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                var check = false;
-                yield return LoadCheckOPCO(operation, error => check = error);
-                if (!check)
-                    throw new Exception(
-                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
-                AddHandle(location, operation);
+                yield return operation.UnloadAsync();
+                FreeHandle(location);
             }
 
+            YAssetPackage package = null;
+            yield return GetAutoPackageCO(location, ya => package = ya);
+            if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
+
+            operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            var check = false;
+            yield return LoadCheckOPCO(operation, error => check = error);
+            if (!check)
+                throw new Exception(
+                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+            AddHandle(location, operation);
+            operation.ActivateScene();
             cb?.Invoke(operation.SceneObject);
         }
 
@@ -339,60 +276,29 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
-            if (operation is null)
+            if (operation != null)
             {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
-
-                operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
-                var check = false;
-                yield return LoadCheckOPCO(operation, error => check = error);
-                if (!check)
-                    throw new Exception(
-                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
-                AddHandle(location, operation);
+                yield return operation.UnloadAsync();
+                FreeHandle(location);
             }
+            YAssetPackage package = null;
+            yield return GetAutoPackageCO(location, ya => package = ya);
+            if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
 
+            operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
+            var check = false;
+            yield return LoadCheckOPCO(operation, error => check = error);
+            if (!check)
+                throw new Exception(
+                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+            AddHandle(location, operation);
+            operation.ActivateScene();
             cb?.Invoke(operation.SceneObject);
         }
 
         #endregion
 
         #region 原生文件
-
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadRawFileDataCO(AssetInfo location, Action<byte[]> cb)
-        {
-            var operation = GetHandle<RawFileOperationHandle>(location);
-            if (operation is null)
-            {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                operation = package.LoadRawFileAsync(location);
-                var check = false;
-                yield return LoadCheckOPCO(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                AddHandle(location, operation);
-            }
-
-            cb?.Invoke(operation.GetRawFileData());
-        }
 
         /// <summary>
         /// 异步加载原生文件
@@ -425,39 +331,6 @@ namespace AIO.UEngine.YooAsset
             }
 
             cb?.Invoke(operation.GetRawFileData());
-        }
-
-        /// <summary>
-        /// 异步加载原生文件
-        /// </summary>
-        /// <param name="location">资源信息</param>
-        /// <param name="cb">回调</param>
-        public static IEnumerator LoadRawFileTextCO(AssetInfo location, Action<string> cb)
-        {
-            var operation = GetHandle<RawFileOperationHandle>(location);
-            if (operation is null)
-            {
-                YAssetPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                operation = package.LoadRawFileAsync(location);
-                var check = false;
-                yield return LoadCheckOPCO(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                AddHandle(location, operation);
-            }
-
-            cb?.Invoke(operation.GetRawFileText());
         }
 
         /// <summary>

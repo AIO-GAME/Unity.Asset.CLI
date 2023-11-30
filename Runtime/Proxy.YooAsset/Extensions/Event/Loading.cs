@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> XINAN
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-11
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -20,14 +19,12 @@ namespace AIO.UEngine.YooAsset
             /// <summary>
             /// 当前下载进度
             /// </summary>
-            public double Progress
-            {
-                get
-                {
-                    if (operations.Count == 0) return 1;
-                    return CurrentDownloadBytes / (double)TotalDownloadBytes;
-                }
-            }
+            public IProgressHandle Progress => _Progress;
+
+            /// <summary>
+            /// 当前下载进度
+            /// </summary>
+            private AProgress _Progress;
 
             /// <summary>
             /// 总下载大小
@@ -78,6 +75,7 @@ namespace AIO.UEngine.YooAsset
                 CurrentDownloaadeCountList = new Dictionary<string, int>();
                 CurrentDownloadedBytesList = new Dictionary<string, long>();
                 TotalDownloadedBytesList = new Dictionary<string, long>();
+                _Progress = new AProgress();
             }
 
             private void Finish()
@@ -105,23 +103,30 @@ namespace AIO.UEngine.YooAsset
                 foreach (var operation in operations.Values) operation.ResumeDownload();
             }
 
-            internal void RegisterEvent(string local, DownloaderOperation operation)
+            internal void RegisterEvent(AssetInfo info, DownloaderOperation operation)
             {
-                if (!AssetSystem.HasEvent_OnDownloading()) return;
+                if (!AssetSystem.HasEvent_OnDownloading()) return; // 没有注册事件
+                var local = info.AssetPath;
                 if (operations.ContainsKey(local))
                 {
-                    Debug.LogErrorFormat("当前资源正在下载中: {0}", local);
+                    AssetSystem.LogErrorFormat("当前资源正在下载中: {0}", local);
                     return;
                 }
 
-                void OnDownloadProgressCallback(int totalDownloadCount, int currentDownloadCount,
-                    long totalDownloadBytes, long currentDownloadBytes)
+                void OnDownloadProgressCallback(
+                    int totalDownloadCount,
+                    int currentDownloadCount,
+                    long totalDownloadBytes,
+                    long currentDownloadBytes)
                 {
                     CurrentDownloaadeCountList[local] = currentDownloadCount;
                     TotalDownloadCountList[local] = totalDownloadCount;
                     TotalDownloadedBytesList[local] = totalDownloadBytes;
                     CurrentDownloadedBytesList[local] = currentDownloadBytes;
-                    AssetSystem.InvokeDownloading(this);
+
+                    _Progress.Total = TotalDownloadedBytesList.Values.Sum();
+                    _Progress.Current = CurrentDownloadedBytesList.Values.Sum();
+                    AssetSystem.InvokeDownloading(_Progress);
                 }
 
                 void OnDownloadOver(bool isSucceed)
@@ -131,35 +136,51 @@ namespace AIO.UEngine.YooAsset
                     CurrentDownloadedBytesList.Remove(local);
                     TotalDownloadedBytesList.Remove(local);
                     operations.Remove(local);
-                    AssetSystem.InvokeDownloading(this);
+                    Update();
                 }
 
-                CurrentDownloaadeCountList.Add(local, operation.CurrentDownloadCount); // 当前下载数量
-                TotalDownloadCountList.Add(local, operation.TotalDownloadCount); // 总下载数量
-                CurrentDownloadedBytesList.Add(local, operation.CurrentDownloadBytes); // 当前下载大小
-                TotalDownloadedBytesList.Add(local, operation.TotalDownloadBytes); // 总下载大小
-                operations.Add(local, operation);
+                CurrentDownloaadeCountList[local] = operation.CurrentDownloadCount; // 当前下载数量
+                TotalDownloadCountList[local] = operation.TotalDownloadCount; // 总下载数量
+                CurrentDownloadedBytesList[local] = operation.CurrentDownloadBytes; // 当前下载大小
+                TotalDownloadedBytesList[local] = operation.TotalDownloadBytes; // 总下载大小
+                Update();
 
                 operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
                 operation.OnDownloadOverCallback += OnDownloadOver;
+                operations.Add(local, operation);
+            }
+
+            private void Update()
+            {
+                _Progress.Total = TotalDownloadedBytesList.Values.Sum();
+                _Progress.Current = CurrentDownloadedBytesList.Values.Sum();
+                AssetSystem.InvokeDownloading(_Progress);
             }
         }
 
-        private static LoadingInfo loadingInfo = new LoadingInfo();
+        /// <summary>
+        /// 资源加载器 - 加载资源
+        /// </summary>
+        private static readonly LoadingInfo LoadHandle = new LoadingInfo();
 
-        internal static void RegisterEvent(string package, string location, DownloaderOperation operation)
+        internal static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
         {
-            var record = new AssetSystem.SequenceRecord()
+            var operation = package.CreateBundleDownloader(location,
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
+            var record = new AssetSystem.SequenceRecord
             {
-                Name = package,
-                Location = location,
+                Name = package.PackageName,
+                Location = location.Address,
                 Time = DateTime.Now,
                 Bytes = operation.TotalDownloadBytes,
                 Count = operation.TotalDownloadCount,
-                AssetPath = GetAssetInfo(package, location).AssetPath
+                AssetPath = location.AssetPath
             };
             AssetSystem.AddSequenceRecord(record);
-            loadingInfo.RegisterEvent(location, operation);
+            LoadHandle.RegisterEvent(location, operation);
+            return operation;
         }
 
         /// <summary>
