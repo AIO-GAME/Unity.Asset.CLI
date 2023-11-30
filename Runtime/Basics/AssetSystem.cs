@@ -78,6 +78,7 @@ namespace AIO
             IsInitialized = false;
             Parameter = config;
             Proxy = proxy;
+            yield return Parameter.UpdatePackage();
             yield return Proxy.Initialize();
             SequenceRecords = new SequenceRecordQueue();
             yield return SequenceRecords.LoadAsync();
