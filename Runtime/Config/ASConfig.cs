@@ -116,8 +116,8 @@ namespace AIO.UEngine
                 case EASMode.Remote:
                     if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
                     var remote = Path.Combine(URL, "Version", string.Concat(AssetSystem.PlatformNameStr, ".json"));
-                    var config = await AHelper.Net.HTTP.GetAsync(string.Concat(remote, "?t=", DateTime.Now.Ticks));
-                    Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(config);
+                    Packages = await AHelper.Net.HTTP.GetJsonAsync<AssetsPackageConfig[]>(
+                        string.Concat(remote, "?t=", DateTime.Now.Ticks));
                     break;
                 default:
 #if UNITY_EDITOR && SUPPORT_YOOASSET
@@ -157,10 +157,12 @@ namespace AIO.UEngine
         /// </summary>
         public static ASConfig GetOrCreate()
         {
+            ASConfig config = null;
             foreach (var item in Resources.LoadAll<ASConfig>("ASConfig"))
             {
                 if (item is null) continue;
-                return item;
+                config = item;
+                break;
             }
 
 #if UNITY_EDITOR
@@ -169,25 +171,30 @@ namespace AIO.UEngine
                          .Select(AssetDatabase.LoadAssetAtPath<ASConfig>)
                          .Where(value => value != null))
             {
-                if (item != null) return item;
+                if (item.Equals(null)) continue;
+                config = item;
+                break;
             }
 
-            var config = CreateInstance<ASConfig>();
-            config.ASMode = EASMode.Editor;
-            config.URL = "";
-            config.LoadPathToLower = false;
-            config.AutoSaveVersion = false;
-            config.AppendTimeTicks = false;
-            config.OutputLog = false;
-            config.AutoSequenceRecord = false;
-            config.Packages = Array.Empty<AssetsPackageConfig>();
-            if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
-                Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
-            AssetDatabase.CreateAsset(config, "Assets/Resources/ASConfig.asset");
-            return config;
+            if (config is null)
+            {
+                config = CreateInstance<ASConfig>();
+                config.ASMode = EASMode.Editor;
+                config.URL = "";
+                config.LoadPathToLower = false;
+                config.AutoSaveVersion = false;
+                config.AppendTimeTicks = false;
+                config.OutputLog = false;
+                config.AutoSequenceRecord = false;
+                config.Packages = Array.Empty<AssetsPackageConfig>();
+                if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
+                    Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
+                AssetDatabase.CreateAsset(config, "Assets/Resources/ASConfig.asset");
+            }
 #else
             throw new System.Exception("Not found ASConfig.asset ! Please create it !");
 #endif
+            return config;
         }
 
         /// <summary>

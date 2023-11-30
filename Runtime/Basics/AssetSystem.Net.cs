@@ -226,7 +226,7 @@ namespace AIO
         /// <param name="url">网址</param>
         /// <param name="audioType">音频类型</param>
         /// <param name="cb">回调</param>
-        public static IEnumerator NetLoadAudioCO(string url, AudioType audioType, Action<AudioClip> cb)
+        public static IEnumerator NetLoadAudioClipCO(string url, AudioType audioType, Action<AudioClip> cb)
         {
             using (var uwr = UnityWebRequestMultimedia.GetAudioClip(url, audioType))
             {
