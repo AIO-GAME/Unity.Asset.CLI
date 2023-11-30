@@ -63,6 +63,12 @@ namespace AIO.UEngine.YooAsset
             PackageDebug(LoadType.Coroutine, location);
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
+                if (AssetSystem.WhiteListLocal.Contains(location))
+                {
+                    cb?.Invoke(package);
+                    yield break;
+                }
+
                 if (package.IsNeedDownloadFromRemote(location))
                 {
                     var info = package.GetAssetInfo(location);
@@ -107,6 +113,12 @@ namespace AIO.UEngine.YooAsset
             if (!Dic.TryGetValue(packagename, out var package))
             {
                 AssetSystem.LogException("目标资源包不存在 [{0} : {1}]", packagename, location);
+                yield break;
+            }
+
+            if (AssetSystem.WhiteListLocal.Contains(location))
+            {
+                cb?.Invoke(package);
                 yield break;
             }
 
@@ -155,6 +167,8 @@ namespace AIO.UEngine.YooAsset
             PackageDebug(LoadType.Sync, location);
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
+                if (AssetSystem.WhiteListLocal.Contains(location)) return package;
+
                 if (package.IsNeedDownloadFromRemote(location))
                     AssetSystem.LogException($"不支持同步加载远程资源 [{package.PackageName} : {location}]");
                 return package;
@@ -185,6 +199,9 @@ namespace AIO.UEngine.YooAsset
                 return null;
             }
 
+            if (AssetSystem.WhiteListLocal.Contains(location))
+                return package;
+
             if (package.IsNeedDownloadFromRemote(location))
                 AssetSystem.LogException(string.Format("不支持同步加载远程资源 [{0} : {1}]", package.PackageName, location));
 
@@ -214,6 +231,7 @@ namespace AIO.UEngine.YooAsset
             PackageDebug(LoadType.Async, location);
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
+                if (AssetSystem.WhiteListLocal.Contains(location)) return package;
                 if (!package.IsNeedDownloadFromRemote(location)) return package;
 
                 var info = package.GetAssetInfo(location);
@@ -250,6 +268,9 @@ namespace AIO.UEngine.YooAsset
                 AssetSystem.LogException($"目标资源包不存在 [{packagename} : {location}]");
                 return null;
             }
+
+            if (AssetSystem.WhiteListLocal.Contains(location))
+                return package;
 
             if (package.IsNeedDownloadFromRemote(location))
             {

@@ -379,6 +379,111 @@ namespace AIO.UEngine
             }
 
             #endregion
+
+            /// <summary>
+            /// 创建补丁下载器 异步
+            /// </summary>
+            private void DownloaderTagBegin(params string[] tag)
+            {
+                if (tag is null || tag.Length == 0)
+                {
+#if UNITY_EDITOR
+                    AssetSystem.LogError("下载标签不能为空");
+#endif
+                    return;
+                }
+
+                AssetSystem.InvokeNotify(EASEventType.BeginDownload, string.Empty);
+                DownloadBytesList.Clear();
+                Progress.Total = 0;
+                foreach (var name in ManifestOperations.Keys)
+                {
+                    var asset = Packages[name];
+                    var version = asset.Config.Version;
+                    var operation = asset.CreateResourceDownloader(tag,
+                        AssetSystem.Parameter.LoadingMaxTimeSlice,
+                        AssetSystem.Parameter.DownloadFailedTryAgain,
+                        AssetSystem.Parameter.Timeout);
+                    if (operation.TotalDownloadCount <= 0)
+                    {
+                        AssetSystem.LogFormat("[{0} : {1}] 无需下载更新当前资源包", asset.Config, version);
+                        Packages.Remove(name);
+                        continue;
+                    }
+
+                    Progress.Total += operation.TotalDownloadBytes;
+
+                    DownloadBytesList[name] = operation.CurrentDownloadBytes;
+
+                    AssetSystem.LogFormat("创建补丁下载器，准备下载更新当前资源版本所有的资源包文件 [{0} -> {1} ] 文件数量 : {2} , 包体大小 : {3}",
+                        asset.Config, version,
+                        operation.TotalDownloadCount, operation.TotalDownloadBytes);
+
+                    void OnUpdateProgress(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes,
+                        long currentDownloadBytes)
+                    {
+                        DownloadBytesList[name] = currentDownloadBytes;
+
+                        AssetSystem.InvokeDownloading(Progress);
+                    }
+
+                    void OnUpdateDownloadOver(bool isSucceed)
+                    {
+                        if (isSucceed) AssetSystem.InvokeNotify(EASEventType.DownlandPackageSuccess, name);
+                        else
+                            AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
+                                DownloaderOperations[name].Error);
+                    }
+
+                    void OnUpdateDownloadError(string filename, string error)
+                    {
+                        AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
+                            string.Concat(filename, ":", error));
+                    }
+
+                    operation.OnDownloadOverCallback = OnUpdateDownloadOver;
+                    operation.OnDownloadProgressCallback = OnUpdateProgress;
+                    operation.OnDownloadErrorCallback = OnUpdateDownloadError;
+
+                    DownloaderOperations.Add(name, operation);
+                }
+            }
+
+            public async Task DownloadTagTask(IEnumerable<string> tags)
+            {
+                if (!Flow) return;
+                DownloaderTagBegin(tags.ToArray());
+                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
+                await WaitTask(DownloaderOperations.Values);
+                DownloaderEnd();
+            }
+
+            public IEnumerator DownloadTagCO(IEnumerable<string> tags)
+            {
+                if (!Flow) yield break;
+                DownloaderTagBegin(tags.ToArray());
+                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
+                yield return WaitCO(DownloaderOperations.Values);
+                DownloaderEnd();
+            }
+            
+            public async Task DownloadTagTask(string tag)
+            {
+                if (!Flow) return;
+                DownloaderTagBegin(tag);
+                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
+                await WaitTask(DownloaderOperations.Values);
+                DownloaderEnd();
+            }
+
+            public IEnumerator DownloadTagCO(string tag)
+            {
+                if (!Flow) yield break;
+                DownloaderTagBegin(tag);
+                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
+                yield return WaitCO(DownloaderOperations.Values);
+                DownloaderEnd();
+            }
         }
     }
 }

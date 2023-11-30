@@ -17,6 +17,11 @@ namespace AIO
         private static AssetProxy Proxy;
 
         /// <summary>
+        /// 白名单 - 定位指定白名单 - 允许同步加载
+        /// </summary>
+        public static List<string> WhiteListLocal { get; private set; } = new List<string>();
+
+        /// <summary>
         /// 资源包配置
         /// </summary>
         public static ICollection<AssetsPackageConfig> PackageConfigs => Parameter.Packages;
@@ -36,7 +41,10 @@ namespace AIO
         /// <summary>
         /// 序列记录队列
         /// </summary>
-        public static SequenceRecordQueue SequenceRecords { get; private set; } = new SequenceRecordQueue();
+        public static SequenceRecordQueue SequenceRecords { get; private set; }
+#if UNITY_EDITOR
+            = new SequenceRecordQueue();
+#endif
 
         /// <summary>
         /// 资源包记录序列
@@ -106,7 +114,7 @@ namespace AIO
             /// </summary>
             internal static readonly string LOCAL_PATH =
 #if UNITY_EDITOR
-                Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Bundles", FILE_NAME);
+                Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Bundles", "Version", FILE_NAME);
 #else
                 Path.Combine(Application.persistentDataPath, "BuildinFiles", FILE_NAME);
 #endif
@@ -121,7 +129,7 @@ namespace AIO
             public async Task LoadAsync()
             {
                 if (Parameter.AutoSequenceRecord) return;
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
                 if (File.Exists(LOCAL_PATH)) // 如果在编辑器下存在本地记录则加载
                     Records = await AHelper.IO.ReadJsonUTF8Async<Queue<SequenceRecord>>(LOCAL_PATH);
 #else
@@ -129,6 +137,7 @@ namespace AIO
                 else if (Parameter.ASMode == EASMode.Remote)
                 {
                     Records = AHelper.Net.HTTP.GetJson<Queue<SequenceRecord>>(REMOTE_PATH);
+                    if (Records is null) Records = new Queue<SequenceRecord>();
                     await AHelper.IO.WriteJsonUTF8Async(LOCAL_PATH, Records);
                 }
 #endif
@@ -171,13 +180,13 @@ namespace AIO
                 return false;
             }
 
-            public int Count => Records.Count;
+            public int Count => Records?.Count ?? 0;
             public bool IsReadOnly => false;
 
-#if SUPPORT_YOOASSET && UNITY_EDITOR
             public static implicit operator Dictionary<string, List<AssetInfo>>(SequenceRecordQueue recordQueue)
             {
                 var list = new Dictionary<string, List<AssetInfo>>();
+                if (recordQueue?.Records is null) return list;
                 foreach (var record in recordQueue.Records)
                 {
                     var info = YooAssets.GetPackage(record.Name).GetAssetInfo(record.Location);
@@ -189,9 +198,10 @@ namespace AIO
 
                 return list;
             }
-#endif
+
             public IEnumerator<SequenceRecord> GetEnumerator()
             {
+                if (Records is null) Records = new Queue<SequenceRecord>();
                 return Records.GetEnumerator();
             }
 

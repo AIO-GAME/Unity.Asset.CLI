@@ -44,7 +44,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke(operation.InstantiateSync(parent));
+            cb?.Invoke( operation.InstantiateSync(parent));
         }
 
         public static IEnumerator InstGameObjectCO(string location, Action<GameObject> cb)
@@ -72,7 +72,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke(operation.InstantiateSync());
+            cb?.Invoke( operation.InstantiateSync());
         }
 
         #endregion
@@ -110,7 +110,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke(operation.GetSubAssetObjects<TObject>());
+            cb?.Invoke( operation.GetSubAssetObjects<TObject>());
         }
 
         /// <summary>

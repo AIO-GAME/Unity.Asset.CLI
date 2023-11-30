@@ -109,7 +109,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator InstGameObjectCO(string location, Transform parent)
         {
-            return Proxy.InstGameObjectCO(SettingToLocalPath(location), null, parent);
+            return Proxy.InstGameObjectCO(SettingToLocalPath(location), _ => { }, parent);
         }
 
         /// <summary>

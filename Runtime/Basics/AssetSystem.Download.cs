@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
 
@@ -111,6 +112,16 @@ namespace AIO
         Task DownloadTask();
 
         /// <summary>
+        /// 开始标签下载
+        /// </summary>
+        Task DownloadTagTask(string tag);
+
+        /// <summary>
+        /// 开始标签下载
+        /// </summary>
+        Task DownloadTagTask(IEnumerable<string> tags);
+
+        /// <summary>
         /// 更新资源包版本信息
         /// </summary>
         /// <returns>Ture:有新版本 False:无需更新</returns>
@@ -126,6 +137,16 @@ namespace AIO
         /// 开始下载
         /// </summary>
         IEnumerator DownloadCO();
+
+        /// <summary>
+        /// 开始标签下载
+        /// </summary>
+        IEnumerator DownloadTagCO(string tag);
+
+        /// <summary>
+        /// 开始标签下载
+        /// </summary>
+        IEnumerator DownloadTagCO(IEnumerable<string> tags);
 
         /// <summary>
         /// 下载序列列表文件
@@ -147,8 +168,11 @@ namespace AIO
         public Task UpdatePackageVersionTask() => Task.CompletedTask;
         public Task UpdatePackageManifestTask() => Task.CompletedTask;
         public Task DownloadRecordTask(AssetSystem.SequenceRecordQueue queue) => Task.CompletedTask;
-
         public Task DownloadTask() => Task.CompletedTask;
+        public Task DownloadTagTask(string tag) => Task.CompletedTask;
+
+        public Task DownloadTagTask(IEnumerable<string> tags) => Task.CompletedTask;
+
         public Task DownloadRecordTask() => Task.CompletedTask;
 
         public IEnumerator UpdatePackageVersionCO()
@@ -166,6 +190,16 @@ namespace AIO
             yield break;
         }
 
+        public IEnumerator DownloadTagCO(string tag)
+        {
+            yield break;
+        }
+
+        public IEnumerator DownloadTagCO(IEnumerable<string> tags)
+        {
+            yield break;
+        }
+
         public IEnumerator DownloadRecordCO(AssetSystem.SequenceRecordQueue queue)
         {
             yield break;
@@ -178,6 +212,8 @@ namespace AIO
 
     public partial class AssetSystem
     {
+        private static IASDownloader Downloader;
+
         /// <summary>
         /// 获取下载器
         /// </summary>
@@ -190,7 +226,52 @@ namespace AIO
         }
 
         /// <summary>
-        /// 预加载记录
+        /// 预下载指定标签资源
+        /// </summary>
+        public static IEnumerator DownloadPreTag(string tag, IProgressEvent progress = null)
+        {
+            if (Parameter.ASMode != EASMode.Remote) yield break;
+            var handle = GetDownloader(progress);
+            yield return handle.UpdatePackageManifestCO();
+            yield return handle.UpdatePackageVersionCO();
+            Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
+            if (!handle.Flow) yield break;
+            yield return handle.DownloadTagTask(tag);
+            WhiteListLocal.AddRange(GetAssetInfos(tag));
+            Log($"【资源下载】 标签资源列表 下载完成");
+        }
+
+        /// <summary>
+        /// 预下载指定标签资源
+        /// </summary>
+        public static IEnumerator DownloadPreTag(string tag1, string tag2, IProgressEvent progress = null)
+        {
+            if (Parameter.ASMode != EASMode.Remote) yield break;
+            yield return DownloadPreTag(new[] { tag1, tag2 }, progress);
+            WhiteListLocal.AddRange(GetAssetInfos(tag1));
+            WhiteListLocal.AddRange(GetAssetInfos(tag2));
+            Log($"【资源下载】 标签资源列表 下载完成");
+        }
+
+        /// <summary>
+        /// 预下载指定标签资源
+        /// </summary>
+        public static IEnumerator DownloadPreTag(IEnumerable<string> tag, IProgressEvent progress = null)
+        {
+            if (Parameter.ASMode != EASMode.Remote) yield break;
+            var handle = GetDownloader(progress);
+            yield return handle.UpdatePackageManifestCO();
+            yield return handle.UpdatePackageVersionCO();
+            Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
+            if (!handle.Flow) yield break;
+            var enumerable = tag as string[] ?? tag.ToArray();
+            yield return handle.DownloadTagTask(enumerable);
+            WhiteListLocal.AddRange(GetAssetInfos(enumerable));
+            Log($"【资源下载】 标签资源列表 下载完成");
+        }
+
+        /// <summary>
+        /// 预下载记录序列资源
         /// </summary>
         public static IEnumerator DownloadPreRecord(IProgressEvent progress = null)
         {
@@ -201,7 +282,8 @@ namespace AIO
             Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
             if (!handle.Flow) yield break;
             yield return handle.DownloadRecordCO(SequenceRecords);
-            Log($"【资源下载】 预下载序列列表完成");
+            WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
+            Log($"【资源下载】 序列列表 预下载完成");
         }
 
         /// <summary>
@@ -217,7 +299,7 @@ namespace AIO
             Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
             if (!handle.Flow) yield break;
             yield return handle.DownloadCO();
-            Log($"【资源下载】 {(handle.Flow ? "下载完成" : "下载失败")}");
+            Log($"【资源下载】 全部资源列表 预下载完成");
         }
 
         /// <summary>

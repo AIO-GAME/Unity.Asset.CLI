@@ -56,7 +56,7 @@ namespace AIO.UEngine
         /// 根据资源标签获取资源信息
         /// </summary>
         /// <param name="tag">资源标签</param>
-        public override ICollection<string> GetAssetInfos(ICollection<string> tag)
+        public override ICollection<string> GetAssetInfos(IEnumerable<string> tag)
         {
             return YAssetSystem.GetAssetInfos(tag).Select(info => info.Address).ToArray();
         }

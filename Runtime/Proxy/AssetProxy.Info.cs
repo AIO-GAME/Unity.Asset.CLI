@@ -69,7 +69,7 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="tags">资源标签</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public abstract ICollection<string> GetAssetInfos(ICollection<string> tags);
+        public abstract ICollection<string> GetAssetInfos(IEnumerable<string> tags);
 
         /// <summary>
         /// 检查资源定位地址是否有效

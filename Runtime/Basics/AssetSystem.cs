@@ -32,6 +32,11 @@ namespace AIO
             return Proxy.GetAssetInfos(tag);
         }
 
+        public static ICollection<string> GetAssetInfos(IEnumerable<string> tag)
+        {
+            return Proxy.GetAssetInfos(tag);
+        }
+
         /// <summary>
         /// 系统初始化
         /// </summary>
