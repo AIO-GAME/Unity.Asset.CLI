@@ -183,6 +183,7 @@ namespace AIO
             public int Count => Records?.Count ?? 0;
             public bool IsReadOnly => false;
 
+#if SUPPORT_YOOASSET
             public static implicit operator Dictionary<string, List<AssetInfo>>(SequenceRecordQueue recordQueue)
             {
                 var list = new Dictionary<string, List<AssetInfo>>();
@@ -198,6 +199,7 @@ namespace AIO
 
                 return list;
             }
+#endif
 
             public IEnumerator<SequenceRecord> GetEnumerator()
             {
