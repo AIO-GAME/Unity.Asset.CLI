@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using YooAsset;
 using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
@@ -235,12 +234,12 @@ namespace AIO.UEditor
 
                     // 判断自定义收集规则等
                     if (RuleUseCollectCustom && data.RuleCustomCollect?.Length > 0 &&
-                        !AIO.UEditor.RuleCollect.IsCollectAssetCustom(data.RuleCustomCollect, data.Extension))
+                        !UEditor.RuleCollect.IsCollectAssetCustom(data.RuleCustomCollect, data.Extension))
                         continue;
 
                     // 判断自定义过滤规则等
                     if (RuleUseFilterCustom && data.RuleCustomFilter?.Length > 0 &&
-                        AIO.UEditor.RuleCollect.IsCollectAssetCustom(data.RuleCustomFilter, data.Extension))
+                        UEditor.RuleCollect.IsCollectAssetCustom(data.RuleCustomFilter, data.Extension))
                         continue;
 
                     var assetDataInfo = new AssetDataInfo
