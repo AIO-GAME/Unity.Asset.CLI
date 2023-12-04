@@ -184,11 +184,11 @@ namespace AIO
             public bool IsReadOnly => false;
 
 #if SUPPORT_YOOASSET
-            public static implicit operator Dictionary<string, List<AssetInfo>>(SequenceRecordQueue recordQueue)
+            public Dictionary<string, List<AssetInfo>> ToYoo()
             {
                 var list = new Dictionary<string, List<AssetInfo>>();
-                if (recordQueue?.Records is null) return list;
-                foreach (var record in recordQueue.Records)
+                if (Records is null) return list;
+                foreach (var record in Records)
                 {
                     var info = YooAssets.GetPackage(record.Name).GetAssetInfo(record.Location);
                     if (info is null) continue;

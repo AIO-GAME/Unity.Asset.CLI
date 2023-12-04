@@ -321,8 +321,7 @@ namespace AIO.UEngine
             {
                 DownloadBytesList.Clear();
 
-                Dictionary<string, List<AssetInfo>> list = queue;
-                foreach (var pair in list)
+                foreach (var pair in queue.ToYoo())
                 {
                     var name = pair.Key;
                     var assetInfos = pair.Value.ToArray();
@@ -466,7 +465,7 @@ namespace AIO.UEngine
                 yield return WaitCO(DownloaderOperations.Values);
                 DownloaderEnd();
             }
-            
+
             public async Task DownloadTagTask(string tag)
             {
                 if (!Flow) return;

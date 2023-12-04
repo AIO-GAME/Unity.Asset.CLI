@@ -15,6 +15,7 @@ namespace AIO.UEditor
         public bool ShowGroup = false;
         public bool ShowPackage = true;
         public bool ShowSetting = false;
+        public bool ShowList => OnDrawCurrentItem != null;
         private StringBuilder TempBuilder = new StringBuilder();
 
         partial void OnDrawHeader()
