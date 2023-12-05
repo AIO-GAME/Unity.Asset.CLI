@@ -4,58 +4,43 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System.Collections.Generic;
-
 namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
         partial void OnDrawGroup()
         {
-            using (GELayout.Vertical(GEStyle.GridList))
+            using (GELayout.VHorizontal(GEStyle.PreToolbar))
             {
-                using (GELayout.VHorizontal())
+                if (GELayout.Button(Content_ADD, GEStyle.ObjectPickerTab, 20, 20))
                 {
-                    if (GELayout.Button("Group", GEStyle.PreButton, GTOption.Height(20)))
-                        ShowGroup = false;
-
-                    if (GELayout.Button("+", GEStyle.PreButton, 20))
-                    {
-                        Data.Packages[CurrentPackageIndex].Groups = Data.Packages[CurrentPackageIndex].Groups.Add(
-                            new AssetCollectGroup
-                            {
-                                Name = "Default Group",
-                                Description = Data.Packages[CurrentPackageIndex].Groups.Length.ToString(),
-                                Collectors = new AssetCollectItem[] { }
-                            });
-
-                        if (Data.Packages[CurrentPackageIndex].Groups.Length == 1)
+                    Data.Packages[CurrentPackageIndex].Groups = Data.Packages[CurrentPackageIndex].Groups.Add(
+                        new AssetCollectGroup
                         {
-                            CurrentGroupIndex = 0;
-                            ShowGroup = true;
-                        }
+                            Name = "Default Group",
+                            Description = Data.Packages[CurrentPackageIndex].Groups.Length.ToString(),
+                            Collectors = new AssetCollectItem[] { }
+                        });
+
+                    if (Data.Packages[CurrentPackageIndex].Groups.Length == 1)
+                    {
+                        CurrentGroupIndex = 0;
+                        ShowGroup = true;
                     }
                 }
 
+                GELayout.Label("|", GTOption.Width(4));
+                if (GELayout.Button("Group", GEStyle.ObjectPickerTab, GTOption.Width(DrawGroupWidth - 50)))
+                    ShowGroup = false;
+            }
+
+            using (GELayout.Vertical(GEStyle.GridList))
+            {
                 for (var i = Data.Packages[CurrentPackageIndex].Groups.Length - 1; i >= 0; i--)
                 {
-                    using (GELayout.VHorizontal())
+                    using (GELayout.VHorizontal(GTOption.Height(25)))
                     {
-                        var label = string.IsNullOrEmpty(Data.Packages[CurrentPackageIndex].Groups[i].Description)
-                            ? Data.Packages[CurrentPackageIndex].Groups[i].Name
-                            : string.Concat(Data.Packages[CurrentPackageIndex].Groups[i].Name, '(',
-                                Data.Packages[CurrentPackageIndex].Groups[i].Description, ')');
-
-                        var style = CurrentGroupIndex == i
-                            ? GEStyle.PreButton
-                            : GEStyle.RLFooterButton;
-                        if (GELayout.Button(label, style))
-                        {
-                            CurrentGroupIndex = i;
-                            ShowGroup = true;
-                        }
-
-                        if (GELayout.Button("-", GEStyle.PreButton, 20))
+                        if (GELayout.Button(Content_DEL, GEStyle.ObjectPickerTab, 20, 20))
                         {
                             Data.Packages[CurrentPackageIndex].Groups =
                                 Data.Packages[CurrentPackageIndex].Groups.RemoveAt(i);
@@ -65,8 +50,22 @@ namespace AIO.UEditor
                                 ShowGroup = false;
                             }
 
-
                             return;
+                        }
+
+                        GELayout.Label("|", GTOption.Width(5));
+                        var label = string.IsNullOrEmpty(Data.Packages[CurrentPackageIndex].Groups[i].Description)
+                            ? Data.Packages[CurrentPackageIndex].Groups[i].Name
+                            : string.Concat(Data.Packages[CurrentPackageIndex].Groups[i].Name, '(',
+                                Data.Packages[CurrentPackageIndex].Groups[i].Description, ')');
+
+                        var style = CurrentGroupIndex == i
+                            ? GEStyle.PRInsertion
+                            : GEStyle.ObjectPickerTab;
+                        if (GELayout.Button(label, style, GTOption.Height(20), GTOption.Width(DrawGroupWidth - 50)))
+                        {
+                            CurrentGroupIndex = i;
+                            ShowGroup = true;
                         }
                     }
                 }

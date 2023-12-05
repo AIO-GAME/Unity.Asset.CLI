@@ -14,42 +14,42 @@ namespace AIO.UEditor
     {
         private static string GetInfo(IEnumerable<string> Displays, long source)
         {
-            var _sb = new StringBuilder();
-            if (source <= -1)
-            {
-                _sb.Append("当前选中: ").Append(source).Append(" -> ");
-                foreach (var disPlay in Displays) _sb.Append(disPlay).Append(";");
-                return _sb.ToString();
-            }
+            if (source <= -1) return "全选所有条件";
+            if (source == 0) return "忽略当前条件";
 
-            _sb.Append("当前选中: ").Append(source).Append(" -> ");
-
+            var builder = new StringBuilder().Append("当前选中: ").Append(source).Append(" -> ");
             var status = 1L;
             foreach (var display in Displays)
             {
-                if ((source & status) == status) _sb.Append(display).Append(";");
+                if ((source & status) == status) builder.Append(display).Append(";");
                 status *= 2;
             }
 
-            return _sb.ToString();
+            return builder.ToString();
         }
 
         partial void OnDrawItem(AssetCollectItem item)
         {
-            using (GELayout.Vertical(GEStyle.DDHeaderStyle))
+            using (GELayout.Vertical(GEStyle.INThumbnailShadow))
             {
                 using (GELayout.VHorizontal())
                 {
-                    if (GELayout.Button("-", 30))
+                    if (GELayout.Button(item.Folded ? "⇙" : "⇗", 30))
+                    {
+                        item.Folded = !item.Folded;
+                    }
+
+                    item.Path = GELayout.Field(item.Path);
+                    item.Type = GELayout.Popup(item.Type, GTOption.Width(80));
+
+                    if (GELayout.Button(Content_DEL, 24))
                     {
                         Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors =
                             Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Remove(item);
                         return;
                     }
 
-                    item.Path = GELayout.Field(item.Path);
-                    item.Type = GELayout.Popup(item.Type, GTOption.Width(80));
-                    if (GELayout.Button("List", 50))
+                    if (GELayout.Button(Content_OPEN, 24))
                     {
                         OnDrawCurrentItem = item;
                         OnDrawCurrentItem.CollectAsset(
@@ -58,6 +58,8 @@ namespace AIO.UEditor
                         return;
                     }
                 }
+
+                if (item.Folded) return;
 
                 using (GELayout.VHorizontal())
                 {
@@ -76,10 +78,10 @@ namespace AIO.UEditor
                     }
                     else
                     {
+                        GELayout.HelpBox(GetInfo(AssetCollectSetting.MapCollect.Displays, item.RuleCollectIndex));
                         item.RuleCollectIndex = GELayout.Mask(item.RuleCollectIndex,
                             AssetCollectSetting.MapCollect.Displays,
                             GTOption.Width(80));
-                        GELayout.HelpBox(GetInfo(AssetCollectSetting.MapCollect.Displays, item.RuleCollectIndex));
                     }
 
                     item.RuleUseCollectCustom = GELayout.ToggleLeft(
@@ -96,10 +98,10 @@ namespace AIO.UEditor
                     }
                     else
                     {
+                        GELayout.HelpBox(GetInfo(AssetCollectSetting.MapFilter.Displays, item.RuleFilterIndex));
                         item.RuleFilterIndex =
                             GELayout.Mask(item.RuleFilterIndex, AssetCollectSetting.MapFilter.Displays,
                                 GTOption.Width(80));
-                        GELayout.HelpBox(GetInfo(AssetCollectSetting.MapFilter.Displays, item.RuleFilterIndex));
                     }
 
                     item.RuleUseFilterCustom = GELayout.ToggleLeft(

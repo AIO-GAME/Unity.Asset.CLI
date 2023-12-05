@@ -12,13 +12,21 @@ namespace AIO.UEditor
     {
         partial void OnDrawSetting()
         {
+            using (GELayout.VHorizontal(GEStyle.PreToolbar))
+            {
+                GELayout.Label("⇘", GEStyle.ObjectPickerTab, GTOption.Width(15));
+                if (GELayout.Button("Setting", GEStyle.ObjectPickerTab, GTOption.Width(DrawSettingWidth - 40)))
+                {
+                    ShowSetting = false;
+                }
+            }
+
             var width = GTOption.Width(DrawSettingWidth - 20);
             using (GELayout.Vertical(GEStyle.GridList, width))
             {
-                if (GELayout.Button("Setting", GEStyle.PreButton, GTOption.Height(20))) ShowSetting = false;
                 Data.EnableAddressable = GELayout.ToggleLeft("开启地址化", Data.EnableAddressable, width);
                 Data.LocationToLower = GELayout.ToggleLeft("定位地址小写", Data.LocationToLower, width);
-                Data.IncludeAssetGuid = GELayout.ToggleLeft("包含资源GUID", Data.IncludeAssetGuid, width);
+                Data.IncludeAssetGUID = GELayout.ToggleLeft("包含资源GUID", Data.IncludeAssetGUID, width);
                 Data.UniqueBundleName = GELayout.ToggleLeft("唯一Bundle名称", Data.UniqueBundleName, width);
             }
         }

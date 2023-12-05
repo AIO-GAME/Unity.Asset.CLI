@@ -4,24 +4,22 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using UnityEditor;
+using UnityEngine;
+
 namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
+        private bool ShowConfigSetting = false;
         private bool ShowPackageInfo = true;
         private bool ShowCollectors = true;
 
-        partial void OnDrawGroupList()
+        private void OnDrawPackageInfo()
         {
-            using (GELayout.Vertical(GEStyle.GridList))
+            if (Data.Packages.Length == 0) return;
+            using (GELayout.Vertical(GEStyle.INThumbnailShadow))
             {
-                if (GELayout.Button("Package Info", GEStyle.PreButton, GTOption.Width(true), GTOption.Height(20)))
-                {
-                    ShowPackageInfo = !ShowPackageInfo;
-                }
-
-                if (Data.Packages.Length == 0) return;
-
                 if (CurrentPackageIndex < 0 || Data.Packages.Length <= CurrentPackageIndex)
                 {
                     GELayout.HelpBox("Package Index Error");
@@ -57,32 +55,44 @@ namespace AIO.UEditor
                     Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Tags = GELayout.Field("Group Tags",
                         Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Tags);
                 }
+            }
+        }
 
-                using (GELayout.VHorizontal())
-                {
-                    if (GELayout.Button("Collectors", GEStyle.PreButton, GTOption.Width(true), GTOption.Height(20)))
-                    {
-                        ShowCollectors = !ShowCollectors;
-                    }
+        private void OnDrawItem()
+        {
+            for (var i = Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Length - 1;
+                 i >= 0;
+                 i--)
+            {
+                OnDrawItem(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors[i]);
+                GELayout.Space();
+            }
+        }
 
-                    if (GELayout.Button("+", GEStyle.PreButton, 20))
+        partial void OnDrawGroupList()
+        {
+            using (GELayout.Vertical(GEStyle.GridList))
+            {
+                ShowConfigSetting =
+                    GELayout.VFoldoutHeaderGroupWithHelp(OnDrawASConfig, "Config Setting", ShowConfigSetting);
+
+                GELayout.Space();
+
+                ShowPackageInfo =
+                    GELayout.VFoldoutHeaderGroupWithHelp(OnDrawPackageInfo, "Package Info", ShowPackageInfo);
+
+                GELayout.Space();
+
+                ShowCollectors = GELayout.VFoldoutHeaderGroupWithHelp(
+                    OnDrawItem,
+                    "Collectors",
+                    ShowCollectors,
+                    () =>
                     {
                         Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors =
                             Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Add(
                                 new AssetCollectItem());
-                    }
-                }
-
-                if (ShowCollectors)
-                {
-                    for (var i = Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Length - 1;
-                         i >= 0;
-                         i--)
-                    {
-                        OnDrawItem(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors[i]);
-                        GELayout.Space();
-                    }
-                }
+                    }, 0, null, new GUIContent("✚"));
             }
         }
     }

@@ -14,11 +14,11 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
-    public enum AssetCollectItemType
+    public enum EAssetCollectItemType
     {
-        Main,
-        Dependence,
-        Static,
+        [InspectorName("动态资源")] MainAssetCollector,
+        [InspectorName("依赖资源")] DependAssetCollector,
+        [InspectorName("静态资源")] StaticAssetCollector,
     }
 
     public enum AssetLocationFormat
@@ -37,7 +37,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 收集器类型
         /// </summary>
-        public AssetCollectItemType Type;
+        public EAssetCollectItemType Type;
 
         /// <summary>
         /// 资源标签 使用;分割
@@ -49,10 +49,12 @@ namespace AIO.UEditor
         /// </summary>
         public Object Path;
 
+        public string GUID => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(Path));
+
         /// <summary>
         /// 收集器路径
         /// </summary>
-        public string CollectorPath => AssetDatabase.GetAssetPath(Path);
+        public string CollectPath => AssetDatabase.GetAssetPath(Path);
 
         /// <summary>
         /// 自定义数据
@@ -69,6 +71,8 @@ namespace AIO.UEditor
         /// </summary>
         public int Address;
 
+        #region Collect
+
         /// <summary>
         /// 收集规则(获取收集规则下标)
         /// </summary>
@@ -84,6 +88,10 @@ namespace AIO.UEditor
         /// </summary>
         public string RuleCollect;
 
+        #endregion
+
+        #region Filter
+
         /// <summary>
         /// 过滤规则(获取收集规则下标)
         /// </summary>
@@ -98,6 +106,8 @@ namespace AIO.UEditor
         /// 过滤规则
         /// </summary>
         public string RuleFilter;
+
+        #endregion
 
         /// <summary>
         /// 定位格式
@@ -147,139 +157,172 @@ namespace AIO.UEditor
 
         public List<IAssetRuleFilter> RuleFilters = new List<IAssetRuleFilter>();
 
+        /// <summary>
+        /// 是否折叠
+        /// </summary>
+        public bool Folded = true;
+
+        /// <summary>
+        /// 自定义过滤器 (分隔符标准: /)
+        /// </summary>
+        public string[] RuleCustomFilter { get; private set; }
+
+        /// <summary>
+        /// 自定义收集器 (分隔符标准: /)
+        /// </summary>
+        public string[] RuleCustomCollect { get; private set; }
+
+        /// <summary>
+        /// 判断是否符合收集规则
+        /// </summary>
+        /// <param name="data">数据</param>
+        /// <returns>Ture:忽略 False:需要过滤</returns>
+        public bool IsCollectAsset(AssetInfoData data)
+        {
+            // 判断收集规则是否符合条件 如果不符合则跳过
+            if (RuleCollects.Count != 0 &&
+                !RuleCollects.Any(filter => filter.IsCollectAsset(data))
+               ) return false;
+
+            // 判断自定义收集规则等
+            if (RuleUseCollectCustom && RuleCustomCollect?.Length > 0 &&
+                !UEditor.RuleCollect.IsCollectAssetCustom(RuleCustomCollect, data.Extension)
+               ) return false;
+
+            // 判断过滤规则是否符合条件 如果符合则跳过
+            if (RuleFilters.Count != 0 &&
+                RuleFilters.Any(filter => filter.IsCollectAsset(data))
+               ) return false;
+
+            // 判断自定义过滤规则等
+            if (RuleUseFilterCustom && RuleCustomFilter?.Length > 0 &&
+                UEditor.RuleCollect.IsCollectAssetCustom(RuleCustomFilter, data.Extension)
+               ) return false;
+
+            return true;
+        }
+
+        public string GetAssetAddress(AssetInfoData data)
+        {
+            var rule = AssetCollectSetting.MapAddress.GetValue(Address);
+            var address = rule.GetAssetAddress(data);
+
+            if (HasExtension) address = string.Concat(address, ".", data.Extension);
+            switch (LocationFormat)
+            {
+                case AssetLocationFormat.ToLower:
+                    return address.ToLower();
+                case AssetLocationFormat.ToUpper:
+                    return address.ToUpper();
+                case AssetLocationFormat.None:
+                default: return address;
+            }
+        }
+
+        public void UpdateFilter()
+        {
+            RuleFilters.Clear();
+            if (RuleUseFilterCustom)
+            {
+                if (!string.IsNullOrEmpty(RuleFilter))
+                    RuleCustomFilter = RuleFilter?.Split(';');
+            }
+            else if (RuleFilterIndex < 0)
+            {
+                RuleFilters.AddRange(AssetCollectSetting.MapFilter.Values);
+            }
+            else if (RuleFilterIndex > 0)
+            {
+                var status = 1;
+                foreach (var item in AssetCollectSetting.MapFilter.Values)
+                {
+                    if ((RuleFilterIndex & status) == status) RuleFilters.Add(item);
+                    status *= 2;
+                }
+            }
+        }
+
+        public void UpdateCollect()
+        {
+            RuleCollects.Clear();
+            if (RuleUseCollectCustom)
+            {
+                if (!string.IsNullOrEmpty(RuleCollect))
+                    RuleCustomCollect = RuleCollect?.Split(';');
+            }
+            else if (RuleCollectIndex < 0)
+            {
+                RuleCollects.AddRange(AssetCollectSetting.MapCollect.Values);
+            }
+            else if (RuleCollectIndex > 0)
+            {
+                var status = 1;
+                foreach (var item in AssetCollectSetting.MapCollect.Values)
+                {
+                    if ((RuleCollectIndex & status) == status) RuleCollects.Add(item);
+                    status *= 2;
+                }
+            }
+        }
+
+        public string PackageName { get; private set; }
+
+        public string GroupName { get; private set; }
+
         public void CollectAsset(string package, string group)
         {
-            if (Path is null || string.IsNullOrEmpty(CollectorPath)) return;
-            switch (Type)
-            {
-                case AssetCollectItemType.Main:
-                    break;
-                case AssetCollectItemType.Dependence:
-                    return;
-                case AssetCollectItemType.Static:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
             AssetDataInfos.Clear();
+            RuleFilters.Clear();
+            RuleCollects.Clear();
+            PackageName = package;
+            GroupName = group;
+            if (Path is null || string.IsNullOrEmpty(CollectPath)) return;
+            if (Type != EAssetCollectItemType.MainAssetCollector) return;
             var data = new AssetInfoData
             {
                 Tags = Tags,
                 UserData = UserData,
                 PackageName = package,
                 GroupName = group,
-                CollectPath = CollectorPath,
+                CollectPath = CollectPath,
             };
 
-            RuleCollects.Clear();
-            if (RuleUseCollectCustom && !string.IsNullOrEmpty(RuleCollect))
-            {
-                data.RuleCustomCollect = RuleCollect.Split(';');
-            }
-            else
-            {
-                if (RuleCollectIndex < 0) RuleCollects.AddRange(AssetCollectSetting.MapCollect.Values);
-                else if (RuleCollectIndex > 0)
-                {
-                    var status = 1;
-                    foreach (var item in AssetCollectSetting.MapCollect.Values)
-                    {
-                        if ((RuleCollectIndex & status) == status) RuleCollects.Add(item);
-                        status *= 2;
-                    }
-                }
-            }
+            UpdateCollect();
+            UpdateFilter();
 
-            RuleFilters.Clear();
-            if (RuleUseFilterCustom && !string.IsNullOrEmpty(RuleFilter))
-            {
-                data.RuleCustomFilter = RuleFilter.Split(';');
-            }
-            else
-            {
-                if (RuleFilterIndex < 0) RuleFilters.AddRange(AssetCollectSetting.MapFilter.Values);
-                else if (RuleFilterIndex > 0)
-                {
-                    var status = 1;
-                    foreach (var item in AssetCollectSetting.MapFilter.Values)
-                    {
-                        if ((RuleFilterIndex & status) == status) RuleFilters.Add(item);
-                        status *= 2;
-                    }
-                }
-            }
-
-            // 判断Path是否为文件夹
-            if (AssetDatabase.IsValidFolder(CollectorPath))
+            if (AssetDatabase.IsValidFolder(CollectPath)) // 判断Path是否为文件夹
             {
                 // 获取文件夹下所有文件
-                var files = EHelper.IO.GetFilesRelativeAssetNoMeta(CollectorPath, SearchOption.AllDirectories);
+                var files = EHelper.IO.GetFilesRelativeAssetNoMeta(CollectPath, SearchOption.AllDirectories);
                 foreach (var file in files)
                 {
                     var fixedPath = file.Replace("\\", "/");
-                    var address = AssetCollectSetting.MapAddress.GetValue(Address);
                     data.Extension = System.IO.Path.GetExtension(fixedPath).Replace(".", "").ToLower();
                     data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
-
-                    // 判断收集规则是否符合条件 如果不符合则跳过
-                    if (RuleCollects.Count != 0 &&
-                        !RuleCollects.Any(filter => filter.IsCollectAsset(data))
-                       ) continue;
-
-                    // 判断过滤规则是否符合条件 如果符合则跳过
-                    if (RuleFilters.Count != 0 &&
-                        RuleFilters.Any(filter => filter.IsCollectAsset(data))
-                       ) continue;
-
-                    // 判断自定义收集规则等
-                    if (RuleUseCollectCustom && data.RuleCustomCollect?.Length > 0 &&
-                        !UEditor.RuleCollect.IsCollectAssetCustom(data.RuleCustomCollect, data.Extension))
-                        continue;
-
-                    // 判断自定义过滤规则等
-                    if (RuleUseFilterCustom && data.RuleCustomFilter?.Length > 0 &&
-                        UEditor.RuleCollect.IsCollectAssetCustom(data.RuleCustomFilter, data.Extension))
-                        continue;
-
-                    var assetDataInfo = new AssetDataInfo
+                    if (!IsCollectAsset(data)) continue;
+                    AssetDataInfos[fixedPath] = new AssetDataInfo
                     {
-                        Address = address.GetAssetAddress(data),
+                        Address = GetAssetAddress(data),
                         AssetPath = fixedPath,
                     };
-
-                    if (HasExtension)
+                }
+            }
+            else
+            {
+                data.Extension = System.IO.Path.GetExtension(CollectPath).Replace(".", "");
+                data.AssetPath = CollectPath.Substring(0, CollectPath.Length - data.Extension.Length - 1);
+                if (IsCollectAsset(data))
+                {
+                    AssetDataInfos[CollectPath] = new AssetDataInfo
                     {
-                        assetDataInfo.Address = assetDataInfo.Address + "." + assetDataInfo.Extension;
-                    }
-
-                    if (LocationFormat == AssetLocationFormat.ToLower)
-                    {
-                        assetDataInfo.Address = assetDataInfo.Address.ToLower();
-                    }
-                    else if (LocationFormat == AssetLocationFormat.ToUpper)
-                    {
-                        assetDataInfo.Address = assetDataInfo.Address.ToUpper();
-                    }
-
-                    AssetDataInfos[assetDataInfo.AssetPath] = assetDataInfo;
+                        Address = GetAssetAddress(data),
+                        AssetPath = CollectPath,
+                    };
                 }
             }
 
-            else
-            {
-                var address = AssetCollectSetting.MapAddress.GetValue(Address);
-                data.Extension = System.IO.Path.GetExtension(CollectorPath).Replace(".", "");
-                data.AssetPath = CollectorPath.Substring(0, CollectorPath.Length - data.Extension.Length - 1);
-                var assetDataInfo = new AssetDataInfo
-                {
-                    Address = address.GetAssetAddress(data),
-                    AssetPath = CollectorPath,
-                };
-                AssetDataInfos[assetDataInfo.AssetPath] = assetDataInfo;
-            }
-
-            AssetDataInfos.PageIndex = 1;
+            AssetDataInfos.PageSize = 20;
+            AssetDataInfos.PageIndex = 0;
         }
     }
 }

@@ -12,46 +12,36 @@ namespace AIO.UEditor
     {
         partial void OnDrawPackage()
         {
-            using (GELayout.Vertical(GEStyle.GridList))
+            using (GELayout.VHorizontal(GEStyle.PreToolbar))
             {
-                using (GELayout.VHorizontal())
+                if (GELayout.Button("✚", GEStyle.ObjectPickerTab, 20, 20))
                 {
-                    if (GELayout.Button("Package", GEStyle.PreButton, GTOption.Height(20))) ShowPackage = false;
-                    if (GELayout.Button("+", GEStyle.PreButton, 20))
+                    Data.Packages = Data.Packages.Add(new AssetCollectPackage
                     {
-                        Data.Packages = Data.Packages.Add(new AssetCollectPackage
-                        {
-                            Name = "Default Package",
-                            Description = Data.Packages.Length.ToString(),
-                            Groups = new AssetCollectGroup[] { }
-                        });
+                        Name = "Default Package",
+                        Description = Data.Packages.Length.ToString(),
+                        Groups = new AssetCollectGroup[] { }
+                    });
 
-                        if (Data.Packages.Length == 1)
-                        {
-                            CurrentPackageIndex = 0;
-                            ShowGroup = true;
-                        }
+                    if (Data.Packages.Length == 1)
+                    {
+                        CurrentPackageIndex = 0;
+                        ShowGroup = true;
                     }
                 }
 
+                GELayout.Label("|", GTOption.Width(5));
+                if (GELayout.Button("Package", GEStyle.ObjectPickerTab, GTOption.Width(DrawPackageWidth - 50)))
+                    ShowPackage = false;
+            }
+
+            using (GELayout.Vertical(GEStyle.GridList))
+            {
                 for (var i = Data.Packages.Length - 1; i >= 0; i--)
                 {
-                    using (GELayout.VHorizontal())
+                    using (GELayout.VHorizontal(GTOption.Height(25)))
                     {
-                        var label = string.IsNullOrEmpty(Data.Packages[i].Description)
-                            ? Data.Packages[i].Name
-                            : string.Concat(Data.Packages[i].Name, '(', Data.Packages[i].Description, ')');
-
-                        var style = CurrentPackageIndex == i
-                            ? GEStyle.PreButton
-                            : GEStyle.RLFooterButton;
-                        if (GELayout.Button(label, style))
-                        {
-                            CurrentPackageIndex = i;
-                            ShowGroup = true;
-                        }
-
-                        if (GELayout.Button("-", GEStyle.PreButton, 20))
+                        if (GELayout.Button("✘", GEStyle.ObjectPickerTab, 20, 20))
                         {
                             Data.Packages = Data.Packages.RemoveAt(i);
                             if (--CurrentPackageIndex < 0) CurrentPackageIndex = 0;
@@ -61,6 +51,20 @@ namespace AIO.UEditor
                             }
 
                             return;
+                        }
+
+                        GELayout.Label("|", GTOption.Width(5));
+                        var label = string.IsNullOrEmpty(Data.Packages[i].Description)
+                            ? Data.Packages[i].Name
+                            : string.Concat(Data.Packages[i].Name, '(', Data.Packages[i].Description, ')');
+
+                        var style = CurrentPackageIndex == i
+                            ? GEStyle.PRInsertion
+                            : GEStyle.ObjectPickerTab;
+                        if (GELayout.Button(label, style, GTOption.Height(20), GTOption.Width(DrawPackageWidth - 50)))
+                        {
+                            CurrentPackageIndex = i;
+                            ShowGroup = true;
                         }
                     }
                 }

@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System.Text;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,12 +23,12 @@ namespace AIO.UEditor
         {
             using (GELayout.VHorizontal())
             {
-                if (!ShowSetting && GELayout.Button("Setting", GEStyle.RLFooter, ButtonWidth, 20))
+                if (!ShowSetting && GELayout.Button("⇘ Setting", GEStyle.RLFooter, ButtonWidth, 20))
                 {
                     ShowSetting = true;
                 }
 
-                if (!ShowPackage && GELayout.Button("Package", GEStyle.RLFooter, ButtonWidth, 20))
+                if (!ShowPackage && GELayout.Button("⇘ Package", GEStyle.RLFooter, ButtonWidth, 20))
                 {
                     ShowPackage = true;
                 }
@@ -37,7 +38,7 @@ namespace AIO.UEditor
                 {
                     ShowGroup = false;
                 }
-                else if (!ShowGroup && GELayout.Button("Group", GEStyle.RLFooter, ButtonWidth, 20))
+                else if (!ShowGroup && GELayout.Button("⇘ Group", GEStyle.RLFooter, ButtonWidth, 20))
                 {
                     ShowGroup = true;
                 }
@@ -71,13 +72,21 @@ namespace AIO.UEditor
                 GELayout.Label(TempBuilder.ToString(), GEStyle.HeaderLabel);
                 EditorGUILayout.Separator();
 
-                if (GELayout.Button("转换", GEStyle.RLFooter, ButtonWidth, 20))
+#if SUPPORT_YOOASSET
+                if (GELayout.Button("转换 Yoo", GEStyle.RLFooter, ButtonWidth, 20))
                 {
+                    ConvertYooAsset.Convert(Data);
+                }
+#endif
+                if (GELayout.Button("配置", GEStyle.RLFooter, ButtonWidth, 20))
+                {
+                    Selection.activeObject = ASConfig.GetOrCreate();
                 }
 
                 if (GELayout.Button("保存", GEStyle.RLFooter, ButtonWidth, 20))
                 {
                     Data.Save();
+                    EditorUtility.DisplayDialog("保存", "保存成功", "确定");
                 }
             }
         }

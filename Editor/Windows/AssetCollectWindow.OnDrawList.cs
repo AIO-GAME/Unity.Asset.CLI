@@ -22,14 +22,19 @@ namespace AIO.UEditor
             {
                 foreach (var data in OnDrawCurrentItem.AssetDataInfos.CurrentPage)
                 {
-                    using (GELayout.Vertical())
+                    using (GELayout.Vertical(GEStyle.HelpBox))
                     {
-                        GELayout.HelpBox($"Location : {data.Value.Address} \nPath : {data.Key}");
                         using (GELayout.VHorizontal())
                         {
-                            GELayout.Field(AssetDatabase.LoadAssetAtPath<Object>(data.Key));
-                            GELayout.ButtonCopy("Copy", data.Value.Address, 50);
-                            if (GELayout.Button("Select", 50))
+                            GELayout.Label(data.Value.Address, GEStyle.MiniLabel);
+                            GELayout.ButtonCopy(Content_COPY, data.Value.Address, 24);
+                        }
+
+                        using (GELayout.VHorizontal())
+                        {
+                            GELayout.Label(data.Key, GEStyle.MiniLabel);
+                            GELayout.Field(AssetDatabase.LoadAssetAtPath<Object>(data.Key), GTOption.Width(80));
+                            if (GELayout.Button(Content_SELECT, 24))
                             {
                                 Selection.activeObject = AssetDatabase.LoadAssetAtPath<Object>(data.Key);
                             }

@@ -5,8 +5,8 @@
 |*|============|*/
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,7 +22,7 @@ namespace AIO.UEditor
 
         [Description("Bundle名称唯一")] public bool UniqueBundleName;
 
-        [Description("包含资源GUID")] public bool IncludeAssetGuid;
+        [Description("包含资源GUID")] public bool IncludeAssetGUID;
 
         [Description("地址转小写")] public bool LocationToLower;
 
@@ -30,6 +30,17 @@ namespace AIO.UEditor
         /// 资源收集配置
         /// </summary>
         [SerializeField] public AssetCollectPackage[] Packages;
+
+        public AssetCollectPackage this[int index]
+        {
+            get => Packages[index];
+            set => Packages[index] = value;
+        }
+
+        public AssetCollectPackage GetPackage(string packageName)
+        {
+            return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
+        }
 
         /// <summary>
         /// 获取资源收集配置

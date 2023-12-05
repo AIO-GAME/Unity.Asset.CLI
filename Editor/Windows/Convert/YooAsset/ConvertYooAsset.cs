@@ -1,0 +1,189 @@
+﻿/*|============|*|
+|*|Author:     |*| Star fire
+|*|Date:       |*| 2023-12-05
+|*|E-Mail:     |*| xinansky99@foxmail.com
+|*|============|*/
+
+#if SUPPORT_YOOASSET
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using YooAsset.Editor;
+
+namespace AIO.UEditor
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    internal static class ConvertYooAsset
+    {
+        public static Dictionary<AssetCollectItem, bool> Collectors;
+
+        private static AssetCollectRoot _Instance;
+
+        private static AssetCollectRoot Instance
+        {
+            get
+            {
+                if (!(_Instance is null)) return _Instance;
+                _Instance = AssetCollectRoot.GetOrCreate();
+
+                return _Instance;
+            }
+        }
+
+        static ConvertYooAsset()
+        {
+            AssetCollectSetting.Initialize();
+            Collectors = new Dictionary<AssetCollectItem, bool>();
+        }
+
+        [DisplayName("AIO Asset FilterRule")]
+        internal class AIOFilterRule : IFilterRule
+        {
+            public bool IsCollectAsset(FilterRuleData data)
+            {
+                if (!data.GroupName.Contains('_')) return false;
+                var info = data.GroupName.Split('_');
+                var collector = Instance.GetPackage(info[0])?.GetGroup(info[1])?.GetCollector(data.CollectPath);
+                if (collector is null) return false;
+                if (!Collectors.ContainsKey(collector) || Collectors[collector] == false)
+                {
+                    collector.UpdateCollect();
+                    collector.UpdateFilter();
+                }
+                else Collectors[collector] = true;
+
+                var infoData = new AssetInfoData
+                {
+                    Tags = collector.Tags,
+                    UserData = collector.UserData,
+                    PackageName = info[0],
+                    GroupName = info[1],
+                    CollectPath = collector.CollectPath,
+                    Extension = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
+                };
+                infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
+                return collector.IsCollectAsset(infoData);
+            }
+        }
+
+        [DisplayName("AIO IAddressRule")]
+        internal class AIOAddressRule : IAddressRule
+        {
+            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            {
+                if (!data.GroupName.Contains('_')) return "Error : Rule mismatch";
+                var info = data.GroupName.Split('_');
+                var collector = Instance.GetPackage(info[0])?.GetGroup(info[1])?.GetCollector(data.CollectPath);
+                if (collector is null) return "Error : Not found collector";
+                if (!Collectors.ContainsKey(collector) || Collectors[collector] == false)
+                {
+                    collector.UpdateCollect();
+                    collector.UpdateFilter();
+                }
+                else Collectors[collector] = true;
+
+                var infoData = new AssetInfoData
+                {
+                    Tags = collector.Tags,
+                    UserData = collector.UserData,
+                    PackageName = info[0],
+                    GroupName = info[1],
+                    CollectPath = collector.CollectPath,
+                    Extension = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
+                };
+                infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
+                return collector.GetAssetAddress(infoData);
+            }
+        }
+
+        private static IEnumerable<AssetBundleCollectorPackage> Convert(IEnumerable<AssetCollectPackage> packages)
+            => packages.Select(Convert);
+
+        private static IEnumerable<AssetBundleCollectorGroup> Convert(IEnumerable<AssetCollectGroup> groups)
+            => groups.Select(Convert);
+
+        private static IEnumerable<AssetBundleCollector> Convert(IEnumerable<AssetCollectItem> collects)
+            => collects.Select(Convert);
+
+        private static AssetBundleCollectorPackage Convert(AssetCollectPackage package)
+            => new AssetBundleCollectorPackage
+            {
+                PackageName = package.Name,
+                PackageDesc = package.Description,
+                Groups = Convert(package.Groups).ToList()
+            };
+
+        private static AssetBundleCollectorGroup Convert(AssetCollectGroup group)
+            => new AssetBundleCollectorGroup
+            {
+                AssetTags = group.Tags,
+                GroupDesc = group.Description,
+                GroupName = group.Name,
+                Collectors = Convert(group.Collectors).ToList()
+            };
+
+        private static AssetBundleCollector Convert(AssetCollectItem collect)
+            => new AssetBundleCollector
+            {
+                CollectorGUID = collect.GUID,
+                CollectPath = collect.CollectPath,
+                CollectorType = Convert(collect.Type),
+                AssetTags = collect.Tags,
+                AddressRuleName = nameof(AIOAddressRule),
+                FilterRuleName = nameof(AIOFilterRule),
+
+                UserData = collect.UserData,
+            };
+
+        private static ECollectorType Convert(EAssetCollectItemType type)
+        {
+            switch (type)
+            {
+                default:
+                case EAssetCollectItemType.MainAssetCollector:
+                    return ECollectorType.MainAssetCollector;
+                case EAssetCollectItemType.DependAssetCollector:
+                    return ECollectorType.DependAssetCollector;
+                case EAssetCollectItemType.StaticAssetCollector:
+                    return ECollectorType.StaticAssetCollector;
+            }
+        }
+
+        public static void Convert(AssetCollectRoot asset)
+        {
+            asset.Save();
+            var YPackages = AssetBundleCollectorSettingData.Setting.Packages;
+            foreach (var APackage in asset.Packages)
+            {
+                for (var YPIndex = YPackages.Count - 1; YPIndex >= 0; YPIndex--)
+                {
+                    if (YPackages[YPIndex].PackageName != APackage.Name) continue;
+                    YPackages.RemoveAt(YPIndex);
+                    break;
+                }
+            }
+
+            AssetBundleCollectorSettingData.Setting.ShowPackageView = true;
+            AssetBundleCollectorSettingData.Setting.ShowEditorAlias = true;
+            AssetBundleCollectorSettingData.Setting.UniqueBundleName = asset.UniqueBundleName;
+            AssetBundleCollectorSettingData.Setting.IncludeAssetGUID = asset.IncludeAssetGUID;
+            AssetBundleCollectorSettingData.Setting.LocationToLower = asset.LocationToLower;
+            AssetBundleCollectorSettingData.Setting.EnableAddressable = asset.EnableAddressable;
+            foreach (var package in Convert(asset.Packages))
+            {
+                foreach (var group in package.Groups)
+                {
+                    group.GroupName = $"{package.PackageName}_{group.GroupName}";
+                }
+
+                AssetBundleCollectorSettingData.Setting.Packages.Add(package);
+            }
+          
+            // AssetBundleCollectorWindow.OpenWindow();
+        }
+    }
+}
+#endif

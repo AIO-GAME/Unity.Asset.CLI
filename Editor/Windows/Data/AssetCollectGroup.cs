@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System;
+using System.Linq;
 
 namespace AIO.UEditor
 {
@@ -30,5 +31,18 @@ namespace AIO.UEditor
         /// 资源收集配置
         /// </summary>
         public AssetCollectItem[] Collectors;
+
+        public AssetCollectItem this[int index]
+        {
+            get => Collectors[index];
+            set => Collectors[index] = value;
+        }
+
+        public AssetCollectItem GetCollector(string collectPath)
+        {
+            return Collectors
+                .Where(collectItem => !(collectItem is null))
+                .FirstOrDefault(collectItem => collectItem.CollectPath == collectPath);
+        }
     }
 }

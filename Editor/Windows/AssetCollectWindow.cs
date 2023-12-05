@@ -4,7 +4,10 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System;
+using System.Collections.Generic;
+using System.Linq;
+using AIO.UEngine;
+using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -25,27 +28,57 @@ namespace AIO.UEditor
         /// </summary>
         public AssetCollectRoot Data;
 
+        public ASConfig Config;
+
         private const int ButtonWidth = 75;
 
         protected override void OnAwake()
         {
+            Data = AssetCollectRoot.GetOrCreate();
+            Selection.activeObject = Data;
         }
+
+        private GUIContent Content_ADD;
+        private GUIContent Content_DEL;
+        private GUIContent Content_OPEN;
+        private GUIContent Content_REFRESH;
+        private GUIContent Content_COPY;
+        private GUIContent Content_SELECT;
 
         protected override void OnActivation()
         {
             if (Data is null) Data = AssetCollectRoot.GetOrCreate();
             Data.Save();
+            
+            if (Config is null) Config = ASConfig.GetOrCreate();
+            Config.Save();
+            
             AssetCollectSetting.Initialize();
+
+            Content_SELECT = new GUIContent("☈", "选择指向指定资源");
+            Content_ADD = new GUIContent("✚", "添加元素");
+            Content_DEL = new GUIContent("✘", "删除元素");
+            Content_REFRESH = new GUIContent("↺", "刷新内容");
+            Content_OPEN = new GUIContent("☑", "打开资源管理界面");
+            Content_COPY = new GUIContent("❒", "复制资源路径");
+            
+            if (_packages is null)
+                _packages = Config.Packages is null
+                    ? new List<AssetsPackageConfig>()
+                    : Config.Packages.ToList();
+
+            UpdateRecordQueue();
         }
 
         private int WidthOffset = 0;
         private int CurrentPackageIndex = 0;
         private int CurrentGroupIndex = 0;
-        private const int DrawListWidth = 400;
-        private const int DrawSettingWidth = 150;
-        private const int DrawPackageWidth = 150;
-        private const int DrawGroupWidth = 150;
-        private const int DrawHeaderHeight = 25;
+
+        private int DrawListWidth = 400;
+        private int DrawSettingWidth = 150;
+        private int DrawPackageWidth = 150;
+        private int DrawGroupWidth = 150;
+        private int DrawHeaderHeight = 25;
 
         protected override void OnDraw()
         {
@@ -93,46 +126,62 @@ namespace AIO.UEditor
             {
                 GULayout.BeginArea(new Rect(CurrentWidth - 5 - DrawListWidth,
                     DrawHeaderHeight, DrawListWidth, height), GEStyle.INThumbnailShadow);
-                using (GELayout.VHorizontal(GEStyle.DDHeaderStyle))
+                using (GELayout.Vertical(GEStyle.INThumbnailShadow))
                 {
-                    GELayout.Label(
-                        $"[{OnDrawCurrentItem.Type}] Collector : {OnDrawCurrentItem.CollectorPath} Count: {OnDrawCurrentItem.AssetDataInfos.Count}");
-                    if (GELayout.Button("刷新", 50))
+                    using (GELayout.VHorizontal())
                     {
-                        if (Data.Packages[CurrentPackageIndex] is null ||
-                            Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex] is null)
+                        GELayout.Label($"[{OnDrawCurrentItem.Type}] Count: {OnDrawCurrentItem.AssetDataInfos.Count}");
+                        GELayout.Separator();
+
+                        if (GELayout.Button(Content_REFRESH, 24))
+                        {
+                            if (Data.Packages[CurrentPackageIndex] is null ||
+                                Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex] is null)
+                            {
+                                OnDrawCurrentItem = null;
+                                return;
+                            }
+
+                            OnDrawCurrentItem.CollectAsset(
+                                Data.Packages[CurrentPackageIndex].Name,
+                                Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+                            return;
+                        }
+
+                        if (GELayout.Button(Content_DEL, 24))
                         {
                             OnDrawCurrentItem = null;
                             return;
                         }
-
-                        OnDrawCurrentItem.CollectAsset(
-                            Data.Packages[CurrentPackageIndex].Name,
-                            Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
-                        return;
                     }
 
-                    if (GELayout.Button("关闭", 50))
+                    using (GELayout.VHorizontal())
                     {
-                        OnDrawCurrentItem = null;
-                        return;
+                        GELayout.Label($"{OnDrawCurrentItem.CollectPath}", GEStyle.MiniLabel);
                     }
-                }
 
-                using (GELayout.VHorizontal()) // 设置页面滑动条
-                {
-                    GELayout.Label("Page Index : ");
-                    OnDrawCurrentItem.AssetDataInfos.PageIndex = GELayout.Slider(
-                        OnDrawCurrentItem.AssetDataInfos.PageIndex,
-                        1, OnDrawCurrentItem.AssetDataInfos.PageCount - 1);
-                }
+                    if (OnDrawCurrentItem.AssetDataInfos.Count > 20)
+                    {
+                        using (GELayout.VHorizontal())
+                        {
+                            GELayout.Label("Size", GTOption.Width(35)); // 设置页面数量
+                            OnDrawCurrentItem.AssetDataInfos.PageSize = GELayout.Slider(
+                                OnDrawCurrentItem.AssetDataInfos.PageSize,
+                                20, 100);
+                        }
+                    }
 
-                using (GELayout.VHorizontal()) // 设置页面数量
-                {
-                    GELayout.Label("Page Count : ");
-                    OnDrawCurrentItem.AssetDataInfos.PageSize = GELayout.Slider(
-                        OnDrawCurrentItem.AssetDataInfos.PageSize,
-                        20, 100);
+                    if (OnDrawCurrentItem.AssetDataInfos.PageSize < OnDrawCurrentItem.AssetDataInfos.Count)
+                    {
+                        using (GELayout.VHorizontal())
+                        {
+                            GELayout.Label("Index", GTOption.Width(35)); // 设置页面滑动条
+
+                            OnDrawCurrentItem.AssetDataInfos.PageIndex = GELayout.Slider(
+                                OnDrawCurrentItem.AssetDataInfos.PageIndex,
+                                0, OnDrawCurrentItem.AssetDataInfos.PageCount - 1);
+                        }
+                    }
                 }
 
                 OnDrawListScroll = GELayout.VScrollView(OnDrawList, OnDrawListScroll,
@@ -156,6 +205,7 @@ namespace AIO.UEditor
         partial void OnDrawGroupList();
         partial void OnDrawItem(AssetCollectItem item);
         partial void OnDrawList();
+        partial void OnDrawASConfig();
 
         protected override void OnDisable()
         {
