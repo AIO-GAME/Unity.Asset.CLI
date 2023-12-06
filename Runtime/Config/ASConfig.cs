@@ -256,6 +256,11 @@ namespace AIO.UEngine
             config.OutputLog = outputLog;
             return config;
         }
+
+        public void Save()
+        {
+            EditorUtility.SetDirty(this);
+        }
 #endif
     }
 }

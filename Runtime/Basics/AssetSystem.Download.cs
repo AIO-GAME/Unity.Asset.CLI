@@ -236,7 +236,7 @@ namespace AIO
             yield return handle.UpdatePackageVersionCO();
             Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
             if (!handle.Flow) yield break;
-            yield return handle.DownloadTagTask(tag);
+            yield return handle.DownloadTagCO(tag);
             WhiteListLocal.AddRange(GetAssetInfos(tag));
             Log($"【资源下载】 标签资源列表 下载完成");
         }
@@ -265,7 +265,7 @@ namespace AIO
             Log($"【资源下载】 {(handle.Flow ? "有新版本" : "无需更新")}");
             if (!handle.Flow) yield break;
             var enumerable = tag as string[] ?? tag.ToArray();
-            yield return handle.DownloadTagTask(enumerable);
+            yield return handle.DownloadTagCO(enumerable);
             WhiteListLocal.AddRange(GetAssetInfos(enumerable));
             Log($"【资源下载】 标签资源列表 下载完成");
         }

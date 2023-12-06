@@ -13,7 +13,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tag">资源标签</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        public static ResourceDownloaderOperation CreateResourceDownloaderDefault(string tag, int downloadingMaxNumber, int failedTryAgain)
+        public static ResourceDownloaderOperation CreateResourceDownloaderDefault(string tag, int downloadingMaxNumber,
+            int failedTryAgain)
         {
             return DefaultPackage.CreateResourceDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain);
         }
@@ -24,7 +25,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        public static ResourceDownloaderOperation CreateResourceDownloaderDefault(string[] tags, int downloadingMaxNumber, int failedTryAgain)
+        public static ResourceDownloaderOperation CreateResourceDownloaderDefault(string[] tags,
+            int downloadingMaxNumber, int failedTryAgain)
         {
             return DefaultPackage.CreateResourceDownloader(tags, downloadingMaxNumber, failedTryAgain);
         }
@@ -34,7 +36,8 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        public static ResourceDownloaderOperation CreateResourceDownloaderDefault(int downloadingMaxNumber, int failedTryAgain)
+        public static ResourceDownloaderOperation CreateResourceDownloaderDefault(int downloadingMaxNumber,
+            int failedTryAgain)
         {
             return DefaultPackage.CreateResourceDownloader(downloadingMaxNumber, failedTryAgain);
         }
@@ -49,7 +52,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="assetInfos">资源信息列表</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        public static ResourceDownloaderOperation CreateBundleDownloaderDefault(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain)
+        public static ResourceDownloaderOperation CreateBundleDownloaderDefault(AssetInfo[] assetInfos,
+            int downloadingMaxNumber, int failedTryAgain)
         {
             return DefaultPackage.CreateBundleDownloader(assetInfos, downloadingMaxNumber, failedTryAgain);
         }
@@ -63,7 +67,8 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
         /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static UpdatePackageVersionOperation UpdatePackageVersionDefaultAsync(bool appendTimeTicks = true, int timeout = 60)
+        public static UpdatePackageVersionOperation UpdatePackageVersionDefaultAsync(bool appendTimeTicks = true,
+            int timeout = 60)
         {
             return DefaultPackage.UpdatePackageVersionAsync(appendTimeTicks, timeout);
         }
@@ -74,7 +79,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="packageVersion">更新的包裹版本</param>
         /// <param name="autoSaveVersion">自动激活清单</param>
         /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static UpdatePackageManifestOperation UpdatePackageManifestDefaultAsync(string packageVersion, bool autoSaveVersion = true, int timeout = 60)
+        public static UpdatePackageManifestOperation UpdatePackageManifestDefaultAsync(string packageVersion,
+            bool autoSaveVersion = true, int timeout = 60)
         {
             return DefaultPackage.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
         }
@@ -88,7 +94,8 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="packageVersion">下载的包裹版本</param>
         /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static PreDownloadContentOperation PreDownloadContentDefaultAsync(string packageVersion, int timeout = 60)
+        public static PreDownloadContentOperation PreDownloadContentDefaultAsync(string packageVersion,
+            int timeout = 60)
         {
             return DefaultPackage.PreDownloadContentAsync(packageVersion, timeout);
         }
@@ -105,7 +112,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="timeout">超时时间</param>
-        public static ResourceDownloaderOperation CreateResourceDownloader(string package, string tag, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public static ResourceDownloaderOperation CreateResourceDownloader(string package, string tag,
+            int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
             return asset.CreateResourceDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain, timeout);
@@ -119,7 +127,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="package">包名</param>
         /// <param name="timeout">超时时间</param>
-        public static ResourceDownloaderOperation CreateResourceDownloader(string package, string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public static ResourceDownloaderOperation CreateResourceDownloader(string package, string[] tags,
+            int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
             return asset.CreateResourceDownloader(tags, downloadingMaxNumber, failedTryAgain, timeout);
@@ -132,7 +141,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="failedTryAgain">下载失败的重试次数</param>
         /// <param name="package">包名</param>
         /// <param name="timeout">超时时间</param>
-        public static ResourceDownloaderOperation CreateResourceDownloader(string package, int downloadingMaxNumber, int failedTryAgain, int timeout = 60)
+        public static ResourceDownloaderOperation CreateResourceDownloader(string package, int downloadingMaxNumber,
+            int failedTryAgain, int timeout = 60)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
             return asset.CreateResourceDownloader(downloadingMaxNumber, failedTryAgain, timeout);
@@ -149,7 +159,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="assetInfos">资源信息列表</param>
         /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
         /// <param name="failedTryAgain">下载失败的重试次数</param>
-        public static ResourceDownloaderOperation CreateBundleDownloader(string package, AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain)
+        public static ResourceDownloaderOperation CreateBundleDownloader(string package,
+            AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
             return asset.CreateBundleDownloader(assetInfos, downloadingMaxNumber, failedTryAgain);
@@ -165,7 +176,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="package">包名</param>
         /// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
         /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static UpdatePackageVersionOperation UpdatePackageVersionAsync(string package, bool appendTimeTicks = true, int timeout = 60)
+        public static UpdatePackageVersionOperation UpdatePackageVersionAsync(string package,
+            bool appendTimeTicks = true, int timeout = 60)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
             return asset.UpdatePackageVersionAsync(appendTimeTicks, timeout);
@@ -178,7 +190,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="packageVersion">更新的包裹版本</param>
         /// <param name="autoSaveVersion">自动激活清单</param>
         /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static UpdatePackageManifestOperation UpdatePackageManifestAsync(string package, string packageVersion, bool autoSaveVersion = true, int timeout = 60)
+        public static UpdatePackageManifestOperation UpdatePackageManifestAsync(string package, string packageVersion,
+            bool autoSaveVersion = true, int timeout = 60)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
             return asset.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
@@ -194,7 +207,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="package">包名</param>
         /// <param name="packageVersion">下载的包裹版本</param>
         /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static PreDownloadContentOperation PreDownloadContentAsync(string package, string packageVersion, int timeout = 60)
+        public static PreDownloadContentOperation PreDownloadContentAsync(string package, string packageVersion,
+            int timeout = 60)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
             return asset.PreDownloadContentAsync(packageVersion, timeout);

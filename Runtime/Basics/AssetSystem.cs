@@ -101,7 +101,29 @@ namespace AIO
         /// </summary>
         /// <returns></returns>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static async Task Destroy()
+        public static Task DestroyTask()
+        {
+            Destroy();
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 销毁资源管理系统
+        /// </summary>
+        /// <returns></returns>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IEnumerator DestroyCO()
+        {
+            Destroy();
+            yield break;
+        }
+
+        /// <summary>
+        /// 销毁资源管理系统
+        /// </summary>
+        /// <returns></returns>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static void Destroy()
         {
             Proxy.Dispose();
             SequenceRecords.Dispose();

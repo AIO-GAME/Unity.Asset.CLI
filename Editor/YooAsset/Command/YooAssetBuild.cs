@@ -82,12 +82,41 @@ namespace AIO.UEditor
         public static void ArtBuild(YooAssetBuildCommand command)
         {
             Debug.Log(AHelper.Json.Serialize(command));
+            YooAsset.Editor.EBuildPipeline buildPipeline;
+            switch (command.BuildPipeline)
+            {
+                default:
+                case EBuildPipeline.BuiltinBuildPipeline:
+                    buildPipeline = YooAsset.Editor.EBuildPipeline.BuiltinBuildPipeline;
+                    break;
+                case EBuildPipeline.ScriptableBuildPipeline:
+                    buildPipeline = YooAsset.Editor.EBuildPipeline.ScriptableBuildPipeline;
+                    break;
+            }
+
+            YooAsset.Editor.EBuildMode buildMode;
+            switch (command.BuildMode)
+            {
+                default:
+                case EBuildMode.ForceRebuild:
+                    buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
+                    break;
+                case EBuildMode.IncrementalBuild:
+                    buildMode = YooAsset.Editor.EBuildMode.IncrementalBuild;
+                    break;
+                case EBuildMode.DryRunBuild:
+                    buildMode = YooAsset.Editor.EBuildMode.DryRunBuild;
+                    break;
+                case EBuildMode.SimulateBuild:
+                    buildMode = YooAsset.Editor.EBuildMode.SimulateBuild;
+                    break;
+            }
 
             var buildParameters = new BuildParameters
             {
                 BuildTarget = command.ActiveTarget,
-                BuildPipeline = command.BuildPipeline,
-                BuildMode = command.BuildMode,
+                BuildPipeline = buildPipeline,
+                BuildMode = buildMode,
                 PackageName = command.BuildPackage,
                 CompressOption = command.CompressOption,
                 OutputNameStyle = command.OutputNameStyle,
