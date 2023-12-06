@@ -4,6 +4,8 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using UnityEngine;
+
 namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
@@ -27,11 +29,16 @@ namespace AIO.UEditor
                         CurrentGroupIndex = 0;
                         ShowGroup = true;
                     }
+
+                    GUI.FocusControl(null);
                 }
 
                 GELayout.Label("|", GTOption.Width(4));
                 if (GELayout.Button("Group", GEStyle.ObjectPickerTab, GTOption.Width(DrawGroupWidth - 50)))
+                {
                     ShowGroup = false;
+                    GUI.FocusControl(null);
+                }
             }
 
             using (GELayout.Vertical(GEStyle.GridList))
@@ -50,6 +57,7 @@ namespace AIO.UEditor
                                 ShowGroup = false;
                             }
 
+                            GUI.FocusControl(null);
                             return;
                         }
 
@@ -66,6 +74,7 @@ namespace AIO.UEditor
                         {
                             CurrentGroupIndex = i;
                             ShowGroup = true;
+                            GUI.FocusControl(null);
                         }
                     }
                 }

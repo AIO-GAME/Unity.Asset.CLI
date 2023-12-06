@@ -93,6 +93,11 @@ namespace AIO.UEditor
         #region Filter
 
         /// <summary>
+        /// 打包规则
+        /// </summary>
+        public int RulePackIndex;
+        
+        /// <summary>
         /// 过滤规则(获取收集规则下标)
         /// </summary>
         public int RuleFilterIndex;
@@ -137,6 +142,7 @@ namespace AIO.UEditor
 
         public int GetHashCode(AssetCollectItem obj)
         {
+            if (obj.Equals(null)) return 0;
             unchecked
             {
                 var hashCode = (int)obj.Type;
@@ -144,7 +150,7 @@ namespace AIO.UEditor
                 hashCode = (hashCode * 397) ^ (obj.Path != null ? obj.Path.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.UserData != null ? obj.UserData.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.Name != null ? obj.Name.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (obj.Address != null ? obj.Address.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ obj.Address.GetHashCode();
                 hashCode = (hashCode * 397) ^ (obj.RuleCollect != null ? obj.RuleCollect.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.RuleFilter != null ? obj.RuleFilter.GetHashCode() : 0);
                 return hashCode;
@@ -177,7 +183,7 @@ namespace AIO.UEditor
         /// </summary>
         /// <param name="data">数据</param>
         /// <returns>Ture:忽略 False:需要过滤</returns>
-        public bool IsCollectAsset(AssetInfoData data)
+        public bool IsCollectAsset(AssetRuleData data)
         {
             // 判断收集规则是否符合条件 如果不符合则跳过
             if (RuleCollects.Count != 0 &&
@@ -202,7 +208,12 @@ namespace AIO.UEditor
             return true;
         }
 
-        public string GetAssetAddress(AssetInfoData data)
+        public AssetRulePackResult GetPackRule(AssetRuleData data)
+        {
+            return AssetCollectSetting.MapPacks.GetValue(RulePackIndex).GetPackRuleResult(data);
+        }
+
+        public string GetAssetAddress(AssetRuleData data)
         {
             var rule = AssetCollectSetting.MapAddress.GetValue(Address);
             var address = rule.GetAssetAddress(data);
@@ -278,7 +289,7 @@ namespace AIO.UEditor
             GroupName = group;
             if (Path is null || string.IsNullOrEmpty(CollectPath)) return;
             if (Type != EAssetCollectItemType.MainAssetCollector) return;
-            var data = new AssetInfoData
+            var data = new AssetRuleData
             {
                 Tags = Tags,
                 UserData = UserData,
@@ -304,6 +315,10 @@ namespace AIO.UEditor
                     {
                         Address = GetAssetAddress(data),
                         AssetPath = fixedPath,
+                        Extension = data.Extension,
+                        Name = System.IO.Path.GetFileNameWithoutExtension(fixedPath),
+                        Size = AHelper.IO.GetFileLength(fixedPath),
+                        CollectPath = CollectPath,
                     };
                 }
             }
@@ -316,7 +331,10 @@ namespace AIO.UEditor
                     AssetDataInfos[CollectPath] = new AssetDataInfo
                     {
                         Address = GetAssetAddress(data),
-                        AssetPath = CollectPath,
+                        AssetPath = CollectPath, 
+                        Extension = data.Extension,
+                        Name = System.IO.Path.GetFileNameWithoutExtension(CollectPath),
+                        Size = AHelper.IO.GetFileLength(CollectPath),
                     };
                 }
             }

@@ -99,7 +99,7 @@ namespace AIO.UEditor
                             {
                                 using (GELayout.VHorizontal())
                                 {
-                                    GELayout.Button("Update", UpdateRecordQueue);
+                                    GELayout.Button("Update", UpdateDataRecordQueue);
 
                                     if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
                                     {
@@ -159,7 +159,7 @@ namespace AIO.UEditor
                 : Config.Packages.ToList();
         }
 
-        private void UpdateRecordQueue()
+        private void UpdateDataRecordQueue()
         {
             if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH)) // 如果在编辑器下存在本地记录则加载
                 AssetSystem.SequenceRecords.Records = AHelper.IO.ReadJsonUTF8<Queue<AssetSystem.SequenceRecord>>(

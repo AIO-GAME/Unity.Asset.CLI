@@ -4,43 +4,41 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-namespace AIO.UEditor
+namespace AIO
 {
-    public struct AssetInfoData
+    /// <summary>
+    /// nameof(AssetInfo)
+    /// </summary>
+    public struct AssetDataInfo
     {
         /// <summary>
-        /// 收集器 (分隔符标准: /)
-        /// </summary>
-        public string CollectPath;
-
-        /// <summary>
-        /// 资源路径 (不包含扩展名)
+        /// Asset Path
         /// </summary>
         public string AssetPath;
-        
+
         /// <summary>
-        /// 扩展名 (小写 .xxx)
+        /// Asset Address
+        /// </summary>
+        public string Address;
+
+        /// <summary>
+        /// Asset Extension
         /// </summary>
         public string Extension;
+
+        /// <summary>
+        /// Asset Name
+        /// </summary>
+        public string Name;
         
         /// <summary>
-        /// 用户数据
+        /// Asset Collect Path
         /// </summary>
-        public string UserData;
-
+        public string CollectPath;
+        
         /// <summary>
-        /// 标签
+        /// Asset Size
         /// </summary>
-        public string Tags;
-
-        /// <summary>
-        /// 组名称
-        /// </summary>
-        public string GroupName;
-
-        /// <summary>
-        /// 包名称
-        /// </summary>
-        public string PackageName;
+        public long Size;
     }
 }

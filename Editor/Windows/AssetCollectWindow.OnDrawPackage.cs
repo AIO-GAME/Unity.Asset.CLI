@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace AIO.UEditor
 {
@@ -28,11 +29,16 @@ namespace AIO.UEditor
                         CurrentPackageIndex = 0;
                         ShowGroup = true;
                     }
+
+                    GUI.FocusControl(null);
                 }
 
                 GELayout.Label("|", GTOption.Width(5));
                 if (GELayout.Button("Package", GEStyle.ObjectPickerTab, GTOption.Width(DrawPackageWidth - 50)))
+                {
                     ShowPackage = false;
+                    GUI.FocusControl(null);
+                }
             }
 
             using (GELayout.Vertical(GEStyle.GridList))
@@ -45,11 +51,8 @@ namespace AIO.UEditor
                         {
                             Data.Packages = Data.Packages.RemoveAt(i);
                             if (--CurrentPackageIndex < 0) CurrentPackageIndex = 0;
-                            if (CurrentPackageIndex >= Data.Packages.Length)
-                            {
-                                ShowGroup = false;
-                            }
-
+                            if (CurrentPackageIndex >= Data.Packages.Length) ShowGroup = false;
+                            GUI.FocusControl(null);
                             return;
                         }
 
@@ -65,6 +68,7 @@ namespace AIO.UEditor
                         {
                             CurrentPackageIndex = i;
                             ShowGroup = true;
+                            GUI.FocusControl(null);
                         }
                     }
                 }

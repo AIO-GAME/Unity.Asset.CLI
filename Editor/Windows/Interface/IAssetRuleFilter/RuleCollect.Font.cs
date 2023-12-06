@@ -4,7 +4,6 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using FilterRuleData = AIO.UEditor.AssetInfoData;
 using IFilterRule = AIO.UEditor.IAssetRuleFilter;
 
 namespace AIO.UEditor
@@ -15,28 +14,28 @@ namespace AIO.UEditor
         {
             public string DisplayFilterName => "Font/*.otf";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "otf";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "otf";
         }
 
         public class CollectFontTTC : IFilterRule
         {
             public string DisplayFilterName => "Font/*.ttc";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "ttc";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "ttc";
         }
 
         public class CollectFontTTF : IFilterRule
         {
             public string DisplayFilterName => "Font/*.ttf";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "ttf";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "ttf";
         }
 
         public class CollectFont : IFilterRule
         {
             public string DisplayFilterName => "Font/ALL";
 
-            public bool IsCollectAsset(FilterRuleData data) =>
+            public bool IsCollectAsset(AssetRuleData data) =>
                 new CollectFontOTF().IsCollectAsset(data) ||
                 new CollectFontTTC().IsCollectAsset(data) ||
                 new CollectFontTTF().IsCollectAsset(data);

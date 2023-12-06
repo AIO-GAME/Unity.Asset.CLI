@@ -13,6 +13,6 @@ namespace AIO.UEditor
         /// <summary>
         /// 验证资源是否符合规则
         /// </summary>
-        bool IsCollectAsset(AssetInfoData Data);
+        bool IsCollectAsset(AssetRuleData Data);
     }
 }

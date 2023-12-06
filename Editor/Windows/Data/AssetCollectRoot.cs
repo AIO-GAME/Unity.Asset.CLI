@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
@@ -65,10 +66,30 @@ namespace AIO.UEditor
             return collect;
         }
 
+        public string[] GetTags()
+        {
+            var dictionary = new Dictionary<string, bool>();
+            foreach (var package in Packages)
+            {
+                foreach (var group in package.Groups)
+                {
+                    foreach (var collect in group.Collectors)
+                    {
+                        if (string.IsNullOrEmpty(collect.Tags)) continue;
+                        foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
+                    }
+
+                    if (string.IsNullOrEmpty(group.Tags)) continue;
+                    foreach (var tag in group.Tags.Split(';')) dictionary[tag] = true;
+                }
+            }
+
+            return dictionary.Keys.ToArray();
+        }
+
         public void Save()
         {
             EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
         }
     }
 }

@@ -36,6 +36,7 @@ namespace AIO.UEditor
                             GELayout.Field(AssetDatabase.LoadAssetAtPath<Object>(data.Key), GTOption.Width(80));
                             if (GELayout.Button(Content_SELECT, 24))
                             {
+                                GUI.FocusControl(null);
                                 Selection.activeObject = AssetDatabase.LoadAssetAtPath<Object>(data.Key);
                             }
                         }

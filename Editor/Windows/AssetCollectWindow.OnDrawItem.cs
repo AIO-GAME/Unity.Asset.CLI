@@ -30,22 +30,24 @@ namespace AIO.UEditor
 
         partial void OnDrawItem(AssetCollectItem item)
         {
-            using (GELayout.Vertical(GEStyle.INThumbnailShadow))
+            using (GELayout.Vertical(GEStyle.Toolbar))
             {
                 using (GELayout.VHorizontal())
                 {
                     if (GELayout.Button(item.Folded ? "⇙" : "⇗", 30))
                     {
                         item.Folded = !item.Folded;
+                        GUI.FocusControl(null);
                     }
 
+                    item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GTOption.Width(80));
                     item.Path = GELayout.Field(item.Path);
-                    item.Type = GELayout.Popup(item.Type, GTOption.Width(80));
 
                     if (GELayout.Button(Content_DEL, 24))
                     {
                         Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors =
                             Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Remove(item);
+                        GUI.FocusControl(null);
                         return;
                     }
 
@@ -55,6 +57,7 @@ namespace AIO.UEditor
                         OnDrawCurrentItem.CollectAsset(
                             Data.Packages[CurrentPackageIndex].Name,
                             Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+                        GUI.FocusControl(null);
                         return;
                     }
                 }
@@ -64,8 +67,12 @@ namespace AIO.UEditor
                 using (GELayout.VHorizontal())
                 {
                     GELayout.Label("定位", GTOption.Width(30));
-                    item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays);
-                    item.LocationFormat = GELayout.Popup(item.LocationFormat, GTOption.Width(80));
+                    item.LocationFormat = GELayout.Popup(item.LocationFormat, GEStyle.PreDropDown, GTOption.Width(80));
+                    item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays,
+                        GEStyle.PreDropDown);
+
+                    item.RulePackIndex = GELayout.Popup(item.RulePackIndex, AssetCollectSetting.MapPacks.Displays,
+                        GEStyle.PreDropDown);
                     item.HasExtension = GELayout.ToggleLeft("后缀", item.HasExtension, GTOption.Width(50));
                 }
 
@@ -78,10 +85,10 @@ namespace AIO.UEditor
                     }
                     else
                     {
-                        GELayout.HelpBox(GetInfo(AssetCollectSetting.MapCollect.Displays, item.RuleCollectIndex));
                         item.RuleCollectIndex = GELayout.Mask(item.RuleCollectIndex,
-                            AssetCollectSetting.MapCollect.Displays,
+                            AssetCollectSetting.MapCollect.Displays, GEStyle.PreDropDown,
                             GTOption.Width(80));
+                        GELayout.HelpBox(GetInfo(AssetCollectSetting.MapCollect.Displays, item.RuleCollectIndex));
                     }
 
                     item.RuleUseCollectCustom = GELayout.ToggleLeft(
@@ -98,10 +105,10 @@ namespace AIO.UEditor
                     }
                     else
                     {
-                        GELayout.HelpBox(GetInfo(AssetCollectSetting.MapFilter.Displays, item.RuleFilterIndex));
                         item.RuleFilterIndex =
                             GELayout.Mask(item.RuleFilterIndex, AssetCollectSetting.MapFilter.Displays,
-                                GTOption.Width(80));
+                                GEStyle.PreDropDown, GTOption.Width(80));
+                        GELayout.HelpBox(GetInfo(AssetCollectSetting.MapFilter.Displays, item.RuleFilterIndex));
                     }
 
                     item.RuleUseFilterCustom = GELayout.ToggleLeft(

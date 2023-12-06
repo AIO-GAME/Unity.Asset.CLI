@@ -5,7 +5,6 @@
 |*|============|*/
 
 using System.Collections.Generic;
-using FilterRuleData = AIO.UEditor.AssetInfoData;
 using IFilterRule = AIO.UEditor.IAssetRuleFilter;
 
 namespace AIO.UEditor
@@ -16,7 +15,7 @@ namespace AIO.UEditor
         {
             public string DisplayFilterName => "*.fbx";
 
-            public bool IsCollectAsset(FilterRuleData data)
+            public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "fbx";
             }
@@ -26,7 +25,7 @@ namespace AIO.UEditor
         {
             public string DisplayFilterName => "*.material";
 
-            public bool IsCollectAsset(FilterRuleData data)
+            public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "mat";
             }
@@ -36,7 +35,7 @@ namespace AIO.UEditor
         {
             public string DisplayFilterName => "*.shader";
 
-            public bool IsCollectAsset(FilterRuleData data)
+            public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "shader";
             }
@@ -46,7 +45,7 @@ namespace AIO.UEditor
         {
             public string DisplayFilterName => "*.prefab";
 
-            public bool IsCollectAsset(FilterRuleData data)
+            public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "prefab";
             }
@@ -56,7 +55,7 @@ namespace AIO.UEditor
         {
             public string DisplayFilterName => "*.unity";
 
-            public bool IsCollectAsset(FilterRuleData data)
+            public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "unity";
             }

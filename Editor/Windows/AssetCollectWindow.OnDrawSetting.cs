@@ -18,6 +18,7 @@ namespace AIO.UEditor
                 if (GELayout.Button("Setting", GEStyle.ObjectPickerTab, GTOption.Width(DrawSettingWidth - 40)))
                 {
                     ShowSetting = false;
+                    GUI.FocusControl(null);
                 }
             }
 

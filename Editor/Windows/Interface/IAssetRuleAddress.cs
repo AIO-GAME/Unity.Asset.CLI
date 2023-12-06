@@ -16,6 +16,6 @@ namespace AIO.UEditor
         /// <summary>
         /// 获取资源地址
         /// </summary>
-        string GetAssetAddress(AssetInfoData Collect);
+        string GetAssetAddress(AssetRuleData Collect);
     }
 }

@@ -5,7 +5,6 @@
 |*|============|*/
 
 using System.IO;
-using AddressRuleData = AIO.UEditor.AssetInfoData;
 using IAddressRule = AIO.UEditor.IAssetRuleAddress;
 
 namespace AIO.UEditor
@@ -16,7 +15,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = Group + Relative File Path";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return data.AssetPath.Replace(
                     string.Concat(data.CollectPath, '/'),
@@ -29,7 +28,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = Group + FileName";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return string.Concat(Path.GetFileName(data.GroupName), '/', Path.GetFileName(data.AssetPath));
             }
@@ -39,7 +38,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = FileName";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return Path.GetFileName(data.AssetPath);
             }
@@ -49,7 +48,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = InstanceID";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 var obj = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(data.AssetPath);
                 return obj != null ? obj.GetInstanceID().ToString() : Path.GetFileName(data.AssetPath);
@@ -60,7 +59,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = Collect + Relative File Path";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return data.AssetPath.Substring(data.CollectPath.LastIndexOf('/') + 1);
             }
@@ -70,7 +69,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = Collect + FileName";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return string.Concat(Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath));
             }
@@ -80,7 +79,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = Root Relative";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return data.AssetPath;
             }
@@ -90,7 +89,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = UserData + Relative File Path";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return data.AssetPath.Replace(
                     string.Concat(data.CollectPath, '/'),
@@ -103,7 +102,7 @@ namespace AIO.UEditor
         {
             public string DisplayAddressName => "Location = UserData + FileName";
 
-            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return string.Concat(data.UserData, '/', Path.GetFileName(data.AssetPath));
             }

@@ -4,7 +4,6 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using FilterRuleData = AIO.UEditor.AssetInfoData;
 using IFilterRule = AIO.UEditor.IAssetRuleFilter;
 
 namespace AIO.UEditor
@@ -15,63 +14,63 @@ namespace AIO.UEditor
         {
             public string DisplayFilterName => "Texture/*.spriteAtlas";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "spriteatlas";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "spriteatlas";
         }
 
         public class CollectTexturePNG : IFilterRule
         {
             public string DisplayFilterName => "Texture/*.png";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "png";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "png";
         }
 
         public class CollectTextureJPG : IFilterRule
         {
             public string DisplayFilterName => "Texture/*.jpg";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "jpg";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "jpg";
         }
 
         public class CollectTextureTGA : IFilterRule
         {
             public string DisplayFilterName => "Texture/*.tga";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "tga";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "tga";
         }
 
         public class CollectTexturePSD : IFilterRule
         {
             public string DisplayFilterName => "Texture/*.psd";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "psd";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "psd";
         }
 
         public class CollectTextureBMP : IFilterRule
         {
             public string DisplayFilterName => "Texture/*.bmp";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "bmp";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "bmp";
         }
 
         public class CollectTextureEXR : IFilterRule
         {
             public string DisplayFilterName => "Texture/*.exr";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "exr";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "exr";
         }
 
         public class CollectTextureHDR : IFilterRule
         {
             public string DisplayFilterName => "Texture/*.hdr";
 
-            public bool IsCollectAsset(FilterRuleData data) => data.Extension == "hdr";
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "hdr";
         }
 
         public class CollectTexture : IFilterRule
         {
             public string DisplayFilterName => "Texture/ALL";
 
-            public bool IsCollectAsset(FilterRuleData data) =>
+            public bool IsCollectAsset(AssetRuleData data) =>
                 new CollectTextureSpriteAtlas().IsCollectAsset(data) ||
                 new CollectTexturePNG().IsCollectAsset(data) ||
                 new CollectTextureJPG().IsCollectAsset(data) ||

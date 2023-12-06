@@ -5,6 +5,7 @@
 |*|============|*/
 
 #if SUPPORT_YOOASSET
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace AIO.UEditor
             Collectors = new Dictionary<AssetCollectItem, bool>();
         }
 
-        [DisplayName("AIO Asset FilterRule")]
+        [DisplayName("AIO Asset Filter Rule")]
         internal class AIOFilterRule : IFilterRule
         {
             public bool IsCollectAsset(FilterRuleData data)
@@ -55,7 +56,7 @@ namespace AIO.UEditor
                 }
                 else Collectors[collector] = true;
 
-                var infoData = new AssetInfoData
+                var infoData = new AssetRuleData
                 {
                     Tags = collector.Tags,
                     UserData = collector.UserData,
@@ -69,7 +70,7 @@ namespace AIO.UEditor
             }
         }
 
-        [DisplayName("AIO IAddressRule")]
+        [DisplayName("AIO Asset Address Rule")]
         internal class AIOAddressRule : IAddressRule
         {
             string IAddressRule.GetAssetAddress(AddressRuleData data)
@@ -85,7 +86,7 @@ namespace AIO.UEditor
                 }
                 else Collectors[collector] = true;
 
-                var infoData = new AssetInfoData
+                var infoData = new AssetRuleData
                 {
                     Tags = collector.Tags,
                     UserData = collector.UserData,
@@ -97,6 +98,39 @@ namespace AIO.UEditor
                 infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
                 return collector.GetAssetAddress(infoData);
             }
+        }
+
+        [DisplayName("AIO Asset Pack Rule")]
+        internal class AIOPackRule : IPackRule
+        {
+            public PackRuleResult GetPackRuleResult(PackRuleData data)
+            {
+                if (!data.GroupName.Contains('_')) throw new Exception("Error : Rule mismatch");
+                var info = data.GroupName.Split('_');
+                var collector = Instance.GetPackage(info[0])?.GetGroup(info[1])?.GetCollector(data.CollectPath);
+                if (collector is null) throw new Exception("Error : Not found collector");
+                if (!Collectors.ContainsKey(collector) || Collectors[collector] == false)
+                {
+                    collector.UpdateCollect();
+                    collector.UpdateFilter();
+                }
+                else Collectors[collector] = true;
+
+                var infoData = new AssetRuleData
+                {
+                    Tags = collector.Tags,
+                    UserData = collector.UserData,
+                    PackageName = info[0],
+                    GroupName = info[1],
+                    CollectPath = collector.CollectPath,
+                    Extension = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
+                };
+                infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
+                var rule = collector.GetPackRule(infoData);
+                return new PackRuleResult(rule.BundleName, rule.BundleExtension);
+            }
+
+            public bool IsRawFilePackRule() => false;
         }
 
         private static IEnumerable<AssetBundleCollectorPackage> Convert(IEnumerable<AssetCollectPackage> packages)
@@ -134,7 +168,7 @@ namespace AIO.UEditor
                 AssetTags = collect.Tags,
                 AddressRuleName = nameof(AIOAddressRule),
                 FilterRuleName = nameof(AIOFilterRule),
-
+                PackRuleName = nameof(AIOPackRule),
                 UserData = collect.UserData,
             };
 
@@ -181,7 +215,7 @@ namespace AIO.UEditor
 
                 AssetBundleCollectorSettingData.Setting.Packages.Add(package);
             }
-          
+
             // AssetBundleCollectorWindow.OpenWindow();
         }
     }

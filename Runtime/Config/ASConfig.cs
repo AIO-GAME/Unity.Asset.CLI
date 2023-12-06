@@ -260,7 +260,6 @@ namespace AIO.UEngine
         public void Save()
         {
             EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
         }
 #endif
     }
