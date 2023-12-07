@@ -18,12 +18,19 @@ namespace AIO.UEditor
     /// </summary>
     [GWindow("资源收集管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
         Group = "Tools",
-        Menu = "AIO/Asset Window",
+        Menu = "AIO/Window/Asset",
         MinSizeHeight = 500,
         MinSizeWidth = 1000
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
+        [LnkTools("Asset Window", "#00BFFF", "d_Folder Icon", LnkToolsMode.AllMode, -5)]
+        public static void OpenWindow()
+        {
+            EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
+        }
+
+
         /// <summary>
         /// 资源收集根节点
         /// </summary>
@@ -38,7 +45,7 @@ namespace AIO.UEditor
         /// 资源系统打包配置
         /// </summary>
         public ASBuildConfig BuildConfig;
-        
+
         private const int ButtonWidth = 75;
 
         protected override void OnAwake()
@@ -47,12 +54,13 @@ namespace AIO.UEditor
             Selection.activeObject = Data;
         }
 
-        private GUIContent Content_ADD;
-        private GUIContent Content_DEL;
-        private GUIContent Content_OPEN;
-        private GUIContent Content_REFRESH;
-        private GUIContent Content_COPY;
-        private GUIContent Content_SELECT;
+        private GUIContent GC_ADD;
+        private GUIContent GC_DEL;
+        private GUIContent GC_OPEN;
+        private GUIContent GC_REFRESH;
+        private GUIContent GC_COPY;
+        private GUIContent GC_SELECT;
+        private GUIContent GC_SAVE;
 
         protected override void OnActivation()
         {
@@ -67,12 +75,13 @@ namespace AIO.UEditor
 
             AssetCollectSetting.Initialize();
 
-            Content_SELECT = new GUIContent("☈", "选择指向指定资源");
-            Content_ADD = new GUIContent("✚", "添加元素");
-            Content_DEL = new GUIContent("✘", "删除元素");
-            Content_REFRESH = new GUIContent("↺", "刷新内容");
-            Content_OPEN = new GUIContent("☑", "打开资源管理界面");
-            Content_COPY = new GUIContent("❒", "复制资源路径");
+            GC_SELECT = new GUIContent("☈", "选择指向指定资源");
+            GC_ADD = EditorGUIUtility.IconContent("d_CreateAddNew");
+            GC_DEL = new GUIContent("✘", "删除元素");
+            GC_REFRESH = new GUIContent("↺", "刷新数据");
+            GC_OPEN =  new GUIContent("☑", "打开");
+            GC_COPY = new GUIContent("❒", "复制资源路径");
+            GC_SAVE = EditorGUIUtility.IconContent("d_SaveAs");
 
             if (_packages is null)
                 _packages = Config.Packages is null
@@ -105,6 +114,7 @@ namespace AIO.UEditor
 
         partial void OnDrawBuild();
         partial void OnDrawLook();
+
         protected void OnDrawNoLook()
         {
             var height = CurrentHeight - DrawHeaderHeight;
@@ -156,7 +166,7 @@ namespace AIO.UEditor
                         GELayout.Label($"[{OnDrawCurrentItem.Type}] Count: {OnDrawCurrentItem.AssetDataInfos.Count}");
                         GELayout.Separator();
 
-                        if (GELayout.Button(Content_REFRESH, 24))
+                        if (GELayout.Button(GC_REFRESH, 24))
                         {
                             if (Data.Packages[CurrentPackageIndex] is null ||
                                 Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex] is null)
@@ -172,7 +182,7 @@ namespace AIO.UEditor
                             return;
                         }
 
-                        if (GELayout.Button(Content_DEL, 24))
+                        if (GELayout.Button(GC_DEL, 24))
                         {
                             OnDrawCurrentItem = null;
                             GUI.FocusControl(null);

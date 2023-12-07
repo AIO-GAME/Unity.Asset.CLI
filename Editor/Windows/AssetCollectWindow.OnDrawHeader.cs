@@ -95,13 +95,13 @@ namespace AIO.UEditor
             }
 #endif
 
-            if (GELayout.Button("配置", GEStyle.TEtoolbarbutton, ButtonWidth, 20))
+            if (GELayout.Button(EditorGUIUtility.IconContent("d_GameObject Icon"), GEStyle.TEtoolbarbutton, 30, 20))
             {
                 GUI.FocusControl(null);
                 Selection.activeObject = ASConfig.GetOrCreate();
             }
 
-            if (GELayout.Button("保存", GEStyle.TEtoolbarbutton, ButtonWidth, 20))
+            if (GELayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, 30, 20))
             {
                 GUI.FocusControl(null);
                 Data.Save();
@@ -136,6 +136,7 @@ namespace AIO.UEditor
                     GUI.FocusControl(null);
                     switch (LookMode)
                     {
+                        default:
                         case Mode.Editor:
                             UpdateDataRecordQueue();
                             break;

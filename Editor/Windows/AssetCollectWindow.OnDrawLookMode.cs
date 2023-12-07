@@ -60,7 +60,7 @@ namespace AIO.UEditor
             EditorGUILayout.Separator();
 
             SearchText = GELayout.Field(SearchText, GEStyle.SearchTextField);
-            if (GELayout.Button(Content_DEL, GEStyle.TEtoolbarbutton, 24))
+            if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
             {
                 GUI.FocusControl(null);
                 SearchText = string.Empty;
@@ -75,7 +75,7 @@ namespace AIO.UEditor
                 LookModdeCollectorTypes[(CurrentPackageIndex, CurrentGroupIndex)],
                 GEStyle.PreDropDown, GTOption.Width(100));
 
-            if (GELayout.Button(Content_REFRESH, GEStyle.TEtoolbarbutton, 24))
+            if (GELayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, 24))
             {
                 SearchText = string.Empty;
                 LookModdeCollectorsTypeIndex = LookModdeCollectorsIndex = 0;

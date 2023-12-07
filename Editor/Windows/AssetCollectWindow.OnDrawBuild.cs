@@ -75,7 +75,7 @@ namespace AIO.UEditor
             {
                 EditorGUILayout.LabelField("构建版本", GTOption.Width(100));
                 BuildConfig.BuildVersion = GELayout.Field(BuildConfig.BuildVersion);
-                if (GELayout.Button(Content_REFRESH, 20))
+                if (GELayout.Button(GC_REFRESH, 20))
                 {
                     BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                 }
@@ -110,7 +110,7 @@ namespace AIO.UEditor
             {
                 EditorGUILayout.LabelField("构建平台", GTOption.Width(100));
                 BuildConfig.BuildTarget = GELayout.Popup(BuildConfig.BuildTarget, GEStyle.PreDropDown);
-                if (GELayout.Button(Content_REFRESH, 20))
+                if (GELayout.Button(GC_REFRESH, 20))
                 {
                     BuildConfig.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
                 }

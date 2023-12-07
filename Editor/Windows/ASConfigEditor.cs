@@ -14,7 +14,7 @@ using UnityEngine;
 namespace AIO.UEditor
 {
     [CustomEditor(typeof(ASConfig))]
-    public class ASConfigEditor : InspectorSingle<ASConfig>
+    public class ASConfigEditor : NILInspector<ASConfig>
     {
         [MenuItem("AIO/Gen/Asset System Config")]
         public static void Create()

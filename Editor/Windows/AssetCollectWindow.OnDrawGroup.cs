@@ -14,7 +14,7 @@ namespace AIO.UEditor
         {
             using (GELayout.VHorizontal(GEStyle.PreToolbar))
             {
-                if (GELayout.Button(Content_ADD, GEStyle.ObjectPickerTab, 20, 20))
+                if (GELayout.Button(GC_ADD, GEStyle.ObjectPickerTab, 20, 20))
                 {
                     Data.Packages[CurrentPackageIndex].Groups = Data.Packages[CurrentPackageIndex].Groups.Add(
                         new AssetCollectGroup
@@ -47,7 +47,7 @@ namespace AIO.UEditor
                 {
                     using (GELayout.VHorizontal(GTOption.Height(25)))
                     {
-                        if (GELayout.Button(Content_DEL, GEStyle.ObjectPickerTab, 20, 20))
+                        if (GELayout.Button(GC_DEL, GEStyle.ObjectPickerTab, 20, 20))
                         {
                             Data.Packages[CurrentPackageIndex].Groups =
                                 Data.Packages[CurrentPackageIndex].Groups.RemoveAt(i);

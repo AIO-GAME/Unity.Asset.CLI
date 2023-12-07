@@ -47,7 +47,7 @@ namespace AIO.UEditor
                 {
                     using (GELayout.VHorizontal(GTOption.Height(25)))
                     {
-                        if (GELayout.Button("✘", GEStyle.ObjectPickerTab, 20, 20))
+                        if (GELayout.Button(GC_DEL, GEStyle.ObjectPickerTab, 20, 20))
                         {
                             Data.Packages = Data.Packages.RemoveAt(i);
                             if (--CurrentPackageIndex < 0) CurrentPackageIndex = 0;
