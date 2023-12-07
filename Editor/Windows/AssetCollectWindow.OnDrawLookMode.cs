@@ -71,9 +71,12 @@ namespace AIO.UEditor
                 LookModdeCollectors[(CurrentPackageIndex, CurrentGroupIndex)], GEStyle.PreDropDown,
                 GTOption.Width(100));
 
-            LookModdeCollectorsTypeIndex = GELayout.Mask(LookModdeCollectorsTypeIndex,
-                LookModdeCollectorTypes[(CurrentPackageIndex, CurrentGroupIndex)],
-                GEStyle.PreDropDown, GTOption.Width(100));
+            if (LookModdeCollectorTypes[(CurrentPackageIndex, CurrentGroupIndex)].Length > 0)
+            {
+                LookModdeCollectorsTypeIndex = GELayout.Mask(LookModdeCollectorsTypeIndex,
+                    LookModdeCollectorTypes[(CurrentPackageIndex, CurrentGroupIndex)],
+                    GEStyle.PreDropDown, GTOption.Width(100));
+            }
 
             if (GELayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, 24))
             {
@@ -89,6 +92,11 @@ namespace AIO.UEditor
             {
                 GELayout.HelpBox("请添包数据");
                 return;
+            }
+
+            if (Data.Packages.Length >= CurrentPackageIndex)
+            {
+                CurrentPackageIndex = 0;
             }
 
             if (Data.Packages[CurrentPackageIndex].Groups.Length == 0)

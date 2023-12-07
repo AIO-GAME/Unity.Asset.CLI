@@ -43,6 +43,12 @@ namespace AIO.UEditor
 
             using (GELayout.Vertical(GEStyle.GridList))
             {
+                if (Data.Packages.Length <= CurrentPackageIndex)
+                {
+                    CurrentPackageIndex = 0;
+                    return;
+                }
+
                 for (var i = Data.Packages[CurrentPackageIndex].Groups.Length - 1; i >= 0; i--)
                 {
                     using (GELayout.VHorizontal(GTOption.Height(25)))
