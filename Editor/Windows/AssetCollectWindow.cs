@@ -67,6 +67,20 @@ namespace AIO.UEditor
             if (Data is null) Data = AssetCollectRoot.GetOrCreate();
             Data.Save();
 
+            for (var i = 0; i < Data.Packages.Length; i++)
+            {
+                if (Data.Packages[CurrentPackageIndex] is null) continue;
+                if (Data.Packages[CurrentPackageIndex].Groups is null) continue;
+                for (var j = 0; j < Data.Packages[CurrentPackageIndex].Groups.Length; j++)
+                {
+                    // 根据Group的Name进行排序 从小到大
+                    Data.Packages[CurrentPackageIndex].Groups = Data.Packages[CurrentPackageIndex].Groups.OrderByDescending(
+                        group => group.Name).ToArray();
+                }
+            }
+
+            Data.Packages = Data.Packages.OrderByDescending(package => package.Name).ToArray();
+
             if (Config is null) Config = ASConfig.GetOrCreate();
             Config.Save();
 
@@ -79,7 +93,7 @@ namespace AIO.UEditor
             GC_ADD = EditorGUIUtility.IconContent("d_CreateAddNew");
             GC_DEL = new GUIContent("✘", "删除元素");
             GC_REFRESH = new GUIContent("↺", "刷新数据");
-            GC_OPEN =  new GUIContent("☑", "打开");
+            GC_OPEN = new GUIContent("☑", "打开");
             GC_COPY = new GUIContent("❒", "复制资源路径");
             GC_SAVE = EditorGUIUtility.IconContent("d_SaveAs");
 
@@ -241,6 +255,7 @@ namespace AIO.UEditor
             }
 
             DrawVersion(Setting.Version);
+            OnOpenEvent();
         }
 
         private Vector2 OnDrawSettingScroll = Vector2.zero;

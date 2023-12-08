@@ -123,6 +123,11 @@ namespace AIO.UEditor
                     GEStyle.PreDropDown);
                 if (GUI.changed)
                 {
+                    if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0)
+                    {
+                        CurrentPackageIndex = 0;
+                    }
+
                     BuildConfig.PackageName = Data.Packages[CurrentPackageIndex].Name;
                 }
             }

@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using UnityEditor;
@@ -17,6 +16,19 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
+        public enum ESort
+        {
+            [InspectorName("大小")] FileSize,
+            [InspectorName("最后修改时间")] LastWrite,
+            [InspectorName("名称")] AssetName,
+            [InspectorName("资源类型")] ObjectType,
+        }
+
+        /// <summary>
+        /// 查看模式 资源排序
+        /// </summary>
+        private ESort LookModeSort = ESort.LastWrite;
+
         /// <summary>
         /// 查询模式 数据
         /// </summary>
@@ -68,12 +80,27 @@ namespace AIO.UEditor
         private bool LookModeShowAssetDetail => !string.IsNullOrEmpty(LookModeCurrentSelectAssetDataInfo.GUID) &&
                                                 LookModeCurrentSelectAsset != null;
 
-        private static int LookModeShowAssetListWidth = 400;
+        /// <summary>
+        /// 拖拽区域
+        /// </summary>
+        private Rect OnDrawLookDataSpaceRect;
+
+        /// <summary>
+        /// 是否在查询模式拖拽分页大小
+        /// </summary>
+        private bool OnDrawLookDataSpaceRectDrag;
+
+        private float LookModeShowAssetListWidth = LookModeShowAssetDetailMinWidth;
 
         /// <summary>
         /// 资源详情界面最小宽度
         /// </summary>
         private const int LookModeShowAssetDetailMinWidth = 400;
+
+        /// <summary>
+        /// 资源详情界面最小宽度
+        /// </summary>
+        private const int LookModeShowAssetListMinWidth = 200;
 
         private void OnDrawHeaderLook()
         {
@@ -87,6 +114,7 @@ namespace AIO.UEditor
                 GEStyle.PreDropDown,
                 GTOption.Width(100));
 
+            if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0) CurrentPackageIndex = 0;
             if (Data.Packages[CurrentPackageIndex].Groups.Length == 0)
             {
                 EditorGUILayout.Separator();
@@ -135,8 +163,60 @@ namespace AIO.UEditor
             }
         }
 
+        /// <summary>
+        /// 用户当前选择的资源实体
+        /// </summary>
         private Object LookModeCurrentSelectAsset;
+
+        /// <summary>
+        /// 选择的资源实体配置
+        /// </summary>
         private AssetDataInfo LookModeCurrentSelectAssetDataInfo;
+
+        public Dictionary<string, Object> Dependencies = new Dictionary<string, Object>();
+
+        private void LookModeSortData(ESort sort, bool minToMax)
+        {
+            if (!LookModeData.ContainsKey((CurrentPackageIndex, CurrentGroupIndex))) return;
+            LookModeSort = sort;
+            var list = LookModeData[(CurrentPackageIndex, CurrentGroupIndex)];
+            switch (LookModeSort)
+            {
+                case ESort.FileSize:
+                    list.Sort((data1, data2) =>
+                    {
+                        if (data1.Size < data2.Size) return minToMax ? 1 : -1;
+                        if (data1.Size > data2.Size) return minToMax ? -1 : 1;
+                        return 0;
+                    });
+                    break;
+                case ESort.LastWrite:
+                    LookModeSortEnableAssetName = false;
+                    LookModeSortEnableLastWrite = true;
+                    list.Sort((data1, data2) =>
+                    {
+                        if (data1.LastWriteTime < data2.LastWriteTime) return minToMax ? 1 : -1;
+                        if (data1.LastWriteTime > data2.LastWriteTime) return minToMax ? -1 : 1;
+                        return 0;
+                    });
+                    break;
+                case ESort.AssetName:
+                    LookModeSortEnableAssetName = true;
+                    LookModeSortEnableLastWrite = false;
+                    list.Sort((data1, data2) => // 实现文件名 排序 
+                    {
+                        var name1 = data1.Address;
+                        var name2 = data2.Address;
+                        if (name1 == name2) return 0;
+                        return minToMax
+                            ? string.Compare(name1, name2, StringComparison.Ordinal)
+                            : string.Compare(name2, name1, StringComparison.Ordinal);
+                    });
+                    break;
+                default:
+                    return;
+            }
+        }
 
         partial void OnDrawLook()
         {
@@ -177,9 +257,7 @@ namespace AIO.UEditor
             OnDrawLookDataScroll = GUI.BeginScrollView(
                 LookModeShowAssetListRect,
                 OnDrawLookDataScroll,
-                LookModeShowAssetListView,
-                GEStyle.PreHorizontalScrollbarThumb,
-                GEStyle.PreVerticalScrollbarThumb
+                LookModeShowAssetListView
             );
 
             headerRect.x = 1;
@@ -196,6 +274,9 @@ namespace AIO.UEditor
 
             if (LookModeShowAssetDetail)
             {
+                OnDrawLookDataSpaceRect = new Rect(LookModeShowAssetListRect.width, LookModeShowAssetListRect.y,
+                    10, LookModeShowAssetListRect.height);
+
                 LookModeShowAssetDetailRect = new Rect(
                     LookModeShowAssetListRect.width + 10,
                     LookModeShowAssetListRect.y + 3,
@@ -204,7 +285,35 @@ namespace AIO.UEditor
                 GUILayout.BeginArea(LookModeShowAssetDetailRect, GEStyle.Badge);
                 OnDrawAssetDetail();
                 GUILayout.EndArea();
+
+                EditorGUIUtility.AddCursorRect(OnDrawLookDataSpaceRect, MouseCursor.ResizeHorizontal);
             }
+        }
+
+        public override void EventMouseDown(in Event eventData)
+        {
+            if (OnDrawLookDataSpaceRect.Contains(eventData.mousePosition))
+            {
+                OnDrawLookDataSpaceRectDrag = true;
+            }
+        }
+
+        public override void EventMouseDrag(in Event eventData)
+        {
+            if (OnDrawLookDataSpaceRectDrag)
+            {
+                var temp = LookModeShowAssetListWidth + eventData.delta.x;
+                if (temp < LookModeShowAssetListMinWidth)
+                    LookModeShowAssetListWidth = LookModeShowAssetListMinWidth;
+                else if (temp > CurrentWidth - LookModeShowAssetDetailMinWidth)
+                    LookModeShowAssetListWidth = CurrentWidth - LookModeShowAssetDetailMinWidth;
+                else LookModeShowAssetListWidth = temp;
+            }
+        }
+
+        public override void EventMouseUp(in Event eventData)
+        {
+            OnDrawLookDataSpaceRectDrag = false;
         }
 
         private void OnDrawAssetDetail()
@@ -267,11 +376,9 @@ namespace AIO.UEditor
                     EditorGUILayout.LabelField($"{AssetDatabase.IsSubAsset(LookModeCurrentSelectAsset)}");
                 }
 
-                var Dependencies = AssetDatabase.GetDependencies(LookModeCurrentSelectAssetDataInfo
-                    .AssetPath);
                 using (GELayout.Vertical(GEStyle.ProjectBrowserHeaderBgMiddle))
                 {
-                    EditorGUILayout.LabelField($"Dependencies({Dependencies.Length})", GEStyle.HeaderLabel);
+                    EditorGUILayout.LabelField($"Dependencies({Dependencies.Count})", GEStyle.HeaderLabel);
                 }
 
                 using (GELayout.Vertical(GEStyle.Badge))
@@ -282,15 +389,14 @@ namespace AIO.UEditor
                     {
                         using (GELayout.VHorizontal(GEStyle.toolbarbuttonLeft))
                         {
-                            EditorGUILayout.LabelField(
-                                AssetDatabase.GetAssetDependencyHash(dependency).ToString());
-                            var obj = AssetDatabase.LoadAssetAtPath<Object>(dependency);
-                            EditorGUILayout.ObjectField(obj, obj.GetType(), false, GTOption.Width(150));
+                            EditorGUILayout.LabelField(dependency.Value.name, GTOption.Width(true));
+                            EditorGUILayout.ObjectField(dependency.Value, dependency.Value.GetType(), false,
+                                GTOption.Width(150));
                             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scenepicking_pickable_hover"),
-                                    GEStyle.IconButton))
+                                    GEStyle.IconButton, GTOption.Width(16)))
                             {
-                                EditorUtility.RevealInFinder(dependency);
-                                Selection.activeObject = obj;
+                                EditorUtility.RevealInFinder(dependency.Key);
+                                Selection.activeObject = dependency.Value;
                             }
                         }
                     }
@@ -368,30 +474,61 @@ namespace AIO.UEditor
             var rect1 = new Rect(rect)
             {
                 x = 0,
-                width = rect.width - 150,
+                width = rect.width - 80,
             };
 
             var rect2 = new Rect(rect)
             {
                 x = rect1.x + rect1.width,
-                width = 150
+                width = 80
             };
             GUI.Box(rect1, "", GEStyle.TEtoolbarbutton);
             GUI.Box(rect2, "", GEStyle.TEtoolbarbutton);
+
+            if (LookModeSortEnableAssetName)
+            {
+                var temp = new Rect(rect1);
+                temp.x -= 3;
+                temp.y += 2;
+                temp.width = 16;
+                GUI.Box(temp, EditorGUIUtility.IconContent("d_pulldown@2x"));
+            }
+
+            if (LookModeSortEnableLastWrite)
+            {
+                var temp = new Rect(rect2);
+                temp.x -= 3;
+                temp.y += 2;
+                temp.width = 16;
+                GUI.Box(temp, EditorGUIUtility.IconContent("d_pulldown@2x"));
+            }
+
             if (GUI.Button(
                     rect1,
                     new GUIContent($"    Asset[{LookModeCollectorsALLSize.ToConverseStringFileSize()}]"),
                     GEStyle.HeaderLabel))
             {
+                LookModeSortEnableLastWrite = false;
+                LookModeSortEnableAssetNameToMin = !LookModeSortEnableAssetNameToMin;
+                LookModeSortData(ESort.AssetName, LookModeSortEnableAssetNameToMin);
             }
 
             if (GUI.Button(
                     rect2,
-                    new GUIContent("    Last Write Time"),
+                    new GUIContent("    Ago"),
                     GEStyle.HeaderLabel))
             {
+                LookModeSortEnableLastWrite = true;
+                LookModeSortEnableLastWriteToMin = !LookModeSortEnableLastWriteToMin;
+                LookModeSortData(ESort.LastWrite, LookModeSortEnableLastWriteToMin);
             }
         }
+
+        private bool LookModeSortEnableAssetName;
+        private bool LookModeSortEnableAssetNameToMin;
+
+        private bool LookModeSortEnableLastWrite;
+        private bool LookModeSortEnableLastWriteToMin;
 
         private static void OnDrawShading(Rect rect)
         {
@@ -417,6 +554,14 @@ namespace AIO.UEditor
                 LookModeCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(data.AssetPath);
                 LookModeCurrentSelectAssetDataInfo = data;
                 Selection.activeObject = LookModeCurrentSelectAsset;
+                Dependencies.Clear();
+
+                foreach (var dependency in
+                         AssetDatabase.GetDependencies(LookModeCurrentSelectAssetDataInfo.AssetPath))
+                {
+                    Dependencies[dependency] = AssetDatabase.LoadAssetAtPath<Object>(dependency);
+                }
+
                 GUI.FocusControl(null);
             }
 
@@ -425,13 +570,13 @@ namespace AIO.UEditor
             var rect1 = new Rect(rect)
             {
                 x = 10,
-                width = rect.width - 150
+                width = rect.width - 80
             };
 
             var rect2 = new Rect(rect)
             {
                 x = rect1.x + rect1.width,
-                width = 150
+                width = 80
             };
 
 
@@ -439,7 +584,7 @@ namespace AIO.UEditor
             var content = EditorGUIUtility.ObjectContent(AssetDatabase.LoadMainAssetAtPath(data.AssetPath), null);
             content.text = data.Address;
             EditorGUI.LabelField(rect1, content, EditorStyles.label);
-            EditorGUI.LabelField(rect2, data.LastWriteTime.ToString("yyyy-MM-dd hh:mm:ss"), EditorStyles.label);
+            EditorGUI.LabelField(rect2, data.GetLatestTime(), EditorStyles.label);
         }
 
         private void UpdateDataLook()
@@ -465,12 +610,16 @@ namespace AIO.UEditor
 
             for (var i = 0; i < Data.Packages.Length; i++)
             {
+                var page = Data.Packages[i].Groups.Length > 15;
                 LookModeDisplayPackages[i] = Data.Packages[i].Name;
                 LookModeDisplayGroups[LookModeDisplayPackages[i]] = new string[Data.Packages[i].Groups.Length];
 
                 for (var j = 0; j < Data.Packages[i].Groups.Length; j++)
                 {
-                    LookModeDisplayGroups[LookModeDisplayPackages[i]][j] = Data.Packages[i].Groups[j].Name;
+                    var GroupName = Data.Packages[i].Groups[j].Name;
+                    LookModeDisplayGroups[LookModeDisplayPackages[i]][j] = page
+                        ? string.Concat(char.ToUpper(GroupName[0]), '/', GroupName)
+                        : Data.Packages[i].Groups[j].Name;
 
                     LookModeDisplayCollectors[(i, j)] = new string[Data.Packages[i].Groups[j].Collectors.Length];
                     LookModeData[(i, j)] = new List<AssetDataInfo>();
@@ -498,7 +647,12 @@ namespace AIO.UEditor
                             else CatchList.Add(assetDataInfo.Key, assetDataInfo.Value.Address);
 
                             var type = AssetDatabase.GetMainAssetTypeAtPath(assetDataInfo.Value.AssetPath);
-                            if (!ListType.Contains(type.FullName)) ListType.Add(type.FullName);
+                            if (type is null)
+                            {
+                                if (!ListType.Contains("Unknown")) ListType.Add("Unknown");
+                            }
+                            else if (!ListType.Contains(type.FullName)) ListType.Add(type.FullName);
+
                             LookModeData[(i, j)].Add(assetDataInfo.Value);
                         }
                     }
@@ -519,6 +673,8 @@ namespace AIO.UEditor
 
                 GELayout.HelpBox(builder.ToString());
             }
+
+            LookModeSortData(ESort.LastWrite, true);
         }
     }
 }

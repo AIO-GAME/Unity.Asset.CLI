@@ -230,6 +230,11 @@ namespace AIO.UEditor
             }
         }
 
+        public void SetAddress<T>() where T : IAssetRuleAddress
+        {
+            Address = AssetCollectSetting.MapAddress.Values.FindIndex(address => address is T);
+        }
+
         public void UpdateFilter()
         {
             RuleFilters.Clear();
@@ -308,7 +313,13 @@ namespace AIO.UEditor
                 foreach (var file in files)
                 {
                     var fixedPath = file.Replace("\\", "/");
-                    data.Extension = System.IO.Path.GetExtension(fixedPath).Replace(".", "").ToLower();
+                    var temp = System.IO.Path.GetFileName(fixedPath);
+                    var index = temp.LastIndexOf('.');
+                    if (index >= 0)
+                    {
+                        data.Extension = temp.Substring(index).Replace(".", "").ToLower();
+                    }
+
                     data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
                     if (!IsCollectAsset(data)) continue;
                     var info = new AssetDataInfo

@@ -67,22 +67,23 @@ namespace AIO.UEditor
                     TempBuilder.Append(Data.Packages[CurrentPackageIndex].Description);
                     TempBuilder.Append(')');
                 }
-            }
 
-            if (CurrentGroupIndex >= 0 && Data.Packages.Length > CurrentPackageIndex &&
-                Data.Packages[CurrentPackageIndex].Groups.Length > CurrentGroupIndex)
-            {
-                TempBuilder.Append(" / ");
-                TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
-                if (!string.IsNullOrEmpty(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                        .Description))
+                if (CurrentGroupIndex >= 0 && Data.Packages.Length > CurrentPackageIndex &&
+                    Data.Packages[CurrentPackageIndex].Groups.Length > CurrentGroupIndex)
                 {
-                    TempBuilder.Append('(');
-                    TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                        .Description);
-                    TempBuilder.Append(')');
+                    TempBuilder.Append(" / ");
+                    TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+                    if (!string.IsNullOrEmpty(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
+                            .Description))
+                    {
+                        TempBuilder.Append('(');
+                        TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
+                            .Description);
+                        TempBuilder.Append(')');
+                    }
                 }
             }
+
 
             GELayout.Label(TempBuilder.ToString(), GEStyle.HeaderLabel);
             EditorGUILayout.Separator();
