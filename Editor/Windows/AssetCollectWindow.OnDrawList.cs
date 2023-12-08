@@ -33,11 +33,10 @@ namespace AIO.UEditor
                         using (GELayout.VHorizontal())
                         {
                             GELayout.Label(data.Key, GEStyle.MiniLabel);
-                            GELayout.Field(AssetDatabase.LoadAssetAtPath<Object>(data.Key), GTOption.Width(80));
                             if (GELayout.Button(GC_SELECT, 24))
                             {
                                 GUI.FocusControl(null);
-                                Selection.activeObject = AssetDatabase.LoadAssetAtPath<Object>(data.Key);
+                                Selection.activeObject = AssetDatabase.LoadAssetAtPath<Object>(AssetDatabase.GUIDToAssetPath(data.Key));
                             }
                         }
                     }

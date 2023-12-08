@@ -61,8 +61,9 @@ namespace AIO.UEditor
         private void OnDrawItem()
         {
             if (Data.Packages.Length == 0) return;
-            if (Data.Packages.Length >= CurrentPackageIndex) CurrentPackageIndex = 0;
+            if (Data.Packages.Length <= CurrentPackageIndex) CurrentPackageIndex = 0;
             if (Data.Packages[CurrentPackageIndex].Groups.Length == 0) return;
+            if (Data.Packages[CurrentPackageIndex].Groups.Length <= CurrentGroupIndex) CurrentGroupIndex = 0;
             if (Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Length == 0) return;
             for (var i = Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Length - 1;
                  i >= 0;

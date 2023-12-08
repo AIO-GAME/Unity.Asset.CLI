@@ -24,7 +24,7 @@ namespace AIO.UEditor
 
         private void UpdateDataBuild()
         {
-            LookModdePackages = Data.Packages.Select(x => x.Name).ToArray();
+            LookModeDisplayPackages = Data.Packages.Select(x => x.Name).ToArray();
             BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
             Tags = Data.GetTags();
             CurrentTagIndex = 0;
@@ -38,12 +38,12 @@ namespace AIO.UEditor
 
             CurrentPackageIndex = BuildConfig.PackageName == null
                 ? 0
-                : Array.IndexOf(LookModdePackages, BuildConfig.PackageName);
+                : Array.IndexOf(LookModeDisplayPackages, BuildConfig.PackageName);
         }
 
         private void OnDrawBuildBuild()
         {
-            if (LookModdePackages is null || LookModdePackages.Length == 0)
+            if (LookModeDisplayPackages is null || LookModeDisplayPackages.Length == 0)
             {
                 EditorGUILayout.Separator();
                 return;
@@ -119,7 +119,7 @@ namespace AIO.UEditor
             using (GELayout.VHorizontal())
             {
                 EditorGUILayout.LabelField("构建包名", GTOption.Width(100));
-                CurrentPackageIndex = EditorGUILayout.Popup(CurrentPackageIndex, LookModdePackages,
+                CurrentPackageIndex = EditorGUILayout.Popup(CurrentPackageIndex, LookModeDisplayPackages,
                     GEStyle.PreDropDown);
                 if (GUI.changed)
                 {

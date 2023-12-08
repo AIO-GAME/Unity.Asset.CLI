@@ -96,7 +96,7 @@ namespace AIO.UEditor
         /// 打包规则
         /// </summary>
         public int RulePackIndex;
-        
+
         /// <summary>
         /// 过滤规则(获取收集规则下标)
         /// </summary>
@@ -311,15 +311,18 @@ namespace AIO.UEditor
                     data.Extension = System.IO.Path.GetExtension(fixedPath).Replace(".", "").ToLower();
                     data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
                     if (!IsCollectAsset(data)) continue;
-                    AssetDataInfos[fixedPath] = new AssetDataInfo
+                    var info = new AssetDataInfo
                     {
                         Address = GetAssetAddress(data),
                         AssetPath = fixedPath,
                         Extension = data.Extension,
+                        LastWriteTime = AHelper.IO.GetFileLastWriteTimeUtc(fixedPath),
+                        GUID = AssetDatabase.AssetPathToGUID(fixedPath),
                         Name = System.IO.Path.GetFileNameWithoutExtension(fixedPath),
                         Size = AHelper.IO.GetFileLength(fixedPath),
                         CollectPath = CollectPath,
                     };
+                    AssetDataInfos[info.GUID] = info;
                 }
             }
             else
@@ -328,14 +331,17 @@ namespace AIO.UEditor
                 data.AssetPath = CollectPath.Substring(0, CollectPath.Length - data.Extension.Length - 1);
                 if (IsCollectAsset(data))
                 {
-                    AssetDataInfos[CollectPath] = new AssetDataInfo
+                    var info = new AssetDataInfo
                     {
+                        LastWriteTime = AHelper.IO.GetFileLastWriteTimeUtc(CollectPath),
                         Address = GetAssetAddress(data),
-                        AssetPath = CollectPath, 
+                        AssetPath = CollectPath,
+                        GUID = GUID,
                         Extension = data.Extension,
                         Name = System.IO.Path.GetFileNameWithoutExtension(CollectPath),
                         Size = AHelper.IO.GetFileLength(CollectPath),
                     };
+                    AssetDataInfos[GUID] = info;
                 }
             }
 

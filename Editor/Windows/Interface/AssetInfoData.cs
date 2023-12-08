@@ -4,6 +4,8 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System;
+
 namespace AIO
 {
     /// <summary>
@@ -16,6 +18,11 @@ namespace AIO
         /// </summary>
         public string AssetPath;
 
+        /// <summary>
+        /// Asset GUID
+        /// </summary>
+        public string GUID;
+        
         /// <summary>
         /// Asset Address
         /// </summary>
@@ -40,5 +47,10 @@ namespace AIO
         /// Asset Size
         /// </summary>
         public long Size;
+        
+        /// <summary>
+        /// Asset Last Imported
+        /// </summary>
+        public DateTime LastWriteTime;
     }
 }
