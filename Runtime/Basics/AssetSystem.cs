@@ -78,7 +78,10 @@ namespace AIO
             IsInitialized = false;
             Parameter = config;
             Proxy = proxy;
-            yield return Parameter.UpdatePackage();
+            if (Parameter.ASMode == EASMode.Remote)
+                yield return Parameter.UpdatePackageRemote();
+            else Parameter.UpdatePackage();
+
             yield return Proxy.Initialize();
             SequenceRecords = new SequenceRecordQueue();
             yield return SequenceRecords.LoadAsync();

@@ -4,9 +4,11 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -14,7 +16,7 @@ using UnityEngine;
 namespace AIO.UEditor
 {
     [CustomEditor(typeof(ASConfig))]
-    public class ASConfigEditor : InspectorSingle<ASConfig>
+    public class ASConfigEditor : NILInspector<ASConfig>
     {
         [MenuItem("AIO/Gen/Asset System Config")]
         public static void Create()
@@ -36,6 +38,7 @@ namespace AIO.UEditor
             UpdateRecordQueue();
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         protected override void OnGUI()
         {
             using (GELayout.VHorizontal())
@@ -163,9 +166,9 @@ namespace AIO.UEditor
             RecordQueueSizeStr = AssetSystem.SequenceRecords.Sum(record => record.Bytes).ToConverseStringFileSize();
         }
 
-        private async void Update()
+        private void Update()
         {
-            await Target.UpdatePackage();
+            Target.UpdatePackage();
             _packages = Target.Packages is null
                 ? _packages
                 : Target.Packages.ToList();

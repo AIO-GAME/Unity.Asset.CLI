@@ -30,9 +30,9 @@ namespace AIO.UEditor
 
         partial void OnDrawItem(AssetCollectItem item)
         {
-            using (GELayout.Vertical(GEStyle.Toolbar))
+            using (GELayout.Vertical())
             {
-                using (GELayout.VHorizontal())
+                using (GELayout.VHorizontal(GEStyle.Toolbar))
                 {
                     if (GELayout.Button(item.Folded ? "⇙" : "⇗", 30))
                     {
@@ -43,7 +43,7 @@ namespace AIO.UEditor
                     item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GTOption.Width(80));
                     item.Path = GELayout.Field(item.Path);
 
-                    if (GELayout.Button(Content_DEL, 24))
+                    if (GELayout.Button(GC_DEL, 24))
                     {
                         Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors =
                             Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Remove(item);
@@ -51,12 +51,28 @@ namespace AIO.UEditor
                         return;
                     }
 
-                    if (GELayout.Button(Content_OPEN, 24))
+                    if (GELayout.Button(GC_OPEN, 24))
                     {
-                        OnDrawCurrentItem = item;
-                        OnDrawCurrentItem.CollectAsset(
-                            Data.Packages[CurrentPackageIndex].Name,
-                            Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+                        // OnDrawCurrentItem = item;
+                        // OnDrawCurrentItem.CollectAsset(
+                        //     Data.Packages[CurrentPackageIndex].Name,
+                        //     Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+                        WindowMode = Mode.Look;
+                        UpdateDataLook();
+                        var status = 1;
+                        foreach (var collector in Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
+                                     .Collectors)
+                        {
+                            if (collector.CollectPath != item.CollectPath)
+                            {
+                                status *= 2;
+                                continue;
+                            }
+
+                            LookModeDisplayCollectorsIndex = status;
+                            break;
+                        }
+
                         GUI.FocusControl(null);
                         return;
                     }

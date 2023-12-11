@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -109,16 +110,24 @@ namespace AIO.UEngine
             return Path.Combine(URL, AssetSystem.PlatformNameStr, package, version, fileName);
         }
 
-        public async Task UpdatePackage()
+        public IEnumerator UpdatePackageRemote()
         {
+            if (ASMode != EASMode.Remote) yield break;
+            {
+                if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
+                var remote = Path.Combine(URL, "Version",
+                    string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks));
+
+                yield return AssetSystem.NetLoadStringCO(remote,
+                    data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
+            }
+        }
+
+        public void UpdatePackage()
+        {
+            if (ASMode == EASMode.Remote) return;
             switch (ASMode)
             {
-                case EASMode.Remote:
-                    if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
-                    var remote = Path.Combine(URL, "Version", string.Concat(AssetSystem.PlatformNameStr, ".json"));
-                    Packages = await AHelper.Net.HTTP.GetJsonAsync<AssetsPackageConfig[]>(
-                        string.Concat(remote, "?t=", DateTime.Now.Ticks));
-                    break;
                 default:
 #if UNITY_EDITOR && SUPPORT_YOOASSET
                     var assembly = Assembly.Load("YooAsset.Editor");

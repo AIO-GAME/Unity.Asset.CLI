@@ -4,7 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -13,41 +13,40 @@ namespace AIO.UEditor
     {
         partial void OnDrawPackage()
         {
-            using (GELayout.VHorizontal(GEStyle.PreToolbar))
+            using (new EditorGUILayout.VerticalScope(GEStyle.GridList))
             {
-                if (GELayout.Button("✚", GEStyle.ObjectPickerTab, 20, 20))
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    Data.Packages = Data.Packages.Add(new AssetCollectPackage
+                    if (GUILayout.Button(GC_ADD, GEStyle.TEtoolbarbutton, GP_Width_20))
                     {
-                        Name = "Default Package",
-                        Description = Data.Packages.Length.ToString(),
-                        Groups = new AssetCollectGroup[] { }
-                    });
+                        Data.Packages = Data.Packages.Add(new AssetCollectPackage
+                        {
+                            Name = "Default Package",
+                            Description = Data.Packages.Length.ToString(),
+                            Groups = new AssetCollectGroup[] { }
+                        });
 
-                    if (Data.Packages.Length == 1)
-                    {
-                        CurrentPackageIndex = 0;
-                        ShowGroup = true;
+                        if (Data.Packages.Length == 1)
+                        {
+                            CurrentPackageIndex = 0;
+                            ShowGroup = true;
+                        }
+
+                        GUI.FocusControl(null);
                     }
 
-                    GUI.FocusControl(null);
+                    if (GUILayout.Button("Package", GEStyle.PreToolbar))
+                    {
+                        ShowPackage = false;
+                        GUI.FocusControl(null);
+                    }
                 }
 
-                GELayout.Label("|", GTOption.Width(5));
-                if (GELayout.Button("Package", GEStyle.ObjectPickerTab, GTOption.Width(DrawPackageWidth - 50)))
-                {
-                    ShowPackage = false;
-                    GUI.FocusControl(null);
-                }
-            }
-
-            using (GELayout.Vertical(GEStyle.GridList))
-            {
                 for (var i = Data.Packages.Length - 1; i >= 0; i--)
                 {
-                    using (GELayout.VHorizontal(GTOption.Height(25)))
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        if (GELayout.Button("✘", GEStyle.ObjectPickerTab, 20, 20))
+                        if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_20))
                         {
                             Data.Packages = Data.Packages.RemoveAt(i);
                             if (--CurrentPackageIndex < 0) CurrentPackageIndex = 0;
@@ -56,7 +55,6 @@ namespace AIO.UEditor
                             return;
                         }
 
-                        GELayout.Label("|", GTOption.Width(5));
                         var label = string.IsNullOrEmpty(Data.Packages[i].Description)
                             ? Data.Packages[i].Name
                             : string.Concat(Data.Packages[i].Name, '(', Data.Packages[i].Description, ')');
@@ -64,7 +62,7 @@ namespace AIO.UEditor
                         var style = CurrentPackageIndex == i
                             ? GEStyle.PRInsertion
                             : GEStyle.ObjectPickerTab;
-                        if (GELayout.Button(label, style, GTOption.Height(20), GTOption.Width(DrawPackageWidth - 50)))
+                        if (GUILayout.Button(label, style))
                         {
                             CurrentPackageIndex = i;
                             ShowGroup = true;

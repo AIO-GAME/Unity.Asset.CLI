@@ -12,19 +12,19 @@ namespace AIO.UEditor
     {
         partial void OnDrawSetting()
         {
-            using (GELayout.VHorizontal(GEStyle.PreToolbar))
-            {
-                GELayout.Label("⇘", GEStyle.ObjectPickerTab, GTOption.Width(15));
-                if (GELayout.Button("Setting", GEStyle.ObjectPickerTab, GTOption.Width(DrawSettingWidth - 40)))
-                {
-                    ShowSetting = false;
-                    GUI.FocusControl(null);
-                }
-            }
-
-            var width = GTOption.Width(DrawSettingWidth - 20);
+            var width = GTOption.Width(DrawWidthSettingView - 20);
             using (GELayout.Vertical(GEStyle.GridList, width))
             {
+                using (GELayout.VHorizontal())
+                {
+                    GELayout.Label("⇘", GEStyle.TEtoolbarbutton, GP_Width_20);
+                    if (GELayout.Button("Setting", GEStyle.PreToolbar))
+                    {
+                        ShowSetting = false;
+                        GUI.FocusControl(null);
+                    }
+                }
+
                 Data.EnableAddressable = GELayout.ToggleLeft("开启地址化", Data.EnableAddressable, width);
                 Data.LocationToLower = GELayout.ToggleLeft("定位地址小写", Data.LocationToLower, width);
                 Data.IncludeAssetGUID = GELayout.ToggleLeft("包含资源GUID", Data.IncludeAssetGUID, width);

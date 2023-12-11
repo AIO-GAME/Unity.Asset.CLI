@@ -5,7 +5,6 @@
 |*|============|*/
 
 using System;
-using System.Text;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -14,31 +13,15 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        public enum Mode
-        {
-            [InspectorName("编辑模式")] Editor,
-            [InspectorName("查询模式")] Look,
-            [InspectorName("打包模式")] Build,
-        }
-
-        private Mode LookMode = Mode.Editor;
-
-        public bool ShowGroup = false;
-        public bool ShowPackage = true;
-        public bool ShowSetting = false;
-
-        public bool ShowList => OnDrawCurrentItem != null;
-        private StringBuilder TempBuilder = new StringBuilder();
-
         private void OnDrawHeaderEditor()
         {
-            if (!ShowSetting && GELayout.Button("⇘ Setting", GEStyle.TEtoolbarbutton, ButtonWidth, 20))
+            if (!ShowSetting && GUILayout.Button("⇘ Setting", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
             {
                 GUI.FocusControl(null);
                 ShowSetting = true;
             }
 
-            if (!ShowPackage && GELayout.Button("⇘ Package", GEStyle.TEtoolbarbutton, ButtonWidth, 20))
+            if (!ShowPackage && GUILayout.Button("⇘ Package", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
             {
                 GUI.FocusControl(null);
                 ShowPackage = true;
@@ -50,7 +33,7 @@ namespace AIO.UEditor
                 GUI.FocusControl(null);
                 ShowGroup = false;
             }
-            else if (!ShowGroup && GELayout.Button("⇘ Group", GEStyle.TEtoolbarbutton, ButtonWidth, 20))
+            else if (!ShowGroup && GUILayout.Button("⇘ Group", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
             {
                 GUI.FocusControl(null);
                 ShowGroup = true;
@@ -67,41 +50,49 @@ namespace AIO.UEditor
                     TempBuilder.Append(Data.Packages[CurrentPackageIndex].Description);
                     TempBuilder.Append(')');
                 }
-            }
 
-            if (CurrentGroupIndex >= 0 && Data.Packages.Length > CurrentPackageIndex &&
-                Data.Packages[CurrentPackageIndex].Groups.Length > CurrentGroupIndex)
-            {
-                TempBuilder.Append(" / ");
-                TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
-                if (!string.IsNullOrEmpty(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                        .Description))
+                if (CurrentGroupIndex >= 0 && Data.Packages.Length > CurrentPackageIndex &&
+                    Data.Packages[CurrentPackageIndex].Groups.Length > CurrentGroupIndex)
                 {
-                    TempBuilder.Append('(');
-                    TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                        .Description);
-                    TempBuilder.Append(')');
+                    TempBuilder.Append(" / ");
+                    TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+                    if (!string.IsNullOrEmpty(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
+                            .Description))
+                    {
+                        TempBuilder.Append('(');
+                        TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
+                            .Description);
+                        TempBuilder.Append(')');
+                    }
                 }
             }
 
-            GELayout.Label(TempBuilder.ToString(), GEStyle.HeaderLabel);
+            GUILayout.Label(TempBuilder.ToString(), GEStyle.flownodetitlebar, GP_Height_20);
             EditorGUILayout.Separator();
 
 #if SUPPORT_YOOASSET
-            if (GELayout.Button("转换 Yoo", GEStyle.TEtoolbarbutton, ButtonWidth, 20))
+            if (GUILayout.Button(GC_ToConvert_YooAsset, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
-                ConvertYooAsset.Convert(Data);
+                try
+                {
+                    ConvertYooAsset.Convert(Data);
+                    EditorUtility.DisplayDialog("转换", "转换 YooAsset 成功", "确定");
+                }
+                catch (Exception e)
+                {
+                    EditorUtility.DisplayDialog("转换", "转换 YooAsset 失败\n" + e.Message, "确定");
+                }
             }
 #endif
 
-            if (GELayout.Button("配置", GEStyle.TEtoolbarbutton, ButtonWidth, 20))
+            if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
                 Selection.activeObject = ASConfig.GetOrCreate();
             }
 
-            if (GELayout.Button("保存", GEStyle.TEtoolbarbutton, ButtonWidth, 20))
+            if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
                 Data.Save();
@@ -115,7 +106,7 @@ namespace AIO.UEditor
         {
             using (GELayout.VHorizontal())
             {
-                switch (LookMode)
+                switch (WindowMode)
                 {
                     case Mode.Editor:
                         OnDrawHeaderEditor();
@@ -128,23 +119,28 @@ namespace AIO.UEditor
                         break;
                 }
 
-                LookMode = GELayout.Popup(LookMode, GEStyle.TEtoolbarbutton,
-                    GTOption.Width(ButtonWidth), GTOption.Height(20));
+                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
 
                 if (GUI.changed)
                 {
-                    GUI.FocusControl(null);
-                    switch (LookMode)
+                    if (WindowMode != TempTable.GetOrDefault<Mode>(nameof(WindowMode)))
                     {
-                        case Mode.Editor:
-                            UpdateDataRecordQueue();
-                            break;
-                        case Mode.Look:
-                            UpdateDataLook();
-                            break;
-                        case Mode.Build:
-                            UpdateDataBuild();
-                            break;
+                        GUI.FocusControl(null);
+                        switch (WindowMode)
+                        {
+                            default:
+                            case Mode.Editor:
+                                UpdateDataRecordQueue();
+                                break;
+                            case Mode.Look:
+                                UpdateDataLook();
+                                break;
+                            case Mode.Build:
+                                UpdateDataBuild();
+                                break;
+                        }
+
+                        TempTable[nameof(WindowMode)] = WindowMode;
                     }
                 }
             }

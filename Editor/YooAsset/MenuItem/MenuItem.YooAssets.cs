@@ -27,6 +27,17 @@ namespace AIO.UEditor
                 return;
             }
 
+            CreateConfig(BundlesDir);
+        }
+
+        public static void CreateConfig(string BundlesDir)
+        {
+            if (!Directory.Exists(BundlesDir))
+            {
+                Debug.LogWarningFormat("Bundles 目录不存在 : 无需创建配置文件");
+                return;
+            }
+
             var BundlesConfigDir = Path.Combine(BundlesDir, "Version");
             if (Directory.Exists(BundlesConfigDir)) Directory.Delete(BundlesConfigDir, true);
             Directory.CreateDirectory(BundlesConfigDir);

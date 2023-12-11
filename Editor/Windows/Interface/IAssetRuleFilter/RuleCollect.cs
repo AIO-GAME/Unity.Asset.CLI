@@ -66,7 +66,30 @@ namespace AIO.UEditor
         /// </summary>
         internal static bool IsCollectAssetCustom(IEnumerable<string> FilterCollect, string Extension)
         {
-            return FilterCollect.Contains(Extension);
+            foreach (var collect in FilterCollect)
+            {
+                if (collect[1] == '.' && collect.Substring(2) == Extension) return true;
+                switch (collect[0])
+                {
+                    case '.':
+                    {
+                        if (collect.Substring(1) == Extension) return true;
+                        break;
+                    }
+                    case '*':
+                    {
+                        if (collect.Substring(1) == Extension) return true;
+                        break;
+                    }
+                    default:
+                    {
+                        if (collect == Extension) return true;
+                        break;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

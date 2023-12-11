@@ -18,28 +18,17 @@ namespace AIO.UEditor
     /// </summary>
     [GWindow("资源收集管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
         Group = "Tools",
-        Menu = "AIO/Asset Window",
+        Menu = "AIO/Window/Asset",
         MinSizeHeight = 500,
         MinSizeWidth = 1000
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
-        /// <summary>
-        /// 资源收集根节点
-        /// </summary>
-        public AssetCollectRoot Data;
-
-        /// <summary>
-        /// 资源系统配置
-        /// </summary>
-        public ASConfig Config;
-
-        /// <summary>
-        /// 资源系统打包配置
-        /// </summary>
-        public ASBuildConfig BuildConfig;
-        
-        private const int ButtonWidth = 75;
+        [LnkTools("Asset Window", "#00BFFF", "d_Folder Icon", LnkToolsMode.AllMode, -5)]
+        public static void OpenWindow()
+        {
+            EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
+        }
 
         protected override void OnAwake()
         {
@@ -47,39 +36,45 @@ namespace AIO.UEditor
             Selection.activeObject = Data;
         }
 
-        private GUIContent Content_ADD;
-        private GUIContent Content_DEL;
-        private GUIContent Content_OPEN;
-        private GUIContent Content_REFRESH;
-        private GUIContent Content_COPY;
-        private GUIContent Content_SELECT;
+        partial void GCInit();
 
         protected override void OnActivation()
         {
-            if (Data is null) Data = AssetCollectRoot.GetOrCreate();
-            Data.Save();
-
-            if (Config is null) Config = ASConfig.GetOrCreate();
-            Config.Save();
-
-            if (BuildConfig is null) BuildConfig = ASBuildConfig.GetOrCreate();
-            BuildConfig.Save();
-
             AssetCollectSetting.Initialize();
 
-            Content_SELECT = new GUIContent("☈", "选择指向指定资源");
-            Content_ADD = new GUIContent("✚", "添加元素");
-            Content_DEL = new GUIContent("✘", "删除元素");
-            Content_REFRESH = new GUIContent("↺", "刷新内容");
-            Content_OPEN = new GUIContent("☑", "打开资源管理界面");
-            Content_COPY = new GUIContent("❒", "复制资源路径");
+            if (Data is null) Data = AssetCollectRoot.GetOrCreate();
+            else Data.Save();
+
+            if (Config is null) Config = ASConfig.GetOrCreate();
+            else Config.Save();
+
+            if (BuildConfig is null) BuildConfig = ASBuildConfig.GetOrCreate();
+            else BuildConfig.Save();
+
+            Data.Packages = Data.Packages.OrderByDescending(package => package.Name).ToArray();
+            for (var i = 0; i < Data.Packages.Length; i++)
+            {
+                if (Data.Packages[CurrentPackageIndex]?.Groups is null) continue;
+                for (var j = 0; j < Data.Packages[CurrentPackageIndex].Groups.Length; j++)
+                {
+                    Data.Packages[CurrentPackageIndex].Groups = Data.Packages[CurrentPackageIndex].Groups
+                        .OrderByDescending(group => group.Name).ToArray();
+                }
+            }
 
             if (_packages is null)
                 _packages = Config.Packages is null
                     ? new List<AssetsPackageConfig>()
                     : Config.Packages.ToList();
 
-            switch (LookMode)
+            GCInit();
+
+            UpdateData();
+        }
+
+        protected void UpdateData()
+        {
+            switch (WindowMode)
             {
                 case Mode.Editor:
                     UpdateDataRecordQueue();
@@ -93,137 +88,25 @@ namespace AIO.UEditor
             }
         }
 
-        private int WidthOffset = 0;
-        private int CurrentPackageIndex = 0;
-        private int CurrentGroupIndex = 0;
 
-        private int DrawListWidth = 400;
-        private int DrawSettingWidth = 150;
-        private int DrawPackageWidth = 150;
-        private int DrawGroupWidth = 150;
-        private int DrawHeaderHeight = 25;
-
-        partial void OnDrawBuild();
-        partial void OnDrawLook();
-        protected void OnDrawNoLook()
-        {
-            var height = CurrentHeight - DrawHeaderHeight;
-            WidthOffset = 5;
-            if (ShowSetting)
-            {
-                GULayout.BeginArea(new Rect(WidthOffset, DrawHeaderHeight, DrawSettingWidth - 5, height),
-                    GEStyle.INThumbnailShadow);
-
-                OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll);
-                GULayout.EndArea();
-                WidthOffset += DrawSettingWidth;
-            }
-
-            if (ShowPackage)
-            {
-                GULayout.BeginArea(new Rect(WidthOffset, DrawHeaderHeight, DrawPackageWidth - 5, height),
-                    GEStyle.INThumbnailShadow);
-
-                OnDrawPackageScroll = GELayout.VScrollView(OnDrawPackage, OnDrawPackageScroll);
-                GULayout.EndArea();
-                WidthOffset += DrawPackageWidth;
-            }
-
-            if (ShowGroup)
-            {
-                GULayout.BeginArea(new Rect(WidthOffset, DrawHeaderHeight, DrawGroupWidth - 5, height),
-                    GEStyle.INThumbnailShadow);
-
-                OnDrawGroupScroll = GELayout.VScrollView(OnDrawGroup, OnDrawGroupScroll);
-                GULayout.EndArea();
-                WidthOffset += DrawGroupWidth;
-            }
-
-            GULayout.BeginArea(new Rect(
-                WidthOffset, DrawHeaderHeight,
-                CurrentWidth - WidthOffset - 5 - (ShowList ? DrawListWidth : 0), height));
-            OnDrawGroupListScroll = GELayout.VScrollView(OnDrawGroupList, OnDrawGroupListScroll);
-            GULayout.EndArea();
-
-            if (ShowList)
-            {
-                GULayout.BeginArea(new Rect(CurrentWidth - 5 - DrawListWidth,
-                    DrawHeaderHeight, DrawListWidth, height), GEStyle.INThumbnailShadow);
-                using (GELayout.Vertical(GEStyle.INThumbnailShadow))
-                {
-                    using (GELayout.VHorizontal())
-                    {
-                        GELayout.Label($"[{OnDrawCurrentItem.Type}] Count: {OnDrawCurrentItem.AssetDataInfos.Count}");
-                        GELayout.Separator();
-
-                        if (GELayout.Button(Content_REFRESH, 24))
-                        {
-                            if (Data.Packages[CurrentPackageIndex] is null ||
-                                Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex] is null)
-                            {
-                                OnDrawCurrentItem = null;
-                                return;
-                            }
-
-                            OnDrawCurrentItem.CollectAsset(
-                                Data.Packages[CurrentPackageIndex].Name,
-                                Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
-                            GUI.FocusControl(null);
-                            return;
-                        }
-
-                        if (GELayout.Button(Content_DEL, 24))
-                        {
-                            OnDrawCurrentItem = null;
-                            GUI.FocusControl(null);
-                            return;
-                        }
-                    }
-
-                    using (GELayout.VHorizontal())
-                    {
-                        GELayout.Label(OnDrawCurrentItem.CollectPath, GEStyle.MiniLabel);
-                    }
-
-                    if (OnDrawCurrentItem.AssetDataInfos.Count > 20)
-                    {
-                        using (GELayout.VHorizontal())
-                        {
-                            GELayout.Label("显示数量", GTOption.Width(35)); // 设置页面数量
-                            OnDrawCurrentItem.AssetDataInfos.PageSize = GELayout.Slider(
-                                OnDrawCurrentItem.AssetDataInfos.PageSize,
-                                20, 100);
-                        }
-                    }
-
-                    if (OnDrawCurrentItem.AssetDataInfos.PageSize < OnDrawCurrentItem.AssetDataInfos.Count)
-                    {
-                        using (GELayout.VHorizontal())
-                        {
-                            GELayout.Label("当前页数", GTOption.Width(35)); // 设置页面滑动条
-
-                            OnDrawCurrentItem.AssetDataInfos.PageIndex = GELayout.Slider(
-                                OnDrawCurrentItem.AssetDataInfos.PageIndex,
-                                0, OnDrawCurrentItem.AssetDataInfos.PageCount - 1);
-                        }
-                    }
-                }
-
-                OnDrawListScroll = GELayout.VScrollView(OnDrawList, OnDrawListScroll);
-                GULayout.EndArea();
-            }
-        }
+        #region 绘制
 
         protected override void OnDraw()
         {
-            GELayout.VHorizontal(OnDrawHeader, GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5));
-            switch (LookMode)
+            using (new EditorGUILayout.HorizontalScope(
+                       GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
             {
+                OnDrawHeader();
+            }
+
+            switch (WindowMode)
+            {
+                default:
                 case Mode.Editor:
                     OnDrawNoLook();
                     break;
                 case Mode.Look:
-                    OnDrawLook();
+                    OnDrawLookMode();
                     break;
                 case Mode.Build:
                     OnDrawBuild();
@@ -231,23 +114,83 @@ namespace AIO.UEditor
             }
 
             DrawVersion(Setting.Version);
+            OnOpenEvent();
         }
 
-        private Vector2 OnDrawSettingScroll = Vector2.zero;
-        private Vector2 OnDrawPackageScroll = Vector2.zero;
-        private Vector2 OnDrawGroupScroll = Vector2.zero;
-        private Vector2 OnDrawGroupListScroll = Vector2.zero;
-        private Vector2 OnDrawListScroll = Vector2.zero;
-        private Vector2 OnDrawLookDataScroll = Vector2.zero;
+        protected void OnDrawNoLook()
+        {
+            DoDrawRect.x = 5;
+            DoDrawRect.height = CurrentHeight - DrawHeaderHeight;
+            if (ShowSetting)
+            {
+                DoDrawRect.width = DrawWidthSettingView - 5;
+                GULayout.BeginArea(DoDrawRect, GEStyle.INThumbnailShadow);
+                OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll);
+                GULayout.EndArea();
+                DoDrawRect.x += DrawWidthSettingView;
 
+                OnDragRectSettingView = new Rect(DoDrawRect.x - 5, DoDrawRect.y, 5, DoDrawRect.height);
+                EditorGUIUtility.AddCursorRect(OnDragRectSettingView, MouseCursor.ResizeHorizontal);
+            }
+
+            if (ShowPackage)
+            {
+                DoDrawRect.width = DrawWidthPackageList - 5;
+                GULayout.BeginArea(DoDrawRect, GEStyle.INThumbnailShadow);
+                OnDrawPackageScroll = GELayout.VScrollView(OnDrawPackage, OnDrawPackageScroll);
+                GULayout.EndArea();
+                DoDrawRect.x += DrawWidthPackageList;
+
+                OnDragRectPackageList = new Rect(DoDrawRect.x - 5, DoDrawRect.y, 5, DoDrawRect.height);
+                EditorGUIUtility.AddCursorRect(OnDragRectPackageList, MouseCursor.ResizeHorizontal);
+            }
+
+            if (ShowGroup)
+            {
+                DoDrawRect.width = DrawWidthGroupList - 5;
+                GULayout.BeginArea(DoDrawRect, GEStyle.INThumbnailShadow);
+                OnDrawGroupScroll = GELayout.VScrollView(OnDrawGroup, OnDrawGroupScroll);
+                GULayout.EndArea();
+                DoDrawRect.x += DrawWidthGroupList;
+
+                OnDragRectGroupList = new Rect(DoDrawRect.x - 5, DoDrawRect.y, 5, DoDrawRect.height);
+                EditorGUIUtility.AddCursorRect(OnDragRectGroupList, MouseCursor.ResizeHorizontal);
+            }
+
+            DoDrawRect.width = CurrentWidth - DoDrawRect.x - 5;
+            GULayout.BeginArea(DoDrawRect);
+            OnDrawGroupListScroll = GELayout.VScrollView(OnDrawGroupList, OnDrawGroupListScroll);
+            GULayout.EndArea();
+        }
+
+        partial void OnDrawBuild();
+        partial void OnDrawLookMode();
         partial void OnDrawHeader();
         partial void OnDrawSetting();
         partial void OnDrawPackage();
         partial void OnDrawGroup();
         partial void OnDrawGroupList();
         partial void OnDrawItem(AssetCollectItem item);
-        partial void OnDrawList();
         partial void OnDrawASConfig();
+
+        /// <summary>
+        /// 绘制资源 阴影
+        /// </summary>
+        private static void OnDrawShading(Rect rect)
+        {
+            if (Mathf.FloorToInt((rect.y - 4f) / rect.height % 2f) != 0) return;
+            var rect2 = new Rect(rect);
+            rect2.width += rect.x + rect.height;
+            rect2.height += 1f;
+            rect2.x = 0f;
+            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
+            rect2.height = 1f;
+            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
+            rect2.y += rect.height;
+            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
+        }
+
+        #endregion
 
         protected override void OnDisable()
         {
@@ -257,6 +200,122 @@ namespace AIO.UEditor
         protected override void OnDispose()
         {
             Data.Save();
+        }
+
+        public override void EventMouseDown(in Event eventData)
+        {
+            switch (WindowMode)
+            {
+                case Mode.Editor:
+                    if (OnDragRectSettingView.Contains(eventData.mousePosition))
+                    {
+                        OnDragRectSettingViewing = true;
+                    }
+                    else if (OnDragRectPackageList.Contains(eventData.mousePosition))
+                    {
+                        OnDragRectPackageListViewing = true;
+                    }
+                    else if (OnDragRectGroupList.Contains(eventData.mousePosition))
+                    {
+                        OnDragRectGroupListViewing = true;
+                    }
+
+                    break;
+                case Mode.Look:
+                    if (OnDragRectDetailsView.Contains(eventData.mousePosition))
+                    {
+                        OnDragRectDetailsViewing = true;
+                    }
+
+                    break;
+                case Mode.Build:
+                default:
+                    break;
+            }
+        }
+
+        public override void EventMouseDrag(in Event eventData)
+        {
+            switch (WindowMode)
+            {
+                case Mode.Editor:
+                {
+                    if (OnDragRectSettingViewing)
+                    {
+                        var temp = DrawWidthSettingView + eventData.delta.x;
+                        if (temp < 100)
+                        {
+                            DrawWidthSettingView = 100;
+                            eventData.Use();
+                            break;
+                        }
+
+                        var t = CurrentWidth - temp;
+                        if (ShowGroup) t -= DrawWidthGroupList;
+                        if (ShowPackage) t -= DrawWidthPackageList;
+                        if (t < 100) break;
+                        DrawWidthSettingView = temp;
+                        eventData.Use();
+                    }
+
+                    else if (OnDragRectPackageListViewing)
+                    {
+                        var temp = DrawWidthPackageList + eventData.delta.x;
+                        if (temp < 100)
+                        {
+                            DrawWidthPackageList = 100;
+                            eventData.Use();
+                            break;
+                        }
+
+                        var t = CurrentWidth - temp;
+                        if (ShowSetting) t -= DrawWidthSettingView;
+                        if (ShowGroup) t -= DrawWidthGroupList;
+                        if (t < 100) break;
+                        DrawWidthPackageList = temp;
+                        eventData.Use();
+                    }
+
+                    else if (OnDragRectGroupListViewing)
+                    {
+                        var temp = DrawWidthGroupList + eventData.delta.x;
+                        if (temp < 100)
+                        {
+                            DrawWidthGroupList = 100;
+                            eventData.Use();
+                            break;
+                        }
+
+                        var t = CurrentWidth - temp;
+                        if (ShowSetting) t -= DrawWidthSettingView;
+                        if (ShowPackage) t -= DrawWidthPackageList;
+                        if (t < 100) break;
+                        DrawWidthGroupList = temp;
+                        eventData.Use();
+                    }
+
+                    break;
+                }
+                case Mode.Look:
+                {
+                    if (!OnDragRectDetailsViewing) return;
+                    var temp = LookModeShowAssetListWidth + eventData.delta.x;
+                    if (temp < LookModeShowAssetListMinWidth) break;
+                    if (CurrentWidth - temp < LookModeShowAssetDetailMinWidth) break;
+                    LookModeShowAssetListWidth = temp;
+                    eventData.Use();
+                    break;
+                }
+                case Mode.Build:
+                default:
+                    break;
+            }
+        }
+
+        public override void EventMouseUp(in Event eventData)
+        {
+            OnDragRectSettingViewing = OnDragRectGroupListViewing =
+                OnDragRectPackageListViewing = OnDragRectDetailsViewing = false;
         }
     }
 }
