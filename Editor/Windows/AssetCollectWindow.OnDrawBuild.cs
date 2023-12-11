@@ -36,6 +36,13 @@ namespace AIO.UEditor
             CurrentPackageIndex = BuildConfig.PackageName == null
                 ? 0
                 : Array.IndexOf(LookModeDisplayPackages, BuildConfig.PackageName);
+
+            if (BuildConfig.BuildTarget == 0 ||
+                BuildConfig.BuildTarget == BuildTarget.NoTarget
+               )
+            {
+                BuildConfig.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
+            }
         }
 
         private void OnDrawBuildBuild()
@@ -62,11 +69,13 @@ namespace AIO.UEditor
                     return;
                 }
 
+#if SUPPORT_YOOASSET
                 if (GUILayout.Button("生成配置", GP_Width_75))
                 {
                     MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
                     return;
                 }
+#endif
             }
 
             using (GELayout.VHorizontal())
@@ -90,8 +99,8 @@ namespace AIO.UEditor
                 BuildConfig.ValidateBuild =
                     GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
 
-#if SUPPORT_YOOASSET
                 GELayout.Separator();
+#if SUPPORT_YOOASSET
                 if (GUILayout.Button("构建 Yoo", GP_Width_75))
                 {
                     var BuildCommand = new YooAssetBuildCommand
@@ -105,6 +114,11 @@ namespace AIO.UEditor
                     };
                     YooAssetBuild.ArtBuild(BuildCommand);
                     BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                }
+#else
+                if (GUILayout.Button("构建", GP_Width_50))
+                {
+                    EditorUtility.DisplayDialog("提示", "请先导入 YooAsset Or Other TrdTools", "确定");
                 }
 #endif
             }
@@ -184,7 +198,9 @@ namespace AIO.UEditor
             using (GELayout.VHorizontal())
             {
                 EditorGUILayout.LabelField("地址", GP_Width_100);
-                BuildConfig.FTPServerIP = GELayout.Field(BuildConfig.FTPServerIP);
+                BuildConfig.FTPServerIP = GELayout.FieldDelayed(BuildConfig.FTPServerIP);
+                if (string.IsNullOrEmpty(BuildConfig.FTPServerIP)) return;
+
                 if (GUILayout.Button("校验", GP_Width_50))
                 {
                     GUI.FocusControl(null);
@@ -201,31 +217,31 @@ namespace AIO.UEditor
             using (GELayout.VHorizontal())
             {
                 EditorGUILayout.LabelField("端口", GP_Width_100);
-                BuildConfig.FTPServerPort = GELayout.Field(BuildConfig.FTPServerPort);
+                BuildConfig.FTPServerPort = GELayout.FieldDelayed(BuildConfig.FTPServerPort);
             }
 
             using (GELayout.VHorizontal())
             {
                 EditorGUILayout.LabelField("用户名", GP_Width_100);
-                BuildConfig.FTPUser = GELayout.Field(BuildConfig.FTPUser);
+                BuildConfig.FTPUser = GELayout.FieldDelayed(BuildConfig.FTPUser);
             }
 
             using (GELayout.VHorizontal())
             {
                 EditorGUILayout.LabelField("密码", GP_Width_100);
-                BuildConfig.FTPPassword = GELayout.Field(BuildConfig.FTPPassword);
+                BuildConfig.FTPPassword = GELayout.FieldDelayed(BuildConfig.FTPPassword);
             }
 
             using (GELayout.VHorizontal())
             {
                 EditorGUILayout.LabelField("远程路径", GP_Width_100);
-                BuildConfig.FTPRemotePath = GELayout.Field(BuildConfig.FTPRemotePath);
+                BuildConfig.FTPRemotePath = GELayout.FieldDelayed(BuildConfig.FTPRemotePath);
             }
 
             using (GELayout.VHorizontal())
             {
                 EditorGUILayout.LabelField("本地路径", GP_Width_100);
-                BuildConfig.FTPLocalPath = GELayout.Field(BuildConfig.FTPLocalPath);
+                BuildConfig.FTPLocalPath = GELayout.FieldDelayed(BuildConfig.FTPLocalPath);
 
                 if (GUILayout.Button("选择", GP_Width_50))
                 {
@@ -265,7 +281,6 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         PrPlatform.Open.Path(BuildConfig.FTPLocalPath).Async();
-                        return;
                     }
                 }
             }

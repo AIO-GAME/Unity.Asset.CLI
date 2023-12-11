@@ -510,8 +510,8 @@ namespace AIO.UEditor
 
             GC_LookMode_Page_Right = EditorGUIUtility.IconContent("ArrowNavigationRight");
             GC_LookMode_Page_Right.tooltip = "下一页";
-
-            GC_LookMode_Page_Size = EditorGUIUtility.IconContent("d_ToolSettings");
+            
+            GC_LookMode_Page_Size = EditorGUIUtility.IconContent("d_CustomSorting");
             GC_LookMode_Page_Size.tooltip = "设置页面大小";
 
             LookDataPageSizeMenu = new GenericMenu();
