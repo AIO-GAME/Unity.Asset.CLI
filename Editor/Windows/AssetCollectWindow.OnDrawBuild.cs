@@ -14,9 +14,6 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        private string[] Tags;
-        private int CurrentTagIndex;
-
         partial void OnDrawHeaderBuild()
         {
             EditorGUILayout.Separator();
@@ -52,16 +49,22 @@ namespace AIO.UEditor
             using (GELayout.VHorizontal())
             {
                 GELayout.Label("输出路径", GTOption.Width(true));
-                if (GELayout.Button("选择", 50))
+                if (GUILayout.Button("选择", GP_Width_50))
                     BuildConfig.BuildOutputPath =
                         EditorUtility.OpenFolderPanel("请选择导出路径", BuildConfig.BuildOutputPath, "");
 
                 if (string.IsNullOrEmpty(BuildConfig.BuildOutputPath) ||
                     Directory.GetParent(BuildConfig.BuildOutputPath) == null) return;
 
-                if (GELayout.Button("打开", 50))
+                if (GUILayout.Button("打开", GP_Width_50))
                 {
                     PrPlatform.Open.Path(BuildConfig.BuildOutputPath).Async();
+                    return;
+                }
+
+                if (GUILayout.Button("生成配置", GP_Width_75))
+                {
+                    MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
                     return;
                 }
             }
@@ -73,9 +76,9 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("构建版本", GTOption.Width(100));
+                EditorGUILayout.LabelField("构建版本", GP_Width_100);
                 BuildConfig.BuildVersion = GELayout.Field(BuildConfig.BuildVersion);
-                if (GELayout.Button(GC_REFRESH, 20))
+                if (GUILayout.Button(GC_REFRESH, GP_Width_20))
                 {
                     BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                 }
@@ -85,11 +88,11 @@ namespace AIO.UEditor
             {
                 BuildConfig.FirstPack = GELayout.ToggleLeft("首包", BuildConfig.FirstPack, GTOption.Width(50));
                 BuildConfig.ValidateBuild =
-                    GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GTOption.Width(100));
+                    GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
 
 #if SUPPORT_YOOASSET
                 GELayout.Separator();
-                if (GELayout.Button("构建 Yoo", 75))
+                if (GUILayout.Button("构建 Yoo", GP_Width_75))
                 {
                     var BuildCommand = new YooAssetBuildCommand
                     {
@@ -108,9 +111,9 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("构建平台", GTOption.Width(100));
+                EditorGUILayout.LabelField("构建平台", GP_Width_100);
                 BuildConfig.BuildTarget = GELayout.Popup(BuildConfig.BuildTarget, GEStyle.PreDropDown);
-                if (GELayout.Button(GC_REFRESH, 20))
+                if (GUILayout.Button(GC_REFRESH, GP_Width_20))
                 {
                     BuildConfig.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
                 }
@@ -118,7 +121,7 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("构建包名", GTOption.Width(100));
+                EditorGUILayout.LabelField("构建包名", GP_Width_100);
                 CurrentPackageIndex = EditorGUILayout.Popup(CurrentPackageIndex, LookModeDisplayPackages,
                     GEStyle.PreDropDown);
                 if (GUI.changed)
@@ -134,13 +137,13 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("构建管线", GTOption.Width(100));
+                EditorGUILayout.LabelField("构建管线", GP_Width_100);
                 BuildConfig.BuildPipeline = GELayout.Popup(BuildConfig.BuildPipeline, GEStyle.PreDropDown);
             }
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("构建模式", GTOption.Width(100));
+                EditorGUILayout.LabelField("构建模式", GP_Width_100);
                 BuildConfig.BuildMode = GELayout.Popup(BuildConfig.BuildMode, GEStyle.PreDropDown);
             }
 
@@ -156,7 +159,7 @@ namespace AIO.UEditor
             {
                 using (GELayout.VHorizontal())
                 {
-                    EditorGUILayout.LabelField("首包标签", GTOption.Width(100));
+                    EditorGUILayout.LabelField("首包标签", GP_Width_100);
                     CurrentTagIndex = EditorGUILayout.MaskField(CurrentTagIndex, Tags, GEStyle.PreDropDown);
                 }
 
@@ -176,22 +179,19 @@ namespace AIO.UEditor
             }
         }
 
-        private bool FoldoutBuildSetting = true;
-        private bool FoldoutUploadFTP = true;
-
         private void OnDrawBuildFTP()
         {
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("地址", GTOption.Width(100));
+                EditorGUILayout.LabelField("地址", GP_Width_100);
                 BuildConfig.FTPServerIP = GELayout.Field(BuildConfig.FTPServerIP);
-                if (GELayout.Button("校验", 50))
+                if (GUILayout.Button("校验", GP_Width_50))
                 {
                     GUI.FocusControl(null);
                     BuildFTPValidate();
                 }
 
-                if (GELayout.Button("上传", 50))
+                if (GUILayout.Button("上传", GP_Width_50))
                 {
                     GUI.FocusControl(null);
                     BuildFTPUpload();
@@ -200,34 +200,34 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("端口", GTOption.Width(100));
+                EditorGUILayout.LabelField("端口", GP_Width_100);
                 BuildConfig.FTPServerPort = GELayout.Field(BuildConfig.FTPServerPort);
             }
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("用户名", GTOption.Width(100));
+                EditorGUILayout.LabelField("用户名", GP_Width_100);
                 BuildConfig.FTPUser = GELayout.Field(BuildConfig.FTPUser);
             }
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("密码", GTOption.Width(100));
+                EditorGUILayout.LabelField("密码", GP_Width_100);
                 BuildConfig.FTPPassword = GELayout.Field(BuildConfig.FTPPassword);
             }
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("远程路径", GTOption.Width(100));
+                EditorGUILayout.LabelField("远程路径", GP_Width_100);
                 BuildConfig.FTPRemotePath = GELayout.Field(BuildConfig.FTPRemotePath);
             }
 
             using (GELayout.VHorizontal())
             {
-                EditorGUILayout.LabelField("本地路径", GTOption.Width(100));
+                EditorGUILayout.LabelField("本地路径", GP_Width_100);
                 BuildConfig.FTPLocalPath = GELayout.Field(BuildConfig.FTPLocalPath);
 
-                if (GELayout.Button("选择", 50))
+                if (GUILayout.Button("选择", GP_Width_50))
                 {
                     GUI.FocusControl(null);
                     BuildConfig.FTPLocalPath =
@@ -237,7 +237,7 @@ namespace AIO.UEditor
 
                 if (Directory.Exists(BuildConfig.FTPLocalPath))
                 {
-                    if (GELayout.Button("移动", 50))
+                    if (GUILayout.Button("移动", GP_Width_50))
                     {
                         GUI.FocusControl(null);
                         var source = BuildConfig.BuildOutputPath.Trim('/', '\\');
@@ -247,7 +247,7 @@ namespace AIO.UEditor
                         PrPlatform.Folder.Copy(target, source).Async();
                     }
 
-                    if (GELayout.Button("链接", 50))
+                    if (GUILayout.Button("链接", GP_Width_50))
                     {
                         GUI.FocusControl(null);
                         var source = BuildConfig.BuildOutputPath.Trim('/', '\\');
@@ -261,7 +261,7 @@ namespace AIO.UEditor
                         symbolic.Async();
                     }
 
-                    if (GELayout.Button("打开", 50))
+                    if (GUILayout.Button("打开", GP_Width_50))
                     {
                         GUI.FocusControl(null);
                         PrPlatform.Open.Path(BuildConfig.FTPLocalPath).Async();

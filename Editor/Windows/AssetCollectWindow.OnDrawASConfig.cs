@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -151,9 +152,9 @@ namespace AIO.UEditor
             }
         }
 
-        private async void UpdateConfig()
+        private void UpdateConfig()
         {
-            await Config.UpdatePackage();
+            Config.UpdatePackage();
             _packages = Config.Packages is null
                 ? _packages
                 : Config.Packages.ToList();

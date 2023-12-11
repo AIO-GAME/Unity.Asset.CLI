@@ -26,16 +26,16 @@ namespace AIO
             switch (operation.result)
             {
                 case UnityWebRequest.Result.InProgress:
-                    Debug.LogError($"{ERROR_NET}请求正在进行中");
+                    Debug.LogError($"{ERROR_NET}请求正在进行中 -> {operation.error}");
                     return false;
                 case UnityWebRequest.Result.ConnectionError:
-                    Debug.LogError($"{ERROR_NET}无法连接到服务器");
+                    Debug.LogError($"{ERROR_NET}无法连接到服务器 -> {operation.error}");
                     return false;
                 case UnityWebRequest.Result.ProtocolError:
-                    Debug.LogError($"{ERROR_NET}服务器返回响应错误");
+                    Debug.LogError($"{ERROR_NET}服务器返回响应错误 -> {operation.error}");
                     return false;
                 case UnityWebRequest.Result.DataProcessingError:
-                    Debug.LogError($"{ERROR_NET}数据处理异常");
+                    Debug.LogError($"{ERROR_NET}数据处理异常 -> {operation.error}");
                     return false;
             }
 
@@ -54,7 +54,7 @@ namespace AIO
 #endif
 
             if (operation.isDone) return true;
-            Debug.LogError($"{ERROR_NET}请求未完成");
+            Debug.LogError($"{ERROR_NET}请求未完成 -> {operation.error}");
             return false;
         }
 
@@ -245,7 +245,7 @@ namespace AIO
             using (var uwr = UnityWebRequest.Get(url))
             {
                 yield return uwr.SendWebRequest();
-                if (LoadCheckNet(uwr)) cb?.Invoke(uwr.downloadHandler.text);
+                cb?.Invoke(LoadCheckNet(uwr) ? uwr.downloadHandler.text : string.Empty);
             }
         }
 
@@ -259,7 +259,7 @@ namespace AIO
             using (var uwr = UnityWebRequest.Get(url))
             {
                 yield return uwr.SendWebRequest();
-                if (LoadCheckNet(uwr)) cb?.Invoke(uwr.downloadHandler.data);
+                cb?.Invoke(LoadCheckNet(uwr) ? uwr.downloadHandler.data : Array.Empty<byte>());
             }
         }
 

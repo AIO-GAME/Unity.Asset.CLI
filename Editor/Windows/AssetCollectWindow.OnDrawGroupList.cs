@@ -11,10 +11,6 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        private bool ShowConfigSetting = false;
-        private bool ShowPackageInfo = true;
-        private bool ShowCollectors = true;
-
         private void OnDrawPackageInfo()
         {
             if (Data.Packages.Length == 0) return;
@@ -26,7 +22,7 @@ namespace AIO.UEditor
                     return;
                 }
 
-                if (ShowPackageInfo)
+                if (FoldoutPackageInfo)
                 {
                     Data.Packages[CurrentPackageIndex].Name =
                         GELayout.Field("Package Name", Data.Packages[CurrentPackageIndex].Name);
@@ -44,7 +40,7 @@ namespace AIO.UEditor
                     return;
                 }
 
-                if (ShowPackageInfo)
+                if (FoldoutPackageInfo)
                 {
                     Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name = GELayout.Field("Group Name",
                         Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
@@ -78,20 +74,20 @@ namespace AIO.UEditor
         {
             using (GELayout.Vertical(GEStyle.GridList))
             {
-                ShowConfigSetting =
-                    GELayout.VFoldoutHeaderGroupWithHelp(OnDrawASConfig, "Config Setting", ShowConfigSetting);
+                FoldoutConfigSetting =
+                    GELayout.VFoldoutHeaderGroupWithHelp(OnDrawASConfig, "Config Setting", FoldoutConfigSetting);
 
                 GELayout.Space();
 
-                ShowPackageInfo =
-                    GELayout.VFoldoutHeaderGroupWithHelp(OnDrawPackageInfo, "Package Info", ShowPackageInfo);
+                FoldoutPackageInfo =
+                    GELayout.VFoldoutHeaderGroupWithHelp(OnDrawPackageInfo, "Package Info", FoldoutPackageInfo);
 
                 GELayout.Space();
 
-                ShowCollectors = GELayout.VFoldoutHeaderGroupWithHelp(
+                FoldoutCollectors = GELayout.VFoldoutHeaderGroupWithHelp(
                     OnDrawItem,
                     "Collectors",
-                    ShowCollectors,
+                    FoldoutCollectors,
                     () =>
                     {
                         Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors =

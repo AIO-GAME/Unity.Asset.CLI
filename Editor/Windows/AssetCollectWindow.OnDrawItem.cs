@@ -53,10 +53,26 @@ namespace AIO.UEditor
 
                     if (GELayout.Button(GC_OPEN, 24))
                     {
-                        OnDrawCurrentItem = item;
-                        OnDrawCurrentItem.CollectAsset(
-                            Data.Packages[CurrentPackageIndex].Name,
-                            Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+                        // OnDrawCurrentItem = item;
+                        // OnDrawCurrentItem.CollectAsset(
+                        //     Data.Packages[CurrentPackageIndex].Name,
+                        //     Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+                        WindowMode = Mode.Look;
+                        UpdateDataLook();
+                        var status = 1;
+                        foreach (var collector in Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
+                                     .Collectors)
+                        {
+                            if (collector.CollectPath != item.CollectPath)
+                            {
+                                status *= 2;
+                                continue;
+                            }
+
+                            LookModeDisplayCollectorsIndex = status;
+                            break;
+                        }
+
                         GUI.FocusControl(null);
                         return;
                     }
