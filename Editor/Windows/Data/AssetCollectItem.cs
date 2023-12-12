@@ -64,7 +64,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 收集器名称
         /// </summary>
-        public string Name => System.IO.Path.GetFileName(AssetDatabase.GetAssetPath(Path));
+        public string FileName => System.IO.Path.GetFileName(AssetDatabase.GetAssetPath(Path));
 
         /// <summary>
         /// 定位规则
@@ -134,7 +134,7 @@ namespace AIO.UEditor
                    x.Tags == y.Tags &&
                    Equals(x.Path, y.Path) &&
                    x.UserData == y.UserData &&
-                   x.Name == y.Name &&
+                   x.FileName == y.FileName &&
                    x.Address == y.Address &&
                    x.RuleCollect == y.RuleCollect &&
                    x.RuleFilter == y.RuleFilter;
@@ -149,7 +149,7 @@ namespace AIO.UEditor
                 hashCode = (hashCode * 397) ^ (obj.Tags != null ? obj.Tags.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.Path != null ? obj.Path.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.UserData != null ? obj.UserData.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (obj.Name != null ? obj.Name.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (obj.FileName != null ? obj.FileName.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ obj.Address.GetHashCode();
                 hashCode = (hashCode * 397) ^ (obj.RuleCollect != null ? obj.RuleCollect.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.RuleFilter != null ? obj.RuleFilter.GetHashCode() : 0);
@@ -305,7 +305,8 @@ namespace AIO.UEditor
 
             UpdateCollect();
             UpdateFilter();
-
+            var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, GUID);
+            var tagStr = tags.Length == 0 ? string.Empty : string.Join(";", tags);
             if (AssetDatabase.IsValidFolder(CollectPath)) // 判断Path是否为文件夹
             {
                 // 获取文件夹下所有文件
@@ -332,7 +333,11 @@ namespace AIO.UEditor
                         Name = System.IO.Path.GetFileNameWithoutExtension(fixedPath),
                         Size = AHelper.IO.GetFileLength(fixedPath),
                         CollectPath = CollectPath,
+                        Tags = tagStr,
+                        Type = AssetDatabase.GetMainAssetTypeAtPath(fixedPath).FullName,
                     };
+                    if (string.IsNullOrEmpty(info.Type)) info.Type = "Unknown";
+
                     AssetDataInfos[info.GUID] = info;
                 }
             }
@@ -351,7 +356,10 @@ namespace AIO.UEditor
                         Extension = data.Extension,
                         Name = System.IO.Path.GetFileNameWithoutExtension(CollectPath),
                         Size = AHelper.IO.GetFileLength(CollectPath),
+                        Tags = tagStr,
+                        Type = AssetDatabase.GetMainAssetTypeAtPath(CollectPath).FullName,
                     };
+                    if (string.IsNullOrEmpty(info.Type)) info.Type = "Unknown";
                     AssetDataInfos[GUID] = info;
                 }
             }

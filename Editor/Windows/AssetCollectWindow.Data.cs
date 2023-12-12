@@ -4,10 +4,8 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using AIO.UEngine;
 using UnityEditor;
@@ -40,39 +38,19 @@ namespace AIO.UEditor
         /// <summary>
         /// 当前选择包下标
         /// </summary>
-        private int CurrentPackageIndex = 0;
+        private int CurrentPackageIndex;
 
         /// <summary>
         /// 当前选择组下标
         /// </summary>
-        private int CurrentGroupIndex = 0;
-
-        /// <summary>
-        /// 当前列表界面宽度
-        /// </summary>
-        private float DrawWidthCollectorList = 400;
-
-        /// <summary>
-        /// 当前设置界面宽度
-        /// </summary>
-        private float DrawWidthSettingView = 150;
-
-        /// <summary>
-        /// 当前包界面宽度
-        /// </summary>
-        private float DrawWidthPackageList = 150;
-
-        /// <summary>
-        /// 当前组界面宽度
-        /// </summary>
-        private float DrawWidthGroupList = 150;
+        private int CurrentGroupIndex;
 
         /// <summary>
         /// 当前导航栏高度
         /// </summary>
         private const float DrawHeaderHeight = 25;
 
-
+        private Vector2 OnDrawConfigScroll = Vector2.zero;
         private Vector2 OnDrawSettingScroll = Vector2.zero;
         private Vector2 OnDrawPackageScroll = Vector2.zero;
         private Vector2 OnDrawGroupScroll = Vector2.zero;
@@ -107,11 +85,6 @@ namespace AIO.UEditor
         #region Draw Group List
 
         /// <summary>
-        /// 折叠栏 - 配置设置
-        /// </summary>
-        private bool FoldoutConfigSetting = false;
-
-        /// <summary>
         /// 折叠栏 - 资源包信息
         /// </summary>
         private bool FoldoutPackageInfo = true;
@@ -132,6 +105,7 @@ namespace AIO.UEditor
         {
             [InspectorName("编辑模式")] Editor,
             [InspectorName("查询模式")] Look,
+            [InspectorName("标签模式")] Tags,
             [InspectorName("打包模式")] Build,
         }
 
@@ -141,24 +115,9 @@ namespace AIO.UEditor
         private Mode WindowMode = Mode.Editor;
 
         /// <summary>
-        /// 折叠栏 - 显示组界面
-        /// </summary>
-        public bool ShowGroup = false;
-
-        /// <summary>
-        /// 折叠栏 - 显示资源包界面
-        /// </summary>
-        public bool ShowPackage = true;
-
-        /// <summary>
-        /// 折叠栏 - 显示设置界面
-        /// </summary>
-        public bool ShowSetting = false;
-
-        /// <summary>
         /// Header中间显示信息
         /// </summary>
-        private StringBuilder TempBuilder = new StringBuilder();
+        private readonly StringBuilder TempBuilder = new StringBuilder();
 
         #endregion
 
@@ -230,6 +189,11 @@ namespace AIO.UEditor
         private GUIContent GC_LookMode_Detail_IsSubAsset;
 
         /// <summary>
+        /// 界面内容 - 
+        /// </summary>
+        private GUIContent GC_LookMode_Detail_Tags;
+
+        /// <summary>
         /// 界面内容 - 排序方式
         /// </summary>
         private GUIContent GC_LookMode_Data_Sort;
@@ -278,7 +242,12 @@ namespace AIO.UEditor
         /// <summary>
         /// 收集器类型列表
         /// </summary>
-        private Dictionary<(int, int), string[]> LookModeDisplayCollectorTypes;
+        private Dictionary<(int, int), string[]> LookModeDisplayTypes;
+
+        /// <summary>
+        /// 收集器标签列表
+        /// </summary>
+        private Dictionary<(int, int), string[]> LookModeDisplayTags;
 
         /// <summary>
         /// 搜索文本
@@ -288,7 +257,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 当前选择包类型索引
         /// </summary>
-        private int LookModeDisplayCollectorsTypeIndex = -1;
+        private int LookModeDisplayTypeIndex = -1;
 
         /// <summary>
         /// 当前选择收集器索引
@@ -296,32 +265,25 @@ namespace AIO.UEditor
         private int LookModeDisplayCollectorsIndex = -1;
 
         /// <summary>
+        /// 当前标签列表索引
+        /// </summary>
+        private int LookModeDisplayTagsIndex = -1;
+
+        /// <summary>
         /// 收集器全部资源大小
         /// </summary>
-        private long LookModeCollectorsALLSize = 0L;
+        private long LookModeCollectorsALLSize;
 
         /// <summary>
         /// 收集器页签资源大小
         /// </summary>
-        private long LookModeCollectorsPageSize = 0L;
+        private long LookModeCollectorsPageSize;
 
         /// <summary>
         /// 是否显示资源详情
         /// </summary>
         private bool LookModeShowAssetDetail => !string.IsNullOrEmpty(LookModeCurrentSelectAssetDataInfo.GUID) &&
                                                 LookModeCurrentSelectAsset != null;
-
-        private float LookModeShowAssetListWidth = LookModeShowAssetDetailMinWidth;
-
-        /// <summary>
-        /// 资源详情界面最小宽度
-        /// </summary>
-        private const int LookModeShowAssetDetailMinWidth = 400;
-
-        /// <summary>
-        /// 资源详情界面最小宽度
-        /// </summary>
-        private const int LookModeShowAssetListMinWidth = 200;
 
         /// <summary>
         /// 资源展示模式 当前页数量选项
@@ -331,7 +293,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 用户当前选择的资源实体
         /// </summary>
-        private UnityEngine.Object LookModeCurrentSelectAsset;
+        private Object LookModeCurrentSelectAsset;
 
         /// <summary>
         /// 选择的资源实体配置
@@ -341,11 +303,9 @@ namespace AIO.UEditor
         /// <summary>
         /// 依赖资源
         /// </summary>
-        public Dictionary<string, UnityEngine.Object> Dependencies = new Dictionary<string, UnityEngine.Object>();
+        public Dictionary<string, Object> Dependencies = new Dictionary<string, Object>();
 
-        private Rect LookModeShowAssetListRect;
         private Rect LookModeShowAssetListView;
-        private Rect LookModeShowAssetDetailRect;
         private Vector2 LookModeShowAssetDetailScroll;
 
         private static readonly Color ROW_SHADING_COLOR = new Color(0f, 0f, 0f, 0.2f);
@@ -355,6 +315,24 @@ namespace AIO.UEditor
 
         private bool LookModeSortEnableLastWrite;
         private bool LookModeSortEnableLastWriteToMin;
+
+        #endregion
+
+        #region Tags Mode
+
+        /// <summary>
+        /// 收集器标签列表
+        /// </summary>
+        private string[] TagsModeDisplayTags;
+
+        private string[] TagsModeDisplayCollectors;
+        
+        private string[] TagsModeDisplayTypes;
+        
+        /// <summary>
+        /// 标签模式 当前所有资源
+        /// </summary>
+        private List<AssetDataInfo> CurrentTagValues = new List<AssetDataInfo>();
 
         #endregion
 
@@ -424,48 +402,96 @@ namespace AIO.UEditor
         #endregion
 
         /// <summary>
-        /// 拖拽区域 - 设置
+        /// 界面 - 配置界面
         /// </summary>
-        private Rect OnDragRectSettingView;
+        private ViewRect ViewConfig;
 
         /// <summary>
-        /// 拖拽区域 - 设置大小正在拖拽
+        /// 界面 - 配置界面
         /// </summary>
-        private bool OnDragRectSettingViewing;
+        private ViewRect ViewSetting;
 
         /// <summary>
-        /// 拖拽区域 - 包列表
+        /// 界面 - 详情界面
         /// </summary>
-        private Rect OnDragRectPackageList;
+        private ViewRect ViewDetails;
 
         /// <summary>
-        /// 拖拽区域 - 包列表 正在拖拽
+        /// 界面 - 详情界面
         /// </summary>
-        private bool OnDragRectPackageListViewing;
+        private ViewRect ViewDetailList;
 
         /// <summary>
-        /// 拖拽区域 - 组列表
+        /// 界面 - 包列表
         /// </summary>
-        private Rect OnDragRectGroupList;
+        private ViewRect ViewPackageList;
 
         /// <summary>
-        /// 拖拽区域 - 组列表 正在拖拽
+        /// 界面 - 组列表
         /// </summary>
-        private bool OnDragRectGroupListViewing;
+        private ViewRect ViewGroupList;
 
         /// <summary>
-        /// 拖拽区域 - 详细信息
+        /// 界面 - 收集器列表
         /// </summary>
-        private Rect OnDragRectDetailsView;
-
-        /// <summary>
-        /// 拖拽区域 - 详细信息大小正在拖拽
-        /// </summary>
-        private bool OnDragRectDetailsViewing;
+        private ViewRect ViewCollectorsList;
 
         partial void GCInit()
         {
             DoDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
+            ViewConfig = new ViewRect(100, DoDrawRect.height)
+            {
+                IsShow = false,
+                IsAllowHorizontal = true,
+                DragHorizontalWidth = 5,
+                width = 500
+            };
+            ViewSetting = new ViewRect(100, DoDrawRect.height)
+            {
+                IsShow = false,
+                IsAllowHorizontal = true,
+                DragHorizontalWidth = 5,
+                width = 150
+            };
+            ViewPackageList = new ViewRect(100, DoDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = true,
+                DragHorizontalWidth = 5,
+                width = 150
+            };
+            ViewGroupList = new ViewRect(100, DoDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = true,
+                DragHorizontalWidth = 5,
+                width = 150
+            };
+            ViewCollectorsList = new ViewRect(100, DoDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = false,
+                width = 400
+            };
+
+            ViewDetailList = new ViewRect(300, DoDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = false,
+                DragHorizontalWidth = 10,
+                width = 400,
+                x = 0,
+                y = DrawHeaderHeight,
+            };
+
+            ViewDetails = new ViewRect(300, DoDrawRect.height)
+            {
+                IsShow = false,
+                IsAllowHorizontal = false,
+                width = 400,
+                y = ViewDetailList.y + 3,
+            };
+
 #if SUPPORT_YOOASSET
             GC_ToConvert_YooAsset = new GUIContent(Resources.Load<Texture>("Texture/Yooasset"), "转换为YooAsset");
 #endif
@@ -510,7 +536,7 @@ namespace AIO.UEditor
 
             GC_LookMode_Page_Right = EditorGUIUtility.IconContent("ArrowNavigationRight");
             GC_LookMode_Page_Right.tooltip = "下一页";
-            
+
             GC_LookMode_Page_Size = EditorGUIUtility.IconContent("d_CustomSorting");
             GC_LookMode_Page_Size.tooltip = "设置页面大小";
 
@@ -526,6 +552,7 @@ namespace AIO.UEditor
             LookDataPageSizeMenu.AddItem(new GUIContent("50"), CurrentPageValues.PageSize == 50,
                 () => { CurrentPageValues.PageSize = 50; });
 
+            GC_LookMode_Detail_Tags = new GUIContent("Tags", "资源标签");
             GC_LookMode_Detail_GUID = new GUIContent("GUID", "资源GUID");
             GC_LookMode_Detail_Asset = new GUIContent("Asset", "资源实例");
             GC_LookMode_Detail_Type = new GUIContent("Type", "资源类型");

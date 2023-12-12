@@ -50,9 +50,19 @@ namespace AIO
         public long Size;
 
         /// <summary>
+        /// Asset Tags
+        /// </summary>
+        public string Tags;
+
+        /// <summary>
         /// Asset Last Imported
         /// </summary>
         public DateTime LastWriteTime;
+        
+        /// <summary>
+        /// Asset Type
+        /// </summary>
+        public string Type;
     }
 
     public static class ExtensionAssetDataInfo

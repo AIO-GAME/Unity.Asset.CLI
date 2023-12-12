@@ -13,30 +13,40 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        private void OnDrawHeaderEditor()
+        private void OnDrawHeaderEditorMode()
         {
-            if (!ShowSetting && GUILayout.Button("⇘ Setting", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
+            if (!ViewSetting.IsShow &&
+                GUILayout.Button("⇘ Setting", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
             {
                 GUI.FocusControl(null);
-                ShowSetting = true;
+                ViewSetting.IsShow = true;
             }
 
-            if (!ShowPackage && GUILayout.Button("⇘ Package", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
+            if (!ViewConfig.IsShow &&
+                GUILayout.Button("⇘ Config", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
             {
                 GUI.FocusControl(null);
-                ShowPackage = true;
+                ViewConfig.IsShow = true;
+            }
+
+            if (!ViewPackageList.IsShow &&
+                GUILayout.Button("⇘ Package", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
+            {
+                GUI.FocusControl(null);
+                ViewPackageList.IsShow = true;
             }
 
             if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0 ||
                 Data.Packages[CurrentPackageIndex] is null)
             {
                 GUI.FocusControl(null);
-                ShowGroup = false;
+                ViewGroupList.IsShow = false;
             }
-            else if (!ShowGroup && GUILayout.Button("⇘ Group", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
+            else if (!ViewGroupList.IsShow &&
+                     GUILayout.Button("⇘ Group", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
             {
                 GUI.FocusControl(null);
-                ShowGroup = true;
+                ViewGroupList.IsShow = true;
             }
 
             EditorGUILayout.Separator();
@@ -100,7 +110,7 @@ namespace AIO.UEditor
             }
         }
 
-        partial void OnDrawHeaderBuild();
+        partial void OnDrawHeaderBuildMode();
 
         partial void OnDrawHeader()
         {
@@ -108,41 +118,29 @@ namespace AIO.UEditor
             {
                 switch (WindowMode)
                 {
+                    default:
                     case Mode.Editor:
-                        OnDrawHeaderEditor();
+                        OnDrawHeaderEditorMode();
                         break;
                     case Mode.Look:
-                        OnDrawHeaderLook();
+                        OnDrawHeaderLookMode();
                         break;
                     case Mode.Build:
-                        OnDrawHeaderBuild();
+                        OnDrawHeaderBuildMode();
+                        break;
+                    case Mode.Tags:
+                        OnDrawHeaderTagsMode();
                         break;
                 }
 
                 WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
 
-                if (GUI.changed)
-                {
-                    if (WindowMode != TempTable.GetOrDefault<Mode>(nameof(WindowMode)))
-                    {
-                        GUI.FocusControl(null);
-                        switch (WindowMode)
-                        {
-                            default:
-                            case Mode.Editor:
-                                UpdateDataRecordQueue();
-                                break;
-                            case Mode.Look:
-                                UpdateDataLook();
-                                break;
-                            case Mode.Build:
-                                UpdateDataBuild();
-                                break;
-                        }
-
-                        TempTable[nameof(WindowMode)] = WindowMode;
-                    }
-                }
+                if (!GUI.changed) return;
+                if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
+                GUI.FocusControl(null);
+                UpdateData();
+             
+                TempTable[nameof(WindowMode)] = WindowMode;
             }
         }
     }

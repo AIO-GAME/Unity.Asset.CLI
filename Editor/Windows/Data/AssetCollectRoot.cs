@@ -48,6 +48,7 @@ namespace AIO.UEditor
         /// </summary>
         public static AssetCollectRoot GetOrCreate()
         {
+            AssetCollectRoot collect = null;
             var objects = EHelper.IO.GetScriptableObjects<AssetCollectRoot>();
             if (objects != null && objects.Length > 0)
             {
@@ -55,14 +56,35 @@ namespace AIO.UEditor
                 {
                     if (asset is null) continue;
                     if (asset.Packages is null) asset.Packages = new AssetCollectPackage[] { };
-                    return asset;
+                    collect = asset;
+                    break;
                 }
             }
 
-            var collect = CreateInstance<AssetCollectRoot>();
-            collect.Packages = new AssetCollectPackage[] { };
-            AssetDatabase.CreateAsset(collect, "Assets/Editor/AssetCollectRoot.asset");
-            AssetDatabase.SaveAssets();
+            if (collect is null)
+            {
+                collect = CreateInstance<AssetCollectRoot>();
+                collect.Packages = new AssetCollectPackage[] { };
+                AssetDatabase.CreateAsset(collect, "Assets/Editor/AssetCollectRoot.asset");
+                AssetDatabase.SaveAssets();
+            }
+
+
+            for (var i = 0; i < collect.Packages.Length; i++)
+            {
+                if (collect.Packages[i] is null)
+                    collect.Packages[i] = new AssetCollectPackage();
+                if (collect.Packages[i].Groups is null)
+                    collect.Packages[i].Groups = new AssetCollectGroup[] { };
+
+                for (var j = 0; j < collect.Packages[i].Groups.Length; j++)
+                {
+                    collect.Packages[i].Groups = collect.Packages[i].Groups
+                        .OrderByDescending(group => group.Name).ToArray();
+                }
+            }
+
+            collect.Packages = collect.Packages.OrderByDescending(package => package.Name).ToArray();
             return collect;
         }
 
@@ -75,6 +97,75 @@ namespace AIO.UEditor
                 {
                     foreach (var collect in group.Collectors)
                     {
+                        if (string.IsNullOrEmpty(collect.Tags)) continue;
+                        foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
+                    }
+
+                    if (string.IsNullOrEmpty(group.Tags)) continue;
+                    foreach (var tag in group.Tags.Split(';')) dictionary[tag] = true;
+                }
+            }
+
+            return dictionary.Keys.ToArray();
+        }
+
+        public string[] GetTags(string packageName)
+        {
+            var dictionary = new Dictionary<string, bool>();
+            foreach (var package in Packages)
+            {
+                if (package.Name != packageName) continue;
+                foreach (var group in package.Groups)
+                {
+                    foreach (var collect in group.Collectors)
+                    {
+                        if (string.IsNullOrEmpty(collect.Tags)) continue;
+                        foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
+                    }
+
+                    if (string.IsNullOrEmpty(group.Tags)) continue;
+                    foreach (var tag in group.Tags.Split(';')) dictionary[tag] = true;
+                }
+            }
+
+            return dictionary.Keys.ToArray();
+        }
+
+        public string[] GetTags(string packageName, string groupName)
+        {
+            var dictionary = new Dictionary<string, bool>();
+            foreach (var package in Packages)
+            {
+                if (package.Name != packageName) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group.Name != groupName) continue;
+                    foreach (var collect in group.Collectors)
+                    {
+                        if (string.IsNullOrEmpty(collect.Tags)) continue;
+                        foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
+                    }
+
+                    if (string.IsNullOrEmpty(group.Tags)) continue;
+                    foreach (var tag in group.Tags.Split(';')) dictionary[tag] = true;
+                }
+            }
+
+            return dictionary.Keys.ToArray();
+        }
+
+        public string[] GetTags(string packageName, string groupName, string GUID)
+        {
+            var dictionary = new Dictionary<string, bool>();
+            foreach (var package in Packages)
+            {
+                if (package.Name != packageName) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group.Name != groupName) continue;
+                    foreach (var collect in group.Collectors)
+                    {
+                        if (collect.GUID != GUID) continue;
                         if (string.IsNullOrEmpty(collect.Tags)) continue;
                         foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
                     }

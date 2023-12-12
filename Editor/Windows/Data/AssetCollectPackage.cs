@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AIO.UEditor
@@ -39,6 +40,24 @@ namespace AIO.UEditor
         public AssetCollectGroup GetGroup(string groupName)
         {
             return Groups.Where(group => !(group is null)).FirstOrDefault(group => group.Name == groupName);
+        }
+
+        public string[] GetTags()
+        {
+            var dictionary = new Dictionary<string, bool>();
+            foreach (var group in Groups)
+            {
+                foreach (var collect in group.Collectors)
+                {
+                    if (string.IsNullOrEmpty(collect.Tags)) continue;
+                    foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
+                }
+
+                if (string.IsNullOrEmpty(group.Tags)) continue;
+                foreach (var tag in group.Tags.Split(';')) dictionary[tag] = true;
+            }
+
+            return dictionary.Keys.ToArray();
         }
     }
 }

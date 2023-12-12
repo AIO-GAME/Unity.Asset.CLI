@@ -33,7 +33,7 @@ namespace AIO.UEditor
                         if (Data.Packages[CurrentPackageIndex].Groups.Length == 1)
                         {
                             CurrentGroupIndex = 0;
-                            ShowGroup = true;
+                            ViewGroupList.IsShow = true;
                         }
 
                         GUI.FocusControl(null);
@@ -41,7 +41,7 @@ namespace AIO.UEditor
 
                     if (GUILayout.Button("Group", GEStyle.PreToolbar))
                     {
-                        ShowGroup = false;
+                        ViewGroupList.IsShow = false;
                         GUI.FocusControl(null);
                     }
                 }
@@ -62,7 +62,7 @@ namespace AIO.UEditor
                                 Data.Packages[CurrentPackageIndex].Groups.RemoveAt(i);
                             if (--CurrentGroupIndex < 0) CurrentGroupIndex = 0;
                             if (CurrentGroupIndex >= Data.Packages[CurrentPackageIndex].Groups.Length)
-                                ShowGroup = false;
+                                ViewGroupList.IsShow = false;
                             GUI.FocusControl(null);
                             return;
                         }
@@ -78,7 +78,7 @@ namespace AIO.UEditor
                         if (GUILayout.Button(label, style))
                         {
                             CurrentGroupIndex = i;
-                            ShowGroup = true;
+                            ViewGroupList.IsShow = true;
                             GUI.FocusControl(null);
                         }
                     }

@@ -4,7 +4,6 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,8 +24,19 @@ namespace AIO.UEditor
 
         partial void OnDrawASConfig()
         {
-            using (GELayout.Vertical(GEStyle.INThumbnailShadow))
+            var width = GTOption.Width(ViewConfig.width - 20);
+            using (GELayout.Vertical(GEStyle.GridList, width))
             {
+                using (GELayout.VHorizontal())
+                {
+                    GELayout.Label("⇘", GEStyle.TEtoolbarbutton, GP_Width_20);
+                    if (GELayout.Button("Config", GEStyle.PreToolbar))
+                    {
+                        ViewSetting.IsShow = false;
+                        GUI.FocusControl(null);
+                    }
+                }
+
                 using (GELayout.VHorizontal())
                 {
                     Config.ASMode = GELayout.Popup("加载模式", Config.ASMode);

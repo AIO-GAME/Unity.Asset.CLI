@@ -14,12 +14,12 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        partial void OnDrawHeaderBuild()
+        partial void OnDrawHeaderBuildMode()
         {
             EditorGUILayout.Separator();
         }
 
-        private void UpdateDataBuild()
+        private void UpdateDataBuildMode()
         {
             LookModeDisplayPackages = Data.Packages.Select(x => x.Name).ToArray();
             BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
@@ -325,7 +325,7 @@ namespace AIO.UEditor
             }
         }
 
-        partial void OnDrawBuild()
+        partial void OnDrawBuildMode()
         {
             FoldoutBuildSetting = GELayout.VFoldoutHeader(OnDrawBuildBuild, "构建设置", FoldoutBuildSetting);
             FoldoutUploadFTP = GELayout.VFoldoutHeader(OnDrawBuildFTP, "FTP", FoldoutUploadFTP);
