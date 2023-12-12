@@ -183,7 +183,7 @@ namespace AIO.UEditor
                 {
                     ViewConfig.DragHorizontal(eventData);
                     ViewGroupList.DragHorizontal(eventData);
-                    ViewPackageList.DragHorizontal(eventData);
+                    ViewPackageList.DragHorizontal(eventData); 
                     ViewSetting.DragHorizontal(eventData);
                     break;
                 }
