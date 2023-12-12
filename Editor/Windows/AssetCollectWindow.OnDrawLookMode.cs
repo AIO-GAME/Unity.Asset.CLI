@@ -19,7 +19,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 绘制 资源查询模式 导航栏
         /// </summary>
-        private void OnDrawHeaderLook()
+        private void OnDrawHeaderLookMode()
         {
             if (Data.Packages.Length == 0)
             {
@@ -66,8 +66,6 @@ namespace AIO.UEditor
                 }
             }
 
-            EditorGUILayout.Separator();
-
             SearchText = EditorGUILayout.DelayedTextField(SearchText, GEStyle.SearchTextField);
             if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
@@ -75,16 +73,29 @@ namespace AIO.UEditor
                 SearchText = string.Empty;
             }
 
-            LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
-                LookModeDisplayCollectors[(CurrentPackageIndex, CurrentGroupIndex)], GEStyle.PreDropDown,
-                GP_Width_100);
-
-            if (LookModeDisplayCollectorTypes[(CurrentPackageIndex, CurrentGroupIndex)].Length > 0)
+            if (LookModeDisplayCollectors[(CurrentPackageIndex, CurrentGroupIndex)].Length > 0)
             {
-                LookModeDisplayCollectorsTypeIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsTypeIndex,
-                    LookModeDisplayCollectorTypes[(CurrentPackageIndex, CurrentGroupIndex)],
+                LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
+                    LookModeDisplayCollectors[(CurrentPackageIndex, CurrentGroupIndex)],
                     GEStyle.PreDropDown, GP_Width_100);
             }
+            else LookModeDisplayCollectorsIndex = 0;
+
+            if (LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)].Length > 0)
+            {
+                LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
+                    LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)],
+                    GEStyle.PreDropDown, GP_Width_100);
+            }
+            else LookModeDisplayTypeIndex = 0;
+
+            if (LookModeDisplayTags[(CurrentPackageIndex, CurrentGroupIndex)].Length > 0)
+            {
+                LookModeDisplayTagsIndex = EditorGUILayout.MaskField(LookModeDisplayTagsIndex,
+                    LookModeDisplayTags[(CurrentPackageIndex, CurrentGroupIndex)],
+                    GEStyle.PreDropDown, GP_Width_100);
+            }
+            else LookModeDisplayTagsIndex = 0;
 
             if (GUI.changed)
             {
@@ -94,7 +105,7 @@ namespace AIO.UEditor
                     CurrentPageValues.Clear();
                     CurrentPageValues.Add(LookModeData[(CurrentPackageIndex, CurrentGroupIndex)]);
                     CurrentPageValues.PageIndex = 0;
-                    LookModeCollectorsALLSize = CurrentPageValues.CurrentPageValues.Sum(data => data.Size);
+                    LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
                     TempTable[nameof(CurrentPackageIndex)] = CurrentPackageIndex;
                     TempTable[nameof(CurrentGroupIndex)] = CurrentGroupIndex;
                 }
@@ -103,18 +114,21 @@ namespace AIO.UEditor
                     TempTable.GetOrDefault<string>(nameof(SearchText)) != SearchText ||
                     TempTable.GetOrDefault<int>(nameof(LookModeDisplayCollectorsIndex)) !=
                     LookModeDisplayCollectorsIndex ||
-                    TempTable.GetOrDefault<int>(nameof(LookModeDisplayCollectorsTypeIndex)) !=
-                    LookModeDisplayCollectorsTypeIndex
+                    TempTable.GetOrDefault<int>(nameof(LookModeDisplayTypeIndex)) !=
+                    LookModeDisplayTypeIndex ||
+                    TempTable.GetOrDefault<int>(nameof(LookModeDisplayTagsIndex)) !=
+                    LookModeDisplayTagsIndex
                 )
                 {
                     CurrentPageValues.Clear();
                     CurrentPageValues.Add(LookModeData[(CurrentPackageIndex, CurrentGroupIndex)]
                         .Where(data => !LookModeDataFilter(data)));
                     CurrentPageValues.PageIndex = 0;
-                    LookModeCollectorsALLSize = CurrentPageValues.CurrentPageValues.Sum(data => data.Size);
+                    LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
                     TempTable[nameof(SearchText)] = SearchText;
                     TempTable[nameof(LookModeDisplayCollectorsIndex)] = LookModeDisplayCollectorsIndex;
-                    TempTable[nameof(LookModeDisplayCollectorsTypeIndex)] = LookModeDisplayCollectorsTypeIndex;
+                    TempTable[nameof(LookModeDisplayTypeIndex)] = LookModeDisplayTypeIndex;
+                    TempTable[nameof(LookModeDisplayTagsIndex)] = LookModeDisplayTagsIndex;
                 }
             }
 
@@ -124,8 +138,8 @@ namespace AIO.UEditor
             {
                 LookModeCurrentSelectAsset = null;
                 SearchText = string.Empty;
-                LookModeDisplayCollectorsTypeIndex = LookModeDisplayCollectorsIndex = 0;
-                UpdateDataLook();
+                LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
+                UpdateDataLookMode();
             }
         }
 
@@ -243,54 +257,50 @@ namespace AIO.UEditor
                 return;
             }
 
-            LookModeShowAssetListRect = new Rect(0, DrawHeaderHeight,
-                LookModeShowAssetDetail ? LookModeShowAssetListWidth : CurrentWidth,
-                CurrentHeight - DrawHeaderHeight);
-            GUILayout.BeginArea(LookModeShowAssetListRect, GEStyle.Badge);
-
-            if (CurrentPageValues.Count > 0)
-            {
-                var headerRect = new Rect(0, 0, LookModeShowAssetListRect.width, 20);
-                OnDrawLookModeHeader(headerRect);
-                LookModeCollectorsPageSize = 0;
-                LookModeShowAssetListRect.y = headerRect.y + headerRect.height;
-                LookModeShowAssetListRect.height -= LookModeShowAssetListRect.y;
-                LookModeShowAssetListView.width = LookModeShowAssetListRect.width - 15;
-                LookModeShowAssetListView.height = 20 * CurrentPageValues.CurrentPageValues.Length;
-                OnDrawLookDataScroll = GUI.BeginScrollView(LookModeShowAssetListRect,
-                    OnDrawLookDataScroll,
-                    LookModeShowAssetListView
-                );
-                headerRect.x = 1;
-                headerRect.width -= 2;
-                foreach (var data in CurrentPageValues.CurrentPageValues)
-                {
-                    LookModeCollectorsPageSize += data.Size;
-                    OnDrawLookDataItem(headerRect, data);
-                    headerRect.y += headerRect.height;
-                }
-
-                GUI.EndScrollView();
-            }
-
-            GUILayout.EndArea();
-
+            if (!LookModeShowAssetDetail) ViewDetailList.width = CurrentWidth;
+            else ViewDetailList.MaxWidth = CurrentWidth - 300;
+            ViewDetailList.height = CurrentHeight - DrawHeaderHeight;
+            ViewDetailList.IsAllowHorizontal = LookModeShowAssetDetail;
+            ViewDetailList.Draw(OnDrawLookModeAssetList, GEStyle.Badge);
             if (LookModeShowAssetDetail)
             {
-                OnDragRectDetailsView = new Rect(LookModeShowAssetListRect.width, LookModeShowAssetListRect.y,
-                    10, LookModeShowAssetListRect.height);
-
-                LookModeShowAssetDetailRect = new Rect(
-                    LookModeShowAssetListRect.width + 10,
-                    LookModeShowAssetListRect.y + 3,
-                    CurrentWidth - LookModeShowAssetListRect.width - 10,
-                    LookModeShowAssetListRect.height + 23);
-                GUILayout.BeginArea(LookModeShowAssetDetailRect, GEStyle.Badge);
-                OnDrawLookModeAssetDetail();
-                GUILayout.EndArea();
-
-                EditorGUIUtility.AddCursorRect(OnDragRectDetailsView, MouseCursor.ResizeHorizontal);
+                ViewDetails.IsShow = true;
+                ViewDetails.x = ViewDetailList.width;
+                ViewDetails.width = CurrentWidth - ViewDetailList.width;
+                ViewDetails.height = ViewDetailList.height - 3;
+                ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
             }
+        }
+
+        private void OnDrawLookModeAssetList()
+        {
+            var headerRect = new Rect(0, 0, ViewDetailList.width, 20);
+            if (LookModeShowAssetDetail)
+            {
+                headerRect.width -= ViewDetailList.DragHorizontalWidth;
+            }
+
+            OnDrawLookModeHeader(headerRect);
+            if (CurrentPageValues.Count <= 0) return;
+
+            LookModeShowAssetListView.width = headerRect.width - 15;
+            LookModeShowAssetListView.height = headerRect.height * CurrentPageValues.CurrentPageValues.Length;
+
+            var rect = new Rect(0, headerRect.y + headerRect.height, headerRect.width,
+                ViewDetailList.height - headerRect.y - headerRect.height);
+            OnDrawLookDataScroll = GUI.BeginScrollView(rect, OnDrawLookDataScroll, LookModeShowAssetListView);
+
+            headerRect.x = 1;
+            headerRect.width -= 2;
+            LookModeCollectorsPageSize = 0;
+            foreach (var data in CurrentPageValues.CurrentPageValues)
+            {
+                LookModeCollectorsPageSize += data.Size;
+                OnDrawLookDataItem(headerRect, data);
+                headerRect.y += headerRect.height;
+            }
+
+            GUI.EndScrollView();
         }
 
         /// <summary>
@@ -355,6 +365,12 @@ namespace AIO.UEditor
                     EditorGUILayout.LabelField($"{AssetDatabase.IsSubAsset(LookModeCurrentSelectAsset)}");
                 }
 
+                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
+                {
+                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_Tags);
+                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Tags);
+                }
+
                 using (new EditorGUILayout.VerticalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
                 {
                     EditorGUILayout.LabelField($"Dependencies({Dependencies.Count})", GEStyle.HeaderLabel);
@@ -410,14 +426,15 @@ namespace AIO.UEditor
                 }
             }
 
-            if (LookModeDisplayCollectorsTypeIndex < 1) filter++;
+            if (LookModeDisplayTypeIndex < 1) filter++;
             else
             {
-                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath).FullName;
+                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath)?.FullName;
+                if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
                 var status = 1L;
-                foreach (var display in LookModeDisplayCollectorTypes[(CurrentPackageIndex, CurrentGroupIndex)])
+                foreach (var display in LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)])
                 {
-                    if ((LookModeDisplayCollectorsTypeIndex & status) == status && objectType == display)
+                    if ((LookModeDisplayTypeIndex & status) == status && objectType == display)
                     {
                         filter++;
                         break;
@@ -426,6 +443,24 @@ namespace AIO.UEditor
                     status *= 2;
                 }
             }
+
+            if (LookModeDisplayTagsIndex < 1) filter++;
+            else
+            {
+                var status = 1L;
+                foreach (var display in LookModeDisplayTags[(CurrentPackageIndex, CurrentGroupIndex)])
+                {
+                    if ((LookModeDisplayTagsIndex & status) == status &&
+                        data.Tags.Split(';').Contains(display))
+                    {
+                        filter++;
+                        break;
+                    }
+
+                    status *= 2;
+                }
+            }
+
 
             if (string.IsNullOrEmpty(SearchText)) filter++;
             else
@@ -440,7 +475,7 @@ namespace AIO.UEditor
                 }
             }
 
-            return filter != 3;
+            return filter != 4;
         }
 
         private void OnDrawLookModeHeader(Rect rect)
@@ -516,6 +551,7 @@ namespace AIO.UEditor
                     Dependencies[dependency] = AssetDatabase.LoadAssetAtPath<Object>(dependency);
                 }
 
+                ViewDetailList.width = CurrentWidth / 2;
                 GUI.FocusControl(null);
             }
 
@@ -573,6 +609,7 @@ namespace AIO.UEditor
 
             if (!LookModeDisplayGroups.ContainsKey(LookModeDisplayPackages[i])) UpdateDataLookModeGroup(i);
 
+            LookModeDisplayTags[(i, j)] = Data.Packages[i].Groups[j].GetTags();
             LookModeDisplayCollectors[(i, j)] = new string[Data.Packages[i].Groups[j].Collectors.Length];
             LookModeData[(i, j)] = new List<AssetDataInfo>();
             var ListType = new List<string>();
@@ -581,7 +618,7 @@ namespace AIO.UEditor
                 Data.Packages[i].Groups[j].Collectors[k]
                     .CollectAsset(Data.Packages[i].Name, Data.Packages[i].Groups[j].Name);
                 LookModeDisplayCollectors[(i, j)][k] =
-                    Data.Packages[i].Groups[j].Collectors[k].CollectPath.Replace('/', '\\');
+                    Data.Packages[i].Groups[j].Collectors[k].CollectPath.Replace('/', '\\').Trim('\\');
 
                 foreach (var assetDataInfo in Data.Packages[i].Groups[j].Collectors[k].AssetDataInfos)
                 {
@@ -609,7 +646,7 @@ namespace AIO.UEditor
                 }
             }
 
-            LookModeDisplayCollectorTypes[(i, j)] = ListType.ToArray();
+            LookModeDisplayTypes[(i, j)] = ListType.ToArray();
 
             if (RepeatList.Count > 0)
             {
@@ -625,7 +662,7 @@ namespace AIO.UEditor
             }
         }
 
-        private void UpdateDataLook()
+        private void UpdateDataLookMode()
         {
             GUI.FocusControl(null);
             if (Data.Packages.Length == 0)
@@ -651,9 +688,12 @@ namespace AIO.UEditor
             if (LookModeDisplayCollectors is null) LookModeDisplayCollectors = new Dictionary<(int, int), string[]>();
             else LookModeDisplayCollectors.Clear();
 
-            if (LookModeDisplayCollectorTypes is null)
-                LookModeDisplayCollectorTypes = new Dictionary<(int, int), string[]>();
-            else LookModeDisplayCollectorTypes.Clear();
+            if (LookModeDisplayTags is null) LookModeDisplayTags = new Dictionary<(int, int), string[]>();
+            else LookModeDisplayTags.Clear();
+
+            if (LookModeDisplayTypes is null)
+                LookModeDisplayTypes = new Dictionary<(int, int), string[]>();
+            else LookModeDisplayTypes.Clear();
 
             if (LookModeDisplayGroups is null) LookModeDisplayGroups = new Dictionary<string, string[]>();
             else LookModeDisplayGroups.Clear();
@@ -667,7 +707,7 @@ namespace AIO.UEditor
             CurrentPageValues.Clear();
             CurrentPageValues.Add(LookModeData[(CurrentPackageIndex, CurrentGroupIndex)]);
             CurrentPageValues.PageIndex = 0;
-            LookModeCollectorsALLSize = CurrentPageValues.CurrentPageValues.Sum(data => data.Size);
+            LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
             LookModeDataPageValueSort(ESort.LastWrite, true);
         }
     }

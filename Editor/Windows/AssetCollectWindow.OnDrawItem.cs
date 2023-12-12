@@ -53,12 +53,8 @@ namespace AIO.UEditor
 
                     if (GELayout.Button(GC_OPEN, 24))
                     {
-                        // OnDrawCurrentItem = item;
-                        // OnDrawCurrentItem.CollectAsset(
-                        //     Data.Packages[CurrentPackageIndex].Name,
-                        //     Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
                         WindowMode = Mode.Look;
-                        UpdateDataLook();
+                        UpdateDataLookMode();
                         var status = 1;
                         foreach (var collector in Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
                                      .Collectors)

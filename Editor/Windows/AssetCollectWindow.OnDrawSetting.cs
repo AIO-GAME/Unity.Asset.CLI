@@ -12,7 +12,7 @@ namespace AIO.UEditor
     {
         partial void OnDrawSetting()
         {
-            var width = GTOption.Width(DrawWidthSettingView - 20);
+            var width = GTOption.Width(ViewSetting.width - 20);
             using (GELayout.Vertical(GEStyle.GridList, width))
             {
                 using (GELayout.VHorizontal())
@@ -20,7 +20,7 @@ namespace AIO.UEditor
                     GELayout.Label("⇘", GEStyle.TEtoolbarbutton, GP_Width_20);
                     if (GELayout.Button("Setting", GEStyle.PreToolbar))
                     {
-                        ShowSetting = false;
+                        ViewSetting.IsShow = false;
                         GUI.FocusControl(null);
                     }
                 }

@@ -5,7 +5,8 @@
 |*|============|*/
 
 using System;
-using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 
 namespace AIO
 {
@@ -20,11 +21,6 @@ namespace AIO
         public string AssetPath;
 
         /// <summary>
-        /// Asset GUID
-        /// </summary>
-        public string GUID;
-
-        /// <summary>
         /// Asset Address
         /// </summary>
         public string Address;
@@ -35,9 +31,9 @@ namespace AIO
         public string Extension;
 
         /// <summary>
-        /// Asset Name
+        /// Asset Tags
         /// </summary>
-        public string Name;
+        public string Tags;
 
         /// <summary>
         /// Asset Collect Path
@@ -47,12 +43,86 @@ namespace AIO
         /// <summary>
         /// Asset Size
         /// </summary>
-        public long Size;
+        public long Size
+        {
+            get
+            {
+                if (_size == default)
+                {
+                    _size = AHelper.IO.GetFileLength(AssetPath);
+                }
+
+                return _size;
+            }
+        }
+
+        /// <summary>
+        /// Asset GUID
+        /// </summary>
+        public string GUID
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_guid))
+                {
+                    _guid = AssetDatabase.AssetPathToGUID(AssetPath);
+                }
+
+                return _guid;
+            }
+        }
 
         /// <summary>
         /// Asset Last Imported
         /// </summary>
-        public DateTime LastWriteTime;
+        public DateTime LastWriteTime
+        {
+            get
+            {
+                if (_lastWriteTime == default)
+                {
+                    _lastWriteTime = AHelper.IO.GetFileLastWriteTimeUtc(AssetPath);
+                }
+
+                return _lastWriteTime;
+            }
+        }
+
+        /// <summary>
+        /// Asset Name
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_name))
+                {
+                    _name = Path.GetFileNameWithoutExtension(AssetPath);
+                }
+
+                return _name;
+            }
+        }
+
+        /// <summary>
+        /// Asset Type
+        /// </summary>
+        public string Type
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_type)) return _type;
+                _type = AssetDatabase.GetMainAssetTypeAtPath(AssetPath)?.FullName;
+                if (string.IsNullOrEmpty(_type)) _type = "Unknown";
+                return _type;
+            }
+        }
+
+        private string _name;
+        private DateTime _lastWriteTime;
+        private long _size;
+        private string _type;
+        public string _guid;
     }
 
     public static class ExtensionAssetDataInfo

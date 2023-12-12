@@ -4,7 +4,6 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -74,9 +73,6 @@ namespace AIO.UEditor
         {
             using (GELayout.Vertical(GEStyle.GridList))
             {
-                FoldoutConfigSetting =
-                    GELayout.VFoldoutHeaderGroupWithHelp(OnDrawASConfig, "Config Setting", FoldoutConfigSetting);
-
                 GELayout.Space();
 
                 FoldoutPackageInfo =

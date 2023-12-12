@@ -4,7 +4,6 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AIO.UEngine;
@@ -19,12 +18,12 @@ namespace AIO.UEditor
     [GWindow("资源收集管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
         Group = "Tools",
         Menu = "AIO/Window/Asset",
-        MinSizeHeight = 500,
+        MinSizeHeight = 550,
         MinSizeWidth = 1000
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
-        [LnkTools("Asset Window", "#00BFFF", "d_Folder Icon", LnkToolsMode.AllMode, -5)]
+        [LnkTools("Asset Window", "#00BFFF", "d_Folder Icon", LnkToolsMode.AllMode, 0)]
         public static void OpenWindow()
         {
             EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
@@ -51,17 +50,6 @@ namespace AIO.UEditor
             if (BuildConfig is null) BuildConfig = ASBuildConfig.GetOrCreate();
             else BuildConfig.Save();
 
-            Data.Packages = Data.Packages.OrderByDescending(package => package.Name).ToArray();
-            for (var i = 0; i < Data.Packages.Length; i++)
-            {
-                if (Data.Packages[CurrentPackageIndex]?.Groups is null) continue;
-                for (var j = 0; j < Data.Packages[CurrentPackageIndex].Groups.Length; j++)
-                {
-                    Data.Packages[CurrentPackageIndex].Groups = Data.Packages[CurrentPackageIndex].Groups
-                        .OrderByDescending(group => group.Name).ToArray();
-                }
-            }
-
             if (_packages is null)
                 _packages = Config.Packages is null
                     ? new List<AssetsPackageConfig>()
@@ -72,22 +60,28 @@ namespace AIO.UEditor
             UpdateData();
         }
 
+        /// <summary>
+        /// 更新数据
+        /// </summary>
         protected void UpdateData()
         {
             switch (WindowMode)
             {
+                default:
                 case Mode.Editor:
                     UpdateDataRecordQueue();
                     break;
                 case Mode.Look:
-                    UpdateDataLook();
+                    UpdateDataLookMode();
                     break;
                 case Mode.Build:
-                    UpdateDataBuild();
+                    UpdateDataBuildMode();
+                    break;
+                case Mode.Tags:
+                    this.StartCoroutine(UpdateDataTagsMode());
                     break;
             }
         }
-
 
         #region 绘制
 
@@ -103,13 +97,16 @@ namespace AIO.UEditor
             {
                 default:
                 case Mode.Editor:
-                    OnDrawNoLook();
+                    OnDrawEditorMode();
                     break;
                 case Mode.Look:
                     OnDrawLookMode();
                     break;
                 case Mode.Build:
-                    OnDrawBuild();
+                    OnDrawBuildMode();
+                    break;
+                case Mode.Tags:
+                    OnDrawTagsMode();
                     break;
             }
 
@@ -117,53 +114,9 @@ namespace AIO.UEditor
             OnOpenEvent();
         }
 
-        protected void OnDrawNoLook()
-        {
-            DoDrawRect.x = 5;
-            DoDrawRect.height = CurrentHeight - DrawHeaderHeight;
-            if (ShowSetting)
-            {
-                DoDrawRect.width = DrawWidthSettingView - 5;
-                GULayout.BeginArea(DoDrawRect, GEStyle.INThumbnailShadow);
-                OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll);
-                GULayout.EndArea();
-                DoDrawRect.x += DrawWidthSettingView;
-
-                OnDragRectSettingView = new Rect(DoDrawRect.x - 5, DoDrawRect.y, 5, DoDrawRect.height);
-                EditorGUIUtility.AddCursorRect(OnDragRectSettingView, MouseCursor.ResizeHorizontal);
-            }
-
-            if (ShowPackage)
-            {
-                DoDrawRect.width = DrawWidthPackageList - 5;
-                GULayout.BeginArea(DoDrawRect, GEStyle.INThumbnailShadow);
-                OnDrawPackageScroll = GELayout.VScrollView(OnDrawPackage, OnDrawPackageScroll);
-                GULayout.EndArea();
-                DoDrawRect.x += DrawWidthPackageList;
-
-                OnDragRectPackageList = new Rect(DoDrawRect.x - 5, DoDrawRect.y, 5, DoDrawRect.height);
-                EditorGUIUtility.AddCursorRect(OnDragRectPackageList, MouseCursor.ResizeHorizontal);
-            }
-
-            if (ShowGroup)
-            {
-                DoDrawRect.width = DrawWidthGroupList - 5;
-                GULayout.BeginArea(DoDrawRect, GEStyle.INThumbnailShadow);
-                OnDrawGroupScroll = GELayout.VScrollView(OnDrawGroup, OnDrawGroupScroll);
-                GULayout.EndArea();
-                DoDrawRect.x += DrawWidthGroupList;
-
-                OnDragRectGroupList = new Rect(DoDrawRect.x - 5, DoDrawRect.y, 5, DoDrawRect.height);
-                EditorGUIUtility.AddCursorRect(OnDragRectGroupList, MouseCursor.ResizeHorizontal);
-            }
-
-            DoDrawRect.width = CurrentWidth - DoDrawRect.x - 5;
-            GULayout.BeginArea(DoDrawRect);
-            OnDrawGroupListScroll = GELayout.VScrollView(OnDrawGroupList, OnDrawGroupListScroll);
-            GULayout.EndArea();
-        }
-
-        partial void OnDrawBuild();
+        partial void OnDrawEditorMode();
+        partial void OnDrawTagsMode();
+        partial void OnDrawBuildMode();
         partial void OnDrawLookMode();
         partial void OnDrawHeader();
         partial void OnDrawSetting();
@@ -207,26 +160,14 @@ namespace AIO.UEditor
             switch (WindowMode)
             {
                 case Mode.Editor:
-                    if (OnDragRectSettingView.Contains(eventData.mousePosition))
-                    {
-                        OnDragRectSettingViewing = true;
-                    }
-                    else if (OnDragRectPackageList.Contains(eventData.mousePosition))
-                    {
-                        OnDragRectPackageListViewing = true;
-                    }
-                    else if (OnDragRectGroupList.Contains(eventData.mousePosition))
-                    {
-                        OnDragRectGroupListViewing = true;
-                    }
-
+                    ViewConfig.ContainsHorizontal(eventData);
+                    ViewGroupList.ContainsHorizontal(eventData);
+                    ViewPackageList.ContainsHorizontal(eventData);
+                    ViewSetting.ContainsHorizontal(eventData);
                     break;
+                case Mode.Tags:
                 case Mode.Look:
-                    if (OnDragRectDetailsView.Contains(eventData.mousePosition))
-                    {
-                        OnDragRectDetailsViewing = true;
-                    }
-
+                    ViewDetailList.ContainsHorizontal(eventData);
                     break;
                 case Mode.Build:
                 default:
@@ -240,70 +181,16 @@ namespace AIO.UEditor
             {
                 case Mode.Editor:
                 {
-                    if (OnDragRectSettingViewing)
-                    {
-                        var temp = DrawWidthSettingView + eventData.delta.x;
-                        if (temp < 100)
-                        {
-                            DrawWidthSettingView = 100;
-                            eventData.Use();
-                            break;
-                        }
-
-                        var t = CurrentWidth - temp;
-                        if (ShowGroup) t -= DrawWidthGroupList;
-                        if (ShowPackage) t -= DrawWidthPackageList;
-                        if (t < 100) break;
-                        DrawWidthSettingView = temp;
-                        eventData.Use();
-                    }
-
-                    else if (OnDragRectPackageListViewing)
-                    {
-                        var temp = DrawWidthPackageList + eventData.delta.x;
-                        if (temp < 100)
-                        {
-                            DrawWidthPackageList = 100;
-                            eventData.Use();
-                            break;
-                        }
-
-                        var t = CurrentWidth - temp;
-                        if (ShowSetting) t -= DrawWidthSettingView;
-                        if (ShowGroup) t -= DrawWidthGroupList;
-                        if (t < 100) break;
-                        DrawWidthPackageList = temp;
-                        eventData.Use();
-                    }
-
-                    else if (OnDragRectGroupListViewing)
-                    {
-                        var temp = DrawWidthGroupList + eventData.delta.x;
-                        if (temp < 100)
-                        {
-                            DrawWidthGroupList = 100;
-                            eventData.Use();
-                            break;
-                        }
-
-                        var t = CurrentWidth - temp;
-                        if (ShowSetting) t -= DrawWidthSettingView;
-                        if (ShowPackage) t -= DrawWidthPackageList;
-                        if (t < 100) break;
-                        DrawWidthGroupList = temp;
-                        eventData.Use();
-                    }
-
+                    ViewConfig.DragHorizontal(eventData);
+                    ViewGroupList.DragHorizontal(eventData);
+                    ViewPackageList.DragHorizontal(eventData);
+                    ViewSetting.DragHorizontal(eventData);
                     break;
                 }
+                case Mode.Tags:
                 case Mode.Look:
                 {
-                    if (!OnDragRectDetailsViewing) return;
-                    var temp = LookModeShowAssetListWidth + eventData.delta.x;
-                    if (temp < LookModeShowAssetListMinWidth) break;
-                    if (CurrentWidth - temp < LookModeShowAssetDetailMinWidth) break;
-                    LookModeShowAssetListWidth = temp;
-                    eventData.Use();
+                    ViewDetailList.DragHorizontal(eventData);
                     break;
                 }
                 case Mode.Build:
@@ -312,10 +199,46 @@ namespace AIO.UEditor
             }
         }
 
+        public override void EventKeyDown(in Event eventData, in KeyCode keyCode)
+        {
+            switch (WindowMode)
+            {
+                case Mode.Tags:
+                case Mode.Look:
+                {
+                    if (keyCode == KeyCode.LeftArrow) // 数字键盘 右键
+                    {
+                        if (CurrentPageValues.PageIndex > 0)
+                        {
+                            CurrentPageValues.PageIndex -= 1;
+                            eventData.Use();
+                        }
+                    }
+                    else if (keyCode == KeyCode.RightArrow) // 数字键盘 左键 
+                    {
+                        if (CurrentPageValues.PageIndex < CurrentPageValues.PageCount - 1)
+                        {
+                            CurrentPageValues.PageIndex += 1;
+                            eventData.Use();
+                        }
+                    }
+
+                    break;
+                }
+                case Mode.Editor:
+                case Mode.Build:
+                default:
+                    break;
+            }
+        }
+
         public override void EventMouseUp(in Event eventData)
         {
-            OnDragRectSettingViewing = OnDragRectGroupListViewing =
-                OnDragRectPackageListViewing = OnDragRectDetailsViewing = false;
+            ViewDetailList.CancelHorizontal();
+            ViewConfig.CancelHorizontal();
+            ViewGroupList.CancelHorizontal();
+            ViewPackageList.CancelHorizontal();
+            ViewSetting.CancelHorizontal();
         }
     }
 }

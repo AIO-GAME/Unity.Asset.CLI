@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AIO.UEditor
@@ -43,6 +44,22 @@ namespace AIO.UEditor
             return Collectors
                 .Where(collectItem => !(collectItem is null))
                 .FirstOrDefault(collectItem => collectItem.CollectPath == collectPath);
+        }
+
+
+        public string[] GetTags()
+        {
+            var dictionary = new Dictionary<string, bool>();
+            foreach (var collect in Collectors)
+            {
+                if (string.IsNullOrEmpty(collect.Tags)) continue;
+                foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
+            }
+
+            if (string.IsNullOrEmpty(Tags)) return dictionary.Keys.ToArray();
+
+            foreach (var tag in Tags.Split(';')) dictionary[tag] = true;
+            return dictionary.Keys.ToArray();
         }
     }
 }
