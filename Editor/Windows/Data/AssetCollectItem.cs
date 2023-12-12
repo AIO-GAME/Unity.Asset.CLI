@@ -49,11 +49,11 @@ namespace AIO.UEditor
         /// </summary>
         public Object Path;
 
-        private string _GUID;
+        [NonSerialized] private string _GUID;
 
-        private string _CollectPath;
+        [NonSerialized] private string _CollectPath;
 
-        private string _FileName;
+        [NonSerialized] private string _FileName;
 
         /// <summary>
         /// 自定义数据
@@ -300,16 +300,17 @@ namespace AIO.UEditor
                 GroupName = group,
                 CollectPath = CollectPath,
             };
-            var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, data.CollectPath);
+            var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
             var info = new AssetDataInfo
             {
                 CollectPath = data.CollectPath,
                 Tags = tags.Length == 0 ? string.Empty : string.Join(";", tags),
             };
-            if (AssetDatabase.IsValidFolder(data.CollectPath)) // 判断Path是否为文件夹
+
+            if (AssetDatabase.IsValidFolder(CollectPath)) // 判断Path是否为文件夹
             {
                 // 获取文件夹下所有文件
-                foreach (var file in EHelper.IO.GetFilesRelativeAssetNoMeta(data.CollectPath,
+                foreach (var file in EHelper.IO.GetFilesRelativeAssetNoMeta(CollectPath,
                              SearchOption.AllDirectories))
                 {
                     var fixedPath = file.Replace("\\", "/");
@@ -323,7 +324,7 @@ namespace AIO.UEditor
                     data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
                     if (!IsCollectAsset(data)) continue;
                     info.Address = GetAssetAddress(data);
-                    info.AssetPath = fixedPath;
+                    info.AssetPath =fixedPath;
                     info.Extension = data.Extension;
                     AssetDataInfos[fixedPath] = info;
                 }
@@ -375,22 +376,7 @@ namespace AIO.UEditor
             get
             {
                 if (Path is null) return string.Empty;
-                if (!string.IsNullOrEmpty(_CollectPath)) return _CollectPath;
-
-                _CollectPath = AssetDatabase.GetAssetPath(Path);
-                if (string.IsNullOrEmpty(_CollectPath)) return string.Empty;
-                if (AssetDatabase.IsValidFolder(_CollectPath))
-                {
-                    _CollectPath = _CollectPath.Replace("\\", "/");
-                    if (!_CollectPath.EndsWith("/")) _CollectPath = string.Concat(_CollectPath, "/");
-                }
-                else
-                {
-                    _CollectPath = _CollectPath.Replace("\\", "/");
-                    if (_CollectPath.EndsWith("/"))
-                        _CollectPath = _CollectPath.Substring(0, _CollectPath.Length - 1);
-                }
-
+                if (string.IsNullOrEmpty(_CollectPath)) _CollectPath = AssetDatabase.GetAssetPath(Path);
                 return _CollectPath;
             }
         }

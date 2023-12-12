@@ -612,7 +612,7 @@ namespace AIO.UEditor
             LookModeDisplayTags[(i, j)] = Data.Packages[i].Groups[j].GetTags();
             LookModeDisplayCollectors[(i, j)] = new string[Data.Packages[i].Groups[j].Collectors.Length];
             LookModeData[(i, j)] = new List<AssetDataInfo>();
-            var ListType = new List<string>();
+            var ListType = new Dictionary<string, byte>();
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
             {
                 Data.Packages[i].Groups[j].Collectors[k]
@@ -635,18 +635,12 @@ namespace AIO.UEditor
                     }
                     else CatchList.Add(assetDataInfo.Key, assetDataInfo.Value.Address);
 
-                    var type = AssetDatabase.GetMainAssetTypeAtPath(assetDataInfo.Value.AssetPath);
-                    if (type is null)
-                    {
-                        if (!ListType.Contains("Unknown")) ListType.Add("Unknown");
-                    }
-                    else if (!ListType.Contains(type.FullName)) ListType.Add(type.FullName);
-
+                    ListType[assetDataInfo.Value.Type] = 1;
                     LookModeData[(i, j)].Add(assetDataInfo.Value);
                 }
             }
 
-            LookModeDisplayTypes[(i, j)] = ListType.ToArray();
+            LookModeDisplayTypes[(i, j)] = ListType.Keys.ToArray();
 
             if (RepeatList.Count > 0)
             {
@@ -671,14 +665,14 @@ namespace AIO.UEditor
                 return;
             }
 
+            if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0)
+                CurrentPackageIndex = 0;
+
             if (Data.Packages[CurrentPackageIndex].Groups.Length == 0)
             {
                 CurrentGroupIndex = 0;
                 return;
             }
-
-            if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0)
-                CurrentPackageIndex = 0;
 
             if (Data.Packages[CurrentPackageIndex].Groups.Length <= CurrentGroupIndex || CurrentGroupIndex < 0)
                 CurrentGroupIndex = 0;
@@ -705,9 +699,11 @@ namespace AIO.UEditor
 
             UpdateDataLookModeCollector(CurrentPackageIndex, CurrentGroupIndex);
             CurrentPageValues.Clear();
-            CurrentPageValues.Add(LookModeData[(CurrentPackageIndex, CurrentGroupIndex)]);
+            CurrentPageValues.Add(LookModeData[(CurrentPackageIndex, CurrentGroupIndex)]
+                .Where(data => !LookModeDataFilter(data)));
             CurrentPageValues.PageIndex = 0;
             LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
+            LookModeCollectorsPageSize = 0;
             LookModeDataPageValueSort(ESort.LastWrite, true);
         }
     }
