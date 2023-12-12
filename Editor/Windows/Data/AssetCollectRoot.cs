@@ -43,12 +43,14 @@ namespace AIO.UEditor
             return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
         }
 
+        private static AssetCollectRoot _Instance;
+
         /// <summary>
         /// 获取资源收集配置
         /// </summary>
         public static AssetCollectRoot GetOrCreate()
         {
-            AssetCollectRoot collect = null;
+            if (_Instance) return _Instance;
             var objects = EHelper.IO.GetScriptableObjects<AssetCollectRoot>();
             if (objects != null && objects.Length > 0)
             {
@@ -56,36 +58,36 @@ namespace AIO.UEditor
                 {
                     if (asset is null) continue;
                     if (asset.Packages is null) asset.Packages = new AssetCollectPackage[] { };
-                    collect = asset;
+                    _Instance = asset;
                     break;
                 }
             }
 
-            if (collect is null)
+            if (_Instance is null)
             {
-                collect = CreateInstance<AssetCollectRoot>();
-                collect.Packages = new AssetCollectPackage[] { };
-                AssetDatabase.CreateAsset(collect, "Assets/Editor/AssetCollectRoot.asset");
+                _Instance = CreateInstance<AssetCollectRoot>();
+                _Instance.Packages = new AssetCollectPackage[] { };
+                AssetDatabase.CreateAsset(_Instance, "Assets/Editor/AssetCollectRoot.asset");
                 AssetDatabase.SaveAssets();
             }
 
 
-            for (var i = 0; i < collect.Packages.Length; i++)
+            for (var i = 0; i < _Instance.Packages.Length; i++)
             {
-                if (collect.Packages[i] is null)
-                    collect.Packages[i] = new AssetCollectPackage();
-                if (collect.Packages[i].Groups is null)
-                    collect.Packages[i].Groups = new AssetCollectGroup[] { };
+                if (_Instance.Packages[i] is null)
+                    _Instance.Packages[i] = new AssetCollectPackage();
+                if (_Instance.Packages[i].Groups is null)
+                    _Instance.Packages[i].Groups = new AssetCollectGroup[] { };
 
-                for (var j = 0; j < collect.Packages[i].Groups.Length; j++)
+                for (var j = 0; j < _Instance.Packages[i].Groups.Length; j++)
                 {
-                    collect.Packages[i].Groups = collect.Packages[i].Groups
+                    _Instance.Packages[i].Groups = _Instance.Packages[i].Groups
                         .OrderByDescending(group => group.Name).ToArray();
                 }
             }
 
-            collect.Packages = collect.Packages.OrderByDescending(package => package.Name).ToArray();
-            return collect;
+            _Instance.Packages = _Instance.Packages.OrderByDescending(package => package.Name).ToArray();
+            return _Instance;
         }
 
         public string[] GetTags()
@@ -154,7 +156,7 @@ namespace AIO.UEditor
             return dictionary.Keys.ToArray();
         }
 
-        public string[] GetTags(string packageName, string groupName, string GUID)
+        public string[] GetTags(string packageName, string groupName, string CollectPath)
         {
             var dictionary = new Dictionary<string, bool>();
             foreach (var package in Packages)
@@ -165,7 +167,7 @@ namespace AIO.UEditor
                     if (group.Name != groupName) continue;
                     foreach (var collect in group.Collectors)
                     {
-                        if (collect.GUID != GUID) continue;
+                        if (collect.CollectPath != CollectPath) continue;
                         if (string.IsNullOrEmpty(collect.Tags)) continue;
                         foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
                     }

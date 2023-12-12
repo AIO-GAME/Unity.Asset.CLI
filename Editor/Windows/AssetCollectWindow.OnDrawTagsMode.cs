@@ -5,12 +5,11 @@
 |*|============|*/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
@@ -48,8 +47,14 @@ namespace AIO.UEditor
 
             if (TagsModeDisplayCollectors.Length > 0)
             {
-                LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
-                    TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
+                if (TagsModeDisplayCollectors.Length > 31)
+                {
+                    LookModeDisplayCollectorsIndex = EditorGUILayout.Popup(LookModeDisplayCollectorsIndex,
+                        TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
+                }
+                else
+                    LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
+                        TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
             }
 
             if (TagsModeDisplayTypes.Length > 0)
@@ -95,7 +100,7 @@ namespace AIO.UEditor
                 LookModeCurrentSelectAsset = null;
                 SearchText = string.Empty;
                 LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
-                UpdateDataTagsMode();
+                this.StartCoroutine(UpdateDataTagsMode());
             }
         }
 
@@ -105,27 +110,39 @@ namespace AIO.UEditor
         private bool TagsModeDataFilter(AssetDataInfo data)
         {
             var filter = 0;
-            if (LookModeDisplayCollectorsIndex < 1) filter++;
+            if (TagsModeDisplayCollectors.Length > 31)
+            {
+                if (LookModeDisplayCollectorsIndex == 0 ||
+                    TagsModeDisplayCollectors[LookModeDisplayCollectorsIndex] ==
+                    data.CollectPath.Replace('\\', '/'))
+                    filter++;
+            }
             else
             {
-                var status = 1L;
-                foreach (var display in TagsModeDisplayCollectors)
+                if (LookModeDisplayCollectorsIndex < 1) filter++;
+                else
                 {
-                    if ((LookModeDisplayCollectorsIndex & status) == status &&
-                        display == data.CollectPath.Replace('/', '\\'))
+                    var status = 1L;
+                    foreach (var display in TagsModeDisplayCollectors)
                     {
-                        filter++;
-                        break;
-                    }
+                        if ((LookModeDisplayCollectorsIndex & status) == status &&
+                            display == data.CollectPath.Replace('/', '\\'))
+                        {
+                            filter++;
+                            break;
+                        }
 
-                    status *= 2;
+                        status *= 2;
+                    }
                 }
             }
+
 
             if (LookModeDisplayTypeIndex < 1) filter++;
             else
             {
-                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath).FullName;
+                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath)?.FullName;
+                if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
                 var status = 1L;
                 foreach (var display in TagsModeDisplayTypes)
                 {
@@ -196,14 +213,19 @@ namespace AIO.UEditor
             }
         }
 
-        private void UpdateDataTagsMode()
+        private IEnumerator UpdateDataTagsMode()
         {
             GUI.FocusControl(null);
             CurrentPageValues.Clear();
+            CurrentPageValues.PageIndex = 0;
             CurrentTagValues.Clear();
-            if (Data.Packages.Length == 0) return;
+            if (Data.Packages.Length == 0) yield break;
+            TagsModeDisplayCollectors = new string[] { "ALL" };
+            TagsModeDisplayTypes = Array.Empty<string>();
+            TagsModeDisplayTags = Data.GetTags();
             var collectors = new Dictionary<string, byte>();
             var types = new Dictionary<string, byte>();
+            var Dict = new Dictionary<string, AssetDataInfo>();
             foreach (var package in Data.Packages)
             {
                 if (package?.Groups is null) continue;
@@ -215,24 +237,37 @@ namespace AIO.UEditor
                     foreach (var collector in group.Collectors)
                     {
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
-
                         collector.CollectAsset(package.Name, group.Name);
-                        collectors[collector.CollectPath.Replace('/', '\\')] = 1;
+                        collectors[collector.CollectPath.Replace('/', '\\').Trim('\\')] = 1;
                         foreach (var pair in collector.AssetDataInfos)
                         {
+                            if (Dict.ContainsKey(pair.Key)) continue;
                             CurrentTagValues.Add(pair.Value);
+                            CurrentPageValues.Add(pair.Value);
+                            Dict[pair.Key] = pair.Value;
                             types[pair.Value.Type] = 1;
+                            LookModeCollectorsALLSize += pair.Value.Size;
                         }
                     }
                 }
             }
 
-            TagsModeDisplayTags = Data.GetTags();
             TagsModeDisplayTypes = types.Keys.ToArray();
-            TagsModeDisplayCollectors = collectors.Keys.ToArray();
-            CurrentPageValues.Add(CurrentTagValues);
+            if (collectors.Count > 31)
+            {
+                TagsModeDisplayCollectors = new string[collectors.Count + 1];
+                TagsModeDisplayCollectors[0] = "ALL";
+                var tempIndex = 1;
+                foreach (var key in collectors.Keys)
+                {
+                    TagsModeDisplayCollectors[tempIndex++] = key.Replace('\\', '/');
+                }
+            }
+            else TagsModeDisplayCollectors = collectors.Keys.ToArray();
+
+            if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
+
             CurrentPageValues.PageIndex = 0;
-            LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
             LookModeDataPageValueSort(ESort.LastWrite, true);
         }
     }

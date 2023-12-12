@@ -222,7 +222,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 查询模式 当前选择包索引
         /// </summary>
-        private PageList<AssetDataInfo> CurrentPageValues = new PageList<AssetDataInfo>();
+        private PageList<AssetDataInfo> CurrentPageValues;
 
         /// <summary>
         /// 包列表
@@ -326,9 +326,9 @@ namespace AIO.UEditor
         private string[] TagsModeDisplayTags;
 
         private string[] TagsModeDisplayCollectors;
-        
+
         private string[] TagsModeDisplayTypes;
-        
+
         /// <summary>
         /// 标签模式 当前所有资源
         /// </summary>
@@ -540,18 +540,6 @@ namespace AIO.UEditor
             GC_LookMode_Page_Size = EditorGUIUtility.IconContent("d_CustomSorting");
             GC_LookMode_Page_Size.tooltip = "设置页面大小";
 
-            LookDataPageSizeMenu = new GenericMenu();
-            LookDataPageSizeMenu.AddItem(new GUIContent("10"), CurrentPageValues.PageSize == 10,
-                () => { CurrentPageValues.PageSize = 10; });
-            LookDataPageSizeMenu.AddItem(new GUIContent("20"), CurrentPageValues.PageSize == 20,
-                () => { CurrentPageValues.PageSize = 20; });
-            LookDataPageSizeMenu.AddItem(new GUIContent("30"), CurrentPageValues.PageSize == 30,
-                () => { CurrentPageValues.PageSize = 30; });
-            LookDataPageSizeMenu.AddItem(new GUIContent("40"), CurrentPageValues.PageSize == 40,
-                () => { CurrentPageValues.PageSize = 40; });
-            LookDataPageSizeMenu.AddItem(new GUIContent("50"), CurrentPageValues.PageSize == 50,
-                () => { CurrentPageValues.PageSize = 50; });
-
             GC_LookMode_Detail_Tags = new GUIContent("Tags", "资源标签");
             GC_LookMode_Detail_GUID = new GUIContent("GUID", "资源GUID");
             GC_LookMode_Detail_Asset = new GUIContent("Asset", "资源实例");
@@ -560,6 +548,45 @@ namespace AIO.UEditor
             GC_LookMode_Detail_Size = new GUIContent("Size", "文件大小");
             GC_LookMode_Detail_LastWriteTime = new GUIContent("Last Write Time", "最后写入时间");
             GC_LookMode_Detail_IsSubAsset = new GUIContent("IsSubAsset", "资源是否构成了其他资源的一部分？");
+
+            if (CurrentPageValues is null)
+            {
+                CurrentPageValues = new PageList<AssetDataInfo>
+                {
+                    PageSize = 25
+                };
+            }
+
+            if (LookDataPageSizeMenu is null) UpdatePageSizeMenu();
+        }
+
+        private void UpdatePageSizeMenu()
+        {
+            LookDataPageSizeMenu = new GenericMenu();
+            LookDataPageSizeMenu.AddItem(new GUIContent("25"), CurrentPageValues.PageSize == 25,
+                () =>
+                {
+                    CurrentPageValues.PageSize = 25;
+                    UpdatePageSizeMenu();
+                });
+            LookDataPageSizeMenu.AddItem(new GUIContent("30"), CurrentPageValues.PageSize == 30,
+                () =>
+                {
+                    CurrentPageValues.PageSize = 30;
+                    UpdatePageSizeMenu();
+                });
+            LookDataPageSizeMenu.AddItem(new GUIContent("40"), CurrentPageValues.PageSize == 40,
+                () =>
+                {
+                    CurrentPageValues.PageSize = 40;
+                    UpdatePageSizeMenu();
+                });
+            LookDataPageSizeMenu.AddItem(new GUIContent("50"), CurrentPageValues.PageSize == 50,
+                () =>
+                {
+                    CurrentPageValues.PageSize = 50;
+                    UpdatePageSizeMenu();
+                });
         }
     }
 }

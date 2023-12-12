@@ -429,7 +429,8 @@ namespace AIO.UEditor
             if (LookModeDisplayTypeIndex < 1) filter++;
             else
             {
-                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath).FullName;
+                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath)?.FullName;
+                if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
                 var status = 1L;
                 foreach (var display in LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)])
                 {
@@ -617,7 +618,7 @@ namespace AIO.UEditor
                 Data.Packages[i].Groups[j].Collectors[k]
                     .CollectAsset(Data.Packages[i].Name, Data.Packages[i].Groups[j].Name);
                 LookModeDisplayCollectors[(i, j)][k] =
-                    Data.Packages[i].Groups[j].Collectors[k].CollectPath.Replace('/', '\\');
+                    Data.Packages[i].Groups[j].Collectors[k].CollectPath.Replace('/', '\\').Trim('\\');
 
                 foreach (var assetDataInfo in Data.Packages[i].Groups[j].Collectors[k].AssetDataInfos)
                 {

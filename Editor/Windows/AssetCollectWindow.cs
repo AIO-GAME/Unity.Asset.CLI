@@ -18,7 +18,7 @@ namespace AIO.UEditor
     [GWindow("资源收集管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
         Group = "Tools",
         Menu = "AIO/Window/Asset",
-        MinSizeHeight = 500,
+        MinSizeHeight = 550,
         MinSizeWidth = 1000
     )]
     public partial class AssetCollectWindow : GraphicWindow
@@ -78,7 +78,7 @@ namespace AIO.UEditor
                     UpdateDataBuildMode();
                     break;
                 case Mode.Tags:
-                    UpdateDataTagsMode();
+                    this.StartCoroutine(UpdateDataTagsMode());
                     break;
             }
         }
@@ -183,7 +183,7 @@ namespace AIO.UEditor
                 {
                     ViewConfig.DragHorizontal(eventData);
                     ViewGroupList.DragHorizontal(eventData);
-                    ViewPackageList.DragHorizontal(eventData); 
+                    ViewPackageList.DragHorizontal(eventData);
                     ViewSetting.DragHorizontal(eventData);
                     break;
                 }
@@ -193,6 +193,39 @@ namespace AIO.UEditor
                     ViewDetailList.DragHorizontal(eventData);
                     break;
                 }
+                case Mode.Build:
+                default:
+                    break;
+            }
+        }
+
+        public override void EventKeyDown(in Event eventData, in KeyCode keyCode)
+        {
+            switch (WindowMode)
+            {
+                case Mode.Tags:
+                case Mode.Look:
+                {
+                    if (keyCode == KeyCode.LeftArrow) // 数字键盘 右键
+                    {
+                        if (CurrentPageValues.PageIndex > 0)
+                        {
+                            CurrentPageValues.PageIndex -= 1;
+                            eventData.Use();
+                        }
+                    }
+                    else if (keyCode == KeyCode.RightArrow) // 数字键盘 左键 
+                    {
+                        if (CurrentPageValues.PageIndex < CurrentPageValues.PageCount - 1)
+                        {
+                            CurrentPageValues.PageIndex += 1;
+                            eventData.Use();
+                        }
+                    }
+
+                    break;
+                }
+                case Mode.Editor:
                 case Mode.Build:
                 default:
                     break;
