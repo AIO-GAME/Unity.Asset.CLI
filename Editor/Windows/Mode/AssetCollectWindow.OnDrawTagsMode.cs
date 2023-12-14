@@ -207,7 +207,7 @@ namespace AIO.UEditor
             {
                 ViewDetails.IsShow = true;
                 ViewDetails.x = ViewDetailList.width;
-                ViewDetails.width = CurrentWidth - ViewDetailList.width;
+                ViewDetails.width = CurrentWidth - ViewDetails.x;
                 ViewDetails.height = ViewDetailList.height - 3;
                 ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
             }
@@ -243,10 +243,8 @@ namespace AIO.UEditor
                         {
                             if (Dict.ContainsKey(pair.Key)) continue;
                             CurrentTagValues.Add(pair.Value);
-                            CurrentPageValues.Add(pair.Value);
                             Dict[pair.Key] = pair.Value;
                             types[pair.Value.Type] = 1;
-                            LookModeCollectorsALLSize += pair.Value.Size;
                         }
                     }
                 }
@@ -266,8 +264,11 @@ namespace AIO.UEditor
             else TagsModeDisplayCollectors = collectors.Keys.ToArray();
 
             if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
-
+            CurrentPageValues.Clear();
+            CurrentPageValues.Add(CurrentTagValues.Where(data => !LookModeDataFilter(data)));
             CurrentPageValues.PageIndex = 0;
+            LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
+            LookModeCollectorsPageSize = 0;
             LookModeDataPageValueSort(ESort.LastWrite, true);
         }
     }

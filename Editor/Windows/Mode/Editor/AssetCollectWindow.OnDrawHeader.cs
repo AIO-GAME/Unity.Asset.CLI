@@ -131,6 +131,9 @@ namespace AIO.UEditor
                     case Mode.Tags:
                         OnDrawHeaderTagsMode();
                         break;
+                    case Mode.FirstPackage:
+                        OnDrawHeaderFirstPackageMode();
+                        break;
                 }
 
                 WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
@@ -139,7 +142,7 @@ namespace AIO.UEditor
                 if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
                 GUI.FocusControl(null);
                 UpdateData();
-             
+
                 TempTable[nameof(WindowMode)] = WindowMode;
             }
         }

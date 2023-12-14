@@ -169,16 +169,20 @@ namespace AIO.UEngine.YooAsset
                 AssetSystem.Parameter.LoadingMaxTimeSlice,
                 AssetSystem.Parameter.DownloadFailedTryAgain,
                 AssetSystem.Parameter.Timeout);
-            var record = new AssetSystem.SequenceRecord
+            if (AssetSystem.Parameter.EnableSequenceRecord)
             {
-                Name = package.PackageName,
-                Location = location.Address,
-                Time = DateTime.Now,
-                Bytes = operation.TotalDownloadBytes,
-                Count = operation.TotalDownloadCount,
-                AssetPath = location.AssetPath
-            };
-            AssetSystem.AddSequenceRecord(record);
+                var record = new AssetSystem.SequenceRecord
+                {
+                    PackageName = package.PackageName,
+                    Location = location.Address,
+                    Time = DateTime.Now,
+                    Bytes = operation.TotalDownloadBytes,
+                    Count = operation.TotalDownloadCount,
+                    AssetPath = location.AssetPath,
+                };
+                Console.WriteLine(record);
+                AssetSystem.AddSequenceRecord(record);
+            }
             LoadHandle.RegisterEvent(location, operation);
             return operation;
         }

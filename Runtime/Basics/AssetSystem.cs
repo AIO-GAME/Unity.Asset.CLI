@@ -83,8 +83,8 @@ namespace AIO
             else Parameter.UpdatePackage();
 
             yield return Proxy.Initialize();
-            SequenceRecords = new SequenceRecordQueue();
-            yield return SequenceRecords.LoadAsync();
+            SequenceRecords = new SequenceRecordQueue(Parameter.EnableSequenceRecord);
+            yield return SequenceRecords.LoadCo();
             yield return DownloadDynamic();
             IsInitialized = true;
         }

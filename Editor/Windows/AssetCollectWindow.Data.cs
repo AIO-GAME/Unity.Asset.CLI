@@ -107,6 +107,7 @@ namespace AIO.UEditor
             [InspectorName("查询模式")] Look,
             [InspectorName("标签模式")] Tags,
             [InspectorName("打包模式")] Build,
+            [InspectorName("首包模式")] FirstPackage,
         }
 
         /// <summary>
@@ -316,6 +317,9 @@ namespace AIO.UEditor
         private bool LookModeSortEnableLastWrite;
         private bool LookModeSortEnableLastWriteToMin;
 
+        private bool LookModeSortEnableSize;
+        private bool LookModeSortEnableSizeToMin;
+
         #endregion
 
         #region Tags Mode
@@ -374,6 +378,11 @@ namespace AIO.UEditor
         /// 界面内容 - 刷新
         /// </summary>
         private GUIContent GC_REFRESH;
+
+        /// <summary>
+        /// 界面内容 - 同步
+        /// </summary>
+        private GUIContent GC_SyncData;
 
         /// <summary>
         /// 界面内容 - 复制
@@ -436,6 +445,8 @@ namespace AIO.UEditor
         /// </summary>
         private ViewRect ViewCollectorsList;
 
+        private AssetSystem.SequenceRecordQueue SequenceRecords;
+        
         partial void GCInit()
         {
             DoDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
@@ -518,6 +529,9 @@ namespace AIO.UEditor
 
             GC_SAVE = EditorGUIUtility.IconContent("d_SaveAs");
             GC_SAVE.tooltip = "保存";
+
+            GC_SyncData = EditorGUIUtility.IconContent("d_RotateTool On");
+            GC_SyncData.tooltip = "同步数据";
 
             GC_LookMode_Data_Sort = EditorGUIUtility.IconContent("d_pulldown@2x");
             GC_LookMode_Data_Sort.tooltip = "排序方式";

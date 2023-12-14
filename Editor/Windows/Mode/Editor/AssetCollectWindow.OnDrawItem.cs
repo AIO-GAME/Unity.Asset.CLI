@@ -53,8 +53,6 @@ namespace AIO.UEditor
 
                     if (GELayout.Button(GC_OPEN, 24))
                     {
-                        WindowMode = Mode.Look;
-                        UpdateDataLookMode();
                         var status = 1;
                         foreach (var collector in Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
                                      .Collectors)
@@ -70,6 +68,8 @@ namespace AIO.UEditor
                         }
 
                         GUI.FocusControl(null);
+                        WindowMode = Mode.Look;
+                        UpdateDataLookMode();
                         return;
                     }
                 }

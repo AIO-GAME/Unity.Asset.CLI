@@ -195,9 +195,13 @@ namespace AIO.UEditor
         private void LookModeDataPageValueSort(ESort sort, bool minToMax)
         {
             LookModeSort = sort;
+            LookModeSortEnableAssetName = false;
+            LookModeSortEnableLastWrite = false;
+            LookModeSortEnableSize = false;
             switch (LookModeSort)
             {
                 case ESort.FileSize:
+                    LookModeSortEnableSize = true;
                     CurrentPageValues.Sort((data1, data2) =>
                     {
                         if (data1.Size < data2.Size) return minToMax ? 1 : -1;
@@ -206,7 +210,6 @@ namespace AIO.UEditor
                     });
                     break;
                 case ESort.LastWrite:
-                    LookModeSortEnableAssetName = false;
                     LookModeSortEnableLastWrite = true;
                     CurrentPageValues.Sort((data1, data2) =>
                     {
@@ -217,7 +220,6 @@ namespace AIO.UEditor
                     break;
                 case ESort.AssetName:
                     LookModeSortEnableAssetName = true;
-                    LookModeSortEnableLastWrite = false;
                     CurrentPageValues.Sort((data1, data2) => // 实现文件名 排序 
                     {
                         var name1 = data1.Address;
@@ -266,7 +268,7 @@ namespace AIO.UEditor
             {
                 ViewDetails.IsShow = true;
                 ViewDetails.x = ViewDetailList.width;
-                ViewDetails.width = CurrentWidth - ViewDetailList.width;
+                ViewDetails.width = CurrentWidth - ViewDetails.x;
                 ViewDetails.height = ViewDetailList.height - 3;
                 ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
             }
@@ -349,7 +351,7 @@ namespace AIO.UEditor
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
                 {
                     EditorGUILayout.PrefixLabel(GC_LookMode_Detail_Size);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Size.ToConverseStringFileSize());
+                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.SizeStr);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
@@ -483,7 +485,7 @@ namespace AIO.UEditor
             var rect1 = new Rect(rect)
             {
                 x = 0,
-                width = rect.width - 80,
+                width = rect.width - 160,
             };
 
             var rect2 = new Rect(rect)
@@ -491,8 +493,15 @@ namespace AIO.UEditor
                 x = rect1.x + rect1.width,
                 width = 80
             };
+
+            var rect3 = new Rect(rect2)
+            {
+                x = rect2.x + rect2.width,
+            };
+
             GUI.Box(rect1, "", GEStyle.TEtoolbarbutton);
             GUI.Box(rect2, "", GEStyle.TEtoolbarbutton);
+            GUI.Box(rect3, "", GEStyle.TEtoolbarbutton);
 
             if (LookModeSortEnableAssetName)
             {
@@ -502,9 +511,17 @@ namespace AIO.UEditor
                 temp.width = 16;
                 GUI.Box(temp, GC_LookMode_Data_Sort);
             }
-            else if (LookModeSortEnableLastWrite)
+            else if (LookModeSortEnableSize)
             {
                 var temp = new Rect(rect2);
+                temp.x -= 3;
+                temp.y += 2;
+                temp.width = 16;
+                GUI.Box(temp, GC_LookMode_Data_Sort);
+            }
+            else if (LookModeSortEnableLastWrite)
+            {
+                var temp = new Rect(rect3);
                 temp.x -= 3;
                 temp.y += 2;
                 temp.width = 16;
@@ -524,6 +541,16 @@ namespace AIO.UEditor
 
             if (GUI.Button(
                     rect2,
+                    new GUIContent("    Size"),
+                    GEStyle.HeaderLabel))
+            {
+                LookModeSortEnableSize = true;
+                LookModeSortEnableSizeToMin = !LookModeSortEnableSizeToMin;
+                LookModeDataPageValueSort(ESort.FileSize, LookModeSortEnableSizeToMin);
+            }
+
+            if (GUI.Button(
+                    rect3,
                     new GUIContent("    Ago"),
                     GEStyle.HeaderLabel))
             {
@@ -560,7 +587,7 @@ namespace AIO.UEditor
             var rect1 = new Rect(rect)
             {
                 x = 10,
-                width = rect.width - 80
+                width = rect.width - 160
             };
 
             var rect2 = new Rect(rect)
@@ -569,12 +596,18 @@ namespace AIO.UEditor
                 width = 80
             };
 
+            var rect3 = new Rect(rect2)
+            {
+                x = rect2.x + rect2.width,
+            };
+
 
             EditorGUIUtility.SetIconSize(new Vector2(rect.height - 4, rect.height - 4));
             var content = EditorGUIUtility.ObjectContent(AssetDatabase.LoadMainAssetAtPath(data.AssetPath), null);
             content.text = data.Address;
             EditorGUI.LabelField(rect1, content, EditorStyles.label);
-            EditorGUI.LabelField(rect2, data.GetLatestTime(), EditorStyles.label);
+            EditorGUI.LabelField(rect2, data.SizeStr, EditorStyles.label);
+            EditorGUI.LabelField(rect3, data.GetLatestTime(), EditorStyles.label);
         }
 
         /// <summary>
@@ -612,7 +645,7 @@ namespace AIO.UEditor
             LookModeDisplayTags[(i, j)] = Data.Packages[i].Groups[j].GetTags();
             LookModeDisplayCollectors[(i, j)] = new string[Data.Packages[i].Groups[j].Collectors.Length];
             LookModeData[(i, j)] = new List<AssetDataInfo>();
-            var ListType = new List<string>();
+            var ListType = new Dictionary<string, byte>();
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
             {
                 Data.Packages[i].Groups[j].Collectors[k]
@@ -635,18 +668,12 @@ namespace AIO.UEditor
                     }
                     else CatchList.Add(assetDataInfo.Key, assetDataInfo.Value.Address);
 
-                    var type = AssetDatabase.GetMainAssetTypeAtPath(assetDataInfo.Value.AssetPath);
-                    if (type is null)
-                    {
-                        if (!ListType.Contains("Unknown")) ListType.Add("Unknown");
-                    }
-                    else if (!ListType.Contains(type.FullName)) ListType.Add(type.FullName);
-
+                    ListType[assetDataInfo.Value.Type] = 1;
                     LookModeData[(i, j)].Add(assetDataInfo.Value);
                 }
             }
 
-            LookModeDisplayTypes[(i, j)] = ListType.ToArray();
+            LookModeDisplayTypes[(i, j)] = ListType.Keys.ToArray();
 
             if (RepeatList.Count > 0)
             {
@@ -671,14 +698,14 @@ namespace AIO.UEditor
                 return;
             }
 
+            if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0)
+                CurrentPackageIndex = 0;
+
             if (Data.Packages[CurrentPackageIndex].Groups.Length == 0)
             {
                 CurrentGroupIndex = 0;
                 return;
             }
-
-            if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0)
-                CurrentPackageIndex = 0;
 
             if (Data.Packages[CurrentPackageIndex].Groups.Length <= CurrentGroupIndex || CurrentGroupIndex < 0)
                 CurrentGroupIndex = 0;
@@ -705,9 +732,11 @@ namespace AIO.UEditor
 
             UpdateDataLookModeCollector(CurrentPackageIndex, CurrentGroupIndex);
             CurrentPageValues.Clear();
-            CurrentPageValues.Add(LookModeData[(CurrentPackageIndex, CurrentGroupIndex)]);
+            CurrentPageValues.Add(LookModeData[(CurrentPackageIndex, CurrentGroupIndex)]
+                .Where(data => !LookModeDataFilter(data)));
             CurrentPageValues.PageIndex = 0;
             LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
+            LookModeCollectorsPageSize = 0;
             LookModeDataPageValueSort(ESort.LastWrite, true);
         }
     }

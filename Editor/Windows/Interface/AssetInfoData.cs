@@ -11,7 +11,7 @@ using UnityEditor;
 namespace AIO
 {
     /// <summary>
-    /// nameof(AssetInfo)
+    /// 
     /// </summary>
     public struct AssetDataInfo
     {
@@ -49,10 +49,27 @@ namespace AIO
             {
                 if (_size == default)
                 {
-                    _size = AHelper.IO.GetFileLength(AssetPath);
+                    if (File.Exists(AssetPath))
+                    {
+                        _size = AHelper.IO.GetFileLength(AssetPath);
+                    }
+                    else if (Directory.Exists(AssetPath))
+                    {
+                        _size = AHelper.IO.GetFolderLength(AssetPath);
+                    }
+                    else _size = -1;
                 }
 
                 return _size;
+            }
+        }
+
+        public string SizeStr
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_sizeStr)) _sizeStr = Size.ToConverseStringFileSize();
+                return _sizeStr;
             }
         }
 
@@ -81,7 +98,11 @@ namespace AIO
             {
                 if (_lastWriteTime == default)
                 {
-                    _lastWriteTime = AHelper.IO.GetFileLastWriteTimeUtc(AssetPath);
+                    if (File.Exists(AssetPath))
+                        _lastWriteTime = AHelper.IO.GetFileLastWriteTimeUtc(AssetPath);
+                    else if (Directory.Exists(AssetPath))
+                        _lastWriteTime = AHelper.IO.GetFolderLastWriteTimeUtc(AssetPath);
+                    else _lastWriteTime = DateTime.MinValue;
                 }
 
                 return _lastWriteTime;
@@ -111,18 +132,22 @@ namespace AIO
         {
             get
             {
-                if (!string.IsNullOrEmpty(_type)) return _type;
-                _type = AssetDatabase.GetMainAssetTypeAtPath(AssetPath)?.FullName;
-                if (string.IsNullOrEmpty(_type)) _type = "Unknown";
+                if (string.IsNullOrEmpty(_type))
+                {
+                    _type = AssetDatabase.GetMainAssetTypeAtPath(AssetPath)?.FullName;
+                    if (string.IsNullOrEmpty(_type)) _type = "Unknown";
+                }
+
                 return _type;
             }
         }
 
-        private string _name;
-        private DateTime _lastWriteTime;
-        private long _size;
-        private string _type;
-        public string _guid;
+        [NonSerialized] private string _sizeStr;
+        [NonSerialized] private string _name;
+        [NonSerialized] private DateTime _lastWriteTime;
+        [NonSerialized] private long _size;
+        [NonSerialized] private string _type;
+        [NonSerialized] private string _guid;
     }
 
     public static class ExtensionAssetDataInfo

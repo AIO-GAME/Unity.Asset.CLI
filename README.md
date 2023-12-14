@@ -33,7 +33,8 @@
       "name": "package.openupm.com",
       "url": "https://package.openupm.com",
       "scopes": [
-        "com.aio.cli.asset"
+        "com.aio.cli.asset",
+        "com.aio.package"
       ]
     }
   ]

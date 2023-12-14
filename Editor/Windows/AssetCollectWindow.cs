@@ -69,7 +69,7 @@ namespace AIO.UEditor
             {
                 default:
                 case Mode.Editor:
-                    UpdateDataRecordQueue();
+
                     break;
                 case Mode.Look:
                     UpdateDataLookMode();
@@ -79,6 +79,9 @@ namespace AIO.UEditor
                     break;
                 case Mode.Tags:
                     this.StartCoroutine(UpdateDataTagsMode());
+                    break;
+                case Mode.FirstPackage:
+                    UpdateDataFirstPackageMode();
                     break;
             }
         }
@@ -107,6 +110,9 @@ namespace AIO.UEditor
                     break;
                 case Mode.Tags:
                     OnDrawTagsMode();
+                    break;
+                case Mode.FirstPackage:
+                    OnDrawFirstPackageMode();
                     break;
             }
 
@@ -165,6 +171,7 @@ namespace AIO.UEditor
                     ViewPackageList.ContainsHorizontal(eventData);
                     ViewSetting.ContainsHorizontal(eventData);
                     break;
+                case Mode.FirstPackage:
                 case Mode.Tags:
                 case Mode.Look:
                     ViewDetailList.ContainsHorizontal(eventData);
@@ -187,6 +194,7 @@ namespace AIO.UEditor
                     ViewSetting.DragHorizontal(eventData);
                     break;
                 }
+                case Mode.FirstPackage:
                 case Mode.Tags:
                 case Mode.Look:
                 {
@@ -205,6 +213,7 @@ namespace AIO.UEditor
             {
                 case Mode.Tags:
                 case Mode.Look:
+                case Mode.FirstPackage:
                 {
                     if (keyCode == KeyCode.LeftArrow) // 数字键盘 右键
                     {

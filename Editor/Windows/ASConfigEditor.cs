@@ -65,7 +65,7 @@ namespace AIO.UEditor
                 case EASMode.Remote:
                     Target.AutoSaveVersion = GELayout.ToggleLeft("自动激活清单", Target.AutoSaveVersion);
                     Target.AppendTimeTicks = GELayout.ToggleLeft("请求附加时间磋", Target.AppendTimeTicks);
-                    Target.AutoSequenceRecord = GELayout.ToggleLeft("自动序列记录", Target.AutoSequenceRecord);
+                    Target.EnableSequenceRecord = GELayout.ToggleLeft("自动序列记录", Target.EnableSequenceRecord);
                     Target.DownloadFailedTryAgain = GELayout.Slider("下载失败尝试次数", Target.DownloadFailedTryAgain, 1, 100);
                     Target.LoadingMaxTimeSlice = GELayout.Slider("资源加载的最大数量", Target.LoadingMaxTimeSlice, 144, 8192);
                     Target.Timeout = GELayout.Slider("请求超时时间", Target.Timeout, 3, 180);
@@ -81,7 +81,7 @@ namespace AIO.UEditor
 
                     Target.URL = GELayout.AreaText(Target.URL, GUILayout.Height(50));
 
-                    if (Target.AutoSequenceRecord)
+                    if (Target.EnableSequenceRecord)
                     {
                         if (EditorApplication.isPlaying)
                         {
@@ -113,7 +113,7 @@ namespace AIO.UEditor
                                     foreach (var record in AssetSystem.SequenceRecords)
                                     {
                                         GELayout.Label(
-                                            $"{++index} : {record.Name} -> {record.Location} : {record.AssetPath} ");
+                                            $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
                                         GELayout.HelpBox(
                                             $"{record.Time:yyyy-MM-dd HH:mm:ss} [Num : {record.Count}] [Size : {record.Bytes.ToConverseStringFileSize()}] ");
                                     }
@@ -161,9 +161,8 @@ namespace AIO.UEditor
         private void UpdateRecordQueue()
         {
             if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH)) // 如果在编辑器下存在本地记录则加载
-                AssetSystem.SequenceRecords.Records = AHelper.IO.ReadJsonUTF8<Queue<AssetSystem.SequenceRecord>>(
-                    AssetSystem.SequenceRecordQueue.LOCAL_PATH);
-            RecordQueueSizeStr = AssetSystem.SequenceRecords.Sum(record => record.Bytes).ToConverseStringFileSize();
+                AssetSystem.SequenceRecords.UpdateLocal();
+            RecordQueueSizeStr = AssetSystem.SequenceRecords.Size.ToConverseStringFileSize();
         }
 
         private void Update()

@@ -49,7 +49,7 @@ namespace AIO.UEngine
         /// <summary>
         /// 自动序列记录
         /// </summary>
-        public bool AutoSequenceRecord;
+        public bool EnableSequenceRecord;
 
         /// <summary>
         /// 输出日志
@@ -84,7 +84,7 @@ namespace AIO.UEngine
             AutoSaveVersion = true;
             AppendTimeTicks = true;
             LoadPathToLower = true;
-            AutoSequenceRecord = true;
+            EnableSequenceRecord = true;
             OutputLog = true;
         }
 
@@ -94,7 +94,7 @@ namespace AIO.UEngine
             ASMode = EASMode.Local;
             AutoSaveVersion = false;
             AppendTimeTicks = false;
-            AutoSequenceRecord = false;
+            EnableSequenceRecord = false;
             LoadPathToLower = false;
             OutputLog = true;
         }
@@ -194,7 +194,7 @@ namespace AIO.UEngine
                 config.AutoSaveVersion = false;
                 config.AppendTimeTicks = false;
                 config.OutputLog = false;
-                config.AutoSequenceRecord = false;
+                config.EnableSequenceRecord = false;
                 config.Packages = Array.Empty<AssetsPackageConfig>();
                 if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
                     Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
@@ -230,7 +230,7 @@ namespace AIO.UEngine
             config.ASMode = EASMode.Remote;
             config.LoadPathToLower = loadPathToLower;
             config.OutputLog = outputLog;
-            config.AutoSequenceRecord = autoSequenceRecord;
+            config.EnableSequenceRecord = autoSequenceRecord;
             return config;
         }
 
