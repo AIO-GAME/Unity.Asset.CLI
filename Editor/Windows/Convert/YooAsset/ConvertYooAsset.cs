@@ -134,13 +134,13 @@ namespace AIO.UEditor
         }
 
         private static IEnumerable<AssetBundleCollectorPackage> Convert(IEnumerable<AssetCollectPackage> packages)
-            => packages.Select(Convert);
+            => packages.Where(package => !package.Groups.Equals(null)).Select(Convert);
 
         private static IEnumerable<AssetBundleCollectorGroup> Convert(IEnumerable<AssetCollectGroup> groups)
-            => groups.Select(Convert);
+            => groups.Where(group => !group.Collectors.Equals(null)).Select(Convert);
 
         private static IEnumerable<AssetBundleCollector> Convert(IEnumerable<AssetCollectItem> collects)
-            => collects.Select(Convert);
+            => collects.Where(collect => !collect.Path.Equals(null)).Select(Convert);
 
         private static AssetBundleCollectorPackage Convert(AssetCollectPackage package)
             => new AssetBundleCollectorPackage

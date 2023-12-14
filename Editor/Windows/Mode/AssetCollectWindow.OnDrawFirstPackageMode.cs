@@ -61,7 +61,7 @@ namespace AIO.UEditor
                 GELayout.Button("Sync", SyncSequenceRecords, GEStyle.TEtoolbarbutton, GP_Width_50);
             }
 
-            SearchText = EditorGUILayout.DelayedTextField(SearchText, GEStyle.SearchTextField);
+            SearchText = EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
             if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
                 GUI.FocusControl(null);
@@ -126,11 +126,13 @@ namespace AIO.UEditor
             if (string.IsNullOrEmpty(SearchText)) filter++;
             else
             {
-                if (data.AssetPath.Contains(SearchText) || data.Address.Contains(SearchText))
+                if (data.AssetPath.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase) ||
+                    data.Address.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase))
                 {
                     filter++;
                 }
-                else if (SearchText.Contains(data.AssetPath) || SearchText.Contains(data.Address))
+                else if (SearchText.Contains(data.AssetPath, StringComparison.CurrentCultureIgnoreCase) ||
+                         SearchText.Contains(data.Address, StringComparison.CurrentCultureIgnoreCase))
                 {
                     filter++;
                 }
