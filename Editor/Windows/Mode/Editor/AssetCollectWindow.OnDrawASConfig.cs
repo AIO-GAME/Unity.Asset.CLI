@@ -31,7 +31,7 @@ namespace AIO.UEditor
                     GELayout.Label("⇘", GEStyle.TEtoolbarbutton, GP_Width_20);
                     if (GELayout.Button("Config", GEStyle.PreToolbar))
                     {
-                        ViewSetting.IsShow = false;
+                        ViewConfig.IsShow = false;
                         GUI.FocusControl(null);
                     }
                 }

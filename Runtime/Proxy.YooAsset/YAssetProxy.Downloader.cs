@@ -323,6 +323,7 @@ namespace AIO.UEngine
 
                 foreach (var pair in queue.ToYoo())
                 {
+                    AssetSystem.Log($"创建序列下载器，准备下载更新当前资源版本所有的资源包文件 [{pair.Key}]");
                     var name = pair.Key;
                     var assetInfos = pair.Value.ToArray();
                     var operation = YAssetSystem.CreateBundleDownloader(pair.Key, assetInfos,

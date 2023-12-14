@@ -105,7 +105,7 @@ namespace AIO
             {
                 return File.Exists(LOCAL_PATH);
             }
-            
+
             /// <summary>
             /// 序列记录路径
             /// </summary>
@@ -117,9 +117,9 @@ namespace AIO
 #if UNITY_EDITOR
                         Path.Combine(Application.dataPath.Substring(
                                 0, Application.dataPath.LastIndexOf('/')),
-                            "BuildinFiles");
+                            "Bundles", "Version");
 #else
-                        Path.Combine(Application.persistentDataPath, "BuildinFiles");
+                        Path.Combine(Application.persistentDataPath, "BuildinFiles", "Version");
 #endif
                     if (!Directory.Exists(root)) Directory.CreateDirectory(root);
                     return Path.Combine(root, FILE_NAME);
@@ -193,6 +193,7 @@ namespace AIO
                 {
                     var info = YooAssets.GetPackage(record.PackageName).GetAssetInfo(record.Location);
                     if (info is null) continue;
+                    if (!YooAssets.GetPackage(record.PackageName).IsNeedDownloadFromRemote(info)) continue;
                     if (!list.ContainsKey(record.PackageName)) list.Add(record.PackageName, new List<AssetInfo>());
                     if (list[record.PackageName].Contains(info)) continue;
                     list[record.PackageName].Add(info);
@@ -261,6 +262,12 @@ namespace AIO
                 return YooAssets.GetPackage(record.PackageName).GetAssetInfo(record.Location);
             }
 #endif
+
+            public override string ToString()
+            {
+                return
+                    $"[{Time}] {PackageName} - {Location} - {AssetPath} - {Bytes.ToConverseStringFileSize()} - {Count}";
+            }
         }
     }
 }
