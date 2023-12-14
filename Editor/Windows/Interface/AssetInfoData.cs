@@ -64,6 +64,15 @@ namespace AIO
             }
         }
 
+        public string SizeStr
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_sizeStr)) _sizeStr = Size.ToConverseStringFileSize();
+                return _sizeStr;
+            }
+        }
+
         /// <summary>
         /// Asset GUID
         /// </summary>
@@ -133,6 +142,7 @@ namespace AIO
             }
         }
 
+        [NonSerialized] private string _sizeStr;
         [NonSerialized] private string _name;
         [NonSerialized] private DateTime _lastWriteTime;
         [NonSerialized] private long _size;

@@ -191,18 +191,18 @@ namespace AIO.UEditor
             if (!IsShow) return;
             if (IsAllowVertical)
             {
-                RectDragVertical =
-                    new Rect(rect.x, rect.y + rect.height, rect.width, DragVerticalHeight);
-                EditorGUIUtility.AddCursorRect(RectDragVertical, MouseCursor.ResizeVertical);
                 rect.height -= DragVerticalHeight;
+                RectDragVertical = new Rect(rect.x, rect.y + rect.height,
+                    rect.width, DragVerticalHeight);
+                EditorGUIUtility.AddCursorRect(RectDragVertical, MouseCursor.ResizeVertical);
             }
 
             if (IsAllowHorizontal)
             {
-                RectDragHorizontal =
-                    new Rect(rect.x + rect.width, rect.y, DragHorizontalWidth, rect.height);
-                EditorGUIUtility.AddCursorRect(RectDragHorizontal, MouseCursor.ResizeHorizontal);
                 rect.width -= DragHorizontalWidth;
+                RectDragHorizontal = new Rect(rect.x + rect.width, rect.y,
+                    DragHorizontalWidth, rect.height);
+                EditorGUIUtility.AddCursorRect(RectDragHorizontal, MouseCursor.ResizeHorizontal);
             }
 
             if (style is null) GUILayout.BeginArea(rect);

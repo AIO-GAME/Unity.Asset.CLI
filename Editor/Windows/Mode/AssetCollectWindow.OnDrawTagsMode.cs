@@ -207,7 +207,7 @@ namespace AIO.UEditor
             {
                 ViewDetails.IsShow = true;
                 ViewDetails.x = ViewDetailList.width;
-                ViewDetails.width = CurrentWidth - ViewDetailList.width;
+                ViewDetails.width = CurrentWidth - ViewDetails.x;
                 ViewDetails.height = ViewDetailList.height - 3;
                 ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
             }

@@ -171,12 +171,12 @@ namespace AIO.UEngine.YooAsset
                 AssetSystem.Parameter.Timeout);
             var record = new AssetSystem.SequenceRecord
             {
-                Name = package.PackageName,
+                PackageName = package.PackageName,
                 Location = location.Address,
                 Time = DateTime.Now,
                 Bytes = operation.TotalDownloadBytes,
                 Count = operation.TotalDownloadCount,
-                AssetPath = location.AssetPath
+                AssetPath = location.AssetPath,
             };
             AssetSystem.AddSequenceRecord(record);
             LoadHandle.RegisterEvent(location, operation);

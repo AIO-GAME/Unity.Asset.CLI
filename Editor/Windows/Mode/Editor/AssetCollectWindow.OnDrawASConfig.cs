@@ -19,7 +19,6 @@ namespace AIO.UEditor
     public partial class AssetCollectWindow
     {
         private bool FoldoutAutoRecord;
-        private string RecordQueueSizeStr;
         private List<AssetsPackageConfig> _packages;
 
         partial void OnDrawASConfig()
@@ -64,7 +63,6 @@ namespace AIO.UEditor
                     case EASMode.Remote:
                         Config.AutoSaveVersion = GELayout.ToggleLeft("自动激活清单", Config.AutoSaveVersion);
                         Config.AppendTimeTicks = GELayout.ToggleLeft("请求附加时间磋", Config.AppendTimeTicks);
-                        Config.AutoSequenceRecord = GELayout.ToggleLeft("自动序列记录", Config.AutoSequenceRecord);
                         Config.DownloadFailedTryAgain =
                             GELayout.Slider("下载失败尝试次数", Config.DownloadFailedTryAgain, 1, 100);
                         Config.LoadingMaxTimeSlice =
@@ -79,71 +77,7 @@ namespace AIO.UEditor
                             }
                         }
 
-
                         Config.URL = GELayout.AreaText(Config.URL, GUILayout.Height(50));
-
-                        if (Config.AutoSequenceRecord)
-                        {
-                            if (EditorApplication.isPlaying)
-                            {
-                                using (new EditorGUILayout.HorizontalScope(GEStyle.DropzoneStyle))
-                                {
-                                    GELayout.LabelPrefix("序列记录");
-                                    if (!string.IsNullOrEmpty(
-                                            AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Config)))
-                                    {
-                                        if (GELayout.Button("Open"))
-                                            Application.OpenURL(
-                                                AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Config));
-
-                                        if (GELayout.Button("Upload FTP"))
-                                        {
-                                            AHandle.FTP.Create("", "", "").UploadFile(
-                                                AssetSystem.SequenceRecordQueue.LOCAL_PATH);
-                                        }
-                                    }
-                                }
-                            }
-
-                            FoldoutAutoRecord = GELayout.VFoldout($"序列记录 Size {RecordQueueSizeStr}", FoldoutAutoRecord);
-                            if (FoldoutAutoRecord)
-                            {
-                                using (GELayout.VHorizontal())
-                                {
-                                    GELayout.Button("Update", UpdateDataRecordQueue);
-
-                                    if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
-                                    {
-                                        if (GELayout.Button("Open Local"))
-                                        {
-                                            Application.OpenURL(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
-                                        }
-
-                                        if (GELayout.Button("Delete Local"))
-                                        {
-                                            AHelper.IO.DeleteFile(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
-                                        }
-                                    }
-                                }
-
-                                if (AssetSystem.SequenceRecords != null)
-                                {
-                                    using (GELayout.Vertical())
-                                    {
-                                        var index = 0;
-                                        foreach (var record in AssetSystem.SequenceRecords)
-                                        {
-                                            GELayout.Label(
-                                                $"{++index} : {record.Name} -> {record.Location} : {record.AssetPath} ");
-                                            GELayout.HelpBox(
-                                                $"{record.Time:yyyy-MM-dd HH:mm:ss} [Num : {record.Count}] [Size : {record.Bytes.ToConverseStringFileSize()}] ");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-
                         break;
                     default:
                         GELayout.List("资源包配置", _packages,
@@ -168,14 +102,6 @@ namespace AIO.UEditor
             _packages = Config.Packages is null
                 ? _packages
                 : Config.Packages.ToList();
-        }
-
-        private void UpdateDataRecordQueue()
-        {
-            if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH)) // 如果在编辑器下存在本地记录则加载
-                AssetSystem.SequenceRecords.Records = AHelper.IO.ReadJsonUTF8<Queue<AssetSystem.SequenceRecord>>(
-                    AssetSystem.SequenceRecordQueue.LOCAL_PATH);
-            RecordQueueSizeStr = AssetSystem.SequenceRecords.Sum(record => record.Bytes).ToConverseStringFileSize();
         }
     }
 }
