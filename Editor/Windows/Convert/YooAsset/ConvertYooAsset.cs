@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AIO.UEngine;
 using UnityEngine;
 using YooAsset.Editor;
 
@@ -49,6 +50,28 @@ namespace AIO.UEditor
                 var info = data.GroupName.SplitOnce('_');
                 var collector = Instance.GetPackage(info.Item1)?.GetGroup(info.Item2).GetCollector(data.CollectPath);
                 if (collector is null) return false;
+
+                if (Application.isPlaying)
+                {
+                    if (AssetSystem.Parameter.ASMode == EASMode.Editor &&
+                        collector.LoadType == AssetLoadType.Runtime)
+                        return false;
+
+                    if (AssetSystem.Parameter.ASMode != EASMode.Editor &&
+                        collector.LoadType == AssetLoadType.Editor)
+                        return false;
+                }
+                else
+                {
+                    if (ASConfig.GetOrCreate().ASMode == EASMode.Editor &&
+                        collector.LoadType == AssetLoadType.Runtime)
+                        return false;
+
+                    if (ASConfig.GetOrCreate().ASMode != EASMode.Editor &&
+                        collector.LoadType == AssetLoadType.Editor)
+                        return false;
+                }
+
                 if (!Collectors.ContainsKey(collector) || Collectors[collector] == false)
                 {
                     collector.UpdateCollect();

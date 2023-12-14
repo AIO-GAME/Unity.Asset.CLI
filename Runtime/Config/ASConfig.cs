@@ -161,16 +161,18 @@ namespace AIO.UEngine
             }
         }
 
+        private static ASConfig instance;
+        
         /// <summary>
         /// 获取本地资源包地址
         /// </summary>
         public static ASConfig GetOrCreate()
         {
-            ASConfig config = null;
+            if (instance != null) return instance;
             foreach (var item in Resources.LoadAll<ASConfig>("ASConfig"))
             {
                 if (item is null) continue;
-                config = item;
+                instance = item;
                 break;
             }
 
@@ -181,29 +183,29 @@ namespace AIO.UEngine
                          .Where(value => value != null))
             {
                 if (item.Equals(null)) continue;
-                config = item;
+                instance = item;
                 break;
             }
 
-            if (config is null)
+            if (instance is null)
             {
-                config = CreateInstance<ASConfig>();
-                config.ASMode = EASMode.Editor;
-                config.URL = "";
-                config.LoadPathToLower = false;
-                config.AutoSaveVersion = false;
-                config.AppendTimeTicks = false;
-                config.OutputLog = false;
-                config.EnableSequenceRecord = false;
-                config.Packages = Array.Empty<AssetsPackageConfig>();
+                instance = CreateInstance<ASConfig>();
+                instance.ASMode = EASMode.Editor;
+                instance.URL = "";
+                instance.LoadPathToLower = false;
+                instance.AutoSaveVersion = false;
+                instance.AppendTimeTicks = false;
+                instance.OutputLog = false;
+                instance.EnableSequenceRecord = false;
+                instance.Packages = Array.Empty<AssetsPackageConfig>();
                 if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
                     Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
-                AssetDatabase.CreateAsset(config, "Assets/Resources/ASConfig.asset");
+                AssetDatabase.CreateAsset(instance, "Assets/Resources/ASConfig.asset");
             }
 #else
             throw new System.Exception("Not found ASConfig.asset ! Please create it !");
 #endif
-            return config;
+            return instance;
         }
 
         /// <summary>

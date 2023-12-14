@@ -28,6 +28,13 @@ namespace AIO.UEditor
         [InspectorName("大写")] ToUpper,
     }
 
+    public enum AssetLoadType
+    {
+        [InspectorName("始终")] Always,
+        [InspectorName("运行时")] Runtime,
+        [InspectorName("编辑时")] Editor,
+    }
+
     /// <summary>
     ///     
     /// </summary>
@@ -48,6 +55,11 @@ namespace AIO.UEditor
         /// 收集器路径
         /// </summary>
         public Object Path;
+
+        /// <summary>
+        /// 加载类型
+        /// </summary>
+        public AssetLoadType LoadType = AssetLoadType.Always;
 
         [NonSerialized] private string _GUID;
 
@@ -324,7 +336,7 @@ namespace AIO.UEditor
                     data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
                     if (!IsCollectAsset(data)) continue;
                     info.Address = GetAssetAddress(data);
-                    info.AssetPath =fixedPath;
+                    info.AssetPath = fixedPath;
                     info.Extension = data.Extension;
                     AssetDataInfos[fixedPath] = info;
                 }

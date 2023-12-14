@@ -78,19 +78,21 @@ namespace AIO.UEditor
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("定位", GTOption.Width(30));
+                    GELayout.Label("定位", GP_Width_30);
                     item.LocationFormat = GELayout.Popup(item.LocationFormat, GEStyle.PreDropDown, GTOption.Width(80));
                     item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays,
                         GEStyle.PreDropDown);
 
                     item.RulePackIndex = GELayout.Popup(item.RulePackIndex, AssetCollectSetting.MapPacks.Displays,
                         GEStyle.PreDropDown);
-                    item.HasExtension = GELayout.ToggleLeft("后缀", item.HasExtension, GTOption.Width(50));
+
+                    item.LoadType = GELayout.Popup(item.LoadType, GEStyle.PreDropDown, GP_Width_75);
+                    item.HasExtension = GELayout.ToggleLeft("后缀", item.HasExtension, GP_Width_50);
                 }
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("收集", GTOption.Width(30));
+                    GELayout.Label("收集", GP_Width_30);
                     if (item.RuleUseCollectCustom)
                     {
                         item.RuleCollect = GELayout.Field(item.RuleCollect);
@@ -110,7 +112,7 @@ namespace AIO.UEditor
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("过滤", GTOption.Width(30));
+                    GELayout.Label("过滤", GP_Width_30);
                     if (item.RuleUseFilterCustom)
                     {
                         item.RuleFilter = GELayout.Field(item.RuleFilter);
@@ -130,13 +132,13 @@ namespace AIO.UEditor
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("标签", GTOption.Width(30));
+                    GELayout.Label("标签", GP_Width_30);
                     item.Tags = GELayout.Field(item.Tags);
                 }
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("自定", GTOption.Width(30));
+                    GELayout.Label("自定", GP_Width_30);
                     item.UserData = GELayout.Field(item.UserData);
                 }
             }
