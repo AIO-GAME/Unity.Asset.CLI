@@ -25,7 +25,6 @@ namespace AIO.UEditor
                 if (SequenceRecords is null)
                     SequenceRecords = new AssetSystem.SequenceRecordQueue();
                 if (SequenceRecords.ExistsLocal()) SequenceRecords.UpdateLocal();
-                else if (!string.IsNullOrEmpty(Config.URL)) await SequenceRecords.DownloadTask(Config.URL);
                 UpdatePageValuesFirstPackageMode();
             }
             else SequenceRecords?.Clear();
@@ -46,6 +45,11 @@ namespace AIO.UEditor
                 if (GELayout.Button("Delete", GEStyle.TEtoolbarbutton, GP_Width_50))
                 {
                     AHelper.IO.DeleteFile(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
+                    SearchText = string.Empty;
+                    LookModeDisplayTypeIndex = 0;
+                    SequenceRecords.UpdateLocal();
+                    UpdatePageValuesFirstPackageMode();
+                    return;
                 }
             }
 
@@ -64,7 +68,7 @@ namespace AIO.UEditor
                 SearchText = string.Empty;
             }
 
-            if (TagsModeDisplayTypes.Length > 0)
+            if (TagsModeDisplayTypes != null && TagsModeDisplayTypes.Length > 0)
             {
                 LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
                     TagsModeDisplayTypes, GEStyle.PreDropDown, GP_Width_100);
@@ -137,6 +141,8 @@ namespace AIO.UEditor
 
         private async void SyncSequenceRecords()
         {
+            SearchText = string.Empty;
+            LookModeDisplayTypeIndex = 0;
             await SequenceRecords.DownloadTask(Config.URL);
             SequenceRecords.UpdateLocal();
             UpdatePageValuesFirstPackageMode();
@@ -144,12 +150,15 @@ namespace AIO.UEditor
 
         private void UpdatePageValuesFirstPackageMode()
         {
-            CurrentPageValues.Clear();
+            CurrentTagValues.Clear();
             LookModeCollectorsALLSize = 0;
+            LookModeCollectorsPageSize = 0;
             TagsModeDisplayTypes = Array.Empty<string>();
             var types = new Dictionary<string, byte>();
+            var asset = new Dictionary<string, AssetDataInfo>();
             foreach (var item in SequenceRecords)
             {
+                if (asset.ContainsKey(item.AssetPath)) continue;
                 var info = new AssetDataInfo
                 {
                     AssetPath = item.AssetPath,
@@ -157,6 +166,7 @@ namespace AIO.UEditor
                     Tags = "FirstPackage",
                     Extension = Path.GetExtension(item.AssetPath)
                 };
+                asset[info.AssetPath] = info;
                 CurrentTagValues.Add(info);
                 types[info.Type] = 0;
             }
