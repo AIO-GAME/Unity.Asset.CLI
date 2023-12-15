@@ -20,6 +20,8 @@ namespace AIO
         /// </summary>
         public static event Action<IProgressHandle> OnEventDownloading;
 
+        public static event Action OnNoNetwork;
+        
         internal static void InvokeNotify(EASEventType eventType, string message)
         {
             OnEventNotify?.Invoke(eventType, message);

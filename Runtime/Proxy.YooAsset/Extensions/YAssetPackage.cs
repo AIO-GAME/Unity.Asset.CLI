@@ -108,33 +108,32 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 向网络端请求最新的资源版本
         /// </summary>
-        /// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks = true, int timeout = 60)
+        public UpdatePackageVersionOperation UpdatePackageVersionAsync()
         {
-            return Package.UpdatePackageVersionAsync(appendTimeTicks, timeout);
+            return Package.UpdatePackageVersionAsync(
+                AssetSystem.Parameter.AppendTimeTicks,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 向网络端请求并更新清单
         /// </summary>
         /// <param name="packageVersion">更新的包裹版本</param>
-        /// <param name="autoSaveVersion">更新成功后自动保存版本号，作为下次初始化的版本。</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion,
-            bool autoSaveVersion = true, int timeout = 60)
+        public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion)
         {
-            return Package.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
+            return Package.UpdatePackageManifestAsync(
+                packageVersion,
+                AssetSystem.Parameter.AutoSaveVersion,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 预下载指定版本的包裹资源
         /// </summary>
         /// <param name="packageVersion">下载的包裹版本</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, int timeout = 60)
+        public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion)
         {
-            return Package.PreDownloadContentAsync(packageVersion, timeout);
+            return Package.PreDownloadContentAsync(packageVersion, AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>

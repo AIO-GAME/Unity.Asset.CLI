@@ -65,24 +65,18 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 向网络端请求最新的资源版本
         /// </summary>
-        /// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static UpdatePackageVersionOperation UpdatePackageVersionDefaultAsync(bool appendTimeTicks = true,
-            int timeout = 60)
+        public static UpdatePackageVersionOperation UpdatePackageVersionDefaultAsync()
         {
-            return DefaultPackage.UpdatePackageVersionAsync(appendTimeTicks, timeout);
+            return DefaultPackage.UpdatePackageVersionAsync();
         }
 
         /// <summary>
         /// 向网络端请求并更新补丁清单
         /// </summary>
         /// <param name="packageVersion">更新的包裹版本</param>
-        /// <param name="autoSaveVersion">自动激活清单</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static UpdatePackageManifestOperation UpdatePackageManifestDefaultAsync(string packageVersion,
-            bool autoSaveVersion = true, int timeout = 60)
+        public static UpdatePackageManifestOperation UpdatePackageManifestDefaultAsync(string packageVersion)
         {
-            return DefaultPackage.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
+            return DefaultPackage.UpdatePackageManifestAsync(packageVersion);
         }
 
         #endregion
@@ -93,11 +87,9 @@ namespace AIO.UEngine.YooAsset
         /// 预下载指定版本的包裹资源
         /// </summary>
         /// <param name="packageVersion">下载的包裹版本</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static PreDownloadContentOperation PreDownloadContentDefaultAsync(string packageVersion,
-            int timeout = 60)
+        public static PreDownloadContentOperation PreDownloadContentDefaultAsync(string packageVersion)
         {
-            return DefaultPackage.PreDownloadContentAsync(packageVersion, timeout);
+            return DefaultPackage.PreDownloadContentAsync(packageVersion);
         }
 
         #endregion
@@ -176,11 +168,10 @@ namespace AIO.UEngine.YooAsset
         /// <param name="package">包名</param>
         /// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
         /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static UpdatePackageVersionOperation UpdatePackageVersionAsync(string package,
-            bool appendTimeTicks = true, int timeout = 60)
+        public static UpdatePackageVersionOperation UpdatePackageVersionAsync(string package)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
-            return asset.UpdatePackageVersionAsync(appendTimeTicks, timeout);
+            return asset.UpdatePackageVersionAsync();
         }
 
         /// <summary>
@@ -188,13 +179,10 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="package">包名</param>
         /// <param name="packageVersion">更新的包裹版本</param>
-        /// <param name="autoSaveVersion">自动激活清单</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static UpdatePackageManifestOperation UpdatePackageManifestAsync(string package, string packageVersion,
-            bool autoSaveVersion = true, int timeout = 60)
+        public static UpdatePackageManifestOperation UpdatePackageManifestAsync(string package, string packageVersion)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
-            return asset.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
+            return asset.UpdatePackageManifestAsync(packageVersion);
         }
 
         #endregion
@@ -206,12 +194,10 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="package">包名</param>
         /// <param name="packageVersion">下载的包裹版本</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public static PreDownloadContentOperation PreDownloadContentAsync(string package, string packageVersion,
-            int timeout = 60)
+        public static PreDownloadContentOperation PreDownloadContentAsync(string package, string packageVersion)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
-            return asset.PreDownloadContentAsync(packageVersion, timeout);
+            return asset.PreDownloadContentAsync(packageVersion);
         }
 
         #endregion
