@@ -39,7 +39,7 @@ namespace AIO.UEditor
             }
 
             SearchText = EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
-            if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_25))
+            if (GUILayout.Button(GC_CLEAR, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
                 GUI.FocusControl(null);
                 SearchText = string.Empty;
@@ -237,6 +237,7 @@ namespace AIO.UEditor
 
                     foreach (var collector in group.Collectors)
                     {
+                        if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
                         collector.CollectAsset(package.Name, group.Name);
                         collectors[collector.CollectPath.Replace('/', '\\').Trim('\\')] = 1;

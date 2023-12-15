@@ -21,35 +21,33 @@ namespace AIO.UEditor
                     return;
                 }
 
-                if (FoldoutPackageInfo)
-                {
-                    Data.Packages[CurrentPackageIndex].Name =
-                        GELayout.Field("Package Name", Data.Packages[CurrentPackageIndex].Name);
+                Data.Packages[CurrentPackageIndex].Name =
+                    GELayout.Field("Package Name", Data.Packages[CurrentPackageIndex].Name);
 
-                    Data.Packages[CurrentPackageIndex].Description =
-                        GELayout.Field("Package Description", Data.Packages[CurrentPackageIndex].Description);
-                }
+                Data.Packages[CurrentPackageIndex].Description =
+                    GELayout.Field("Package Description", Data.Packages[CurrentPackageIndex].Description);
+            }
 
-                if (Data.Packages[CurrentPackageIndex].Groups.Length == 0) return;
+            if (Data.Packages[CurrentPackageIndex].Groups.Length == 0) return;
 
-                if (CurrentGroupIndex < 0 ||
-                    Data.Packages[CurrentPackageIndex].Groups.Length <= CurrentGroupIndex)
-                {
-                    GELayout.HelpBox("Groups Index Error");
-                    return;
-                }
+            if (CurrentGroupIndex < 0 ||
+                Data.Packages[CurrentPackageIndex].Groups.Length <= CurrentGroupIndex)
+            {
+                GELayout.HelpBox("Groups Index Error");
+                return;
+            }
 
-                if (FoldoutPackageInfo)
-                {
-                    Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name = GELayout.Field("Group Name",
-                        Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
+            GELayout.Space();
+            using (GELayout.Vertical(GEStyle.INThumbnailShadow))
+            {
+                Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name = GELayout.Field("Group Name",
+                    Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
 
-                    Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Description = GELayout.Field(
-                        "Group Description", Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Description);
+                Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Description = GELayout.Field(
+                    "Group Description", Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Description);
 
-                    Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Tags = GELayout.Field("Group Tags",
-                        Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Tags);
-                }
+                Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Tags = GELayout.Field("Group Tags",
+                    Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Tags);
             }
         }
 

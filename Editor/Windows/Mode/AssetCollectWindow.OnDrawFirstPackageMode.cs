@@ -37,12 +37,12 @@ namespace AIO.UEditor
         {
             if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
             {
-                if (GELayout.Button("Open", GEStyle.TEtoolbarbutton, GP_Width_50))
+                if (GELayout.Button(GC_OPEN_FOLDER, GEStyle.TEtoolbarbutton, GP_Width_25))
                 {
                     Application.OpenURL(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                 }
 
-                if (GELayout.Button("Delete", GEStyle.TEtoolbarbutton, GP_Width_50))
+                if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_25))
                 {
                     AHelper.IO.DeleteFile(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                     SearchText = string.Empty;
@@ -55,14 +55,14 @@ namespace AIO.UEditor
 
             if (!string.IsNullOrEmpty(Config.URL))
             {
-                if (GELayout.Button("Web", GEStyle.TEtoolbarbutton, GP_Width_50))
+                if (GELayout.Button(GC_NET, GEStyle.TEtoolbarbutton, GP_Width_25))
                     Application.OpenURL(AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Config));
 
-                GELayout.Button("Sync", SyncSequenceRecords, GEStyle.TEtoolbarbutton, GP_Width_50);
+                GELayout.Button(GC_DOWNLOAD, SyncSequenceRecords, GEStyle.TEtoolbarbutton, GP_Width_25);
             }
 
             SearchText = EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
-            if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_25))
+            if (GUILayout.Button(GC_CLEAR, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
                 GUI.FocusControl(null);
                 SearchText = string.Empty;
