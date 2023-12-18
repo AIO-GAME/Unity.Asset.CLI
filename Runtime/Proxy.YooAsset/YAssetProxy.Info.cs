@@ -18,14 +18,14 @@ namespace AIO.UEngine
         /// 获取下载器
         /// </summary>
         /// <returns></returns>
-        public override IASDownloader GetDownloader(IProgressEvent progress = null)
+        public override IASDownloader GetDownloader(DownlandAssetEvent dEvent = default)
         {
-            var dic = new Dictionary<string, YAssetPackage>();
             var config = AssetSystem.PackageConfigs;
-            if (config is null) return new YASDownloader(dic, progress);
-            foreach (var item in config)
-                dic.Add(item.Name, YAssetSystem.GetPackage(item.Name));
-            return new YASDownloader(dic, progress);
+            if (config is null) return new YASDownloader(null, dEvent);
+            var dic = config.ToDictionary(
+                item => item.Name,
+                item => YAssetSystem.GetPackage(item.Name));
+            return new YASDownloader(dic, dEvent);
         }
 
         /// <summary>

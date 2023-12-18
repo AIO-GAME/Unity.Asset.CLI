@@ -121,6 +121,12 @@ namespace AIO
             if (Parameter.OutputLog) Debug.Log(e);
         }
 
+        internal static void LogWarning(string e)
+        {
+            if (Parameter.OutputLog) Debug.LogWarning(e);
+        }
+
+
         //      [Conditional("UNITY_EDITOR")]
         internal static void LogFormat(string format, params object[] args)
         {

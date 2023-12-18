@@ -238,8 +238,6 @@ namespace AIO.UEditor
 
                 AssetBundleCollectorSettingData.Setting.Packages.Add(package);
             }
-
-            // AssetBundleCollectorWindow.OpenWindow();
         }
     }
 }

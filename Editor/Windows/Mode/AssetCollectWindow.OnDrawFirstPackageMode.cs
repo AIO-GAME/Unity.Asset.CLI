@@ -18,7 +18,7 @@ namespace AIO.UEditor
     /// </summary>
     public partial class AssetCollectWindow
     {
-        private async void UpdateDataFirstPackageMode()
+        private void UpdateDataFirstPackageMode()
         {
             if (Config.EnableSequenceRecord)
             {
@@ -33,7 +33,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 绘制 资源查询模式 导航栏
         /// </summary>
-        private async void OnDrawHeaderFirstPackageMode()
+        private void OnDrawHeaderFirstPackageMode()
         {
             if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
             {

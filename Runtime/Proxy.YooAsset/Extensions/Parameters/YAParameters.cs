@@ -54,25 +54,6 @@ namespace AIO.UEngine.YooAsset
         protected YAssetParameters(EPlayMode mode)
         {
             Mode = mode;
-#if UNITY_EDITOR
-            switch (Mode)
-            {
-                case EPlayMode.EditorSimulateMode:
-                    Debug.Log("Asset System : 编辑器资源管理");
-                    break;
-                case EPlayMode.OfflinePlayMode:
-                    Debug.Log("Asset System : 离线资源管理");
-                    break;
-                case EPlayMode.HostPlayMode:
-                    Debug.Log("Asset System : 联网资源管理");
-                    break;
-                case EPlayMode.WebPlayMode:
-                    Debug.Log("Asset System : Web资源管理");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-#endif
         }
 
         public void UpdateParameters()

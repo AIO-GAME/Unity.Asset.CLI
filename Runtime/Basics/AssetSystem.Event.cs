@@ -18,7 +18,7 @@ namespace AIO
         /// <summary>
         /// 资源正在下载
         /// </summary>
-        public static event Action<IProgressHandle> OnEventDownloading;
+        public static event Action<IProgressInfo> OnEventDownloading;
 
         public static event Action OnNoNetwork;
         
@@ -32,7 +32,7 @@ namespace AIO
             return OnEventDownloading != null;
         }
 
-        internal static void InvokeDownloading<T>(T loading) where T : IProgressHandle
+        internal static void InvokeDownloading<T>(T loading) where T : IProgressInfo
         {
             OnEventDownloading?.Invoke(loading);
         }

@@ -104,6 +104,11 @@ namespace AIO.UEngine
             EventParameter = null;
             YAssetSystem.Destroy();
         }
+
+        public override void CleanCache(Action<bool> cb)
+        {
+            YAssetSystem.ClearCacheResource(cb);
+        }
     }
 }
 #endif

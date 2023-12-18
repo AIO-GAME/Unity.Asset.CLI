@@ -45,10 +45,6 @@ namespace AIO.UEngine.YooAsset
 
         public InitializationOperation InitializeAsync(YAssetParameters parameters)
         {
-#if UNITY_EDITOR
-            Debug.LogFormat($"Assets System Initialize Config -> | Mode -> {parameters.Mode} Start");
-#endif
-
             Mode = parameters.Mode;
             parameters.UpdateParameters();
 #if UNITY_EDITOR
@@ -428,66 +424,59 @@ namespace AIO.UEngine.YooAsset
         /// 创建资源下载器，用于下载当前资源版本所有的资源包文件
         /// </summary>
         /// <param name="tag">资源标签</param>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber,
-            int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string tag)
         {
-            return Package.CreateResourceDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain,
-                timeout);
+            return Package.CreateResourceDownloader(new string[] { tag },
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载当前资源版本所有的资源包文件
         /// </summary>
         /// <param name="tags">资源标签列表</param>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber,
-            int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags)
         {
-            return Package.CreateResourceDownloader(tags, downloadingMaxNumber, failedTryAgain, timeout);
+            return Package.CreateResourceDownloader(tags,
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载当前资源版本所有的资源包文件
         /// </summary>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain,
-            int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader()
         {
-            return Package.CreateResourceDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+            return Package.CreateResourceDownloader(
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载指定的资源列表依赖的资源包文件
         /// </summary>
         /// <param name="assetInfos">资源信息列表</param>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber,
-            int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos)
         {
-            return Package.CreateBundleDownloader(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
+            return Package.CreateBundleDownloader(assetInfos,
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载指定的资源列表依赖的资源包文件
         /// </summary>
         /// <param name="assetInfos">资源信息列表</param>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo assetInfos, int downloadingMaxNumber,
-            int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo assetInfos)
         {
-            return Package.CreateBundleDownloader(new AssetInfo[] { assetInfos }, downloadingMaxNumber, failedTryAgain,
-                timeout);
+            return Package.CreateBundleDownloader(new AssetInfo[] { assetInfos },
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         #endregion

@@ -13,16 +13,9 @@ using AIO.UEngine;
 
 namespace AIO
 {
-    internal struct ASDownloaderEmpty : IASDownloader
+    internal class ASDownloaderEmpty : AOperation, IASDownloader
     {
-        public IProgressHandle Progress { get; }
-
         public bool Flow => false;
-
-        public ASDownloaderEmpty(IProgressEvent iEvent = null)
-        {
-            Progress = new AProgress(iEvent);
-        }
 
         public Task UpdatePackageVersionTask() => Task.CompletedTask;
         public Task UpdatePackageManifestTask() => Task.CompletedTask;
@@ -32,12 +25,7 @@ namespace AIO
         public Task DownloadTagTask(IEnumerable<string> tags) => Task.CompletedTask;
         public Task DownloadRecordTask() => Task.CompletedTask;
 
-        public IEnumerator UpdatePackageVersionCO()
-        {
-            yield break;
-        }
-
-        public IEnumerator UpdatePackageManifestCO()
+        public IEnumerator UpdateHeader()
         {
             yield break;
         }
@@ -46,7 +34,7 @@ namespace AIO
         {
         }
 
-        public void CollectNeedTag(IEnumerable<string> tags)
+        public void CollectNeedTag(params string[] tags)
         {
         }
 
@@ -58,10 +46,6 @@ namespace AIO
         {
             yield break;
         }
-
-        public void Dispose()
-        {
-        }
     }
 
     public partial class AssetSystem
@@ -72,25 +56,41 @@ namespace AIO
         /// 获取下载器
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IASDownloader GetDownloader(IProgressEvent progress = null)
+        public static IASDownloader GetDownloader(DownlandAssetEvent dEvent = default)
         {
             return Parameter.ASMode != EASMode.Remote
-                ? new ASDownloaderEmpty(progress)
-                : Proxy.GetDownloader(progress);
+                ? new ASDownloaderEmpty()
+                : Proxy.GetDownloader(dEvent);
         }
 
         /// <summary>
         /// 预下载指定标签资源
         /// </summary>
-        public static IEnumerator DownloadTag(IEnumerable<string> tag, IProgressEvent progress = null)
+        public static IEnumerator DownloadTag(string tag, DownlandAssetEvent dEvent = default)
+        {
+            yield return DownloadTag(new[] { tag }, dEvent);
+        }
+
+        /// <summary>
+        /// 预下载指定标签资源
+        /// </summary>
+        public static IEnumerator DownloadTagWithRecord(string tag, DownlandAssetEvent dEvent = default)
+        {
+            yield return DownloadTagWithRecord(new[] { tag }, dEvent);
+        }
+
+        /// <summary>
+        /// 预下载指定标签资源
+        /// </summary>
+        public static IEnumerator DownloadTag(IEnumerable<string> tag, DownlandAssetEvent dEvent = default)
         {
             var enumerable = tag as string[] ?? tag.ToArray();
             if (Parameter.ASMode == EASMode.Remote)
             {
-                using (var handle = Proxy.GetDownloader(progress))
+                using (var handle = Proxy.GetDownloader(dEvent))
                 {
-                    yield return handle.UpdatePackageManifestCO();
-                    yield return handle.UpdatePackageVersionCO();
+                    yield return handle.UpdateHeader();
+                    handle.Begin();
                     handle.CollectNeedTag(enumerable);
                     yield return handle.WaitCo();
                 }
@@ -102,15 +102,15 @@ namespace AIO
         /// <summary>
         /// 预下载指定标签资源 + 记录序列资源
         /// </summary>
-        public static IEnumerator DownloadTagWithRecord(IEnumerable<string> tag, IProgressEvent progress = null)
+        public static IEnumerator DownloadTagWithRecord(IEnumerable<string> tag, DownlandAssetEvent dEvent = default)
         {
             var enumerable = tag as string[] ?? tag.ToArray();
             if (Parameter.ASMode == EASMode.Remote)
             {
-                using (var handle = Proxy.GetDownloader(progress))
+                using (var handle = Proxy.GetDownloader(dEvent))
                 {
-                    yield return handle.UpdatePackageManifestCO();
-                    yield return handle.UpdatePackageVersionCO();
+                    yield return handle.UpdateHeader();
+                    handle.Begin();
                     handle.CollectNeedTag(enumerable);
                     handle.CollectNeedRecord(SequenceRecords);
                     yield return handle.WaitCo();
@@ -124,14 +124,14 @@ namespace AIO
         /// <summary>
         /// 预下载记录序列资源
         /// </summary>
-        public static IEnumerator DownloadRecord(IProgressEvent progress = null)
+        public static IEnumerator DownloadRecord(DownlandAssetEvent dEvent = default)
         {
             if (Parameter.ASMode == EASMode.Remote)
             {
-                using (var handle = Proxy.GetDownloader(progress))
+                using (var handle = Proxy.GetDownloader(dEvent))
                 {
-                    yield return handle.UpdatePackageManifestCO();
-                    yield return handle.UpdatePackageVersionCO();
+                    yield return handle.UpdateHeader();
+                    handle.Begin();
                     handle.CollectNeedRecord(SequenceRecords);
                     yield return handle.WaitCo();
                 }
@@ -144,13 +144,13 @@ namespace AIO
         /// 预下载全部远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator DownloadAll(IProgressEvent progress = null)
+        public static IEnumerator DownloadAll(DownlandAssetEvent dEvent = default)
         {
             if (Parameter.ASMode != EASMode.Remote) yield break;
-            using (var handle = Proxy.GetDownloader(progress))
+            using (var handle = Proxy.GetDownloader(dEvent))
             {
-                yield return handle.UpdatePackageManifestCO();
-                yield return handle.UpdatePackageVersionCO();
+                yield return handle.UpdateHeader();
+                handle.Begin();
                 handle.CollectNeedAll();
                 yield return handle.WaitCo();
             }
@@ -160,14 +160,12 @@ namespace AIO
         /// 动态下载远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator DownloadHeader(IProgressEvent progress = null)
+        public static IEnumerator DownloadHeader(DownlandAssetEvent dEvent = default)
         {
             if (Parameter.ASMode != EASMode.Remote) yield break;
-            using (var handle = Proxy.GetDownloader(progress))
+            using (var handle = Proxy.GetDownloader(dEvent))
             {
-                yield return handle.UpdatePackageManifestCO();
-                yield return handle.UpdatePackageVersionCO();
-                yield return handle.WaitCo();
+                yield return handle.UpdateHeader();
             }
         }
     }

@@ -19,7 +19,7 @@ namespace AIO.UEngine.YooAsset
             /// <summary>
             /// 当前下载进度
             /// </summary>
-            public IProgressHandle Progress => _Progress;
+            public IProgressInfo Progress => _Progress;
 
             /// <summary>
             /// 当前下载进度
@@ -124,8 +124,8 @@ namespace AIO.UEngine.YooAsset
                     TotalDownloadedBytesList[local] = totalDownloadBytes;
                     CurrentDownloadedBytesList[local] = currentDownloadBytes;
 
-                    _Progress.Total = TotalDownloadedBytesList.Values.Sum();
-                    _Progress.Current = CurrentDownloadedBytesList.Values.Sum();
+                    _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
+                    _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
                     AssetSystem.InvokeDownloading(_Progress);
                 }
 
@@ -152,8 +152,8 @@ namespace AIO.UEngine.YooAsset
 
             private void Update()
             {
-                _Progress.Total = TotalDownloadedBytesList.Values.Sum();
-                _Progress.Current = CurrentDownloadedBytesList.Values.Sum();
+                _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
+                _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
                 AssetSystem.InvokeDownloading(_Progress);
             }
         }
@@ -165,10 +165,7 @@ namespace AIO.UEngine.YooAsset
 
         internal static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
         {
-            var operation = package.CreateBundleDownloader(location,
-                AssetSystem.Parameter.LoadingMaxTimeSlice,
-                AssetSystem.Parameter.DownloadFailedTryAgain,
-                AssetSystem.Parameter.Timeout);
+            var operation = package.CreateBundleDownloader(location);
             if (AssetSystem.Parameter.EnableSequenceRecord)
             {
                 var record = new AssetSystem.SequenceRecord
@@ -180,9 +177,9 @@ namespace AIO.UEngine.YooAsset
                     Count = operation.TotalDownloadCount,
                     AssetPath = location.AssetPath,
                 };
-                Console.WriteLine(record);
                 AssetSystem.AddSequenceRecord(record);
             }
+
             LoadHandle.RegisterEvent(location, operation);
             return operation;
         }

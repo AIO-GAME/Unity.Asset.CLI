@@ -75,7 +75,8 @@ namespace AIO
 
             public Task DownloadTask(string URL)
             {
-                return AHelper.Net.HTTP.DownloadAsync(GET_REMOTE_PATH(URL), LOCAL_PATH, null, true);
+                var handle = AHelper.HTTP.Download(GET_REMOTE_PATH(URL), LOCAL_PATH, true);
+                return handle.WaitAsync();
             }
 
             public IEnumerator DownloadCo(string URL)

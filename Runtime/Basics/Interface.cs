@@ -15,62 +15,59 @@ namespace AIO
     /// </summary>
     public interface IASNetLoading
     {
-        IProgressHandle Progress { get; }
+        IProgressInfo Progress { get; }
+    }
+
+    public struct DownlandAssetEvent : IProgressEvent
+    {
+        /// <summary>
+        /// 网络不可用
+        /// </summary>
+        public Action<IProgressReport> OnNetReachableNot { get; set; }
+
+        /// <summary>
+        /// 移动网络 是否允许在移动网络条件下下载
+        /// </summary>
+        public Action<IProgressReport, Action> OnNetReachableCarrier { get; set; }
+
+        /// <summary>
+        /// 磁盘空间不足
+        /// </summary>
+        public Action<IProgressReport> OnDiskSpaceNotEnough { get; set; }
+
+        /// <summary>
+        /// 无写入权限
+        /// </summary>
+        public Action<IProgressReport> OnWritePermissionNot { get; set; }
+
+        /// <summary>
+        /// 无读取权限
+        /// </summary>
+        public Action<IProgressReport> OnReadPermissionNot { get; set; }
+
+        public Action<IProgressInfo> OnProgress { get; set; }
+        public Action<IProgressReport> OnComplete { get; set; }
+        public Action OnBegin { get; set; }
+        public Action<Exception> OnError { get; set; }
+        public Action OnResume { get; set; }
+        public Action OnPause { get; set; }
+        public Action OnCancel { get; set; }
     }
 
     /// <summary>
     /// 资源下载器
     /// </summary>
-    public interface IASDownloader : IASNetLoading, IDisposable
+    public interface IASDownloader : IProgressOperation
     {
         /// <summary>
         /// 是否运行继续流程
         /// </summary>
         bool Flow { get; }
 
-        // /// <summary>
-        // /// 更新资源包版本信息
-        // /// </summary>
-        // /// <returns>Ture:有新版本 False:无需更新</returns>
-        // Task UpdatePackageVersionTask();
-        //
-        // /// <summary>
-        // /// 向网络端请求并更新补丁清单
-        // /// </summary>
-        // /// <returns>Ture:有新版本 False:无需更新</returns>
-        // Task UpdatePackageManifestTask();
-        //
-        // /// <summary>
-        // /// 下载序列列表文件
-        // /// </summary>
-        // Task DownloadRecordTask(AssetSystem.SequenceRecordQueue queue);
-        //
-        // /// <summary>
-        // /// 开始下载
-        // /// </summary>
-        // Task DownloadTask();
-        //
-        // /// <summary>
-        // /// 开始标签下载
-        // /// </summary>
-        // Task DownloadTagTask(string tag);
-        //
-        // /// <summary>
-        // /// 开始标签下载
-        // /// </summary>
-        // Task DownloadTagTask(IEnumerable<string> tags);
-
         /// <summary>
-        /// 更新资源包版本信息
+        /// 更新资源包清单
         /// </summary>
-        /// <returns>Ture:有新版本 False:无需更新</returns>
-        IEnumerator UpdatePackageVersionCO();
-
-        /// <summary>
-        /// 向网络端请求并更新补丁清单
-        /// </summary>
-        /// <returns>Ture:有新版本 False:无需更新</returns>
-        IEnumerator UpdatePackageManifestCO();
+        IEnumerator UpdateHeader();
 
         /// <summary>
         /// 收集需要下载的所有资源
@@ -80,7 +77,7 @@ namespace AIO
         /// <summary>
         /// 收集需要下载的标签
         /// </summary>
-        void CollectNeedTag(IEnumerable<string> tags);
+        void CollectNeedTag(params string[] tags);
 
         /// <summary>
         /// 收集需要下载的序列

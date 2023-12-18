@@ -80,6 +80,11 @@ namespace AIO.UEditor
         /// </summary>
         private bool FoldoutUploadFTP = true;
 
+        /// <summary>
+        /// 折叠栏 - 钉钉通知
+        /// </summary>
+        private bool FoldoutNoticeDingDing = true;
+
         #endregion
 
         #region Draw Group List

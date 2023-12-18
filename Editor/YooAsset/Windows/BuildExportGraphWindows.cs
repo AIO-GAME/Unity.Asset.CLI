@@ -307,7 +307,7 @@ namespace AIO.UEditor.Build
                         Debug.LogException(error);
                         EditorUtility.ClearProgressBar();
                     },
-                    OnComplete = () =>
+                    OnComplete = (e) =>
                     {
                         EditorUtility.ClearProgressBar();
                         EditorUtility.DisplayDialog("Upload FTP", "Upload FTP Complete", "OK");
