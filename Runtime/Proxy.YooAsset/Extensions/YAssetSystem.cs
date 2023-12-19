@@ -11,6 +11,8 @@
 * History:                                         *
 ***************************************************/
 
+
+using System;
 #if SUPPORT_UNITASK
 using ATask = Cysharp.Threading.Tasks.UniTask;
 #else
@@ -21,9 +23,33 @@ using ATask = System.Threading.Tasks.Task;
 using System.Collections.Generic;
 using UnityEngine;
 using YooAsset;
+using ILogger = YooAsset.ILogger;
 
 namespace AIO.UEngine.YooAsset
 {
+    internal class YLogger : ILogger
+    {
+        public void Log(string message)
+        {
+            AssetSystem.Log(message);
+        }
+
+        public void Warning(string message)
+        {
+            AssetSystem.LogWarning(message);
+        }
+
+        public void Error(string message)
+        {
+            AssetSystem.LogError(message);
+        }
+
+        public void Exception(Exception exception)
+        {
+            AssetSystem.LogException(exception);
+        }
+    }
+
     /// <summary>
     /// 资源加载管理器
     /// 该类只提供封装API函数
@@ -55,6 +81,7 @@ namespace AIO.UEngine.YooAsset
 
         private static bool isInitialize;
 
+
         public static void Initialize()
         {
             if (isInitialize == false)
@@ -65,7 +92,7 @@ namespace AIO.UEngine.YooAsset
 
                 Dic = new Dictionary<string, YAssetPackage>(8);
                 Config = new AssetPakList();
-                YooAssets.Initialize();
+                YooAssets.Initialize(new YLogger());
                 YooAssets.SetOperationSystemMaxTimeSlice(30);
             }
 
@@ -93,7 +120,6 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 Dic.Add(item.Name, pak);
-                Debug.LogFormat("Asset Package Info : {0}", item);
             }
 
             isInitialize = true;

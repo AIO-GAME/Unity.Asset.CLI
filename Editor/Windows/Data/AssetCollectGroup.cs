@@ -52,6 +52,7 @@ namespace AIO.UEditor
             var dictionary = new Dictionary<string, bool>();
             foreach (var collect in Collectors)
             {
+                if (collect.Type != EAssetCollectItemType.MainAssetCollector) continue;
                 if (string.IsNullOrEmpty(collect.Tags)) continue;
                 foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
             }

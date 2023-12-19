@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AIO.UEngine;
 using UnityEngine;
 using YooAsset.Editor;
 
@@ -27,9 +28,8 @@ namespace AIO.UEditor
         {
             get
             {
-                if (!(_Instance is null)) return _Instance;
+                if (_Instance != null) return _Instance;
                 _Instance = AssetCollectRoot.GetOrCreate();
-
                 return _Instance;
             }
         }
@@ -46,9 +46,32 @@ namespace AIO.UEditor
             public bool IsCollectAsset(FilterRuleData data)
             {
                 if (!data.GroupName.Contains('_')) return false;
+                if (Instance is null) return false;
                 var info = data.GroupName.SplitOnce('_');
-                var collector = Instance.GetPackage(info.Item1)?.GetGroup(info.Item2).GetCollector(data.CollectPath);
+                var collector = Instance.GetPackage(info.Item1)?.GetGroup(info.Item2)?.GetCollector(data.CollectPath);
                 if (collector is null) return false;
+
+                if (Application.isPlaying)
+                {
+                    if (AssetSystem.Parameter.ASMode == EASMode.Editor &&
+                        collector.LoadType == AssetLoadType.Runtime)
+                        return false;
+
+                    if (AssetSystem.Parameter.ASMode != EASMode.Editor &&
+                        collector.LoadType == AssetLoadType.Editor)
+                        return false;
+                }
+                else
+                {
+                    if (ASConfig.GetOrCreate().ASMode == EASMode.Editor &&
+                        collector.LoadType == AssetLoadType.Runtime)
+                        return false;
+
+                    if (ASConfig.GetOrCreate().ASMode != EASMode.Editor &&
+                        collector.LoadType == AssetLoadType.Editor)
+                        return false;
+                }
+
                 if (!Collectors.ContainsKey(collector) || Collectors[collector] == false)
                 {
                     collector.UpdateCollect();
@@ -204,7 +227,6 @@ namespace AIO.UEditor
             AssetBundleCollectorSettingData.Setting.ShowEditorAlias = true;
             AssetBundleCollectorSettingData.Setting.UniqueBundleName = asset.UniqueBundleName;
             AssetBundleCollectorSettingData.Setting.IncludeAssetGUID = asset.IncludeAssetGUID;
-            AssetBundleCollectorSettingData.Setting.LocationToLower = asset.LocationToLower;
             AssetBundleCollectorSettingData.Setting.EnableAddressable = asset.EnableAddressable;
             foreach (var package in Convert(asset.Packages))
             {
@@ -215,8 +237,6 @@ namespace AIO.UEditor
 
                 AssetBundleCollectorSettingData.Setting.Packages.Add(package);
             }
-
-            // AssetBundleCollectorWindow.OpenWindow();
         }
     }
 }

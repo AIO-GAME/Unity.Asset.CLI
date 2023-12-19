@@ -47,14 +47,13 @@ namespace AIO
 #else
             if (operation.isHttpError || operation.isNetworkError)
             {
-                Debug.LogError(operation.error);
-                Debug.Log($"{ERROR_NET_UNKNOWN} {operation.error}");
+                Debug.Log($"{ERROR_NET_UNKNOWN} {operation.url} -> {operation.error}");
                 return false;
             }
 #endif
 
             if (operation.isDone) return true;
-            Debug.LogError($"{ERROR_NET}请求未完成 -> {operation.url} {operation.error}");
+            Debug.LogError($"{ERROR_NET}请求未完成 -> {operation.url} -> {operation.error}");
             return false;
         }
 

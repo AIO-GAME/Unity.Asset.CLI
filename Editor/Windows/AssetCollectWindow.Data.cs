@@ -33,7 +33,12 @@ namespace AIO.UEditor
         /// <summary>
         /// 宽度偏移量
         /// </summary>
-        private Rect DoDrawRect = Rect.zero;
+        private Rect DoEditorDrawRect = Rect.zero;
+
+        /// <summary>
+        /// 宽度偏移量
+        /// </summary>
+        private Rect DoConfigDrawRect = Rect.zero;
 
         /// <summary>
         /// 当前选择包下标
@@ -80,6 +85,11 @@ namespace AIO.UEditor
         /// </summary>
         private bool FoldoutUploadFTP = true;
 
+        /// <summary>
+        /// 折叠栏 - 钉钉通知
+        /// </summary>
+        private bool FoldoutNoticeDingDing = true;
+
         #endregion
 
         #region Draw Group List
@@ -104,8 +114,9 @@ namespace AIO.UEditor
         public enum Mode
         {
             [InspectorName("编辑模式")] Editor,
+            [InspectorName("配置模式")] Config,
             [InspectorName("查询模式")] Look,
-            [InspectorName("标签模式")] Tags,
+            [InspectorName("标签模式[等待优化]")] Tags,
             [InspectorName("打包模式")] Build,
             [InspectorName("首包模式")] FirstPackage,
         }
@@ -304,7 +315,30 @@ namespace AIO.UEditor
         /// <summary>
         /// 依赖资源
         /// </summary>
-        public Dictionary<string, Object> Dependencies = new Dictionary<string, Object>();
+        private Dictionary<string, DependenciesInfo> Dependencies = new Dictionary<string, DependenciesInfo>();
+
+        /// <summary>
+        /// 依赖资源大小
+        /// </summary>
+        private long DependenciesSize;
+
+        /// <summary>
+        /// 依赖资源搜索文本
+        /// </summary>
+        private string DependenciesSearchText = string.Empty;
+
+        private class DependenciesInfo
+        {
+            public Object Object;
+
+            public string AssetPath;
+
+            public string Name;
+
+            public string Type;
+
+            public long Size;
+        }
 
         private Rect LookModeShowAssetListView;
         private Vector2 LookModeShowAssetDetailScroll;
@@ -365,14 +399,49 @@ namespace AIO.UEditor
         private GUIContent GC_ADD;
 
         /// <summary>
+        /// 界面内容 - 收缩
+        /// </summary>
+        private GUIContent GC_FOLDOUT;
+
+        /// <summary>
+        /// 界面内容 - 展开
+        /// </summary>
+        private GUIContent GC_FOLDOUT_ON;
+
+        /// <summary>
         /// 界面内容 - 删除
         /// </summary>
         private GUIContent GC_DEL;
 
         /// <summary>
+        /// 界面内容 - 清空
+        /// </summary>
+        private GUIContent GC_CLEAR;
+
+        /// <summary>
+        /// 界面内容 - 上传
+        /// </summary>
+        private GUIContent GC_UPLOAD;
+
+        /// <summary>
+        /// 界面内容 - 下载
+        /// </summary>
+        private GUIContent GC_DOWNLOAD;
+
+        /// <summary>
+        /// 界面内容 - 云端
+        /// </summary>
+        private GUIContent GC_NET;
+
+        /// <summary>
         /// 界面内容 - 打开
         /// </summary>
         private GUIContent GC_OPEN;
+
+        /// <summary>
+        /// 界面内容 - 打开文件夹
+        /// </summary>
+        private GUIContent GC_OPEN_FOLDER;
 
         /// <summary>
         /// 界面内容 - 刷新
@@ -388,11 +457,6 @@ namespace AIO.UEditor
         /// 界面内容 - 复制
         /// </summary>
         private GUIContent GC_COPY;
-
-        /// <summary>
-        /// 界面内容 - 选择
-        /// </summary>
-        private GUIContent GC_SELECT;
 
         /// <summary>
         /// 界面内容 - 保存
@@ -446,66 +510,9 @@ namespace AIO.UEditor
         private ViewRect ViewCollectorsList;
 
         private AssetSystem.SequenceRecordQueue SequenceRecords;
-        
-        partial void GCInit()
+
+        private void GPInit()
         {
-            DoDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
-            ViewConfig = new ViewRect(100, DoDrawRect.height)
-            {
-                IsShow = false,
-                IsAllowHorizontal = true,
-                DragHorizontalWidth = 5,
-                width = 500
-            };
-            ViewSetting = new ViewRect(100, DoDrawRect.height)
-            {
-                IsShow = false,
-                IsAllowHorizontal = true,
-                DragHorizontalWidth = 5,
-                width = 150
-            };
-            ViewPackageList = new ViewRect(100, DoDrawRect.height)
-            {
-                IsShow = true,
-                IsAllowHorizontal = true,
-                DragHorizontalWidth = 5,
-                width = 150
-            };
-            ViewGroupList = new ViewRect(100, DoDrawRect.height)
-            {
-                IsShow = true,
-                IsAllowHorizontal = true,
-                DragHorizontalWidth = 5,
-                width = 150
-            };
-            ViewCollectorsList = new ViewRect(100, DoDrawRect.height)
-            {
-                IsShow = true,
-                IsAllowHorizontal = false,
-                width = 400
-            };
-
-            ViewDetailList = new ViewRect(300, DoDrawRect.height)
-            {
-                IsShow = true,
-                IsAllowHorizontal = false,
-                DragHorizontalWidth = 10,
-                width = 400,
-                x = 0,
-                y = DrawHeaderHeight,
-            };
-
-            ViewDetails = new ViewRect(300, DoDrawRect.height)
-            {
-                IsShow = false,
-                IsAllowHorizontal = false,
-                width = 400,
-                y = ViewDetailList.y + 3,
-            };
-
-#if SUPPORT_YOOASSET
-            GC_ToConvert_YooAsset = new GUIContent(Resources.Load<Texture>("Texture/Yooasset"), "转换为YooAsset");
-#endif
             GP_Width_150 = GUILayout.Width(150);
             GP_Width_100 = GUILayout.Width(100);
             GP_Width_75 = GUILayout.Width(75);
@@ -517,42 +524,40 @@ namespace AIO.UEditor
             GP_Height_30 = GUILayout.Height(30);
             GP_Height_25 = GUILayout.Height(25);
             GP_Height_20 = GUILayout.Height(20);
-            GC_Select_ASConfig = EditorGUIUtility.IconContent("d_GameObject Icon");
-            GC_Select_ASConfig.tooltip = "选择资源配置文件";
-            GC_SELECT = new GUIContent("☈", "选择指向指定资源");
-            GC_DEL = new GUIContent("✘", "删除元素");
-            GC_REFRESH = new GUIContent("↺", "刷新数据");
-            GC_OPEN = new GUIContent("☑", "打开");
-            GC_COPY = new GUIContent("❒", "复制资源路径");
+        }
 
-            GC_ADD = new GUIContent("✚", "添加元素");
+        partial void GCInit()
+        {
+            ViewRectUpdate();
+            GPInit();
 
-            GC_SAVE = EditorGUIUtility.IconContent("d_SaveAs");
-            GC_SAVE.tooltip = "保存";
+#if SUPPORT_YOOASSET
+            GC_ToConvert_YooAsset = GEContent.NewApp("Yooasset", "转换为Yooasset资源");
+#endif
 
-            GC_SyncData = EditorGUIUtility.IconContent("d_RotateTool On");
-            GC_SyncData.tooltip = "同步数据";
+            GC_SAVE = GEContent.NewBuiltin("d_SaveAs", "保存");
+            GC_LookMode_Object_Select = GEContent.NewBuiltin("d_scenepicking_pickable_hover", "选择指向指定资源");
 
-            GC_LookMode_Data_Sort = EditorGUIUtility.IconContent("d_pulldown@2x");
-            GC_LookMode_Data_Sort.tooltip = "排序方式";
-
-            GC_LookMode_Object_Select = EditorGUIUtility.IconContent("d_scenepicking_pickable_hover");
-            GC_LookMode_Object_Select.tooltip = "选择指向指定资源";
-
-            GC_LookMode_Page_MaxLeft = EditorGUIUtility.IconContent("ArrowNavigationLeft");
-            GC_LookMode_Page_MaxLeft.tooltip = "跳转到第一页";
-
-            GC_LookMode_Page_Left = EditorGUIUtility.IconContent("d_scrollleft");
-            GC_LookMode_Page_Left.tooltip = "上一页";
-
-            GC_LookMode_Page_MaxRight = EditorGUIUtility.IconContent("d_scrollright");
-            GC_LookMode_Page_MaxRight.tooltip = "跳转到最后一页";
-
-            GC_LookMode_Page_Right = EditorGUIUtility.IconContent("ArrowNavigationRight");
-            GC_LookMode_Page_Right.tooltip = "下一页";
-
-            GC_LookMode_Page_Size = EditorGUIUtility.IconContent("d_CustomSorting");
-            GC_LookMode_Page_Size.tooltip = "设置页面大小";
+            GC_OPEN_FOLDER = GEContent.NewSetting("bangdingliucheng", "打开文件");
+            GC_NET = GEContent.NewSetting("国际", "云端");
+            GC_UPLOAD = GEContent.NewSetting("上传", "上传");
+            GC_DOWNLOAD = GEContent.NewSetting("下载", "下载");
+            GC_FOLDOUT = GEContent.NewSetting("quanping-shouqi-xian", "收缩");
+            GC_FOLDOUT_ON = GEContent.NewSetting("quanping-zhankai-xian", "展开");
+            GC_Select_ASConfig = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
+            GC_REFRESH = GEContent.NewSetting("重置", "刷新数据");
+            GC_COPY = GEContent.NewSetting("ic_copy", "复制资源路径");
+            GC_ADD = GEContent.NewSetting("新增", "添加元素");
+            GC_DEL = GEContent.NewSetting("删除", "删除元素");
+            GC_CLEAR = GEContent.NewSetting("cancel", "清空元素");
+            GC_OPEN = GEContent.NewSetting("操作", "打开");
+            GC_SyncData = GEContent.NewSetting("下载", "下载");
+            GC_LookMode_Data_Sort = GEContent.NewSetting("ic_sort", "排序方式");
+            GC_LookMode_Page_MaxLeft = GEContent.NewSetting("Arrows_Arrow_Big_Left", "跳转到第一页");
+            GC_LookMode_Page_Left = GEContent.NewSetting("Arrows_Arrow_Left_Bar", "上一页");
+            GC_LookMode_Page_MaxRight = GEContent.NewSetting("Arrows_Arrow_Right_Bar", "跳转到最后一页");
+            GC_LookMode_Page_Right = GEContent.NewSetting("Arrows_Arrow_Big_Right", "下一页");
+            GC_LookMode_Page_Size = GEContent.NewSetting("操作", "设置页面大小");
 
             GC_LookMode_Detail_Tags = new GUIContent("Tags", "资源标签");
             GC_LookMode_Detail_GUID = new GUIContent("GUID", "资源GUID");
@@ -563,15 +568,67 @@ namespace AIO.UEditor
             GC_LookMode_Detail_LastWriteTime = new GUIContent("Last Write Time", "最后写入时间");
             GC_LookMode_Detail_IsSubAsset = new GUIContent("IsSubAsset", "资源是否构成了其他资源的一部分？");
 
-            if (CurrentPageValues is null)
-            {
-                CurrentPageValues = new PageList<AssetDataInfo>
-                {
-                    PageSize = 25
-                };
-            }
-
+            if (CurrentPageValues is null) CurrentPageValues = new PageList<AssetDataInfo> { PageSize = 25 };
             if (LookDataPageSizeMenu is null) UpdatePageSizeMenu();
+        }
+
+        private void ViewRectUpdate()
+        {
+            DoEditorDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
+            DoConfigDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
+
+            ViewSetting = new ViewRect(150, DoEditorDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = false,
+                DragHorizontalWidth = 5,
+                width = 150
+            };
+            ViewConfig = new ViewRect(550, DoEditorDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = true,
+                DragHorizontalWidth = 5,
+                width = CurrentWidth - ViewSetting.width
+            };
+            ViewPackageList = new ViewRect(100, DoEditorDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = true,
+                DragHorizontalWidth = 5,
+                width = 150
+            };
+            ViewGroupList = new ViewRect(100, DoEditorDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = true,
+                DragHorizontalWidth = 5,
+                width = 150
+            };
+            ViewCollectorsList = new ViewRect(100, DoEditorDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = false,
+                width = 400
+            };
+
+            ViewDetailList = new ViewRect(300, DoEditorDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = false,
+                DragHorizontalWidth = 10,
+                width = 400,
+                x = 0,
+                y = DrawHeaderHeight,
+            };
+
+            ViewDetails = new ViewRect(300, DoEditorDrawRect.height)
+            {
+                IsShow = false,
+                IsAllowHorizontal = false,
+                width = 400,
+                y = ViewDetailList.y + 3,
+            };
         }
 
         private void UpdatePageSizeMenu()

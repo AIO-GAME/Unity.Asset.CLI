@@ -60,6 +60,44 @@ namespace AIO.UEditor
             UpdateData();
         }
 
+        partial void OnDrawHeader()
+        {
+            using (GELayout.VHorizontal())
+            {
+                switch (WindowMode)
+                {
+                    default:
+                    case Mode.Editor:
+                        OnDrawHeaderEditorMode();
+                        break;
+                    case Mode.Config:
+                        OnDrawHeaderConfigMode();
+                        break;
+                    case Mode.Look:
+                        OnDrawHeaderLookMode();
+                        break;
+                    case Mode.Build:
+                        OnDrawHeaderBuildMode();
+                        break;
+                    case Mode.Tags:
+                        OnDrawHeaderTagsMode();
+                        break;
+                    case Mode.FirstPackage:
+                        OnDrawHeaderFirstPackageMode();
+                        break;
+                }
+
+                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
+
+                if (!GUI.changed) return;
+                if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
+                GUI.FocusControl(null);
+                UpdateData();
+
+                TempTable[nameof(WindowMode)] = WindowMode;
+            }
+        }
+
         /// <summary>
         /// 更新数据
         /// </summary>
@@ -67,6 +105,9 @@ namespace AIO.UEditor
         {
             switch (WindowMode)
             {
+                case Mode.Config:
+                    UpdateDataConfigMode();
+                    break;
                 default:
                 case Mode.Editor:
 
@@ -78,7 +119,7 @@ namespace AIO.UEditor
                     UpdateDataBuildMode();
                     break;
                 case Mode.Tags:
-                    this.StartCoroutine(UpdateDataTagsMode());
+                    UpdateDataTagsMode();
                     break;
                 case Mode.FirstPackage:
                     UpdateDataFirstPackageMode();
@@ -102,6 +143,9 @@ namespace AIO.UEditor
                 case Mode.Editor:
                     OnDrawEditorMode();
                     break;
+                case Mode.Config:
+                    OnDrawConfigMode();
+                    break;
                 case Mode.Look:
                     OnDrawLookMode();
                     break;
@@ -120,6 +164,7 @@ namespace AIO.UEditor
             OnOpenEvent();
         }
 
+        partial void OnDrawConfigMode();
         partial void OnDrawEditorMode();
         partial void OnDrawTagsMode();
         partial void OnDrawBuildMode();
@@ -166,15 +211,16 @@ namespace AIO.UEditor
             switch (WindowMode)
             {
                 case Mode.Editor:
-                    ViewConfig.ContainsHorizontal(eventData);
                     ViewGroupList.ContainsHorizontal(eventData);
                     ViewPackageList.ContainsHorizontal(eventData);
-                    ViewSetting.ContainsHorizontal(eventData);
                     break;
                 case Mode.FirstPackage:
                 case Mode.Tags:
                 case Mode.Look:
                     ViewDetailList.ContainsHorizontal(eventData);
+                    break;
+                case Mode.Config:
+                    ViewConfig.ContainsHorizontal(eventData);
                     break;
                 case Mode.Build:
                 default:
@@ -188,10 +234,8 @@ namespace AIO.UEditor
             {
                 case Mode.Editor:
                 {
-                    ViewConfig.DragHorizontal(eventData);
                     ViewGroupList.DragHorizontal(eventData);
                     ViewPackageList.DragHorizontal(eventData);
-                    ViewSetting.DragHorizontal(eventData);
                     break;
                 }
                 case Mode.FirstPackage:
@@ -201,6 +245,9 @@ namespace AIO.UEditor
                     ViewDetailList.DragHorizontal(eventData);
                     break;
                 }
+                case Mode.Config:
+                    ViewConfig.DragHorizontal(eventData);
+                    break;
                 case Mode.Build:
                 default:
                     break;
@@ -215,25 +262,36 @@ namespace AIO.UEditor
                 case Mode.Look:
                 case Mode.FirstPackage:
                 {
-                    if (keyCode == KeyCode.LeftArrow) // 数字键盘 右键
+                    switch (keyCode)
                     {
-                        if (CurrentPageValues.PageIndex > 0)
-                        {
-                            CurrentPageValues.PageIndex -= 1;
-                            eventData.Use();
-                        }
-                    }
-                    else if (keyCode == KeyCode.RightArrow) // 数字键盘 左键 
-                    {
-                        if (CurrentPageValues.PageIndex < CurrentPageValues.PageCount - 1)
-                        {
-                            CurrentPageValues.PageIndex += 1;
-                            eventData.Use();
-                        }
+                        case KeyCode.LeftArrow: // 数字键盘 右键
+                            if (CurrentPageValues.PageIndex > 0)
+                            {
+                                CurrentPageValues.PageIndex -= 1;
+                                eventData.Use();
+                            }
+
+                            break;
+
+                        case KeyCode.RightArrow: // 数字键盘 左键 
+                            if (CurrentPageValues.PageIndex < CurrentPageValues.PageCount - 1)
+                            {
+                                CurrentPageValues.PageIndex += 1;
+                                eventData.Use();
+                            }
+
+                            break;
+
+                        case KeyCode.UpArrow: // 数字键盘 上键
+                            break;
+
+                        case KeyCode.DownArrow: // 数字键盘 下键
+                            break;
                     }
 
                     break;
                 }
+                case Mode.Config:
                 case Mode.Editor:
                 case Mode.Build:
                 default:

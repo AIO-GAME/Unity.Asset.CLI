@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ namespace AIO.UEditor
             }
 
             SearchText = EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
-            if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_25))
+            if (GUILayout.Button(GC_CLEAR, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
                 GUI.FocusControl(null);
                 SearchText = string.Empty;
@@ -100,7 +101,7 @@ namespace AIO.UEditor
                 LookModeCurrentSelectAsset = null;
                 SearchText = string.Empty;
                 LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
-                this.StartCoroutine(UpdateDataTagsMode());
+                UpdateDataTagsMode();
             }
         }
 
@@ -214,13 +215,13 @@ namespace AIO.UEditor
             }
         }
 
-        private IEnumerator UpdateDataTagsMode()
+        private void UpdateDataTagsMode()
         {
             GUI.FocusControl(null);
             CurrentPageValues.Clear();
             CurrentPageValues.PageIndex = 0;
             CurrentTagValues.Clear();
-            if (Data.Packages.Length == 0) yield break;
+            if (Data.Packages.Length == 0) return;
             TagsModeDisplayCollectors = new string[] { "ALL" };
             TagsModeDisplayTypes = Array.Empty<string>();
             TagsModeDisplayTags = Data.GetTags();
@@ -237,6 +238,7 @@ namespace AIO.UEditor
 
                     foreach (var collector in group.Collectors)
                     {
+                        if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
                         collector.CollectAsset(package.Name, group.Name);
                         collectors[collector.CollectPath.Replace('/', '\\').Trim('\\')] = 1;

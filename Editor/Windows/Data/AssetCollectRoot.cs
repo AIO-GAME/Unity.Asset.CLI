@@ -25,8 +25,6 @@ namespace AIO.UEditor
 
         [Description("包含资源GUID")] public bool IncludeAssetGUID;
 
-        [Description("地址转小写")] public bool LocationToLower;
-
         /// <summary>
         /// 资源收集配置
         /// </summary>
@@ -121,6 +119,7 @@ namespace AIO.UEditor
                 {
                     foreach (var collect in group.Collectors)
                     {
+                        if (collect.Type != EAssetCollectItemType.MainAssetCollector) continue;
                         if (string.IsNullOrEmpty(collect.Tags)) continue;
                         foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
                     }
@@ -144,6 +143,7 @@ namespace AIO.UEditor
                     if (group.Name != groupName) continue;
                     foreach (var collect in group.Collectors)
                     {
+                        if (collect.Type != EAssetCollectItemType.MainAssetCollector) continue;
                         if (string.IsNullOrEmpty(collect.Tags)) continue;
                         foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
                     }
@@ -156,7 +156,7 @@ namespace AIO.UEditor
             return dictionary.Keys.ToArray();
         }
 
-        public string[] GetTags(string packageName, string groupName, string CollectPath)
+        public string[] GetTags(string packageName, string groupName, string collectPath)
         {
             var dictionary = new Dictionary<string, bool>();
             foreach (var package in Packages)
@@ -167,7 +167,8 @@ namespace AIO.UEditor
                     if (group.Name != groupName) continue;
                     foreach (var collect in group.Collectors)
                     {
-                        if (collect.CollectPath != CollectPath) continue;
+                        if (collect.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (collect.CollectPath != collectPath) continue;
                         if (string.IsNullOrEmpty(collect.Tags)) continue;
                         foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
                     }

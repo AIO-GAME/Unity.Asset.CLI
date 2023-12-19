@@ -9,9 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -77,6 +75,11 @@ namespace AIO.UEngine
         /// </summary>
         public AssetsPackageConfig[] Packages;
 
+        /// <summary>
+        /// 运行时内置文件根目录
+        /// </summary>
+        public string RuntimeRootDirectory = "BuiltinFiles";
+
         public ASConfig(string url)
         {
             URL = url;
@@ -123,6 +126,31 @@ namespace AIO.UEngine
             }
         }
 
+        public void Check()
+        {
+            switch (instance.ASMode)
+            {
+                case EASMode.Editor:
+                    if (Packages == null || Packages.Length == 0)
+                        throw new Exception("Please set the package configuration");
+                    if (Packages.Any(value => string.IsNullOrEmpty(value.Name)))
+                        throw new Exception("Please set the package name");
+                    if (Packages.Any(value => string.IsNullOrEmpty(value.Version)))
+                        throw new Exception("Please set the package version");
+                    break;
+                case EASMode.Remote:
+                    if (string.IsNullOrEmpty(RuntimeRootDirectory))
+                        throw new Exception("Please set the runtime root directory");
+                    break;
+                case EASMode.Local:
+                    if (string.IsNullOrEmpty(RuntimeRootDirectory))
+                        throw new Exception("Please set the runtime root directory");
+                    break;
+                default:
+                    break;
+            }
+        }
+
         public void UpdatePackage()
         {
             if (ASMode == EASMode.Remote) return;
@@ -153,7 +181,7 @@ namespace AIO.UEngine
                                         IsDefault = false
                                     })
                                 .ToArray();
-                            Packages[0].IsDefault = true;
+                            if (Packages.Length > 0) Packages[0].IsDefault = true;
                         }
                     }
 #endif
@@ -161,10 +189,9 @@ namespace AIO.UEngine
             }
         }
 
-        /// <summary>
-        /// 获取本地资源包地址
-        /// </summary>
-        public static ASConfig GetOrCreate()
+        private static ASConfig instance;
+
+        private static ASConfig GetResource()
         {
             ASConfig config = null;
             foreach (var item in Resources.LoadAll<ASConfig>("ASConfig"))
@@ -174,36 +201,48 @@ namespace AIO.UEngine
                 break;
             }
 
-#if UNITY_EDITOR
-            foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new string[] { "Assets" })
-                         .Select(AssetDatabase.GUIDToAssetPath)
-                         .Select(AssetDatabase.LoadAssetAtPath<ASConfig>)
-                         .Where(value => value != null))
-            {
-                if (item.Equals(null)) continue;
-                config = item;
-                break;
-            }
-
-            if (config is null)
-            {
-                config = CreateInstance<ASConfig>();
-                config.ASMode = EASMode.Editor;
-                config.URL = "";
-                config.LoadPathToLower = false;
-                config.AutoSaveVersion = false;
-                config.AppendTimeTicks = false;
-                config.OutputLog = false;
-                config.EnableSequenceRecord = false;
-                config.Packages = Array.Empty<AssetsPackageConfig>();
-                if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
-                    Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
-                AssetDatabase.CreateAsset(config, "Assets/Resources/ASConfig.asset");
-            }
-#else
-            throw new System.Exception("Not found ASConfig.asset ! Please create it !");
-#endif
             return config;
+        }
+
+        /// <summary>
+        /// 获取本地资源包地址
+        /// </summary>
+        public static ASConfig GetOrCreate()
+        {
+            if (instance != null) return instance;
+            instance = GetResource();
+#if UNITY_EDITOR
+            if (instance is null)
+            {
+                foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new string[] { "Assets" })
+                             .Select(AssetDatabase.GUIDToAssetPath)
+                             .Select(AssetDatabase.LoadAssetAtPath<ASConfig>)
+                             .Where(value => value != null))
+                {
+                    if (item.Equals(null)) continue;
+                    instance = item;
+                    break;
+                }
+
+                if (instance is null)
+                {
+                    instance = CreateInstance<ASConfig>();
+                    instance.ASMode = EASMode.Editor;
+                    instance.URL = "";
+                    instance.LoadPathToLower = false;
+                    instance.AutoSaveVersion = false;
+                    instance.AppendTimeTicks = false;
+                    instance.OutputLog = false;
+                    instance.EnableSequenceRecord = false;
+                    instance.Packages = Array.Empty<AssetsPackageConfig>();
+                    if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
+                        Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
+                    AssetDatabase.CreateAsset(instance, "Assets/Resources/ASConfig.asset");
+                }
+            }
+#endif
+            if (instance is null) throw new Exception("Not found ASConfig.asset ! Please create it !");
+            return instance;
         }
 
         /// <summary>
@@ -223,15 +262,21 @@ namespace AIO.UEngine
             bool autoSequenceRecord = true,
             bool outputLog = false)
         {
-            var config = CreateInstance<ASConfig>();
-            config.URL = url;
-            config.AppendTimeTicks = appendTimeTicks;
-            config.AutoSaveVersion = autoSaveVersion;
-            config.ASMode = EASMode.Remote;
-            config.LoadPathToLower = loadPathToLower;
-            config.OutputLog = outputLog;
-            config.EnableSequenceRecord = autoSequenceRecord;
-            return config;
+            if (instance != null) return instance;
+            instance = GetResource();
+            if (instance is null)
+            {
+                instance = CreateInstance<ASConfig>();
+                instance.URL = url;
+                instance.AppendTimeTicks = appendTimeTicks;
+                instance.AutoSaveVersion = autoSaveVersion;
+                instance.ASMode = EASMode.Remote;
+                instance.LoadPathToLower = loadPathToLower;
+                instance.OutputLog = outputLog;
+                instance.EnableSequenceRecord = autoSequenceRecord;
+            }
+
+            return instance;
         }
 
         /// <summary>
@@ -242,11 +287,17 @@ namespace AIO.UEngine
         /// <returns>资源配置</returns>
         public static ASConfig GetLocal(bool loadPathToLower = false, bool outputLog = false)
         {
-            var config = CreateInstance<ASConfig>();
-            config.ASMode = EASMode.Local;
-            config.LoadPathToLower = loadPathToLower;
-            config.OutputLog = outputLog;
-            return config;
+            if (instance != null) return instance;
+            instance = GetResource();
+            if (instance is null)
+            {
+                instance = CreateInstance<ASConfig>();
+                instance.ASMode = EASMode.Local;
+                instance.LoadPathToLower = loadPathToLower;
+                instance.OutputLog = outputLog;
+            }
+
+            return instance;
         }
 
 #if UNITY_EDITOR
@@ -259,11 +310,17 @@ namespace AIO.UEngine
         /// <returns>资源配置</returns>
         public static ASConfig GetEditor(bool loadPathToLower = false, bool outputLog = false)
         {
-            var config = CreateInstance<ASConfig>();
-            config.ASMode = EASMode.Editor;
-            config.LoadPathToLower = loadPathToLower;
-            config.OutputLog = outputLog;
-            return config;
+            if (instance != null) return instance;
+            instance = GetResource();
+            if (instance is null)
+            {
+                instance = CreateInstance<ASConfig>();
+                instance.ASMode = EASMode.Editor;
+                instance.LoadPathToLower = loadPathToLower;
+                instance.OutputLog = outputLog;
+            }
+
+            return instance;
         }
 
         public void Save()

@@ -85,7 +85,6 @@ namespace AIO
             yield return Proxy.Initialize();
             SequenceRecords = new SequenceRecordQueue(Parameter.EnableSequenceRecord);
             yield return SequenceRecords.LoadCo();
-            yield return DownloadDynamic();
             IsInitialized = true;
         }
 
@@ -130,6 +129,14 @@ namespace AIO
         {
             Proxy.Dispose();
             SequenceRecords.Dispose();
+        }
+        
+        /// <summary>
+        /// 清理缓存资源 (清空之后需要重新下载资源)
+        /// </summary>
+        public static void CleanCache(Action<bool> cb = null)
+        {
+            Proxy.CleanCache(cb);
         }
     }
 }

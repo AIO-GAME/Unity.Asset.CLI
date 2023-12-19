@@ -20,7 +20,36 @@ namespace AIO
         /// <summary>
         /// 白名单 - 定位指定白名单 - 允许同步加载
         /// </summary>
-        public static List<string> WhiteListLocal { get; private set; } = new List<string>();
+        private static List<string> WhiteListLocal { get; set; } = new List<string>();
+
+        /// <summary>
+        /// 白名单 - 全部白名单 - 允许同步加载
+        /// </summary>
+        public static bool WhiteAll;
+
+        /// <summary>
+        /// 添加白名单
+        /// </summary>
+        public static void AddWhite(params string[] list)
+        {
+            WhiteListLocal.AddRange(list);
+        }
+
+        /// <summary>
+        /// 添加白名单
+        /// </summary>
+        public static void AddWhite(IEnumerable<string> list)
+        {
+            WhiteListLocal.AddRange(list);
+        }
+
+        /// <summary>
+        /// 判断是否在白名单中
+        /// </summary>
+        public static bool IsWhite(string location)
+        {
+            return WhiteAll || WhiteListLocal.Contains(location);
+        }
 
         /// <summary>
         /// 资源包配置
@@ -42,14 +71,14 @@ namespace AIO
         /// <summary>
         /// 序列记录队列
         /// </summary>
-        public static SequenceRecordQueue SequenceRecords { get; private set; }
+        internal static SequenceRecordQueue SequenceRecords { get; private set; }
 #if UNITY_EDITOR
             = new SequenceRecordQueue();
 #endif
 
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
-            private const string FILE_NAME = "record.json";
+            private const string FILE_NAME = "ASSETRECORD";
 
             private Queue<SequenceRecord> Records;
 
@@ -75,7 +104,8 @@ namespace AIO
 
             public Task DownloadTask(string URL)
             {
-                return AHelper.Net.HTTP.DownloadAsync(GET_REMOTE_PATH(URL), LOCAL_PATH, null, true);
+                var handle = AHelper.HTTP.Download(GET_REMOTE_PATH(URL), LOCAL_PATH, true);
+                return handle.WaitAsync();
             }
 
             public IEnumerator DownloadCo(string URL)
@@ -119,7 +149,7 @@ namespace AIO
                                 0, Application.dataPath.LastIndexOf('/')),
                             "Bundles", "Version");
 #else
-                        Path.Combine(Application.persistentDataPath, "BuildinFiles", "Version");
+                        Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory, "Version");
 #endif
                     if (!Directory.Exists(root)) Directory.CreateDirectory(root);
                     return Path.Combine(root, FILE_NAME);

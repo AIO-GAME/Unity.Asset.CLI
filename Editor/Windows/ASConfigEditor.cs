@@ -59,7 +59,7 @@ namespace AIO.UEditor
             Target.ASMode = GELayout.Popup("加载模式", Target.ASMode);
             Target.OutputLog = GELayout.ToggleLeft("开启日志输出", Target.OutputLog);
             Target.LoadPathToLower = GELayout.ToggleLeft("定位地址小写", Target.LoadPathToLower);
-
+            Target.RuntimeRootDirectory = GELayout.Field("运行时根目录(文件夹名)", Target.RuntimeRootDirectory);
             switch (Target.ASMode)
             {
                 case EASMode.Remote:

@@ -5,145 +5,160 @@
 |||✩ - - - - - |*/
 
 #if SUPPORT_YOOASSET
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine.YooAsset;
+using UnityEngine;
 using YooAsset;
 
 namespace AIO.UEngine
 {
     public partial class YAssetProxy
     {
-        private class YASDownloader : IASDownloader
+        private class YASDownloader : AOperation, IASDownloader
         {
             private IDictionary<string, YAssetPackage> Packages;
 
-            private Dictionary<string, long> DownloadBytesList;
-
             private Dictionary<string, UpdatePackageManifestOperation> ManifestOperations;
-
-            private Dictionary<string, DownloaderOperation> DownloaderOperations;
-
             private Dictionary<string, UpdatePackageVersionOperation> VersionOperations;
 
             private Dictionary<string, PreDownloadContentOperation> PreDownloadContentOperations;
-
             private Dictionary<string, ResourceDownloaderOperation> ResourceDownloaderOperations;
 
-            public IProgressHandle Progress { get; set; }
+            /// <summary>
+            /// 记录下载的字节数 分阶段记录
+            /// </summary>
+            private long TempDownloadBytes;
 
-            public YASDownloader(IDictionary<string, YAssetPackage> packages, IProgressEvent iEvent = null)
+            private string TempDownloadName;
+
+            #region Event
+
+            /// <summary>
+            /// 网络不可用
+            /// </summary>
+            private Action<IProgressReport> OnNetReachableNot { get; }
+
+            /// <summary>
+            /// 移动网络 是否允许在移动网络条件下下载
+            /// </summary>
+            private Action<IProgressReport, Action> OnNetReachableCarrier { get; }
+
+            /// <summary>
+            /// 磁盘空间不足
+            /// </summary>
+            private Action<IProgressReport> OnDiskSpaceNotEnough { get; }
+
+            /// <summary>
+            /// 无写入权限
+            /// </summary>
+            private Action<IProgressReport> OnWritePermissionNot { get; }
+
+            /// <summary>
+            /// 无读取权限
+            /// </summary>
+            private Action<IProgressReport> OnReadPermissionNot { get; }
+
+            #endregion
+
+            public YASDownloader(IDictionary<string, YAssetPackage> packages, DownlandAssetEvent iEvent)
             {
                 Packages = packages;
-                Progress = new AProgress(iEvent);
+
                 VersionOperations = new Dictionary<string, UpdatePackageVersionOperation>();
                 ManifestOperations = new Dictionary<string, UpdatePackageManifestOperation>();
-                DownloaderOperations = new Dictionary<string, DownloaderOperation>();
                 PreDownloadContentOperations = new Dictionary<string, PreDownloadContentOperation>();
                 ResourceDownloaderOperations = new Dictionary<string, ResourceDownloaderOperation>();
 
-                DownloadBytesList = new Dictionary<string, long>();
+                Event = iEvent;
+                OnNetReachableNot = iEvent.OnNetReachableNot;
+                OnNetReachableCarrier = iEvent.OnNetReachableCarrier;
+                OnDiskSpaceNotEnough = iEvent.OnDiskSpaceNotEnough;
+                OnWritePermissionNot = iEvent.OnWritePermissionNot;
+                OnReadPermissionNot = iEvent.OnReadPermissionNot;
             }
+
+            private bool AllowReachableCarrier;
 
             public bool Flow => Packages.Count > 0;
 
-            public void Dispose()
+            protected override void OnDispose()
             {
                 Packages = null;
                 VersionOperations = null;
+                Tags = null;
                 ManifestOperations = null;
-                DownloaderOperations = null;
                 PreDownloadContentOperations = null;
                 ResourceDownloaderOperations = null;
-
-                DownloadBytesList = null;
             }
 
-            private static async Task WaitTask(IEnumerable<AsyncOperationBase> operations)
-            {
-                var tasks = operations.Select(operation => operation.Task).ToArray();
-#if UNITY_WEBGL
-                foreach (var task in tasks) await task;
-#else
-                if (tasks.Length > 0) await Task.WhenAll(tasks);
-#endif
-            }
-
-            private static IEnumerator WaitCO(IEnumerable<AsyncOperationBase> operations)
-            {
-                return operations.GetEnumerator();
-            }
-
-            #region Update Package Manifest
+            #region Update Package Header
 
             private void UpdatePackageManifestBegin()
             {
-                AssetSystem.InvokeNotify(EASEventType.UpdatePackageManifest, string.Empty);
                 foreach (var asset in Packages.Values)
                 {
                     if (asset.Mode != EPlayMode.HostPlayMode) continue;
-                    AssetSystem.LogFormat("向网络端请求并更新补丁清单 -> [{0} -> {1}] ", asset.Config.Name, asset.Config.Version);
-                    var operation = asset.UpdatePackageManifestAsync(
-                        asset.Config.Version,
-                        AssetSystem.Parameter.AutoSaveVersion,
-                        AssetSystem.Parameter.Timeout);
-                    ManifestOperations.Add(asset.Config.Name, operation);
+                    ManifestOperations[asset.Config.Name] = asset.UpdatePackageManifestAsync(asset.Config.Version);
                 }
             }
 
             private void UpdatePackageManifestEnd()
             {
-                foreach (var pair in ManifestOperations
-                             .Where(pair => pair.Value.Status != EOperationStatus.Succeed))
+                foreach (var pair in ManifestOperations.Where(pair => pair.Value.Status != EOperationStatus.Succeed))
                 {
-                    AssetSystem.LogErrorFormat("[{0} -> {1} : {2}] -> {3}", pair.Key,
-                        Packages[pair.Key].Config.Version,
-                        pair.Value.Status, pair.Value.Error);
+                    State = EProgressState.Fail;
+                    Event.OnError?.Invoke(new SystemException(pair.Value.Error));
                     Packages.Remove(pair.Key);
                 }
             }
 
-            /// <summary>
-            /// 向网络端请求并更新补丁清单 异步
-            /// </summary>
-            public async Task UpdatePackageManifestTask()
+            protected override void OnBegin()
             {
-                if (!Flow) return;
-                UpdatePackageManifestBegin();
-                await WaitTask(ManifestOperations.Values);
-                UpdatePackageManifestEnd();
+                OpenRecord = false;
+                Tags.Clear();
+                PreDownloadContentOperations.Clear();
+                ResourceDownloaderOperations.Clear();
             }
 
-            /// <summary>
-            /// 向网络端请求并更新补丁清单 异步
-            /// </summary>
-            public IEnumerator UpdatePackageManifestCO()
+            public IEnumerator UpdateHeader()
             {
                 if (!Flow) yield break;
-                UpdatePackageManifestBegin();
-                yield return WaitCO(ManifestOperations.Values);
+                UpdatePackageManifestBegin(); // 向网络端请求并更新补丁清单
+                foreach (var pair in ManifestOperations) yield return pair.Value;
                 UpdatePackageManifestEnd();
+
+                if (!Flow) yield break; // 异步向网络端请求最新的资源版本
+                UpdatePackageVersionBegin();
+                foreach (var pair in VersionOperations) yield return pair.Value;
+                UpdatePackageVersionEnd();
+
+                if (!Flow) yield break;
+
+                foreach (var pair in PreDownloadContentOperations)
+                {
+                    yield return pair.Value;
+                    if (pair.Value.Status == EOperationStatus.Succeed)
+                    {
+                        Packages.Remove(pair.Key);
+                        continue;
+                    }
+
+                    State = EProgressState.Fail;
+                    Event.OnError?.Invoke(new SystemException($"校验本地资源完整性失败 -> [{pair.Key} -> {pair.Value.Error}]"));
+                    yield break;
+                }
             }
-
-            #endregion
-
-            #region UpdatePackageVersion
 
             private void UpdatePackageVersionBegin()
             {
-                AssetSystem.InvokeNotify(EASEventType.UpdatePackageVersion, string.Empty);
-
                 foreach (var asset in Packages.Values)
                 {
                     if (asset.Mode != EPlayMode.HostPlayMode) continue;
-                    AssetSystem.LogFormat("向网络端请求最新的资源版本 -> [{0} -> Local : {1}]", asset.PackageName,
-                        asset.Config.Version);
-                    var opVersion = asset.UpdatePackageVersionAsync(
-                        AssetSystem.Parameter.AppendTimeTicks,
-                        AssetSystem.Parameter.Timeout);
-                    VersionOperations.Add(asset.Config.Name, opVersion);
+                    VersionOperations[asset.Config.Name] = asset.UpdatePackageVersionAsync();
                 }
             }
 
@@ -151,339 +166,233 @@ namespace AIO.UEngine
             {
                 foreach (var pair in VersionOperations)
                 {
-                    var package = Packages[pair.Key];
+                    if (!Packages.TryGetValue(pair.Key, out var asset)) continue;
                     switch (pair.Value.Status)
                     {
                         case EOperationStatus.Succeed: // 本地版本与网络版本不一致
-                            var version = package.Config.Version;
+                            var version = asset.Config.Version;
                             if (version != pair.Value.PackageVersion)
-                                package.Config.Version = pair.Value.PackageVersion;
+                                asset.Config.Version = pair.Value.PackageVersion; // 更新本地版本
                             break;
                         default:
                             // 如果获取远端资源版本失败，说明当前网络无连接。
                             // 在正常开始游戏之前，需要验证本地清单内容的完整性。
-                            var packageVersion = package.GetPackageVersion();
-                            var operation = package.PreDownloadContentAsync(packageVersion);
+                            var packageVersion = asset.GetPackageVersion();
+                            var operation = asset.PreDownloadContentAsync(packageVersion);
                             PreDownloadContentOperations.Add(pair.Key, operation);
-
                             break;
                     }
                 }
             }
 
-            private void UpdatePreDownloadContentEnd()
-            {
-                foreach (var pair in PreDownloadContentOperations)
-                {
-                    if (pair.Value.Status != EOperationStatus.Succeed)
-                    {
-                        AssetSystem.Log($"请检查本地网络，有新的游戏内容需要更新！-> {pair.Key}");
-                        break;
-                    }
+            #endregion
 
-                    Packages.Remove(pair.Key);
-                }
-            }
+            #region DownloadAll
 
-            /// <summary>
-            /// 异步向网络端请求最新的资源版本
-            /// </summary>
-            public async Task UpdatePackageVersionTask()
+            public void CollectNeedAll()
             {
                 if (!Flow) return;
-                UpdatePackageVersionBegin();
-                await WaitTask(VersionOperations.Values);
-                UpdatePackageVersionEnd();
-                await WaitTask(PreDownloadContentOperations.Values);
-            }
+                foreach (var name in ManifestOperations.Keys)
+                {
+                    if (!Packages.TryGetValue(name, out var asset)) continue;
+                    var operation = asset.CreateResourceDownloader();
+                    if (operation is null) continue;
+                    if (operation.TotalDownloadCount <= 0) continue;
 
-            /// <summary>
-            /// 异步向网络端请求最新的资源版本
-            /// </summary>
-            public IEnumerator UpdatePackageVersionCO()
-            {
-                if (!Flow) yield break;
-                UpdatePackageVersionBegin();
-                yield return WaitCO(VersionOperations.Values);
-                UpdatePackageVersionEnd();
-                yield return WaitCO(PreDownloadContentOperations.Values);
+                    TotalValue += operation.TotalDownloadBytes - operation.CurrentDownloadBytes;
+                    StartValue += operation.CurrentDownloadBytes;
+                    ResourceDownloaderOperations[string.Concat("ALL-", name)] = operation;
+                }
+
+                OpenDownloadAll = true;
             }
 
             #endregion
 
             #region Download
 
-            /// <summary>
-            /// 创建补丁下载器 异步
-            /// </summary>
-            private void DownloaderBegin()
+            public void CollectNeedRecord()
             {
-                AssetSystem.InvokeNotify(EASEventType.BeginDownload, string.Empty);
-                DownloadBytesList.Clear();
-                Progress.Total = 0;
+                if (AssetSystem.SequenceRecords is null || AssetSystem.SequenceRecords.Count == 0) return;
+                OpenRecord = true;
+                foreach (var (name, value) in AssetSystem.SequenceRecords.ToYoo())
+                {
+                    var operation = YAssetSystem.CreateBundleDownloader(name, value.ToArray());
+                    if (operation is null) continue;
+                    if (operation.TotalDownloadCount <= 0) continue;
+
+                    TotalValue += operation.TotalDownloadBytes - operation.CurrentDownloadBytes;
+                    StartValue += operation.CurrentDownloadBytes;
+                    ResourceDownloaderOperations[string.Concat("Record-", name)] = operation;
+                }
+            }
+
+            private Dictionary<string, byte> Tags = new Dictionary<string, byte>();
+            private bool OpenRecord;
+            private bool OpenDownloadAll;
+
+            /// <summary>
+            /// 创建补丁下载器
+            /// </summary>
+            private void CollectNeedTagBegin(params string[] tags)
+            {
+                if (tags is null || tags.Length == 0) return;
+
                 foreach (var name in ManifestOperations.Keys)
                 {
-                    var asset = Packages[name];
-                    if (asset.Config.IsSidePlayWithDownload) continue;
-                    var version = asset.Config.Version;
-                    var operation = asset.CreateResourceDownloader(
-                        AssetSystem.Parameter.LoadingMaxTimeSlice,
-                        AssetSystem.Parameter.DownloadFailedTryAgain,
-                        AssetSystem.Parameter.Timeout);
-                    if (operation.TotalDownloadCount <= 0)
-                    {
-                        AssetSystem.LogFormat("[{0} : {1}] 无需下载更新当前资源包", asset.Config, version);
-                        Packages.Remove(name);
-                        continue;
-                    }
+                    if (!Packages.TryGetValue(name, out var asset)) continue;
+                    Tags[name] = 1;
+                    var operation = asset.CreateResourceDownloader(tags);
+                    if (operation is null) continue;
+                    if (operation.TotalDownloadCount <= 0) continue;
 
-                    Progress.Total += operation.TotalDownloadBytes;
-
-                    DownloadBytesList[name] = operation.CurrentDownloadBytes;
-
-                    AssetSystem.LogFormat("创建补丁下载器，准备下载更新当前资源版本所有的资源包文件 [{0} -> {1} ] 文件数量 : {2} , 包体大小 : {3}",
-                        asset.Config, version,
-                        operation.TotalDownloadCount, operation.TotalDownloadBytes);
-
-                    void OnUpdateProgress(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes,
-                        long currentDownloadBytes)
-                    {
-                        DownloadBytesList[name] = currentDownloadBytes;
-
-                        AssetSystem.InvokeDownloading(Progress);
-                    }
-
-                    void OnUpdateDownloadOver(bool isSucceed)
-                    {
-                        if (isSucceed) AssetSystem.InvokeNotify(EASEventType.DownlandPackageSuccess, name);
-                        else
-                            AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
-                                DownloaderOperations[name].Error);
-                    }
-
-                    void OnUpdateDownloadError(string filename, string error)
-                    {
-                        AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
-                            string.Concat(filename, ":", error));
-                    }
-
-                    operation.OnDownloadOverCallback = OnUpdateDownloadOver;
-                    operation.OnDownloadProgressCallback = OnUpdateProgress;
-                    operation.OnDownloadErrorCallback = OnUpdateDownloadError;
-
-                    DownloaderOperations.Add(name, operation);
+                    TotalValue += operation.TotalDownloadBytes - operation.CurrentDownloadBytes;
+                    StartValue += operation.CurrentDownloadBytes;
+                    ResourceDownloaderOperations[string.Concat("Tag-", name)] = operation;
                 }
             }
 
-            private void DownloaderEnd()
+            public void CollectNeedTag(params string[] tags)
             {
-                foreach (var pair in DownloaderOperations)
-                {
-                    if (pair.Value.Status == EOperationStatus.Succeed)
-                    {
-                        AssetSystem.LogFormat("下载资源包文件成功 -> [{0} -> {1}]", pair.Key,
-                            Packages[pair.Key].Config.Version);
-                        Packages.Remove(pair.Key);
-                    }
-                    else
-                    {
-                        AssetSystem.LogErrorFormat("下载资源包文件失败 -> [{0} -> {1} : {2}]", pair.Key,
-                            Packages[pair.Key].Config.Version, pair.Value.Error);
-                    }
-                }
-
-                AssetSystem.InvokeNotify(EASEventType.HotUpdateDownloadFinish, string.Empty);
-            }
-
-            public async Task DownloadTask()
-            {
-                if (!Flow) return;
-                DownloaderBegin();
-                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
-                await WaitTask(DownloaderOperations.Values);
-                DownloaderEnd();
-            }
-
-            public IEnumerator DownloadCO()
-            {
-                if (!Flow) yield break;
-                DownloaderBegin();
-                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
-                yield return WaitCO(DownloaderOperations.Values);
-                DownloaderEnd();
+                CollectNeedTagBegin(tags.ToArray());
             }
 
             #endregion
 
-            #region Download Record
-
-            private void DownloadRecordBegin(AssetSystem.SequenceRecordQueue queue)
+            private static IEnumerator WaitCO(IEnumerable<AsyncOperationBase> operations)
             {
-                DownloadBytesList.Clear();
+                return operations.GetEnumerator();
+            }
 
-                foreach (var pair in queue.ToYoo())
+            protected override void OnPause()
+            {
+                foreach (var operation in ResourceDownloaderOperations)
+                    operation.Value.PauseDownload();
+            }
+
+            protected override void OnResume()
+            {
+                foreach (var operation in ResourceDownloaderOperations)
+                    operation.Value.ResumeDownload();
+            }
+
+            protected override void OnCancel()
+            {
+                foreach (var operation in ResourceDownloaderOperations)
+                    operation.Value.CancelDownload();
+            }
+
+            private void OnUpdateProgress(
+                int totalDownloadCount, int currentDownloadCount,
+                long totalDownloadBytes, long currentDownloadBytes)
+            {
+                switch (Application.internetReachability)
                 {
-                    AssetSystem.Log($"创建序列下载器，准备下载更新当前资源版本所有的资源包文件 [{pair.Key}]");
-                    var name = pair.Key;
-                    var assetInfos = pair.Value.ToArray();
-                    var operation = YAssetSystem.CreateBundleDownloader(pair.Key, assetInfos,
-                        AssetSystem.Parameter.LoadingMaxTimeSlice,
-                        AssetSystem.Parameter.DownloadFailedTryAgain);
-                    Progress.Total += operation.TotalDownloadBytes;
-
-
-                    void OnUpdateProgress(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes,
-                        long currentDownloadBytes)
-                    {
-                        DownloadBytesList[name] = currentDownloadBytes;
-
-                        AssetSystem.InvokeDownloading(Progress);
-                    }
-
-                    void OnUpdateDownloadOver(bool isSucceed)
-                    {
-                        if (isSucceed) AssetSystem.InvokeNotify(EASEventType.DownlandPackageSuccess, name);
-                        else
-                            AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
-                                DownloaderOperations[name].Error);
-                    }
-
-                    void OnUpdateDownloadError(string filename, string error)
-                    {
-                        AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
-                            string.Concat(filename, ":", error));
-                    }
-
-                    operation.OnDownloadOverCallback = OnUpdateDownloadOver;
-                    operation.OnDownloadProgressCallback = OnUpdateProgress;
-                    operation.OnDownloadErrorCallback = OnUpdateDownloadError;
-
-                    ResourceDownloaderOperations.Add(pair.Key, operation);
+                    default:
+                    case NetworkReachability.NotReachable:
+                        OnNetReachableNot?.Invoke(Report);
+                        Pause();
+                        return;
+                    case NetworkReachability.ReachableViaCarrierDataNetwork:
+                        if (AllowReachableCarrier) return;
+                        Pause();
+                        OnNetReachableCarrier?.Invoke(Report, () =>
+                        {
+                            AllowReachableCarrier = true;
+                            Resume();
+                        });
+                        break;
+                    case NetworkReachability.ReachableViaLocalAreaNetwork:
+                        break;
                 }
+
+                if (State == EProgressState.Fail) return;
+                CurrentValue = TempDownloadBytes + currentDownloadBytes;
             }
 
-            public async Task DownloadRecordTask(AssetSystem.SequenceRecordQueue queue)
+            private void OnUpdateDownloadError(string filename, string error)
             {
-                if (!Flow) return;
-                DownloadRecordBegin(queue);
-                foreach (var pair in ResourceDownloaderOperations) pair.Value.BeginDownload();
-                await WaitTask(ResourceDownloaderOperations.Values);
+                State = EProgressState.Fail;
+                foreach (var operation in ResourceDownloaderOperations)
+                    operation.Value.CancelDownload();
+                Event.OnError?.Invoke(new SystemException($"下载资源包文件失败 -> [{filename} -> {error}]"));
             }
 
-            public IEnumerator DownloadRecordCO(AssetSystem.SequenceRecordQueue queue)
+            public IEnumerator WaitCo()
             {
-                if (queue is null) yield break;
-                DownloadRecordBegin(queue);
-                foreach (var pair in ResourceDownloaderOperations) pair.Value.BeginDownload();
-                yield return WaitCO(ResourceDownloaderOperations.Values);
+                if (State == EProgressState.Cancel ||
+                    State == EProgressState.Fail ||
+                    State == EProgressState.Finish)
+                {
+                    Finish();
+                    yield break;
+                }
+
+                foreach (var pair in ResourceDownloaderOperations)
+                {
+                    TempDownloadName = pair.Key;
+                    CurrentInfo = string.Format("Resource Download -> [{0}]", pair.Key);
+                    TempDownloadBytes = CurrentValue;
+
+                    while (State != EProgressState.Running)
+                    {
+                        switch (State)
+                        {
+                            case EProgressState.Finish:
+                            case EProgressState.Fail:
+                                yield break;
+                            case EProgressState.Cancel:
+                                Event.OnError?.Invoke(new TaskCanceledException());
+                                Event.OnComplete?.Invoke(Report);
+                                yield break;
+                            case EProgressState.Pause:
+                                yield return new WaitForSeconds(0.1f);
+                                break;
+                        }
+                    }
+
+                    pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
+                    pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;
+                    pair.Value.BeginDownload();
+                    yield return pair.Value;
+                }
+
+                State = EProgressState.Finish;
+
+                if (OpenDownloadAll)
+                {
+                    AssetSystem.WhiteAll = true;
+                }
+                else
+                {
+                    if (Tags.Count > 0)
+                        AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
+
+                    if (OpenRecord)
+                        AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(record => record.Location));
+                }
+
+                Finish();
+            }
+
+
+            #region End
+
+            private void UpdatePreDownloadContentEnd()
+            {
+                foreach (var pair in PreDownloadContentOperations.Keys.ToArray())
+                {
+                    if (PreDownloadContentOperations[pair].Status != EOperationStatus.Succeed)
+                    {
+                        AssetSystem.Log($"请检查本地网络，有新的游戏内容需要更新！-> {pair}");
+                        break;
+                    }
+
+                    PreDownloadContentOperations.Remove(pair);
+                }
             }
 
             #endregion
-
-            /// <summary>
-            /// 创建补丁下载器 异步
-            /// </summary>
-            private void DownloaderTagBegin(params string[] tag)
-            {
-                if (tag is null || tag.Length == 0)
-                {
-#if UNITY_EDITOR
-                    AssetSystem.LogError("下载标签不能为空");
-#endif
-                    return;
-                }
-
-                AssetSystem.InvokeNotify(EASEventType.BeginDownload, string.Empty);
-                DownloadBytesList.Clear();
-                Progress.Total = 0;
-                foreach (var name in ManifestOperations.Keys)
-                {
-                    var asset = Packages[name];
-                    var version = asset.Config.Version;
-                    var operation = asset.CreateResourceDownloader(tag,
-                        AssetSystem.Parameter.LoadingMaxTimeSlice,
-                        AssetSystem.Parameter.DownloadFailedTryAgain,
-                        AssetSystem.Parameter.Timeout);
-                    if (operation.TotalDownloadCount <= 0)
-                    {
-                        AssetSystem.LogFormat("[{0} : {1}] 无需下载更新当前资源包", asset.Config, version);
-                        Packages.Remove(name);
-                        continue;
-                    }
-
-                    Progress.Total += operation.TotalDownloadBytes;
-
-                    DownloadBytesList[name] = operation.CurrentDownloadBytes;
-
-                    AssetSystem.LogFormat("创建补丁下载器，准备下载更新当前资源版本所有的资源包文件 [{0} -> {1} ] 文件数量 : {2} , 包体大小 : {3}",
-                        asset.Config, version,
-                        operation.TotalDownloadCount, operation.TotalDownloadBytes);
-
-                    void OnUpdateProgress(int totalDownloadCount, int currentDownloadCount, long totalDownloadBytes,
-                        long currentDownloadBytes)
-                    {
-                        DownloadBytesList[name] = currentDownloadBytes;
-
-                        AssetSystem.InvokeDownloading(Progress);
-                    }
-
-                    void OnUpdateDownloadOver(bool isSucceed)
-                    {
-                        if (isSucceed) AssetSystem.InvokeNotify(EASEventType.DownlandPackageSuccess, name);
-                        else
-                            AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
-                                DownloaderOperations[name].Error);
-                    }
-
-                    void OnUpdateDownloadError(string filename, string error)
-                    {
-                        AssetSystem.InvokeNotify(EASEventType.DownlandPackageFailure,
-                            string.Concat(filename, ":", error));
-                    }
-
-                    operation.OnDownloadOverCallback = OnUpdateDownloadOver;
-                    operation.OnDownloadProgressCallback = OnUpdateProgress;
-                    operation.OnDownloadErrorCallback = OnUpdateDownloadError;
-
-                    DownloaderOperations.Add(name, operation);
-                }
-            }
-
-            public async Task DownloadTagTask(IEnumerable<string> tags)
-            {
-                if (!Flow) return;
-                DownloaderTagBegin(tags.ToArray());
-                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
-                await WaitTask(DownloaderOperations.Values);
-                DownloaderEnd();
-            }
-
-            public IEnumerator DownloadTagCO(IEnumerable<string> tags)
-            {
-                if (!Flow) yield break;
-                DownloaderTagBegin(tags.ToArray());
-                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
-                yield return WaitCO(DownloaderOperations.Values);
-                DownloaderEnd();
-            }
-
-            public async Task DownloadTagTask(string tag)
-            {
-                if (!Flow) return;
-                DownloaderTagBegin(tag);
-                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
-                await WaitTask(DownloaderOperations.Values);
-                DownloaderEnd();
-            }
-
-            public IEnumerator DownloadTagCO(string tag)
-            {
-                if (!Flow) yield break;
-                DownloaderTagBegin(tag);
-                foreach (var pair in DownloaderOperations) pair.Value.BeginDownload();
-                yield return WaitCO(DownloaderOperations.Values);
-                DownloaderEnd();
-            }
         }
     }
 }

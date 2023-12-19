@@ -60,6 +60,8 @@ namespace AIO.UEngine.YooAsset
             foreach (var item in Dic.Values)
             {
                 var args = GetParameter.Invoke(item);
+                if (args is null) throw new Exception($"AssetSystem {item.Config.Name} Parameter is null");
+
                 var operation = item.InitializeAsync(args);
                 if (operation.Task != null) tasks.Add(operation);
                 else Debug.LogFormat("{0} -> {1} -> {2}", nameof(LoadTask), item.Config, operation.Error);

@@ -62,7 +62,7 @@ namespace AIO.UEditor
                         var style = CurrentPackageIndex == i
                             ? GEStyle.PRInsertion
                             : GEStyle.ObjectPickerTab;
-                        if (GUILayout.Button(label, style))
+                        if (GUILayout.Button(label, style, GTOption.WidthMin(100)))
                         {
                             CurrentPackageIndex = i;
                             ViewGroupList.IsShow = true;

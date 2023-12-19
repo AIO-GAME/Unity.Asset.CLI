@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -34,7 +35,8 @@ namespace AIO.UEditor
             {
                 using (GELayout.VHorizontal(GEStyle.Toolbar))
                 {
-                    if (GELayout.Button(item.Folded ? "⇙" : "⇗", 30))
+                    if (GELayout.Button(item.Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
+                            GEStyle.TEtoolbarbutton, GP_Width_30))
                     {
                         item.Folded = !item.Folded;
                         GUI.FocusControl(null);
@@ -43,7 +45,7 @@ namespace AIO.UEditor
                     item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GTOption.Width(80));
                     item.Path = GELayout.Field(item.Path);
 
-                    if (GELayout.Button(GC_DEL, 24))
+                    if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
                     {
                         Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors =
                             Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Remove(item);
@@ -51,26 +53,33 @@ namespace AIO.UEditor
                         return;
                     }
 
-                    if (GELayout.Button(GC_OPEN, 24))
+                    if (GELayout.Button(GC_OPEN, GEStyle.TEtoolbarbutton, 24))
                     {
-                        var status = 1;
-                        foreach (var collector in Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                                     .Collectors)
+                        if (item.Type == EAssetCollectItemType.MainAssetCollector)
                         {
-                            if (collector.CollectPath != item.CollectPath)
+                            var status = 1;
+                            foreach (var collector in Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
+                                         .Collectors)
                             {
-                                status *= 2;
-                                continue;
+                                if (collector.CollectPath != item.CollectPath)
+                                {
+                                    status *= 2;
+                                    continue;
+                                }
+
+                                LookModeDisplayCollectorsIndex = status;
+                                break;
                             }
 
-                            LookModeDisplayCollectorsIndex = status;
-                            break;
+                            GUI.FocusControl(null);
+                            WindowMode = Mode.Look;
+                            UpdateDataLookMode();
+                            return;
                         }
-
-                        GUI.FocusControl(null);
-                        WindowMode = Mode.Look;
-                        UpdateDataLookMode();
-                        return;
+                        else
+                        {
+                            EditorUtility.DisplayDialog("打开", "只有动态资源才能查询", "确定");
+                        }
                     }
                 }
 
@@ -78,19 +87,31 @@ namespace AIO.UEditor
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("定位", GTOption.Width(30));
-                    item.LocationFormat = GELayout.Popup(item.LocationFormat, GEStyle.PreDropDown, GTOption.Width(80));
+                    GELayout.Label("定位", GP_Width_25);
+                    if (Config.LoadPathToLower)
+                    {
+                        GUI.enabled = false;
+                        GELayout.Popup(AssetLocationFormat.ToLower, GEStyle.PreDropDown, GTOption.Width(80));
+                        GUI.enabled = true;
+                    }
+                    else
+                        item.LocationFormat =
+                            GELayout.Popup(item.LocationFormat, GEStyle.PreDropDown, GTOption.Width(80));
+
                     item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays,
                         GEStyle.PreDropDown);
 
                     item.RulePackIndex = GELayout.Popup(item.RulePackIndex, AssetCollectSetting.MapPacks.Displays,
                         GEStyle.PreDropDown);
-                    item.HasExtension = GELayout.ToggleLeft("后缀", item.HasExtension, GTOption.Width(50));
+
+                    item.LoadType = GELayout.Popup(item.LoadType, GEStyle.PreDropDown, GP_Width_75);
+                    item.HasExtension =
+                        GELayout.ToggleLeft("后缀", item.HasExtension, GTOption.Width(42));
                 }
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("收集", GTOption.Width(30));
+                    GELayout.Label("收集", GP_Width_25);
                     if (item.RuleUseCollectCustom)
                     {
                         item.RuleCollect = GELayout.Field(item.RuleCollect);
@@ -105,12 +126,12 @@ namespace AIO.UEditor
 
                     item.RuleUseCollectCustom = GELayout.ToggleLeft(
                         new GUIContent("自定", "自定义收集规则 \n传入文件后缀 \n冒号(;)隔开 \n无需填写点(.)"),
-                        item.RuleUseCollectCustom, GTOption.Width(50));
+                        item.RuleUseCollectCustom, GTOption.Width(42));
                 }
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("过滤", GTOption.Width(30));
+                    GELayout.Label("过滤", GP_Width_25);
                     if (item.RuleUseFilterCustom)
                     {
                         item.RuleFilter = GELayout.Field(item.RuleFilter);
@@ -125,19 +146,22 @@ namespace AIO.UEditor
 
                     item.RuleUseFilterCustom = GELayout.ToggleLeft(
                         new GUIContent("自定", "自定义过滤规则 \n传入文件后缀 \n冒号(;)隔开 \n无需填写点(.)"),
-                        item.RuleUseFilterCustom, GTOption.Width(50));
+                        item.RuleUseFilterCustom, GTOption.Width(42));
                 }
 
                 using (GELayout.VHorizontal())
                 {
-                    GELayout.Label("标签", GTOption.Width(30));
-                    item.Tags = GELayout.Field(item.Tags);
-                }
-
-                using (GELayout.VHorizontal())
-                {
-                    GELayout.Label("自定", GTOption.Width(30));
+                    GELayout.Label("自定", GP_Width_25);
                     item.UserData = GELayout.Field(item.UserData);
+                }
+
+                if (item.Type == EAssetCollectItemType.MainAssetCollector)
+                {
+                    using (GELayout.VHorizontal())
+                    {
+                        GELayout.Label("标签", GP_Width_25);
+                        item.Tags = GELayout.Field(item.Tags);
+                    }
                 }
             }
         }

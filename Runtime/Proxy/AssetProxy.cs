@@ -43,5 +43,10 @@ namespace AIO.UEngine
         /// False: 未加载
         /// </returns>
         public abstract bool IsAlreadyLoad(string location);
+
+        /// <summary>
+        /// 清空资源缓存
+        /// </summary>
+        public abstract void CleanCache(Action<bool> cb);
     }
 }

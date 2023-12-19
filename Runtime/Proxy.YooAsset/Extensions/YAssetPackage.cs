@@ -46,16 +46,15 @@ namespace AIO.UEngine.YooAsset
         public InitializationOperation InitializeAsync(YAssetParameters parameters)
         {
 #if UNITY_EDITOR
-            Debug.LogFormat($"Assets System Initialize Config -> | Mode -> {parameters.Mode} Start");
-#endif
+            if (parameters.Parameters is null)
+            {
+                throw new Exception($"Assets System {parameters.Mode} Parameters is null");
+            }
 
+            Debug.LogFormat("Assets System [{0}:{1}] is {2}", Config.Name, Config.Version, parameters.Mode);
+#endif
             Mode = parameters.Mode;
             parameters.UpdateParameters();
-#if UNITY_EDITOR
-            Debug.LogFormat("Assets System {0} is {1}",
-                Mode,
-                parameters.Parameters is null ? "null" : "not null");
-#endif
             switch (Mode)
             {
 #if UNITY_EDITOR
@@ -108,33 +107,32 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 向网络端请求最新的资源版本
         /// </summary>
-        /// <param name="appendTimeTicks">在URL末尾添加时间戳</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public UpdatePackageVersionOperation UpdatePackageVersionAsync(bool appendTimeTicks = true, int timeout = 60)
+        public UpdatePackageVersionOperation UpdatePackageVersionAsync()
         {
-            return Package.UpdatePackageVersionAsync(appendTimeTicks, timeout);
+            return Package.UpdatePackageVersionAsync(
+                AssetSystem.Parameter.AppendTimeTicks,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 向网络端请求并更新清单
         /// </summary>
         /// <param name="packageVersion">更新的包裹版本</param>
-        /// <param name="autoSaveVersion">更新成功后自动保存版本号，作为下次初始化的版本。</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion,
-            bool autoSaveVersion = true, int timeout = 60)
+        public UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion)
         {
-            return Package.UpdatePackageManifestAsync(packageVersion, autoSaveVersion, timeout);
+            return Package.UpdatePackageManifestAsync(
+                packageVersion,
+                AssetSystem.Parameter.AutoSaveVersion,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 预下载指定版本的包裹资源
         /// </summary>
         /// <param name="packageVersion">下载的包裹版本</param>
-        /// <param name="timeout">超时时间（默认值：60秒）</param>
-        public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion, int timeout = 60)
+        public PreDownloadContentOperation PreDownloadContentAsync(string packageVersion)
         {
-            return Package.PreDownloadContentAsync(packageVersion, timeout);
+            return Package.PreDownloadContentAsync(packageVersion, AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
@@ -429,66 +427,59 @@ namespace AIO.UEngine.YooAsset
         /// 创建资源下载器，用于下载当前资源版本所有的资源包文件
         /// </summary>
         /// <param name="tag">资源标签</param>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string tag, int downloadingMaxNumber,
-            int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string tag)
         {
-            return Package.CreateResourceDownloader(new string[] { tag }, downloadingMaxNumber, failedTryAgain,
-                timeout);
+            return Package.CreateResourceDownloader(new string[] { tag },
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载当前资源版本所有的资源包文件
         /// </summary>
         /// <param name="tags">资源标签列表</param>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags, int downloadingMaxNumber,
-            int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader(string[] tags)
         {
-            return Package.CreateResourceDownloader(tags, downloadingMaxNumber, failedTryAgain, timeout);
+            return Package.CreateResourceDownloader(tags,
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载当前资源版本所有的资源包文件
         /// </summary>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateResourceDownloader(int downloadingMaxNumber, int failedTryAgain,
-            int timeout = 60)
+        public ResourceDownloaderOperation CreateResourceDownloader()
         {
-            return Package.CreateResourceDownloader(downloadingMaxNumber, failedTryAgain, timeout);
+            return Package.CreateResourceDownloader(
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载指定的资源列表依赖的资源包文件
         /// </summary>
         /// <param name="assetInfos">资源信息列表</param>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos, int downloadingMaxNumber,
-            int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo[] assetInfos)
         {
-            return Package.CreateBundleDownloader(assetInfos, downloadingMaxNumber, failedTryAgain, timeout);
+            return Package.CreateBundleDownloader(assetInfos,
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
         /// 创建资源下载器，用于下载指定的资源列表依赖的资源包文件
         /// </summary>
         /// <param name="assetInfos">资源信息列表</param>
-        /// <param name="downloadingMaxNumber">同时下载的最大文件数</param>
-        /// <param name="failedTryAgain">下载失败的重试次数</param>
-        /// <param name="timeout">超时时间</param>
-        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo assetInfos, int downloadingMaxNumber,
-            int failedTryAgain, int timeout = 60)
+        public ResourceDownloaderOperation CreateBundleDownloader(AssetInfo assetInfos)
         {
-            return Package.CreateBundleDownloader(new AssetInfo[] { assetInfos }, downloadingMaxNumber, failedTryAgain,
-                timeout);
+            return Package.CreateBundleDownloader(new AssetInfo[] { assetInfos },
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         #endregion

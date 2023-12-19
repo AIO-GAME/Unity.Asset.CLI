@@ -15,20 +15,6 @@ namespace AIO.UEditor
     {
         private void OnDrawHeaderEditorMode()
         {
-            if (!ViewSetting.IsShow &&
-                GUILayout.Button("⇘ Setting", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
-            {
-                GUI.FocusControl(null);
-                ViewSetting.IsShow = true;
-            }
-
-            if (!ViewConfig.IsShow &&
-                GUILayout.Button("⇘ Config", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
-            {
-                GUI.FocusControl(null);
-                ViewConfig.IsShow = true;
-            }
-
             if (!ViewPackageList.IsShow &&
                 GUILayout.Button("⇘ Package", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
             {
@@ -112,39 +98,5 @@ namespace AIO.UEditor
 
         partial void OnDrawHeaderBuildMode();
 
-        partial void OnDrawHeader()
-        {
-            using (GELayout.VHorizontal())
-            {
-                switch (WindowMode)
-                {
-                    default:
-                    case Mode.Editor:
-                        OnDrawHeaderEditorMode();
-                        break;
-                    case Mode.Look:
-                        OnDrawHeaderLookMode();
-                        break;
-                    case Mode.Build:
-                        OnDrawHeaderBuildMode();
-                        break;
-                    case Mode.Tags:
-                        OnDrawHeaderTagsMode();
-                        break;
-                    case Mode.FirstPackage:
-                        OnDrawHeaderFirstPackageMode();
-                        break;
-                }
-
-                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
-
-                if (!GUI.changed) return;
-                if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
-                GUI.FocusControl(null);
-                UpdateData();
-
-                TempTable[nameof(WindowMode)] = WindowMode;
-            }
-        }
     }
 }
