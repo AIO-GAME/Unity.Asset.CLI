@@ -329,62 +329,69 @@ namespace AIO.UEditor
                 {
                     EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Address, GEStyle.AMMixerHeader,
                         GP_Height_30);
-                    if (GELayout.Button(GC_LookMode_Object_Select, GEStyle.IconButton))
-                    {
-                        EditorUtility.RevealInFinder(LookModeCurrentSelectAssetDataInfo.AssetPath);
-                    }
                 }
 
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
-                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_Asset);
-                    EditorGUILayout.ObjectField(LookModeCurrentSelectAsset,
-                        LookModeCurrentSelectAsset.GetType(), false);
-                }
-
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
-                {
-                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_GUID);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.GUID);
-                }
-
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
-                {
-                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_Type);
-                    EditorGUILayout.LabelField(AssetDatabase
-                        .GetMainAssetTypeAtPath(LookModeCurrentSelectAssetDataInfo.AssetPath)?.FullName);
-                }
-
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
-                {
-                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_Path);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.AssetPath);
-                }
-
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
-                {
-                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_Size);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.SizeStr);
-                }
-
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
-                {
-                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_LastWriteTime);
-                    EditorGUILayout.LabelField(
-                        LookModeCurrentSelectAssetDataInfo.LastWriteTime.ToString("yyyy-MM-dd hh:mm:ss"));
-                }
-
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
-                {
-                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_IsSubAsset);
+                    EditorGUILayout.LabelField(GC_LookMode_Detail_IsSubAsset, GP_Width_100);
                     EditorGUILayout.LabelField($"{AssetDatabase.IsSubAsset(LookModeCurrentSelectAsset)}");
                 }
 
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
-                    EditorGUILayout.PrefixLabel(GC_LookMode_Detail_Tags);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Tags);
+                    EditorGUILayout.LabelField(GC_LookMode_Detail_Size, GP_Width_100);
+                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.SizeStr);
                 }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                {
+                    EditorGUILayout.LabelField(GC_LookMode_Detail_Asset, GP_Width_100);
+                    EditorGUILayout.ObjectField(LookModeCurrentSelectAsset, LookModeCurrentSelectAsset.GetType(),
+                        false);
+                    if (GELayout.Button(GC_OPEN_FOLDER, GEStyle.IconButton, 16))
+                        EditorUtility.RevealInFinder(LookModeCurrentSelectAssetDataInfo.AssetPath);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                {
+                    EditorGUILayout.LabelField(GC_LookMode_Detail_GUID, GP_Width_100);
+                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.GUID);
+                    GELayout.ButtonCopy(GC_COPY, LookModeCurrentSelectAssetDataInfo.GUID, 16, GEStyle.IconButton);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                {
+                    EditorGUILayout.LabelField(GC_LookMode_Detail_Type, GP_Width_100);
+                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Type);
+                    GELayout.ButtonCopy(GC_COPY, LookModeCurrentSelectAssetDataInfo.Type, 16, GEStyle.IconButton);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                {
+                    EditorGUILayout.LabelField(GC_LookMode_Detail_Path, GP_Width_100);
+                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.AssetPath);
+                    GELayout.ButtonCopy(GC_COPY, LookModeCurrentSelectAssetDataInfo.AssetPath, 16, GEStyle.IconButton);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                {
+                    EditorGUILayout.LabelField(GC_LookMode_Detail_LastWriteTime, GP_Width_100);
+                    var timer =
+                        LookModeCurrentSelectAssetDataInfo.LastWriteTime.ToString("yyyy-MM-dd hh:mm:ss");
+                    EditorGUILayout.LabelField(timer);
+                    GELayout.ButtonCopy(GC_COPY, timer, 16, GEStyle.IconButton);
+                }
+
+                if (!string.IsNullOrEmpty(LookModeCurrentSelectAssetDataInfo.Tags))
+                {
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                    {
+                        EditorGUILayout.LabelField(GC_LookMode_Detail_Tags, GP_Width_100);
+                        EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Tags);
+                        GELayout.ButtonCopy(GC_COPY, LookModeCurrentSelectAssetDataInfo.Tags, 16, GEStyle.IconButton);
+                    }
+                }
+
 
                 if (Dependencies.Count > 0)
                 {

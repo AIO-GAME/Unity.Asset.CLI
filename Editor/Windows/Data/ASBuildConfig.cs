@@ -118,6 +118,49 @@ namespace AIO.UEditor
         /// </summary>
         public string CompressedModeName;
 
+        public class FTPConfig
+        {
+            /// <summary>
+            /// FTP 服务器地址
+            /// </summary>
+            public string FTPServerIP;
+
+            /// <summary>
+            /// FTP 服务器端口
+            /// </summary>
+            public int FTPServerPort = 21;
+
+            /// <summary>
+            /// FTP 用户名
+            /// </summary>
+            public string FTPUser;
+
+            /// <summary>
+            /// FTP 密码
+            /// </summary>
+            public string FTPPassword;
+
+            /// <summary>
+            /// FTP 远程路径
+            /// </summary>
+            public string FTPRemotePath;
+
+            /// <summary>
+            /// FTP 本地需要上传的资源包地址
+            /// </summary>
+            public string FTPLocalPath;
+            
+            /// <summary>
+            /// 平台名称
+            /// </summary>
+            public string PlatformName;
+            
+            /// <summary>
+            /// 是否上传首包配置
+            /// </summary>
+            public bool UploadFirstPack;
+        }
+
         /// <summary>
         /// FTP 服务器地址
         /// </summary>
