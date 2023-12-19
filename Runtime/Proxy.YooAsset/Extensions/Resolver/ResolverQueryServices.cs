@@ -13,13 +13,13 @@ namespace AIO.UEngine.YooAsset
         public bool QueryStreamingAssets(string packageName, string fileName)
         {
 #if UNITY_WEBGL
-            var path = Path.Combine(Application.persistentDataPath, "BuildinFiles", packageName, fileName);
+            var path = Path.Combine(Application.persistentDataPath, AssetSystem.Parameter.RuntimeRootDirectory, packageName, fileName);
 #else
-            var path = Path.Combine(Application.streamingAssetsPath, "BuildinFiles", packageName, fileName);
+            var path = Path.Combine(Application.streamingAssetsPath, AssetSystem.Parameter.RuntimeRootDirectory, packageName, fileName);
 #endif
 
 #if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog) Debug.LogFormat("{0} -> {1}", nameof(QueryStreamingAssets), path);
+            // AssetSystem.LogFormat("{0} -> {1}", nameof(QueryStreamingAssets), path);
 #endif
             return File.Exists(path);
         }
@@ -38,8 +38,7 @@ namespace AIO.UEngine.YooAsset
         public DeliveryFileInfo GetDeliveryFileInfo(string packageName, string fileName)
         {
 #if UNITY_EDITOR
-            if (AssetSystem.Parameter.OutputLog)
-                Debug.LogFormat("-> GetDeliveryFileInfo: " + string.Concat(packageName, '/', fileName));
+            AssetSystem.LogFormat("-> GetDeliveryFileInfo: " + string.Concat(packageName, '/', fileName));
 #endif
 
             return new DeliveryFileInfo

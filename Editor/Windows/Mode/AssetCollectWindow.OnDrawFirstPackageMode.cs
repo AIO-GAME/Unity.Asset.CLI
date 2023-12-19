@@ -178,6 +178,7 @@ namespace AIO.UEditor
             CurrentPageValues.Add(CurrentTagValues.Where(data => !FirstPackageModeDataFilter(data)));
             LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
             CurrentPageValues.PageIndex = 0;
+            LookModeDataPageValueSort(ESort.AssetName, true);
         }
 
         /// <summary>

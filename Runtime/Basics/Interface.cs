@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace AIO
 {
@@ -82,7 +81,7 @@ namespace AIO
         /// <summary>
         /// 收集需要下载的序列
         /// </summary>
-        void CollectNeedRecord(AssetSystem.SequenceRecordQueue queue);
+        void CollectNeedRecord();
 
         /// <summary>
         /// 等待下载完成

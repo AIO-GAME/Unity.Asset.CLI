@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -225,6 +226,7 @@ namespace AIO.UEditor
             var address = rule.GetAssetAddress(data);
 
             if (HasExtension) address = string.Concat(address, ".", data.Extension);
+            if (ASConfig.GetOrCreate().LoadPathToLower) return address.ToLower();
             switch (LocationFormat)
             {
                 case AssetLocationFormat.ToLower:

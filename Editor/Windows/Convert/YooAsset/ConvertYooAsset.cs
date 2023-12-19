@@ -227,7 +227,6 @@ namespace AIO.UEditor
             AssetBundleCollectorSettingData.Setting.ShowEditorAlias = true;
             AssetBundleCollectorSettingData.Setting.UniqueBundleName = asset.UniqueBundleName;
             AssetBundleCollectorSettingData.Setting.IncludeAssetGUID = asset.IncludeAssetGUID;
-            AssetBundleCollectorSettingData.Setting.LocationToLower = asset.LocationToLower;
             AssetBundleCollectorSettingData.Setting.EnableAddressable = asset.EnableAddressable;
             foreach (var package in Convert(asset.Packages))
             {

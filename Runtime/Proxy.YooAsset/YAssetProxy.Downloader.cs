@@ -89,6 +89,7 @@ namespace AIO.UEngine
             {
                 Packages = null;
                 VersionOperations = null;
+                Tags = null;
                 ManifestOperations = null;
                 PreDownloadContentOperations = null;
                 ResourceDownloaderOperations = null;
@@ -117,6 +118,8 @@ namespace AIO.UEngine
 
             protected override void OnBegin()
             {
+                OpenRecord = false;
+                Tags.Clear();
                 PreDownloadContentOperations.Clear();
                 ResourceDownloaderOperations.Clear();
             }
@@ -125,22 +128,12 @@ namespace AIO.UEngine
             {
                 if (!Flow) yield break;
                 UpdatePackageManifestBegin(); // 向网络端请求并更新补丁清单
-                foreach (var pair in ManifestOperations)
-                {
-                    if (!Packages.TryGetValue(pair.Key, out var asset)) continue;
-                    yield return pair.Value;
-                }
-
+                foreach (var pair in ManifestOperations) yield return pair.Value;
                 UpdatePackageManifestEnd();
 
                 if (!Flow) yield break; // 异步向网络端请求最新的资源版本
                 UpdatePackageVersionBegin();
-                foreach (var pair in ManifestOperations)
-                {
-                    if (!Packages.TryGetValue(pair.Key, out var asset)) continue;
-                    yield return pair.Value;
-                }
-
+                foreach (var pair in VersionOperations) yield return pair.Value;
                 UpdatePackageVersionEnd();
 
                 if (!Flow) yield break;
@@ -202,7 +195,6 @@ namespace AIO.UEngine
                 foreach (var name in ManifestOperations.Keys)
                 {
                     if (!Packages.TryGetValue(name, out var asset)) continue;
-                    if (asset.Config.IsSidePlayWithDownload) continue;
                     var operation = asset.CreateResourceDownloader();
                     if (operation is null) continue;
                     if (operation.TotalDownloadCount <= 0) continue;
@@ -211,17 +203,19 @@ namespace AIO.UEngine
                     StartValue += operation.CurrentDownloadBytes;
                     ResourceDownloaderOperations[string.Concat("ALL-", name)] = operation;
                 }
+
+                OpenDownloadAll = true;
             }
 
             #endregion
 
             #region Download
 
-            public void CollectNeedRecord(AssetSystem.SequenceRecordQueue queue)
+            public void CollectNeedRecord()
             {
-                if (queue is null || queue.Count == 0) return;
-
-                foreach (var (name, value) in queue.ToYoo())
+                if (AssetSystem.SequenceRecords is null || AssetSystem.SequenceRecords.Count == 0) return;
+                OpenRecord = true;
+                foreach (var (name, value) in AssetSystem.SequenceRecords.ToYoo())
                 {
                     var operation = YAssetSystem.CreateBundleDownloader(name, value.ToArray());
                     if (operation is null) continue;
@@ -233,19 +227,25 @@ namespace AIO.UEngine
                 }
             }
 
+            private Dictionary<string, byte> Tags = new Dictionary<string, byte>();
+            private bool OpenRecord;
+            private bool OpenDownloadAll;
+
             /// <summary>
             /// 创建补丁下载器
             /// </summary>
-            private void CollectNeedTagBegin(params string[] tag)
+            private void CollectNeedTagBegin(params string[] tags)
             {
-                if (tag is null || tag.Length == 0) return;
+                if (tags is null || tags.Length == 0) return;
 
                 foreach (var name in ManifestOperations.Keys)
                 {
                     if (!Packages.TryGetValue(name, out var asset)) continue;
-                    var operation = asset.CreateResourceDownloader(tag);
+                    Tags[name] = 1;
+                    var operation = asset.CreateResourceDownloader(tags);
                     if (operation is null) continue;
                     if (operation.TotalDownloadCount <= 0) continue;
+
                     TotalValue += operation.TotalDownloadBytes - operation.CurrentDownloadBytes;
                     StartValue += operation.CurrentDownloadBytes;
                     ResourceDownloaderOperations[string.Concat("Tag-", name)] = operation;
@@ -290,13 +290,11 @@ namespace AIO.UEngine
                 {
                     default:
                     case NetworkReachability.NotReachable:
-                        AssetSystem.LogError("当前网络不可用，请检查网络连接！");
                         OnNetReachableNot?.Invoke(Report);
                         Pause();
                         return;
                     case NetworkReachability.ReachableViaCarrierDataNetwork:
                         if (AllowReachableCarrier) return;
-                        AssetSystem.Log("当前网络为移动网络，请注意流量消耗！");
                         Pause();
                         OnNetReachableCarrier?.Invoke(Report, () =>
                         {
@@ -305,7 +303,6 @@ namespace AIO.UEngine
                         });
                         break;
                     case NetworkReachability.ReachableViaLocalAreaNetwork:
-                        AssetSystem.Log("wifi/网线——环境！");
                         break;
                 }
 
@@ -327,7 +324,7 @@ namespace AIO.UEngine
                     State == EProgressState.Fail ||
                     State == EProgressState.Finish)
                 {
-                    Event.OnComplete?.Invoke(Report);
+                    Finish();
                     yield break;
                 }
 
@@ -361,8 +358,23 @@ namespace AIO.UEngine
                 }
 
                 State = EProgressState.Finish;
-                Event.OnComplete?.Invoke(Report);
+
+                if (OpenDownloadAll)
+                {
+                    AssetSystem.WhiteAll = true;
+                }
+                else
+                {
+                    if (Tags.Count > 0)
+                        AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
+
+                    if (OpenRecord)
+                        AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(record => record.Location));
+                }
+
+                Finish();
             }
+
 
             #region End
 

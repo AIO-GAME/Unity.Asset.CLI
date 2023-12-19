@@ -25,8 +25,6 @@ namespace AIO.UEditor
 
         [Description("包含资源GUID")] public bool IncludeAssetGUID;
 
-        [Description("地址转小写")] public bool LocationToLower;
-
         /// <summary>
         /// 资源收集配置
         /// </summary>

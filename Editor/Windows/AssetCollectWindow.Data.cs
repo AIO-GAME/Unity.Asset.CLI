@@ -33,7 +33,12 @@ namespace AIO.UEditor
         /// <summary>
         /// 宽度偏移量
         /// </summary>
-        private Rect DoDrawRect = Rect.zero;
+        private Rect DoEditorDrawRect = Rect.zero;
+
+        /// <summary>
+        /// 宽度偏移量
+        /// </summary>
+        private Rect DoConfigDrawRect = Rect.zero;
 
         /// <summary>
         /// 当前选择包下标
@@ -109,6 +114,7 @@ namespace AIO.UEditor
         public enum Mode
         {
             [InspectorName("编辑模式")] Editor,
+            [InspectorName("配置模式")] Config,
             [InspectorName("查询模式")] Look,
             [InspectorName("标签模式")] Tags,
             [InspectorName("打包模式")] Build,
@@ -309,7 +315,30 @@ namespace AIO.UEditor
         /// <summary>
         /// 依赖资源
         /// </summary>
-        public Dictionary<string, Object> Dependencies = new Dictionary<string, Object>();
+        private Dictionary<string, DependenciesInfo> Dependencies = new Dictionary<string, DependenciesInfo>();
+
+        /// <summary>
+        /// 依赖资源大小
+        /// </summary>
+        private long DependenciesSize;
+
+        /// <summary>
+        /// 依赖资源搜索文本
+        /// </summary>
+        private string DependenciesSearchText = string.Empty;
+
+        private class DependenciesInfo
+        {
+            public Object Object;
+
+            public string AssetPath;
+
+            public string Name;
+
+            public string Type;
+
+            public long Size;
+        }
 
         private Rect LookModeShowAssetListView;
         private Vector2 LookModeShowAssetDetailScroll;
@@ -545,43 +574,45 @@ namespace AIO.UEditor
 
         private void ViewRectUpdate()
         {
-            DoDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
-            ViewConfig = new ViewRect(100, DoDrawRect.height)
+            DoEditorDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
+            DoConfigDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
+
+            ViewSetting = new ViewRect(150, DoEditorDrawRect.height)
             {
-                IsShow = false,
-                IsAllowHorizontal = true,
-                DragHorizontalWidth = 5,
-                width = 500
-            };
-            ViewSetting = new ViewRect(100, DoDrawRect.height)
-            {
-                IsShow = false,
-                IsAllowHorizontal = true,
+                IsShow = true,
+                IsAllowHorizontal = false,
                 DragHorizontalWidth = 5,
                 width = 150
             };
-            ViewPackageList = new ViewRect(100, DoDrawRect.height)
+            ViewConfig = new ViewRect(550, DoEditorDrawRect.height)
+            {
+                IsShow = true,
+                IsAllowHorizontal = true,
+                DragHorizontalWidth = 5,
+                width = CurrentWidth - ViewSetting.width
+            };
+            ViewPackageList = new ViewRect(100, DoEditorDrawRect.height)
             {
                 IsShow = true,
                 IsAllowHorizontal = true,
                 DragHorizontalWidth = 5,
                 width = 150
             };
-            ViewGroupList = new ViewRect(100, DoDrawRect.height)
+            ViewGroupList = new ViewRect(100, DoEditorDrawRect.height)
             {
                 IsShow = true,
                 IsAllowHorizontal = true,
                 DragHorizontalWidth = 5,
                 width = 150
             };
-            ViewCollectorsList = new ViewRect(100, DoDrawRect.height)
+            ViewCollectorsList = new ViewRect(100, DoEditorDrawRect.height)
             {
                 IsShow = true,
                 IsAllowHorizontal = false,
                 width = 400
             };
 
-            ViewDetailList = new ViewRect(300, DoDrawRect.height)
+            ViewDetailList = new ViewRect(300, DoEditorDrawRect.height)
             {
                 IsShow = true,
                 IsAllowHorizontal = false,
@@ -591,7 +622,7 @@ namespace AIO.UEditor
                 y = DrawHeaderHeight,
             };
 
-            ViewDetails = new ViewRect(300, DoDrawRect.height)
+            ViewDetails = new ViewRect(300, DoEditorDrawRect.height)
             {
                 IsShow = false,
                 IsAllowHorizontal = false,

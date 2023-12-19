@@ -8,7 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using AIO.UEngine;
 
 namespace AIO
@@ -17,13 +16,10 @@ namespace AIO
     {
         public bool Flow => false;
 
-        public Task UpdatePackageVersionTask() => Task.CompletedTask;
-        public Task UpdatePackageManifestTask() => Task.CompletedTask;
-        public Task DownloadRecordTask(AssetSystem.SequenceRecordQueue queue) => Task.CompletedTask;
-        public Task DownloadTask() => Task.CompletedTask;
-        public Task DownloadTagTask(string tag) => Task.CompletedTask;
-        public Task DownloadTagTask(IEnumerable<string> tags) => Task.CompletedTask;
-        public Task DownloadRecordTask() => Task.CompletedTask;
+        public ASDownloaderEmpty(DownlandAssetEvent dEvent)
+        {
+            Event = dEvent;
+        }
 
         public IEnumerator UpdateHeader()
         {
@@ -32,18 +28,22 @@ namespace AIO
 
         public void CollectNeedAll()
         {
+            AssetSystem.WhiteAll = true;
         }
 
         public void CollectNeedTag(params string[] tags)
         {
+            AssetSystem.AddWhite(AssetSystem.GetAssetInfos(tags));
         }
 
-        public void CollectNeedRecord(AssetSystem.SequenceRecordQueue queue)
+        public void CollectNeedRecord()
         {
+            AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(x => x.Location));
         }
 
         public IEnumerator WaitCo()
         {
+            Event.OnComplete?.Invoke(Report);
             yield break;
         }
     }
@@ -59,7 +59,7 @@ namespace AIO
         public static IASDownloader GetDownloader(DownlandAssetEvent dEvent = default)
         {
             return Parameter.ASMode != EASMode.Remote
-                ? new ASDownloaderEmpty()
+                ? new ASDownloaderEmpty(dEvent)
                 : Proxy.GetDownloader(dEvent);
         }
 
@@ -112,13 +112,15 @@ namespace AIO
                     yield return handle.UpdateHeader();
                     handle.Begin();
                     handle.CollectNeedTag(enumerable);
-                    handle.CollectNeedRecord(SequenceRecords);
+                    handle.CollectNeedRecord();
                     yield return handle.WaitCo();
                 }
             }
-
-            WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
-            WhiteListLocal.AddRange(GetAssetInfos(enumerable));
+            else
+            {
+                WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
+                WhiteListLocal.AddRange(GetAssetInfos(enumerable));
+            }
         }
 
         /// <summary>
@@ -132,12 +134,11 @@ namespace AIO
                 {
                     yield return handle.UpdateHeader();
                     handle.Begin();
-                    handle.CollectNeedRecord(SequenceRecords);
+                    handle.CollectNeedRecord();
                     yield return handle.WaitCo();
                 }
             }
-
-            WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
+            else WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
         }
 
         /// <summary>

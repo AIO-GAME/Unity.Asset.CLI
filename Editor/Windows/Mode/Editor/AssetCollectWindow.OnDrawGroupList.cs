@@ -12,13 +12,11 @@ namespace AIO.UEditor
     {
         private void OnDrawPackageInfo()
         {
-            if (Data.Packages.Length == 0) return;
             using (GELayout.Vertical(GEStyle.INThumbnailShadow))
             {
                 if (CurrentPackageIndex < 0 || Data.Packages.Length <= CurrentPackageIndex)
                 {
-                    GELayout.HelpBox("Package Index Error");
-                    return;
+                    CurrentPackageIndex = 0;
                 }
 
                 Data.Packages[CurrentPackageIndex].Name =
@@ -69,10 +67,10 @@ namespace AIO.UEditor
 
         partial void OnDrawGroupList()
         {
+            if (Data.Packages.Length <= 0) return;
             using (GELayout.Vertical(GEStyle.GridList))
             {
                 GELayout.Space();
-
                 FoldoutPackageInfo =
                     GELayout.VFoldoutHeaderGroupWithHelp(OnDrawPackageInfo, "Package Info", FoldoutPackageInfo);
 

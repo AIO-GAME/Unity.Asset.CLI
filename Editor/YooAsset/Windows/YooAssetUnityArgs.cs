@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
@@ -74,7 +75,7 @@ namespace AIO.UEditor.Build
                 return;
             }
 
-            var output = Application.streamingAssetsPath.PathCombine("BuildinFiles");
+            var output = Application.streamingAssetsPath.PathCombine(ASConfig.GetOrCreate().RuntimeRootDirectory);
             if (AHelper.IO.ExistsFolder(output)) await PrPlatform.Folder.Del(output).Async();
             AHelper.IO.CreateFolder(output);
             foreach (var package in packages)
@@ -122,11 +123,13 @@ namespace AIO.UEditor.Build
 
                     if (GetVersion() >= 2020)
                     {
-                        output = Path.Combine(OutputRoot, "unityLibrary", "src", "main", "assets", "BuildinFiles");
+                        output = Path.Combine(OutputRoot, "unityLibrary", "src", "main", "assets",
+                            ASConfig.GetOrCreate().RuntimeRootDirectory);
                     }
                     else
                     {
-                        output = Path.Combine(OutputRoot, "src", "main", "assets", "BuildinFiles");
+                        output = Path.Combine(OutputRoot, "src", "main", "assets",
+                            ASConfig.GetOrCreate().RuntimeRootDirectory);
                     }
 
                     break;

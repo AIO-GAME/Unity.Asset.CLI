@@ -39,14 +39,14 @@ namespace AIO.UEngine
 
         private static YAssetParameters GetParameter(YAssetPackage package)
         {
-            var BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, "BuildinFiles");
+            var BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, AssetSystem.Parameter.RuntimeRootDirectory);
             var SandboxRootDirectory =
 #if UNITY_EDITOR
                 string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
                     Path.DirectorySeparatorChar, "Sandbox", Path.DirectorySeparatorChar,
                     EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
-                Path.Combine(Application.persistentDataPath, "BuildinFiles");
+                Path.Combine(Application.persistentDataPath, AssetSystem.Parameter.RuntimeRootDirectory);
 #endif
 
             YAssetParameters yAssetFlow;

@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor;
@@ -385,32 +386,68 @@ namespace AIO.UEditor
                     EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Tags);
                 }
 
-                using (new EditorGUILayout.VerticalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
+                if (Dependencies.Count > 0)
                 {
-                    EditorGUILayout.LabelField($"Dependencies({Dependencies.Count})", GEStyle.HeaderLabel);
-                }
-
-                using (new EditorGUILayout.VerticalScope(GEStyle.Badge))
-                {
-                    // EditorGUILayout.DelayedTextField("", GEStyle.SearchTextField);
-                    LookModeShowAssetDetailScroll = GELayout.BeginScrollView(LookModeShowAssetDetailScroll);
-                    foreach (var dependency in Dependencies)
+                    using (new EditorGUILayout.VerticalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
                     {
-                        using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
-                        {
-                            EditorGUILayout.LabelField(dependency.Value.name, GUILayout.ExpandWidth(true));
-                            EditorGUILayout.ObjectField(dependency.Value, dependency.Value.GetType(), false,
-                                GP_Width_150);
-                            if (GUILayout.Button(GC_LookMode_Object_Select, GEStyle.IconButton, GTOption.Width(16)))
-                            {
-                                EditorUtility.RevealInFinder(dependency.Key);
-                                Selection.activeObject = dependency.Value;
-                            }
-                        }
+                        EditorGUILayout.LabelField(
+                            $"Dependencies({Dependencies.Count})[{DependenciesSize.ToConverseStringFileSize()}]",
+                            GEStyle.HeaderLabel);
                     }
 
-                    GELayout.EndScrollView();
+                    using (new EditorGUILayout.VerticalScope(GEStyle.Badge))
+                    {
+                        using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                        {
+                            DependenciesSearchText =
+                                EditorGUILayout.TextField(DependenciesSearchText, GEStyle.SearchTextField);
+                            if (!string.IsNullOrEmpty(DependenciesSearchText))
+                            {
+                                if (GUILayout.Button("✘", GEStyle.toolbarbuttonLeft, GTOption.Width(21)))
+                                {
+                                    GUI.FocusControl(null);
+                                    DependenciesSearchText = string.Empty;
+                                }
+                            }
+                        }
+
+
+                        LookModeShowAssetDetailScroll = GELayout.BeginScrollView(LookModeShowAssetDetailScroll);
+                        foreach (var dependency in Dependencies)
+                        {
+                            if (!string.IsNullOrEmpty(DependenciesSearchText))
+                            {
+                                if (!DependenciesSearchText.Contains(dependency.Value.Name,
+                                        StringComparison.CurrentCultureIgnoreCase) &&
+                                    !DependenciesSearchText.Contains(dependency.Value.Type,
+                                        StringComparison.CurrentCultureIgnoreCase) &&
+                                    !dependency.Value.Name.Contains(DependenciesSearchText,
+                                        StringComparison.CurrentCultureIgnoreCase) &&
+                                    !dependency.Value.Type.Contains(DependenciesSearchText,
+                                        StringComparison.CurrentCultureIgnoreCase)
+                                   ) continue;
+                            }
+
+                            using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                            {
+                                EditorGUILayout.LabelField(dependency.Value.Name, GUILayout.MinWidth(100),
+                                    GUILayout.ExpandWidth(true));
+                                EditorGUILayout.LabelField(dependency.Value.Size.ToConverseStringFileSize(),
+                                    GUILayout.MinWidth(50), GUILayout.MaxWidth(125));
+                                EditorGUILayout.ObjectField(dependency.Value.Object, dependency.Value.GetType(), false,
+                                    GUILayout.MinWidth(50), GUILayout.MaxWidth(150));
+                                if (GUILayout.Button(GC_LookMode_Object_Select, GEStyle.IconButton, GTOption.Width(16)))
+                                {
+                                    EditorUtility.RevealInFinder(dependency.Key);
+                                    Selection.activeObject = dependency.Value.Object;
+                                }
+                            }
+                        }
+
+                        GELayout.EndScrollView();
+                    }
                 }
+
 
                 EditorGUILayout.Space();
                 EditorGUILayout.Separator();
@@ -555,13 +592,24 @@ namespace AIO.UEditor
                 LookModeCurrentSelectAssetDataInfo = data;
                 Selection.activeObject = LookModeCurrentSelectAsset;
                 Dependencies.Clear();
-
+                DependenciesSize = 0;
                 foreach (var dependency in
                          AssetDatabase.GetDependencies(LookModeCurrentSelectAssetDataInfo.AssetPath))
                 {
-                    Dependencies[dependency] = AssetDatabase.LoadAssetAtPath<Object>(dependency);
+                    var temp = AssetDatabase.LoadAssetAtPath<Object>(dependency);
+                    if (LookModeCurrentSelectAsset == temp) continue;
+                    Dependencies[dependency] = new DependenciesInfo
+                    {
+                        Object = temp,
+                        Type = AssetDatabase.GetMainAssetTypeAtPath(dependency)?.FullName,
+                        AssetPath = dependency,
+                        Name = temp.name,
+                        Size = new FileInfo(dependency).Length
+                    };
+                    if (string.IsNullOrEmpty(Dependencies[dependency].Type)) Dependencies[dependency].Type = "Unknown";
+                    DependenciesSize += Dependencies[dependency].Size;
                 }
-
+                DependenciesSearchText = string.Empty;
                 ViewDetailList.width = CurrentWidth / 2;
                 GUI.FocusControl(null);
             }

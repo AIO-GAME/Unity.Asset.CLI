@@ -88,7 +88,16 @@ namespace AIO.UEditor
                 using (GELayout.VHorizontal())
                 {
                     GELayout.Label("定位", GP_Width_25);
-                    item.LocationFormat = GELayout.Popup(item.LocationFormat, GEStyle.PreDropDown, GTOption.Width(80));
+                    if (Config.LoadPathToLower)
+                    {
+                        GUI.enabled = false;
+                        GELayout.Popup(AssetLocationFormat.ToLower, GEStyle.PreDropDown, GTOption.Width(80));
+                        GUI.enabled = true;
+                    }
+                    else
+                        item.LocationFormat =
+                            GELayout.Popup(item.LocationFormat, GEStyle.PreDropDown, GTOption.Width(80));
+
                     item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays,
                         GEStyle.PreDropDown);
 

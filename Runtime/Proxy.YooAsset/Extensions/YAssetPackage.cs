@@ -45,13 +45,16 @@ namespace AIO.UEngine.YooAsset
 
         public InitializationOperation InitializeAsync(YAssetParameters parameters)
         {
+#if UNITY_EDITOR
+            if (parameters.Parameters is null)
+            {
+                throw new Exception($"Assets System {parameters.Mode} Parameters is null");
+            }
+
+            Debug.LogFormat("Assets System [{0}:{1}] is {2}", Config.Name, Config.Version, parameters.Mode);
+#endif
             Mode = parameters.Mode;
             parameters.UpdateParameters();
-#if UNITY_EDITOR
-            Debug.LogFormat("Assets System {0} is {1}",
-                Mode,
-                parameters.Parameters is null ? "null" : "not null");
-#endif
             switch (Mode)
             {
 #if UNITY_EDITOR
