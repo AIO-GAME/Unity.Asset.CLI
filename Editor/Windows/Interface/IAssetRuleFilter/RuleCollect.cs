@@ -64,26 +64,27 @@ namespace AIO.UEditor
         /// <summary>
         /// 判断是否为自定义收集规则
         /// </summary>
-        internal static bool IsCollectAssetCustom(IEnumerable<string> FilterCollect, string Extension)
+        internal static bool IsCollectAssetCustom(IEnumerable<string> filterCollect, string extension)
         {
-            foreach (var collect in FilterCollect)
+            if (filterCollect is null) return false;
+            foreach (var collect in filterCollect)
             {
-                if (collect[1] == '.' && collect.Substring(2) == Extension) return true;
+                if (collect[1] == '.' && collect.Substring(2) == extension) return true;
                 switch (collect[0])
                 {
                     case '.':
                     {
-                        if (collect.Substring(1) == Extension) return true;
+                        if (collect.Substring(1) == extension) return true;
                         break;
                     }
                     case '*':
                     {
-                        if (collect.Substring(1) == Extension) return true;
+                        if (collect.Substring(1) == extension) return true;
                         break;
                     }
                     default:
                     {
-                        if (collect == Extension) return true;
+                        if (collect == extension) return true;
                         break;
                     }
                 }

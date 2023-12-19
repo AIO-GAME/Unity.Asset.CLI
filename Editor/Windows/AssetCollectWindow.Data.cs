@@ -116,7 +116,7 @@ namespace AIO.UEditor
             [InspectorName("编辑模式")] Editor,
             [InspectorName("配置模式")] Config,
             [InspectorName("查询模式")] Look,
-            [InspectorName("标签模式")] Tags,
+            [InspectorName("标签模式[等待优化]")] Tags,
             [InspectorName("打包模式")] Build,
             [InspectorName("首包模式")] FirstPackage,
         }

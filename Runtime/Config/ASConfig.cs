@@ -181,7 +181,7 @@ namespace AIO.UEngine
                                         IsDefault = false
                                     })
                                 .ToArray();
-                            Packages[0].IsDefault = true;
+                            if (Packages.Length > 0) Packages[0].IsDefault = true;
                         }
                     }
 #endif

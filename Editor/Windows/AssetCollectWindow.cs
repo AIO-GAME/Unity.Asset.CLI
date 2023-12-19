@@ -119,7 +119,7 @@ namespace AIO.UEditor
                     UpdateDataBuildMode();
                     break;
                 case Mode.Tags:
-                    this.StartCoroutine(UpdateDataTagsMode());
+                    UpdateDataTagsMode();
                     break;
                 case Mode.FirstPackage:
                     UpdateDataFirstPackageMode();

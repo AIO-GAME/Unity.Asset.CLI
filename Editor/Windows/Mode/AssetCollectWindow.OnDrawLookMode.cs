@@ -609,6 +609,7 @@ namespace AIO.UEditor
                     if (string.IsNullOrEmpty(Dependencies[dependency].Type)) Dependencies[dependency].Type = "Unknown";
                     DependenciesSize += Dependencies[dependency].Size;
                 }
+
                 DependenciesSearchText = string.Empty;
                 ViewDetailList.width = CurrentWidth / 2;
                 GUI.FocusControl(null);
@@ -662,7 +663,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 更新资源查询模式收集器
         /// </summary>
-        private void UpdateDataLookModeCollector(int packageIndex, int groupIndex)
+        private async void UpdateDataLookModeCollector(int packageIndex, int groupIndex)
         {
             var i = packageIndex;
             var j = groupIndex;

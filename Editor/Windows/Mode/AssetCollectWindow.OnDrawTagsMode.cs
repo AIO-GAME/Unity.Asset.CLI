@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -100,7 +101,7 @@ namespace AIO.UEditor
                 LookModeCurrentSelectAsset = null;
                 SearchText = string.Empty;
                 LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
-                this.StartCoroutine(UpdateDataTagsMode());
+                UpdateDataTagsMode();
             }
         }
 
@@ -214,13 +215,13 @@ namespace AIO.UEditor
             }
         }
 
-        private IEnumerator UpdateDataTagsMode()
+        private void UpdateDataTagsMode()
         {
             GUI.FocusControl(null);
             CurrentPageValues.Clear();
             CurrentPageValues.PageIndex = 0;
             CurrentTagValues.Clear();
-            if (Data.Packages.Length == 0) yield break;
+            if (Data.Packages.Length == 0) return;
             TagsModeDisplayCollectors = new string[] { "ALL" };
             TagsModeDisplayTypes = Array.Empty<string>();
             TagsModeDisplayTags = Data.GetTags();

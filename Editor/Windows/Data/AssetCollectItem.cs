@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -324,8 +325,70 @@ namespace AIO.UEditor
             if (AssetDatabase.IsValidFolder(CollectPath)) // 判断Path是否为文件夹
             {
                 // 获取文件夹下所有文件
-                foreach (var file in EHelper.IO.GetFilesRelativeAssetNoMeta(CollectPath,
-                             SearchOption.AllDirectories))
+                foreach (var file in
+                         EHelper.IO.GetFilesRelativeAssetNoMeta(CollectPath, SearchOption.AllDirectories))
+                {
+                    var fixedPath = file.Replace("\\", "/");
+                    var temp = System.IO.Path.GetFileName(fixedPath);
+                    var index = temp.LastIndexOf('.');
+                    if (index >= 0)
+                    {
+                        data.Extension = temp.Substring(index).Replace(".", "").ToLower();
+                    }
+
+                    data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
+                    if (!IsCollectAsset(data)) continue;
+                    info.Address = GetAssetAddress(data);
+                    info.AssetPath = fixedPath;
+                    info.Extension = data.Extension;
+                    AssetDataInfos[fixedPath] = info;
+                }
+            }
+            else
+            {
+                data.Extension = System.IO.Path.GetExtension(data.CollectPath).Replace(".", "");
+                data.AssetPath = data.CollectPath.Substring(0, data.CollectPath.Length - data.Extension.Length - 1);
+                if (!IsCollectAsset(data)) return;
+                info.Address = GetAssetAddress(data);
+                info.AssetPath = data.CollectPath;
+                info.Extension = data.Extension;
+                AssetDataInfos[data.CollectPath] = info;
+            }
+        }
+
+        public async Task CollectAssetTask(string package, string group)
+        {
+            AssetDataInfos.Clear();
+            RuleFilters.Clear();
+            RuleCollects.Clear();
+            PackageName = package;
+            GroupName = group;
+            if (Path is null || string.IsNullOrEmpty(CollectPath)) return;
+            if (Type != EAssetCollectItemType.MainAssetCollector) return;
+
+            UpdateCollect();
+            UpdateFilter();
+
+            var data = new AssetRuleData
+            {
+                Tags = Tags,
+                UserData = UserData,
+                PackageName = package,
+                GroupName = group,
+                CollectPath = CollectPath,
+            };
+            var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
+            var info = new AssetDataInfo
+            {
+                CollectPath = data.CollectPath,
+                Tags = tags.Length == 0 ? string.Empty : string.Join(";", tags),
+            };
+
+            if (AssetDatabase.IsValidFolder(CollectPath)) // 判断Path是否为文件夹
+            {
+                // 获取文件夹下所有文件
+                foreach (var file in await Task.Factory.StartNew(() =>
+                             EHelper.IO.GetFilesRelativeAssetNoMeta(CollectPath, SearchOption.AllDirectories)))
                 {
                     var fixedPath = file.Replace("\\", "/");
                     var temp = System.IO.Path.GetFileName(fixedPath);
