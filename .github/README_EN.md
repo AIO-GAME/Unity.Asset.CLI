@@ -1,8 +1,8 @@
 <p align="center">
-    <img src="./Documentation~/Logo.svg" width="144" alt="https://github.com/AIO-GAME/Unity.Asset.CLI"/>
+    <img src="./RES/Logo.svg" width="144" alt="https://github.com/AIO-GAME/Unity.Asset.CLI"/>
 </p>
 <h1 align="center">AIO Unity CLI Asset</h1>
-<p align="center"><a href="README_EN.md">English</a> | 简体中文</p>
+<p align="center"><a href="README.md">简体中文</a> | English</p>
 <p align="center">
 <a href="https://github.com/AIO-GAME/Unity.Asset.CLI/security/policy"><img alt="" src="https://img.shields.io/github/package-json/unity/AIO-GAME/Unity.Asset.CLI"></a>
 <a href="https://github.com/AIO-GAME/Unity.Asset.CLI"><img alt="" src="https://img.shields.io/github/stars/AIO-GAME/Unity.Asset.CLI"></a>
@@ -92,7 +92,7 @@ efficiency of Unity development.
 ## 🖥️ Requirements
 
 - Unity 2019.1 or later
-- .NET 6.0 or later
+- .NET 4.0 or later
 
 ## 🧰 Getting Started
 
@@ -100,7 +100,7 @@ Please refer to the wiki for a step-by-step guide on how to get started with thi
 
 ## 📖 Documentation
 
-For more info please see | [Documentation](./Documentation~/CN/AssetSystem.md)
+For more info please see | [Documentation](./API_USAGE/AssetSystem.md)
 or [Wiki](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)
 
 ## 🤖 Demos
