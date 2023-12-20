@@ -670,7 +670,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 更新资源查询模式收集器
         /// </summary>
-        private async void UpdateDataLookModeCollector(int packageIndex, int groupIndex)
+        private void UpdateDataLookModeCollector(int packageIndex, int groupIndex)
         {
             var i = packageIndex;
             var j = groupIndex;

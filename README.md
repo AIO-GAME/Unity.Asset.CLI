@@ -26,7 +26,7 @@
 ````json
 {
   "dependencies": {
-    "com.aio.cli.asset": "x.x.x"
+    "com.aio.cli.asset": "latest"
   },
   "scopedRegistries": [
     {

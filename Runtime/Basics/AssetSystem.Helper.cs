@@ -15,6 +15,7 @@ using UnityEditor;
 
 namespace AIO
 {
+    [IgnoreConsoleJump]
     public static partial class AssetSystem
     {
         /// <summary>
@@ -96,50 +97,50 @@ namespace AIO
 
         #region LOG
 
-        //      [Conditional("UNITY_EDITOR")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
         internal static void LogException(Exception e)
         {
             if (Parameter.OutputLog) Debug.LogException(e);
         }
 
-        //      [Conditional("UNITY_EDITOR")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
         internal static void LogException(string e)
         {
             if (Parameter.OutputLog) Debug.LogException(new SystemException(e));
         }
 
-        //      [Conditional("UNITY_EDITOR")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
         internal static void LogException(string format, params object[] args)
         {
             if (Parameter.OutputLog)
                 Debug.LogException(new SystemException(string.Format(format, args)));
         }
 
-        //      [Conditional("UNITY_EDITOR")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
         internal static void Log(string e)
         {
             if (Parameter.OutputLog) Debug.Log(e);
         }
 
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
         internal static void LogWarning(string e)
         {
             if (Parameter.OutputLog) Debug.LogWarning(e);
         }
 
-
-        //      [Conditional("UNITY_EDITOR")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
         internal static void LogFormat(string format, params object[] args)
         {
             if (Parameter.OutputLog) Debug.LogFormat(format, args);
         }
 
-        //      [Conditional("UNITY_EDITOR")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
         internal static void LogError(string e)
         {
             if (Parameter.OutputLog) Debug.LogError(e);
         }
 
-        //      [Conditional("UNITY_EDITOR")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
         internal static void LogErrorFormat(string format, params object[] args)
         {
             if (Parameter.OutputLog) Debug.LogErrorFormat(format, args);

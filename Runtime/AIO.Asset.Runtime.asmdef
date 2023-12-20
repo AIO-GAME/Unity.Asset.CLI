@@ -9,7 +9,8 @@
         "UniTask.TextMeshPro",
         "YooAsset",
         "Unity.TextMeshPro",
-        "DOTween.Modules"
+        "DOTween.Modules",
+        "AIO.Core.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
