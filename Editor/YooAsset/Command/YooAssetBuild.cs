@@ -109,6 +109,7 @@ namespace AIO.UEditor
                     break;
                 case EBuildMode.SimulateBuild:
                     buildMode = YooAsset.Editor.EBuildMode.SimulateBuild;
+                    command.PackageVersion = "Simulate";
                     break;
             }
 

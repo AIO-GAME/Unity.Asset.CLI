@@ -9,6 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEngine.YooAsset
 {
+    [IgnoreConsoleJump]
     public class YAssetPackage : IDisposable
     {
         /// <summary>
@@ -51,7 +52,7 @@ namespace AIO.UEngine.YooAsset
                 throw new Exception($"Assets System {parameters.Mode} Parameters is null");
             }
 
-            Debug.LogFormat("Assets System [{0}:{1}] is {2}", Config.Name, Config.Version, parameters.Mode);
+            AssetSystem.LogFormat("Assets System [{0}:{1}] is {2}", Config.Name, Config.Version, parameters.Mode);
 #endif
             Mode = parameters.Mode;
             parameters.UpdateParameters();

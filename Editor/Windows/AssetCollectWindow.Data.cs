@@ -55,6 +55,7 @@ namespace AIO.UEditor
         /// </summary>
         private const float DrawHeaderHeight = 25;
 
+        private Vector2 OnDrawConfigFTPScroll = Vector2.zero;
         private Vector2 OnDrawConfigScroll = Vector2.zero;
         private Vector2 OnDrawSettingScroll = Vector2.zero;
         private Vector2 OnDrawPackageScroll = Vector2.zero;
@@ -113,12 +114,12 @@ namespace AIO.UEditor
         /// </summary>
         public enum Mode
         {
-            [InspectorName("编辑模式")] Editor,
-            [InspectorName("配置模式")] Config,
-            [InspectorName("查询模式")] Look,
-            [InspectorName("标签模式[等待优化]")] Tags,
-            [InspectorName("打包模式")] Build,
-            [InspectorName("首包模式")] FirstPackage,
+            [InspectorName("编辑模式")] Editor = 0,
+            [InspectorName("配置模式")] Config = 1,
+            [InspectorName("查询模式")] Look = 2,
+            [InspectorName("查询标签[等待优化]")] LookTags = 3,
+            [InspectorName("查询首包")] LookFirstPackage = 4,
+            [InspectorName("打包工具")] Build = 5,
         }
 
         /// <summary>
@@ -386,7 +387,7 @@ namespace AIO.UEditor
         private GUILayoutOption GP_Width_40;
         private GUILayoutOption GP_Width_25;
         private GUILayoutOption GP_Width_20;
-
+        private GUILayoutOption GP_Width_EXPAND;
         private GUILayoutOption GP_Height_20;
 
         private GUILayoutOption GP_Height_25;
@@ -513,6 +514,7 @@ namespace AIO.UEditor
 
         private void GPInit()
         {
+            GP_Width_EXPAND = GUILayout.ExpandWidth(true);
             GP_Width_150 = GUILayout.Width(150);
             GP_Width_100 = GUILayout.Width(100);
             GP_Width_75 = GUILayout.Width(75);

@@ -7,8 +7,12 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace AIO.UEditor
 {
@@ -17,6 +21,18 @@ namespace AIO.UEditor
         partial void OnDrawHeaderBuildMode()
         {
             EditorGUILayout.Separator();
+            if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                GUI.FocusControl(null);
+                Selection.activeObject = ASBuildConfig.GetOrCreate();
+            }
+
+            if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                GUI.FocusControl(null);
+                BuildConfig.Save();
+                EditorUtility.DisplayDialog("保存", "保存成功", "确定");
+            }
         }
 
         private void UpdateDataBuildMode()
@@ -49,7 +65,6 @@ namespace AIO.UEditor
         {
             if (LookModeDisplayPackages is null || LookModeDisplayPackages.Length == 0)
             {
-                EditorGUILayout.Separator();
                 return;
             }
 
@@ -61,7 +76,7 @@ namespace AIO.UEditor
                     Directory.GetParent(BuildConfig.BuildOutputPath) == null)
                 {
                     GELayout.Separator();
-                    if (GUILayout.Button("选择", GEStyle.toolbarbutton, GP_Width_50))
+                    if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_50))
                         BuildConfig.BuildOutputPath =
                             EditorUtility.OpenFolderPanel("请选择导出路径", BuildConfig.BuildOutputPath, "");
                     return;
@@ -72,11 +87,11 @@ namespace AIO.UEditor
 
                 GELayout.Separator();
 
-                if (GUILayout.Button("选择", GEStyle.toolbarbutton, GP_Width_75))
+                if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_75))
                     BuildConfig.BuildOutputPath =
                         EditorUtility.OpenFolderPanel("请选择导出路径", BuildConfig.BuildOutputPath, "");
 
-                if (GUILayout.Button("打开", GEStyle.toolbarbutton, GP_Width_75))
+                if (GUILayout.Button("打开目录", GEStyle.toolbarbutton, GP_Width_75))
                 {
                     PrPlatform.Open.Path(BuildConfig.BuildOutputPath).Async();
                     return;
@@ -84,7 +99,7 @@ namespace AIO.UEditor
 
                 if (GUILayout.Button("清空缓存", GEStyle.toolbarbutton, GP_Width_75))
                 {
-                    var sandbox = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Bundles");
+                    var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
                     if (Directory.Exists(sandbox))
                         AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
                     return;
@@ -99,9 +114,24 @@ namespace AIO.UEditor
 
 #endif
 
-#if SUPPORT_YOOASSET
-                if (GUILayout.Button("构建 Yoo", GEStyle.toolbarbutton, GP_Width_75))
+                if (GUILayout.Button("构建资源", GEStyle.toolbarbutton, GP_Width_75))
                 {
+                    var currentScene = SceneManager.GetSceneAt(0);
+                    if (!string.IsNullOrEmpty(currentScene.path))
+                    {
+                        var scene = SceneManager.GetSceneByPath(currentScene.path);
+                        if (scene.isDirty) // 获取当前场景的修改状态
+                        {
+                            if (EditorUtility.DisplayDialog("提示", "当前场景未保存,是否保存?", "保存", "取消"))
+                            {
+                                EditorSceneManager.SaveScene(scene);
+                            }
+                        }
+                    }
+
+
+#if SUPPORT_YOOASSET
+                    ConvertYooAsset.Convert(Data);
                     var BuildCommand = new YooAssetBuildCommand
                     {
                         PackageVersion = BuildConfig.BuildVersion,
@@ -110,18 +140,18 @@ namespace AIO.UEditor
                         ActiveTarget = BuildConfig.BuildTarget,
                         BuildPipeline = BuildConfig.BuildPipeline,
                         OutputRoot = BuildConfig.BuildOutputPath,
+                        BuildMode = BuildConfig.BuildMode,
                     };
-                    ConvertYooAsset.Convert(Data);
                     YooAssetBuild.ArtBuild(BuildCommand);
                     MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
                     BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                }
 #else
-                if (GUILayout.Button("构建", GEStyle.toolbarbutton, GP_Width_50))
-                {
-                    EditorUtility.DisplayDialog("提示", "请先导入 YooAsset Or Other TrdTools", "确定");
-                }
+                    if (EditorUtility.DisplayDialogComplex("提示","当前没有导入资源实现工具","导入 YooAsset","导入其他", "取消") == 0)
+                    {
+                        UnInstall.YooAssetRunAsync();
+                    }
 #endif
+                }
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
@@ -177,14 +207,6 @@ namespace AIO.UEditor
                 BuildConfig.BuildMode = GELayout.Popup(BuildConfig.BuildMode, GEStyle.PreDropDown);
             }
 
-            // BuildConfig.EncyptionClassName = GELayout.Popup("加密模式", YooAssetEncryptionsIndex, YooAssetEncryptionsName);
-
-            // BuildConfig.CompressedModeName = GELayout.Popup("压缩模式", BuildConfig.CompressOption);
-
-            // BuildConfig.OutputNameStyle = GELayout.Popup("文件名称样式", BuildConfig.OutputNameStyle);
-
-            // BuildConfig.CopyBuildinFileOption = GELayout.Popup("首包资源文件的拷贝方式", BuildConfig.CopyBuildinFileOption);
-
             if (Tags != null && Tags.Length > 0)
             {
                 using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
@@ -216,143 +238,220 @@ namespace AIO.UEditor
             // 钉钉 通知事件类型列表
         }
 
+        private StringBuilder _builder = new StringBuilder();
+
+        private string GetFTPItemDes(ASBuildConfig.FTPConfig config, int i)
+        {
+            _builder.Clear();
+            if (!string.IsNullOrEmpty(config.Name))
+            {
+                _builder.Append(config.Name);
+            }
+
+            if (!string.IsNullOrEmpty(config.Description))
+            {
+                _builder.Append('(').Append(config.Description).Append(')');
+            }
+
+            if (!string.IsNullOrEmpty(config.Server))
+            {
+                _builder.Append('[');
+                if (config.DirTreeFiled.IsValidity())
+                {
+                    _builder.Append(config.DirTreeFiled.GetFullPath()).Append(" -> ");
+                }
+
+                _builder.Append(config.Server).Append(':')
+                    .Append(config.Port);
+                if (string.IsNullOrEmpty(config.RemotePath))
+                {
+                    _builder.Append(']');
+                }
+                else
+                {
+                    _builder.Append('\\').Append(config.RemotePath).Append(']');
+                }
+            }
+
+            if (_builder.Length == 0) _builder.Append($"NO.{i}");
+            return _builder.ToString();
+        }
+
         private void OnDrawBuildFTP()
         {
-            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
+            if (BuildConfig.FTPConfigs is null) return;
+            OnDrawConfigFTPScroll = EditorGUILayout.BeginScrollView(OnDrawConfigFTPScroll);
+            for (var i = BuildConfig.FTPConfigs.Length - 1; i >= 0; i--)
             {
-                EditorGUILayout.LabelField("地址", GP_Width_100);
-                BuildConfig.FTPServerIP = GELayout.FieldDelayed(BuildConfig.FTPServerIP);
-                if (string.IsNullOrEmpty(BuildConfig.FTPServerIP)) return;
-
-                if (GUILayout.Button("校验", GEStyle.toolbarbutton, GP_Width_50))
+                using (GELayout.Vertical(GEStyle.INThumbnailShadow))
                 {
-                    GUI.FocusControl(null);
-                    BuildFTPValidate();
+                    using (GELayout.VHorizontal(GEStyle.Toolbar))
+                    {
+                        if (GELayout.Button(BuildConfig.FTPConfigs[i].Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
+                                GEStyle.TEtoolbarbutton, GP_Width_30))
+                        {
+                            BuildConfig.FTPConfigs[i].Folded = !BuildConfig.FTPConfigs[i].Folded;
+                            GUI.FocusControl(null);
+                        }
+
+                        GELayout.Label(GetFTPItemDes(BuildConfig.FTPConfigs[i], i), GEStyle.HeaderLabel,
+                            GP_Width_EXPAND);
+                        if (!string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].Server))
+                        {
+                            if (GUILayout.Button("校验", GEStyle.toolbarbutton, GP_Width_50))
+                            {
+                                GUI.FocusControl(null);
+                                BuildFTPValidate(BuildConfig.FTPConfigs[i]);
+                            }
+
+                            if (!string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].DirTreeFiled.DirPath))
+                            {
+                                if (GUILayout.Button("复制", GEStyle.toolbarbutton, GP_Width_50))
+                                {
+                                    GUI.FocusControl(null);
+                                    var source = BuildConfig.BuildOutputPath.Trim('/', '\\');
+                                    var target = Path.Combine(
+                                        BuildConfig.FTPConfigs[i].DirTreeFiled.DirPath
+                                            .Trim('/', '\\'), Path.GetFileName(source));
+                                    if (EditorUtility.DisplayDialog("提示", $"{source}\n复制\n{target}", "确定",
+                                            "取消"))
+                                    {
+                                        if (AHelper.IO.ExistsFolder(target))
+                                            AHelper.IO.DeleteFolder(target, SearchOption.AllDirectories, true);
+                                        PrPlatform.Folder.Copy(target, source).Async();
+                                        return;
+                                    }
+                                }
+
+                                if (GUILayout.Button("链接", GEStyle.toolbarbutton, GP_Width_50))
+                                {
+                                    GUI.FocusControl(null);
+                                    var source = BuildConfig.BuildOutputPath.Trim('/', '\\');
+                                    var target = Path.Combine(
+                                        BuildConfig.FTPConfigs[i].DirTreeFiled.DirPath.Trim('/', '\\'),
+                                        Path.GetFileName(source));
+                                    if (EditorUtility.DisplayDialog("提示", $"{source}\n链接\n{target}", "确定",
+                                            "取消"))
+                                    {
+                                        IExecutor executor = null;
+                                        if (AHelper.IO.ExistsFolder(target))
+                                            executor = PrPlatform.Folder.Del(target);
+                                        var symbolic = executor is null
+                                            ? PrPlatform.Folder.Symbolic(target, source)
+                                            : executor.Link(PrPlatform.Folder.Symbolic(target, source));
+                                        symbolic.Async();
+                                        return;
+                                    }
+                                }
+                            }
+
+                            if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20))
+                            {
+                                GUI.FocusControl(null);
+                                BuildConfig.FTPConfigs[i].DirTreeFiled.UpdateOption();
+                                return;
+                            }
+                        }
+
+                        if (GUILayout.Button(GC_DEL, GEStyle.toolbarbutton, GP_Width_20))
+                        {
+                            GUI.FocusControl(null);
+                            if (EditorUtility.DisplayDialog("提示", "确定删除?", "确定", "取消"))
+                            {
+                                BuildConfig.FTPConfigs = BuildConfig.FTPConfigs.RemoveAt(i);
+                                return;
+                            }
+                        }
+                    }
+
+                    OnDrawBuildFTP(BuildConfig.FTPConfigs[i]);
                 }
+            }
 
-                if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
-                {
-                    GUI.FocusControl(null);
-                    BuildFTPUpload();
-                }
+            EditorGUILayout.EndScrollView();
+        }
+
+        private static async void CreateFTP(ASBuildConfig.FTPConfig config)
+        {
+            var handle = AHandle.FTP.Create(config.Server, config.Port,
+                config.User, config.Pass, config.RemotePath);
+            var status = await handle.InitAsync();
+            EditorUtility.DisplayDialog("提示", status
+                ? $"创建成功 {handle.URI}"
+                : $"创建失败 {handle.URI}", "确定");
+        }
+
+
+        private void OnDrawBuildFTP(ASBuildConfig.FTPConfig config)
+        {
+            if (!config.Folded) return;
+            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
+            {
+                EditorGUILayout.LabelField("名称:描述", GP_Width_100);
+                config.Name = GELayout.FieldDelayed(config.Name);
+                config.Description = GELayout.FieldDelayed(config.Description);
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
-                EditorGUILayout.LabelField("端口", GP_Width_100);
-                BuildConfig.FTPServerPort = GELayout.FieldDelayed(BuildConfig.FTPServerPort);
+                EditorGUILayout.LabelField("地址:端口", GP_Width_100);
+                config.Server = GELayout.FieldDelayed(config.Server);
+                config.Port = GELayout.FieldDelayed(config.Port, GP_Width_50);
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
-                EditorGUILayout.LabelField("用户名", GP_Width_100);
-                BuildConfig.FTPUser = GELayout.FieldDelayed(BuildConfig.FTPUser);
-            }
-
-            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
-            {
-                EditorGUILayout.LabelField("密码", GP_Width_100);
-                BuildConfig.FTPPassword = GELayout.FieldDelayed(BuildConfig.FTPPassword);
+                EditorGUILayout.LabelField("账户:密码", GP_Width_100);
+                config.User = GELayout.FieldDelayed(config.User);
+                config.Pass = GELayout.FieldDelayed(config.Pass);
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
                 EditorGUILayout.LabelField("远程路径", GP_Width_100);
-                BuildConfig.FTPRemotePath = GELayout.FieldDelayed(BuildConfig.FTPRemotePath);
+                config.RemotePath = GELayout.FieldDelayed(config.RemotePath);
+                if (!string.IsNullOrEmpty(config.RemotePath))
+                {
+                    if (GUILayout.Button("创建", GEStyle.toolbarbutton, GP_Width_50))
+                    {
+                        GUI.FocusControl(null);
+                        CreateFTP(config);
+                        return;
+                    }
+                }
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
                 EditorGUILayout.LabelField("本地路径", GP_Width_100);
-                BuildConfig.FTPLocalPath = GELayout.FieldDelayed(BuildConfig.FTPLocalPath);
-
-                if (GUILayout.Button("选择", GEStyle.toolbarbutton, GP_Width_50))
+                config.DirTreeFiled.OnDraw();
+                if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
                 {
                     GUI.FocusControl(null);
-                    BuildConfig.FTPLocalPath =
-                        EditorUtility.OpenFolderPanel("请选择上传路径", BuildConfig.FTPLocalPath, "");
-                    return;
-                }
-
-                if (Directory.Exists(BuildConfig.FTPLocalPath))
-                {
-                    if (GUILayout.Button("移动", GEStyle.toolbarbutton, GP_Width_50))
-                    {
-                        GUI.FocusControl(null);
-                        var source = BuildConfig.BuildOutputPath.Trim('/', '\\');
-                        var target = BuildConfig.FTPLocalPath.Trim('/', '\\');
-                        if (AHelper.IO.ExistsFolder(target))
-                            AHelper.IO.DeleteFolder(target, SearchOption.AllDirectories, true);
-                        PrPlatform.Folder.Copy(target, source).Async();
-                    }
-
-                    if (GUILayout.Button("链接", GEStyle.toolbarbutton, GP_Width_50))
-                    {
-                        GUI.FocusControl(null);
-                        var source = BuildConfig.BuildOutputPath.Trim('/', '\\');
-                        var target = BuildConfig.FTPLocalPath.Trim('/', '\\');
-                        IExecutor executor = null;
-                        if (AHelper.IO.ExistsFolder(target))
-                            executor = PrPlatform.Folder.Del(target);
-                        var symbolic = executor is null
-                            ? PrPlatform.Folder.Symbolic(target, source)
-                            : executor.Link(PrPlatform.Folder.Symbolic(target, source));
-                        symbolic.Async();
-                    }
-
-                    if (GUILayout.Button("打开", GEStyle.toolbarbutton, GP_Width_50))
-                    {
-                        GUI.FocusControl(null);
-                        PrPlatform.Open.Path(BuildConfig.FTPLocalPath).Async();
-                    }
+                    config.Upload();
                 }
             }
         }
 
-        private async void BuildFTPValidate()
+        private static async void BuildFTPValidate(ASBuildConfig.FTPConfig config)
         {
-            var uri = string.Concat(BuildConfig.FTPServerIP, ":", BuildConfig.FTPServerPort, "\\",
-                BuildConfig.FTPRemotePath).Trim('\\', '/');
-            var handle = await AHelper.FTP.CheckAsync(uri, BuildConfig.FTPUser, BuildConfig.FTPPassword);
+            var handle = await config.Validate();
             EditorUtility.DisplayDialog("提示", handle ? "连接成功" : "连接失败", "确定");
-        }
-
-        private async void BuildFTPUpload()
-        {
-            var serverIP = string.Concat(BuildConfig.FTPServerIP, ":", BuildConfig.FTPServerPort).Trim('\\', '/');
-            using (var handle = AHandle.FTP.Create(serverIP, BuildConfig.FTPUser, BuildConfig.FTPPassword,
-                       BuildConfig.FTPRemotePath))
-            {
-                await handle.InitAsync();
-                var args = new AProgressEvent
-                {
-                    OnProgress = progress =>
-                    {
-                        if (EditorUtility.DisplayCancelableProgressBar("Upload FTP", progress.ToString(),
-                                progress.Progress / 100f))
-                        {
-                        }
-                    },
-                    OnError = error =>
-                    {
-                        Debug.LogException(error);
-                        EditorUtility.ClearProgressBar();
-                    },
-                    OnComplete = (e) =>
-                    {
-                        EditorUtility.ClearProgressBar();
-                        EditorUtility.DisplayDialog("Upload FTP", "Upload FTP Complete", "OK");
-                    }
-                };
-                await handle.UploadDirAsync(BuildConfig.BuildOutputPath, args);
-            }
         }
 
         partial void OnDrawBuildMode()
         {
-            FoldoutBuildSetting = GELayout.VFoldoutHeader(OnDrawBuildBuild, "构建设置", FoldoutBuildSetting);
-            FoldoutUploadFTP = GELayout.VFoldoutHeader(OnDrawBuildFTP, "FTP", FoldoutUploadFTP);
-            FoldoutNoticeDingDing = GELayout.VFoldoutHeader(OnDrawBuildNoticeDingDing, "钉钉通知", FoldoutNoticeDingDing);
+            FoldoutBuildSetting = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildBuild,
+                "构建设置", FoldoutBuildSetting);
+
+            FoldoutUploadFTP = GELayout.VFoldoutHeaderGroupWithHelp(
+                OnDrawBuildFTP,
+                "FTP",
+                FoldoutUploadFTP,
+                () => { BuildConfig.AddOrNewFTP(); }, 0, null, new GUIContent("✚"));
+
+            FoldoutNoticeDingDing = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildNoticeDingDing,
+                "钉钉通知", FoldoutNoticeDingDing);
         }
     }
 }

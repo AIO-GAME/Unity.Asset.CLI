@@ -20,6 +20,12 @@ namespace AIO.UEditor
         private void OnDrawHeaderConfigMode()
         {
             EditorGUILayout.Separator();
+            if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                GUI.FocusControl(null);
+                Selection.activeObject = ASConfig.GetOrCreate();
+            }
+
             if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
@@ -30,6 +36,9 @@ namespace AIO.UEditor
 
         private void UpdateDataConfigMode()
         {
+#if SUPPORT_YOOASSET
+            ConvertYooAsset.Convert(Data);
+#endif
             Config.UpdatePackage();
             _packages = Config.Packages is null
                 ? _packages
@@ -87,6 +96,11 @@ namespace AIO.UEditor
             {
                 GELayout.Label("加载模式", GP_Width_150);
                 Config.ASMode = GELayout.Popup(Config.ASMode, GEStyle.PreDropDown);
+                if (GUI.changed)
+                {
+                    if (Config.ASMode == EASMode.Editor) UpdateDataConfigMode();
+                }
+
                 if (GELayout.Button("Clean Sandbox", GEStyle.toolbarbuttonRight, GP_Width_100))
                 {
                     var sandbox = Path.Combine(ProjectRootDir, "Sandbox");
@@ -146,6 +160,7 @@ namespace AIO.UEditor
 #endif
             }
 
+            if (string.IsNullOrEmpty(Config.RuntimeRootDirectory)) GUI.enabled = false;
             EditorGUILayout.Separator();
             using (new EditorGUILayout.VerticalScope(GEStyle.Badge))
             {
@@ -166,7 +181,7 @@ namespace AIO.UEditor
 
                             if (GELayout.Button("Switch", GEStyle.toolbarbutton, GP_Width_50))
                             {
-                                WindowMode = Mode.FirstPackage;
+                                WindowMode = Mode.LookFirstPackage;
                                 UpdateData();
                                 GUI.FocusControl(null);
                             }
@@ -198,6 +213,7 @@ namespace AIO.UEditor
                         if (string.IsNullOrEmpty(Config.URL)) GUI.enabled = true;
                         break;
                     default:
+                        GUI.enabled = false;
                         GELayout.List("资源包配置", _packages,
                             config =>
                             {
@@ -208,9 +224,11 @@ namespace AIO.UEditor
                                     package.IsDefault = false;
                             },
                             () => new AssetsPackageConfig());
-                        GELayout.Button("Update", UpdateDataConfigMode);
+                        GUI.enabled = true;
                         break;
                 }
+
+                if (string.IsNullOrEmpty(Config.RuntimeRootDirectory)) GUI.enabled = true;
             }
         }
 
