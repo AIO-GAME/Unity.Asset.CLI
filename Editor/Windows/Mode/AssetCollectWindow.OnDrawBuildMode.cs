@@ -148,7 +148,9 @@ namespace AIO.UEditor
 #else
                     if (EditorUtility.DisplayDialogComplex("提示","当前没有导入资源实现工具","导入 YooAsset","导入其他", "取消") == 0)
                     {
-                        UnInstall.YooAssetRunAsync();
+#if !SUPPORT_YOOASSET
+                        Install.YooAssetRunAsync();
+#endif
                     }
 #endif
                 }
