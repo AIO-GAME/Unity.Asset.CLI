@@ -95,8 +95,7 @@ namespace AIO
                     yield return handle.WaitCo();
                 }
             }
-
-            WhiteListLocal.AddRange(GetAssetInfos(enumerable));
+            else WhiteListLocal.AddRange(GetAssetInfos(enumerable));
         }
 
         /// <summary>
@@ -147,7 +146,12 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadAll(DownlandAssetEvent dEvent = default)
         {
-            if (Parameter.ASMode != EASMode.Remote) yield break;
+            if (Parameter.ASMode != EASMode.Remote)
+            {
+                WhiteAll = true;
+                yield break;
+            }
+
             using (var handle = Proxy.GetDownloader(dEvent))
             {
                 yield return handle.UpdateHeader();

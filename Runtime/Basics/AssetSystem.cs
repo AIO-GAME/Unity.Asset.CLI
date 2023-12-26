@@ -89,16 +89,6 @@ namespace AIO
         }
 
         /// <summary>
-        /// 获取序列记录
-        /// </summary>
-        /// <param name="record">记录</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static void AddSequenceRecord(SequenceRecord record)
-        {
-            SequenceRecords.Add(record);
-        }
-
-        /// <summary>
         /// 销毁资源管理系统
         /// </summary>
         /// <returns></returns>
@@ -130,7 +120,7 @@ namespace AIO
             Proxy.Dispose();
             SequenceRecords.Dispose();
         }
-        
+
         /// <summary>
         /// 清理缓存资源 (清空之后需要重新下载资源)
         /// </summary>

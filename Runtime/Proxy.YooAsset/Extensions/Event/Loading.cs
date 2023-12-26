@@ -168,7 +168,7 @@ namespace AIO.UEngine.YooAsset
             var operation = package.CreateBundleDownloader(location);
             if (AssetSystem.Parameter.EnableSequenceRecord)
             {
-                var record = new AssetSystem.SequenceRecord
+                AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
                 {
                     PackageName = package.PackageName,
                     Location = location.Address,
@@ -176,8 +176,7 @@ namespace AIO.UEngine.YooAsset
                     Bytes = operation.TotalDownloadBytes,
                     Count = operation.TotalDownloadCount,
                     AssetPath = location.AssetPath,
-                };
-                AssetSystem.AddSequenceRecord(record);
+                });
             }
 
             LoadHandle.RegisterEvent(location, operation);

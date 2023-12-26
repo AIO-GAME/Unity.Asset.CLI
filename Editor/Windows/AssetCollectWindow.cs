@@ -127,8 +127,6 @@ namespace AIO.UEditor
             }
         }
 
-        #region 绘制
-
         protected override void OnDraw()
         {
             using (new EditorGUILayout.HorizontalScope(
@@ -163,6 +161,8 @@ namespace AIO.UEditor
             DrawVersion(Setting.Version);
             OnOpenEvent();
         }
+
+        #region 绘制
 
         partial void OnDrawConfigMode();
         partial void OnDrawEditorMode();

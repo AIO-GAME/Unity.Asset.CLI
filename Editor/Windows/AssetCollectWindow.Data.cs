@@ -55,6 +55,7 @@ namespace AIO.UEditor
         /// </summary>
         private const float DrawHeaderHeight = 25;
 
+        private Vector2 OnDrawConfigGCScroll = Vector2.zero;
         private Vector2 OnDrawConfigFTPScroll = Vector2.zero;
         private Vector2 OnDrawConfigScroll = Vector2.zero;
         private Vector2 OnDrawSettingScroll = Vector2.zero;
@@ -87,6 +88,11 @@ namespace AIO.UEditor
         private bool FoldoutUploadFTP = true;
 
         /// <summary>
+        /// 折叠栏 - Google Cloud 上传
+        /// </summary>
+        private bool FoldoutUploadGCloud = true;
+
+        /// <summary>
         /// 折叠栏 - 钉钉通知
         /// </summary>
         private bool FoldoutNoticeDingDing = true;
@@ -115,7 +121,7 @@ namespace AIO.UEditor
         public enum Mode
         {
             [InspectorName("编辑模式")] Editor = 0,
-            [InspectorName("配置模式")] Config = 1,
+            [InspectorName("配置管理")] Config = 1,
             [InspectorName("查询模式")] Look = 2,
             [InspectorName("查询标签[等待优化]")] LookTags = 3,
             [InspectorName("查询首包")] LookFirstPackage = 4,

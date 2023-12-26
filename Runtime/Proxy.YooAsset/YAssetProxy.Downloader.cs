@@ -237,15 +237,13 @@ namespace AIO.UEngine
             private void CollectNeedTagBegin(params string[] tags)
             {
                 if (tags is null || tags.Length == 0) return;
-
                 foreach (var name in ManifestOperations.Keys)
                 {
                     if (!Packages.TryGetValue(name, out var asset)) continue;
                     Tags[name] = 1;
-                    var operation = asset.CreateResourceDownloader(tags);
+                    var operation = asset.CreateBundleDownloader(asset.GetAssetInfos(tags));
                     if (operation is null) continue;
                     if (operation.TotalDownloadCount <= 0) continue;
-
                     TotalValue += operation.TotalDownloadBytes - operation.CurrentDownloadBytes;
                     StartValue += operation.CurrentDownloadBytes;
                     ResourceDownloaderOperations[string.Concat("Tag-", name)] = operation;
