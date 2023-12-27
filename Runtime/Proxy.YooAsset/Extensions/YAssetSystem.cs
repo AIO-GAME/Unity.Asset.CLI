@@ -27,6 +27,7 @@ using ILogger = YooAsset.ILogger;
 
 namespace AIO.UEngine.YooAsset
 {
+    [IgnoreConsoleJump]
     internal class YLogger : ILogger
     {
         public void Log(string message)
@@ -54,6 +55,7 @@ namespace AIO.UEngine.YooAsset
     /// 资源加载管理器
     /// 该类只提供封装API函数
     /// </summary>
+    [IgnoreConsoleJump]
     internal static partial class YAssetSystem
     {
         private static Dictionary<string, YAssetPackage> Dic { get; set; }

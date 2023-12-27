@@ -150,7 +150,6 @@ namespace AIO.UEngine.YooAsset
 
         #endregion
 
-
         private static YAssetPackage GetAutoPackageSync(AssetInfo location)
         {
             return GetAutoPackageSync(location.Address);

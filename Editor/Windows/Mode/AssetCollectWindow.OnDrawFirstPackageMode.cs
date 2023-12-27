@@ -202,16 +202,15 @@ namespace AIO.UEditor
 
             if (EditorApplication.isPlaying)
             {
-                using (new EditorGUILayout.HorizontalScope(GEStyle.DropzoneStyle))
+                var index = 0;
+                foreach (var record in AssetSystem.SequenceRecords)
                 {
-                    GELayout.LabelPrefix("序列记录");
-                    if (!string.IsNullOrEmpty(Config.URL))
+                    using (GELayout.Vertical())
                     {
-                        if (GELayout.Button("Upload FTP"))
-                        {
-                            AHandle.FTP.Create("", "", "").UploadFile(
-                                AssetSystem.SequenceRecordQueue.LOCAL_PATH);
-                        }
+                        GELayout.Label(
+                            $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
+                        GELayout.HelpBox(
+                            $"{record.Time:yyyy-MM-dd HH:mm:ss} [Num : {record.Count}] [Size : {record.Bytes.ToConverseStringFileSize()}] ");
                     }
                 }
             }

@@ -79,10 +79,10 @@ namespace AIO.UEditor
                     case Mode.Build:
                         OnDrawHeaderBuildMode();
                         break;
-                    case Mode.Tags:
+                    case Mode.LookTags:
                         OnDrawHeaderTagsMode();
                         break;
-                    case Mode.FirstPackage:
+                    case Mode.LookFirstPackage:
                         OnDrawHeaderFirstPackageMode();
                         break;
                 }
@@ -118,16 +118,14 @@ namespace AIO.UEditor
                 case Mode.Build:
                     UpdateDataBuildMode();
                     break;
-                case Mode.Tags:
+                case Mode.LookTags:
                     UpdateDataTagsMode();
                     break;
-                case Mode.FirstPackage:
+                case Mode.LookFirstPackage:
                     UpdateDataFirstPackageMode();
                     break;
             }
         }
-
-        #region 绘制
 
         protected override void OnDraw()
         {
@@ -152,10 +150,10 @@ namespace AIO.UEditor
                 case Mode.Build:
                     OnDrawBuildMode();
                     break;
-                case Mode.Tags:
+                case Mode.LookTags:
                     OnDrawTagsMode();
                     break;
-                case Mode.FirstPackage:
+                case Mode.LookFirstPackage:
                     OnDrawFirstPackageMode();
                     break;
             }
@@ -163,6 +161,8 @@ namespace AIO.UEditor
             DrawVersion(Setting.Version);
             OnOpenEvent();
         }
+
+        #region 绘制
 
         partial void OnDrawConfigMode();
         partial void OnDrawEditorMode();
@@ -214,8 +214,8 @@ namespace AIO.UEditor
                     ViewGroupList.ContainsHorizontal(eventData);
                     ViewPackageList.ContainsHorizontal(eventData);
                     break;
-                case Mode.FirstPackage:
-                case Mode.Tags:
+                case Mode.LookFirstPackage:
+                case Mode.LookTags:
                 case Mode.Look:
                     ViewDetailList.ContainsHorizontal(eventData);
                     break;
@@ -238,8 +238,8 @@ namespace AIO.UEditor
                     ViewPackageList.DragHorizontal(eventData);
                     break;
                 }
-                case Mode.FirstPackage:
-                case Mode.Tags:
+                case Mode.LookFirstPackage:
+                case Mode.LookTags:
                 case Mode.Look:
                 {
                     ViewDetailList.DragHorizontal(eventData);
@@ -258,9 +258,9 @@ namespace AIO.UEditor
         {
             switch (WindowMode)
             {
-                case Mode.Tags:
+                case Mode.LookTags:
                 case Mode.Look:
-                case Mode.FirstPackage:
+                case Mode.LookFirstPackage:
                 {
                     switch (keyCode)
                     {

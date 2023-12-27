@@ -35,7 +35,6 @@ namespace AIO.UEditor
                 ViewGroupList.IsShow = true;
             }
 
-            EditorGUILayout.Separator();
             TempBuilder.Clear();
             if (CurrentPackageIndex >= 0 && Data.Packages.Length > CurrentPackageIndex)
             {
@@ -63,8 +62,7 @@ namespace AIO.UEditor
                 }
             }
 
-            GUILayout.Label(TempBuilder.ToString(), GEStyle.flownodetitlebar, GP_Height_20);
-            EditorGUILayout.Separator();
+            GUILayout.Label(TempBuilder.ToString(), GEStyle.toolbarbuttonRight, GP_Height_20, GP_Width_EXPAND);
 
 #if SUPPORT_YOOASSET
             if (GUILayout.Button(GC_ToConvert_YooAsset, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
@@ -85,7 +83,7 @@ namespace AIO.UEditor
             if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
-                Selection.activeObject = ASConfig.GetOrCreate();
+                Selection.activeObject = AssetCollectRoot.GetOrCreate();
             }
 
             if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
@@ -97,6 +95,5 @@ namespace AIO.UEditor
         }
 
         partial void OnDrawHeaderBuildMode();
-
     }
 }

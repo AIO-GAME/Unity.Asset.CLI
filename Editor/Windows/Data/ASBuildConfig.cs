@@ -4,87 +4,13 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public enum EBuildPipeline
-    {
-        /// <summary>
-        /// 内置打包管线
-        /// </summary>
-        [InspectorName("内置打包管线")] BuiltinBuildPipeline,
-
-#if UNITY_2018_1_OR_NEWER
-
-        /*
-            01  Setup - 平台环境初始化
-            SwitchToBuildPlatform
-            RebuildSpriteAtlasCache
-
-            02  玩家 Scripts - 工程源代码编译
-            BuildPlayerScripts、PostScriptsCallback
-
-            03  Dependency
-            CalculateSceneDependencyData
-            CalculateCustomDependencyData (UNITY_2019_3_OR_NEWER)
-            CalculateAssetDependencyData
-            StripUnusedSpriteSources
-            PostDependencyCallback
-
-            04  Packing
-            GenerateBundlePacking
-            GenerateBundleCommands
-            GenerateSubAssetPathMaps
-            GenerateBundleMaps
-            PostPackingCallback
-
-            05  Writing
-
-            WriteSerializedFiles
-            ArchiveAndCompressBundles
-            AppendBundleHash
-            GenerateLinkXml
-            PostWritingCallback
-
-            06  Generate manifest files
-         */
-
-        /// <summary>
-        /// 自定义打包管线
-        /// </summary>
-        [InspectorName("自定义打包管线(需安装)")] ScriptableBuildPipeline,
-#endif
-    }
-
-    /// <summary>
-    /// 资源包流水线的构建模式
-    /// </summary>
-    public enum EBuildMode
-    {
-        /// <summary>
-        /// 强制重建模式
-        /// </summary>
-        [InspectorName("强制重建模式")] ForceRebuild,
-
-        /// <summary>
-        /// 增量构建模式
-        /// </summary>
-        [InspectorName("增量构建模式")] IncrementalBuild,
-
-        /// <summary>
-        /// 演练构建模式
-        /// </summary>
-        [InspectorName("演练构建模式")] DryRunBuild,
-
-        /// <summary>
-        /// 模拟构建模式
-        /// </summary>
-        [InspectorName("模拟构建模式")] SimulateBuild,
-    }
-
-    public class ASBuildConfig : ScriptableObject
+    public partial class ASBuildConfig : ScriptableObject
     {
         /// <summary>
         /// 首次打包
@@ -106,6 +32,9 @@ namespace AIO.UEditor
         /// </summary>
         public string BuildVersion;
 
+        /// <summary>
+        /// 资源包名称
+        /// </summary>
         public string PackageName;
 
         /// <summary>
@@ -117,79 +46,6 @@ namespace AIO.UEditor
         /// 压缩模式
         /// </summary>
         public string CompressedModeName;
-
-        public class FTPConfig
-        {
-            /// <summary>
-            /// FTP 服务器地址
-            /// </summary>
-            public string FTPServerIP;
-
-            /// <summary>
-            /// FTP 服务器端口
-            /// </summary>
-            public int FTPServerPort = 21;
-
-            /// <summary>
-            /// FTP 用户名
-            /// </summary>
-            public string FTPUser;
-
-            /// <summary>
-            /// FTP 密码
-            /// </summary>
-            public string FTPPassword;
-
-            /// <summary>
-            /// FTP 远程路径
-            /// </summary>
-            public string FTPRemotePath;
-
-            /// <summary>
-            /// FTP 本地需要上传的资源包地址
-            /// </summary>
-            public string FTPLocalPath;
-            
-            /// <summary>
-            /// 平台名称
-            /// </summary>
-            public string PlatformName;
-            
-            /// <summary>
-            /// 是否上传首包配置
-            /// </summary>
-            public bool UploadFirstPack;
-        }
-
-        /// <summary>
-        /// FTP 服务器地址
-        /// </summary>
-        public string FTPServerIP;
-
-        /// <summary>
-        /// FTP 服务器端口
-        /// </summary>
-        public int FTPServerPort = 21;
-
-        /// <summary>
-        /// FTP 用户名
-        /// </summary>
-        public string FTPUser;
-
-        /// <summary>
-        /// FTP 密码
-        /// </summary>
-        public string FTPPassword;
-
-        /// <summary>
-        /// FTP 远程路径
-        /// </summary>
-        public string FTPRemotePath;
-
-        /// <summary>
-        /// FTP 本地需要上传的资源包地址
-        /// </summary>
-        public string FTPLocalPath;
 
         /// <summary>
         /// 首包标签集合
@@ -211,26 +67,39 @@ namespace AIO.UEditor
         /// </summary>
         public BuildTarget BuildTarget;
 
+        private static ASBuildConfig _instance;
+
         /// <summary>
         /// 获取本地资源包地址
         /// </summary>
         public static ASBuildConfig GetOrCreate()
         {
+            if (_instance != null) return _instance;
             var objects = EHelper.IO.GetScriptableObjects<ASBuildConfig>();
             if (objects != null && objects.Length > 0)
             {
                 foreach (var asset in objects)
                 {
                     if (asset is null) continue;
+                    if (string.IsNullOrEmpty(asset.BuildOutputPath))
+                    {
+                        asset.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
+                    }
 
-                    return asset;
+                    _instance = asset;
+                    break;
                 }
             }
 
-            var collect = CreateInstance<ASBuildConfig>();
-            AssetDatabase.CreateAsset(collect, "Assets/Editor/ASBuildConfig.asset");
-            AssetDatabase.SaveAssets();
-            return collect;
+            if (_instance is null)
+            {
+                _instance = CreateInstance<ASBuildConfig>();
+                _instance.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
+                AssetDatabase.CreateAsset(_instance, "Assets/Editor/ASBuildConfig.asset");
+                AssetDatabase.SaveAssets();
+            }
+
+            return _instance;
         }
 
         public void Save()

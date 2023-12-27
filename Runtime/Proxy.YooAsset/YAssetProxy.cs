@@ -15,6 +15,7 @@ using YooAsset;
 
 namespace AIO.UEngine
 {
+    [IgnoreConsoleJump]
     public partial class YAssetProxy : AssetProxy
     {
         /// <summary>

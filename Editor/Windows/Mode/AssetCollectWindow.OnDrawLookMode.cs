@@ -76,25 +76,50 @@ namespace AIO.UEditor
 
             if (LookModeDisplayCollectors[(CurrentPackageIndex, CurrentGroupIndex)].Length > 0)
             {
-                LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
-                    LookModeDisplayCollectors[(CurrentPackageIndex, CurrentGroupIndex)],
-                    GEStyle.PreDropDown, GP_Width_100);
+                if (LookModeDisplayCollectors[(CurrentPackageIndex, CurrentGroupIndex)].Length == 1)
+                {
+                    LookModeDisplayCollectorsIndex = 0;
+                    EditorGUILayout.Popup(0,
+                        LookModeDisplayCollectors[(CurrentPackageIndex, CurrentGroupIndex)],
+                        GEStyle.PreDropDown, GP_Width_100);
+                }
+                else
+                    LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
+                        LookModeDisplayCollectors[(CurrentPackageIndex, CurrentGroupIndex)],
+                        GEStyle.PreDropDown, GP_Width_100);
             }
             else LookModeDisplayCollectorsIndex = 0;
 
             if (LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)].Length > 0)
             {
-                LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
-                    LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)],
-                    GEStyle.PreDropDown, GP_Width_100);
+                if (LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)].Length == 1)
+                {
+                    LookModeDisplayTypeIndex = 0;
+                    EditorGUILayout.Popup(0,
+                        LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)],
+                        GEStyle.PreDropDown, GP_Width_100);
+                }
+                else
+                    LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
+                        LookModeDisplayTypes[(CurrentPackageIndex, CurrentGroupIndex)],
+                        GEStyle.PreDropDown, GP_Width_100);
             }
             else LookModeDisplayTypeIndex = 0;
 
             if (LookModeDisplayTags[(CurrentPackageIndex, CurrentGroupIndex)].Length > 0)
             {
-                LookModeDisplayTagsIndex = EditorGUILayout.MaskField(LookModeDisplayTagsIndex,
-                    LookModeDisplayTags[(CurrentPackageIndex, CurrentGroupIndex)],
-                    GEStyle.PreDropDown, GP_Width_100);
+                if (LookModeDisplayTags[(CurrentPackageIndex, CurrentGroupIndex)].Length == 1)
+                {
+                    LookModeDisplayTagsIndex = 0;
+                    EditorGUILayout.Popup(0,
+                        LookModeDisplayTags[(CurrentPackageIndex, CurrentGroupIndex)],
+                        GEStyle.PreDropDown, GP_Width_100);
+                }
+
+                else
+                    LookModeDisplayTagsIndex = EditorGUILayout.MaskField(LookModeDisplayTagsIndex,
+                        LookModeDisplayTags[(CurrentPackageIndex, CurrentGroupIndex)],
+                        GEStyle.PreDropDown, GP_Width_100);
             }
             else LookModeDisplayTagsIndex = 0;
 
