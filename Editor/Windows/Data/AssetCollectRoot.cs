@@ -19,9 +19,9 @@ namespace AIO.UEditor
     [Serializable]
     public class AssetCollectRoot : ScriptableObject
     {
-        [Description("开启地址化")] public bool EnableAddressable;
+        [Description("开启地址化")] public bool EnableAddressable = true;
 
-        [Description("Bundle名称唯一")] public bool UniqueBundleName;
+        [Description("Bundle名称唯一")] public bool UniqueBundleName = true;
 
         [Description("包含资源GUID")] public bool IncludeAssetGUID;
 

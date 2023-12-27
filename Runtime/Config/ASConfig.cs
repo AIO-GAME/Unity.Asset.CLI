@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -32,17 +33,17 @@ namespace AIO.UEngine
         /// <summary>
         /// 自动激活清单
         /// </summary>
-        public bool AutoSaveVersion = true;
+        public bool AutoSaveVersion;
 
         /// <summary>
         /// URL请求附加时间搓
         /// </summary>
-        public bool AppendTimeTicks = true;
+        public bool AppendTimeTicks;
 
         /// <summary>
         /// 加载路径转小写
         /// </summary>
-        public bool LoadPathToLower = true;
+        public bool LoadPathToLower;
 
         /// <summary>
         /// 自动序列记录
@@ -88,18 +89,18 @@ namespace AIO.UEngine
             AppendTimeTicks = true;
             LoadPathToLower = true;
             EnableSequenceRecord = true;
-            OutputLog = true;
+            OutputLog = false;
         }
 
         public ASConfig()
         {
             URL = string.Empty;
             ASMode = EASMode.Local;
-            AutoSaveVersion = false;
-            AppendTimeTicks = false;
-            EnableSequenceRecord = false;
-            LoadPathToLower = false;
-            OutputLog = true;
+            AutoSaveVersion = true;
+            AppendTimeTicks = true;
+            EnableSequenceRecord = true;
+            LoadPathToLower = true;
+            OutputLog = false;
         }
 
         /// <summary>
@@ -157,34 +158,37 @@ namespace AIO.UEngine
             switch (ASMode)
             {
                 default:
-#if UNITY_EDITOR && SUPPORT_YOOASSET
-                    var assembly = Assembly.Load("YooAsset.Editor");
-                    var type = assembly.GetType("YooAsset.Editor.AssetBundleCollectorSettingData", true);
-                    var setting = type.GetProperty("Setting",
-                            BindingFlags.Static | BindingFlags.Public | BindingFlags.GetProperty)
-                        ?.GetValue(null, null);
-
-                    var type1 = assembly.GetType("YooAsset.Editor.AssetBundleCollectorSetting", true);
-                    if (type1.GetField("Packages", BindingFlags.Instance | BindingFlags.Public)
-                            ?.GetValue(setting) is IList packages)
+                    var assembly = Assembly.Load("AIO.Asset.Editor");
+                    var type = assembly.GetType("AIO.UEditor.AssetCollectRoot", true);
+                    var getOrCreate = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public);
+                    var CollectRoot = getOrCreate?.Invoke(null, null);
+                    if (CollectRoot is null) break;
+                    var packages = type.GetField("Packages", BindingFlags.Instance | BindingFlags.Public)
+                        ?.GetValue(CollectRoot);
+                    if (packages is Array array)
                     {
-                        var type2 = assembly.GetType("YooAsset.Editor.AssetBundleCollectorPackage", true);
-                        var PackageName = type2.GetField("PackageName", BindingFlags.Instance | BindingFlags.Public);
-                        if (PackageName != null)
+                        var list = new List<AssetsPackageConfig>();
+                        var fieldInfo = assembly
+                            .GetType("AIO.UEditor.AssetCollectPackage", true)
+                            .GetField("Name", BindingFlags.Instance | BindingFlags.Public);
+                        foreach (var item in array)
                         {
-                            Packages = (from object package in packages
-                                    where !(package is null)
-                                    select new AssetsPackageConfig
-                                    {
-                                        Name = PackageName.GetValue(package) as string,
-                                        Version = "-.-.-",
-                                        IsDefault = false
-                                    })
-                                .ToArray();
-                            if (Packages.Length > 0) Packages[0].IsDefault = true;
+                            if (item is null) continue;
+                            list.Add(new AssetsPackageConfig
+                            {
+                                Name = fieldInfo?.GetValue(item) as string,
+                                Version = "-.-.-",
+                                IsDefault = false
+                            });
+                        }
+
+                        if (list.Count > 0)
+                        {
+                            Packages = list.ToArray();
+                            Packages[0].IsDefault = true;
                         }
                     }
-#endif
+
                     break;
             }
         }
@@ -228,12 +232,6 @@ namespace AIO.UEngine
                 {
                     instance = CreateInstance<ASConfig>();
                     instance.ASMode = EASMode.Editor;
-                    instance.URL = "";
-                    instance.LoadPathToLower = false;
-                    instance.AutoSaveVersion = false;
-                    instance.AppendTimeTicks = false;
-                    instance.OutputLog = false;
-                    instance.EnableSequenceRecord = false;
                     instance.Packages = Array.Empty<AssetsPackageConfig>();
                     if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
                         Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
