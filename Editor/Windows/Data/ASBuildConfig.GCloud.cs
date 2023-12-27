@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
+using Console = System.Console;
 
 namespace AIO.UEditor
 {
@@ -81,22 +82,19 @@ namespace AIO.UEditor
             /// </summary>
             public async Task UploadFirstPack(string target)
             {
-                var op = PrGCloud.Storage.UploadFile(
+                var result = await PrGCloud.Storage.UploadFile(
                     AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(BUCKET_NAME),
                     target,
                     MetaData);
-                var result = await op.Async();
-                if (result.ExitCode == 0)
-                {
-                    EditorUtility.DisplayDialog("提示", $"上传成功 {result.StdOut}", "确定");
-                }
-                else EditorUtility.DisplayDialog("提示", $"上传失败 {result.StdError}", "确定");
+                EditorUtility.DisplayDialog("提示", result.ExitCode == 0
+                    ? $"上传成功 {result.StdOut}"
+                    : $"上传失败 {result.StdError}", "确定");
             }
 
             /// <summary>
             /// 更新配置版本
             /// </summary>
-            public async void UploadVersion()
+            public async Task UploadVersion()
             {
                 var one = DirTreeFiled[0];
                 if (string.IsNullOrEmpty(one))
@@ -120,16 +118,15 @@ namespace AIO.UEditor
                 }
 
                 string content;
-                var saveJson = $"{EHelper.Path.Temp}/{one}.json";
+                var saveToLocation = $"{EHelper.Path.Temp}/{one}.json";
+                var BUCKET_PATH = string.Concat(BUCKET_NAME, '/', "Version/", one, ".json");
                 await PrGCloud.Storage.DownloadFile(
-                    BUCKET_NAME,
-                    string.Concat("Version/", one, ".json"),
-                    saveJson);
+                    BUCKET_PATH,
+                    saveToLocation);
 
-                if (File.Exists(saveJson))
+                if (File.Exists(saveToLocation))
                 {
-                    var data = AHelper.IO.ReadJson<List<AssetsPackageConfig>>(saveJson);
-                    Console.WriteLine(AHelper.Json.Serialize(data));
+                    var data = AHelper.IO.ReadJson<List<AssetsPackageConfig>>(saveToLocation);
                     var exists = false;
                     foreach (var item in data.Where(item => item.Name == two))
                     {
@@ -161,18 +158,12 @@ namespace AIO.UEditor
                     });
                 }
 
-                Console.WriteLine(saveJson);
-                AHelper.IO.WriteText(saveJson, content, Encoding.UTF8);
+                AHelper.IO.WriteText(saveToLocation, content, Encoding.UTF8);
                 await PrGCloud.Storage.UploadFile(
-                    string.Concat(BUCKET_NAME, "/Version"),
-                    saveJson
+                    BUCKET_PATH,
+                    saveToLocation, MetaData
                 );
-                await PrGCloud.Storage.MetadataUpdate(
-                    BUCKET_NAME,
-                    string.Concat("Version/", one, ".json"),
-                    MetaData
-                );
-                AHelper.IO.DeleteFile(saveJson);
+                AHelper.IO.DeleteFile(saveToLocation);
             }
 
             public override string ToString()
@@ -184,7 +175,7 @@ namespace AIO.UEditor
             {
                 if (string.IsNullOrEmpty(BUCKET_NAME))
                 {
-                    EditorUtility.DisplayDialog("Upload FTP", "FTP 服务器地址不能为空", "OK");
+                    EditorUtility.DisplayDialog("Upload Google Cloud", "FTP 服务器地址不能为空", "OK");
                     return;
                 }
 
@@ -211,46 +202,20 @@ namespace AIO.UEditor
 
                 if (!DirTreeFiled.IsValidity())
                 {
-                    EditorUtility.DisplayDialog("Upload FTP", "FTP 上传目标路径无效", "OK");
+                    EditorUtility.DisplayDialog("Upload Google Cloud", "FTP 上传目标路径无效", "OK");
                     return;
                 }
 
-                UploadVersion();
+                isUploading = true;
+                await PrGCloud.Storage.UploadDir(
+                    string.Concat(BUCKET_NAME, '/', one, '/', two, '/', three),
+                    DirTreeFiled.GetFullPath(),
+                    MetaData
+                );
 
-                //
-                // using (var handle = AHandle.FTP.Create(BUCKET_NAME, 
-                //            string.Concat(RemotePath, '/', one, '/', two, '/', three)))
-                // {
-                //     var result = await handle.InitAsync();
-                //     if (!result)
-                //     {
-                //         EditorUtility.DisplayDialog("Upload FTP", $"FTP 服务器 {handle.URI} 连接失败", "OK");
-                //         return;
-                //     }
-                //
-                //     UploadOperation = AHelper.FTP.UploadDir(handle.URI, handle.User, handle.Pass,
-                //         DirTreeFiled.GetFullPath());
-                //     isUploading = true;
-                //     var iEvent = new AProgressEvent
-                //     {
-                //         OnProgress = progress => { UploadProgress = progress; },
-                //         OnError = error =>
-                //         {
-                //             isUploading = false;
-                //             Debug.LogException(error);
-                //         },
-                //         OnComplete = e =>
-                //         {
-                //             isUploading = false;
-                //             EditorUtility.DisplayDialog("Upload FTP", e.State == EProgressState.Finish
-                //                 ? $"上传完成 \n{UploadOperation.Report}"
-                //                 : $"上传失败 \n{UploadOperation.Report}", "OK");
-                //         }
-                //     };
-                //     UploadOperation.Event = iEvent;
-                //     UploadOperation.Begin();
-                //     await UploadOperation.WaitAsync();
-                // }
+                await UploadVersion();
+                EditorUtility.DisplayDialog("提示", "上传成功", "确定");
+                isUploading = false;
             }
         }
     }

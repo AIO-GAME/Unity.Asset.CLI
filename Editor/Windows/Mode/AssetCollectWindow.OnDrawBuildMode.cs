@@ -273,6 +273,7 @@ namespace AIO.UEditor
         private string GetGCItemDes(ASBuildConfig.GCloudConfig config, int i)
         {
             _builder.Clear();
+            if (!config.Folded && config.isUploading) _builder.Append($"[上传中 ... ]");
             if (!string.IsNullOrEmpty(config.Name))
                 _builder.Append(config.Name);
 
@@ -425,8 +426,10 @@ namespace AIO.UEditor
                             GUI.FocusControl(null);
                         }
 
-                        GELayout.Label(GetGCItemDes(BuildConfig.GCloudConfigs[i], i), GEStyle.HeaderLabel,
-                            GP_Width_EXPAND);
+                        GELayout.Label(GetGCItemDes(BuildConfig.GCloudConfigs[i], i),
+                            GEStyle.HeaderLabel, GP_Width_EXPAND);
+
+                        if (BuildConfig.GCloudConfigs[i].isUploading) GUI.enabled = false;
 
                         if (!string.IsNullOrEmpty(BuildConfig.GCloudConfigs[i].BUCKET_NAME))
                         {
@@ -465,6 +468,8 @@ namespace AIO.UEditor
                                 return;
                             }
                         }
+
+                        if (BuildConfig.GCloudConfigs[i].isUploading) GUI.enabled = true;
                     }
 
                     OnDrawBuildGC(BuildConfig.GCloudConfigs[i]);
@@ -498,7 +503,6 @@ namespace AIO.UEditor
         private void OnDrawBuildGC(ASBuildConfig.GCloudConfig config)
         {
             if (!config.Folded) return;
-
             if (config.isUploading) GUI.enabled = false;
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
@@ -519,7 +523,9 @@ namespace AIO.UEditor
             {
                 EditorGUILayout.LabelField("本地路径", GP_Width_100);
                 config.DirTreeFiled.OnDraw();
-                if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
+
+                if (config.isUploading) GUILayout.Label("上传中", GEStyle.toolbarbutton, GP_Width_50);
+                else if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
                 {
                     GUI.FocusControl(null);
                     config.Upload();
