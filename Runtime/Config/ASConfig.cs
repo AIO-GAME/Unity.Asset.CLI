@@ -32,17 +32,17 @@ namespace AIO.UEngine
         /// <summary>
         /// 自动激活清单
         /// </summary>
-        public bool AutoSaveVersion;
+        public bool AutoSaveVersion = true;
 
         /// <summary>
         /// URL请求附加时间搓
         /// </summary>
-        public bool AppendTimeTicks;
+        public bool AppendTimeTicks = true;
 
         /// <summary>
         /// 加载路径转小写
         /// </summary>
-        public bool LoadPathToLower;
+        public bool LoadPathToLower = true;
 
         /// <summary>
         /// 自动序列记录
@@ -58,17 +58,17 @@ namespace AIO.UEngine
         /// 下载失败尝试次数
         /// 注意：默认值为MaxValue
         /// </summary>
-        public int DownloadFailedTryAgain;
+        public int DownloadFailedTryAgain = 1;
 
         /// <summary>
         /// 资源加载的最大数量
         /// </summary>
-        public int LoadingMaxTimeSlice;
+        public int LoadingMaxTimeSlice = 144;
 
         /// <summary>
         /// 超时时间
         /// </summary>
-        public int Timeout;
+        public int Timeout = 60;
 
         /// <summary>
         /// 资源包配置
