@@ -1,19 +1,39 @@
-# Security Policy
+# Unity 开源插件安全策略
 
-## Supported Versions
+## 报告安全问题
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+如果您发现了 Unity 开源插件的安全漏洞或其他安全问题，请通过以下方式与我们联系：
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+- 电子邮件：[xinansky99@gmail.com]
 
-## Reporting a Vulnerability
+请不要在公开的问题跟踪中报告安全问题，以确保漏洞得到及时处理。我们对报告安全问题的贡献者将保持匿名。
 
-Use this section to tell people how to report a vulnerability.
+## 支持的 Unity 版本
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Unity 开源插件目前支持的最低 Unity 版本是 2019.1。我们建议用户使用支持的 Unity 版本以确保插件的正常运行和安全性。
+
+## 安全更新政策
+
+我们会及时发布包含安全修复的版本。请确保及时升级到最新版本以获取最新的安全性补丁。
+
+## 安全最佳实践
+
+- 使用支持的 Unity 版本。
+- 定期检查插件的更新，并及时升级到最新版本。
+- 不要使用从非官方来源获得的插件版本。
+- 尽量避免在生产环境中使用尚未经过充分测试的插件版本。
+
+## 安全问题处理流程
+
+1. 安全问题报告收到后，我们将尽快进行确认。
+2. 确认后，我们将开始处理问题并着手准备修复。
+3. 修复完成后，我们将发布包含安全修复的新版本。
+4. 我们会向社区公开披露安全问题的详细信息，以便用户了解问题的性质和解决方法。
+
+请注意，在问题修复之前，请不要公开披露安全问题。
+
+## 更新历史
+
+- 2023/12/27: 创建安全策略文档。
+
+**注意:** 本安全策略是一个通用指南，你可能需要根据具体项目的需要进行调整。请确保仔细阅读和理解，并在你的项目中进行适当的修改。
