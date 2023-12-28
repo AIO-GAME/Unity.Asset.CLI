@@ -48,21 +48,15 @@
 <span style="color: deepskyblue; "> <b> Unity PackageManager </b> </span>
 </summary>
 
-openupm 中国版
-
-~~~
-Name: package.openupm.cn
-URL: https://package.openupm.cn
-Scope(s): com.aio.cli.asset
-~~~
-
-openupm 国际版
-
-~~~
-Name: package.openupm.com
-URL: https://package.openupm.com
-Scope(s): com.aio.cli.asset
-~~~
+> openupm *中国版*
+>> `Name: package.openupm.cn`
+>> `URL: https://package.openupm.cn`
+>> `Scope(s): com.aio.cli.asset`
+>
+> openupm *国际版*
+>> `Name: package.openupm.com`
+>> `URL: https://package.openupm.com`
+>> `Scope(s): com.aio.cli.asset`
 
 </details>
 
@@ -71,11 +65,8 @@ Scope(s): com.aio.cli.asset
 <span style="color: deepskyblue; "> <b> Command Line </b> </span>
 </summary>
 
-openupm-cli
-
-~~~
-openupm add com.aio.cli.asset
-~~~
+> *openupm-cli*
+>> `openupm add com.aio.cli.asset`
 
 </details>
 
