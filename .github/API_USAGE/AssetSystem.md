@@ -7,7 +7,7 @@
     - 【安装】 Unity Menu -> AIO -> CLI -> Install -> YooAsset
     - 【卸载】 Unity Menu -> AIO -> CLI -> UnInstall -> YooAsset
 
-#### 创建配置文件 搭配API [`AssetSystem.Initialize(ASConfig.GetOrCreate());`](../../Runtime/Basics/AssetSystem.cs#L25)
+#### 创建配置文件 搭配 API [`AssetSystem.Initialize(ASConfig.GetOrCreate());`](../../Runtime/Basics/AssetSystem.cs#L25)
 
 | Create Config API                                               | Description                                | Mode         |
 | :-------------------------------------------------------------- | :----------------------------------------- | :----------- |
@@ -60,7 +60,7 @@ public async Task RemoteInitialize()
 | :------------------------------------------------------------------------------------------- | :-------------------------- |
 | [`AssetSystem.LoadAsset("location")`](../../Runtime/Basics/AssetSystem.Load.cs#L156)         | 加载资源                    |
 | [`AssetSystem.LoadSubAssets("location")`](../../Runtime/Basics/AssetSystem.Load.cs#27)       | 加载子资源                  |
-| [`AssetSystem.InstGameObject("location")`](../../Runtime/Basics/AssetSystem.Inst.cs#24)      | 实例化GameObject            |
+| [`AssetSystem.InstGameObject("location")`](../../Runtime/Basics/AssetSystem.Inst.cs#24)      | 实例化 GameObject            |
 | [`AssetSystem.LoadRawFileText("location")`](../../Runtime/Basics/AssetSystem.Load.cs#458)    | 加载原生文件文本            |
 | [`AssetSystem.LoadRawFileData("location")`](../../Runtime/Basics/AssetSystem.Load.cs#490)    | 加载原生文件数据            |
 | [`AssetSystem.LoadScene("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Load.cs#400) | 加载场景 实际为异步回调加载 |
@@ -69,7 +69,7 @@ public async Task RemoteInitialize()
 | :-------------------------------------------------------------------------------------------------- | :-------------------------- |
 | [`await AssetSystem.LoadAssetTask("location")`](../../Runtime/Basics/AssetSystem.Load.cs#361)       | 加载资源                    |
 | [`await AssetSystem.LoadSubAssetsTask("location")`](../../Runtime/Basics/AssetSystem.Load.cs#141)   | 加载子资源                  |
-| [`await AssetSystem.InstGameObjectTask("location")`](../../Runtime/Basics/AssetSystem.Inst.cs#48)   | 实例化GameObject            |
+| [`await AssetSystem.InstGameObjectTask("location")`](../../Runtime/Basics/AssetSystem.Inst.cs#48)   | 实例化 GameObject            |
 | [`await AssetSystem.LoadRawFileTextTask("location")`](../../Runtime/Basics/AssetSystem.Load.cs#478) | 加载原生文件文本            |
 | [`await AssetSystem.LoadRawFileDataTask("location")`](../../Runtime/Basics/AssetSystem.Load.cs#510) | 加载原生文件数据            |
 | [`await AssetSystem.LoadSceneTask("location")`](../../Runtime/Basics/AssetSystem.Load.cs#439)       | 加载场景 实际为异步回调加载 |
@@ -78,7 +78,7 @@ public async Task RemoteInitialize()
 | :---------------------------------------------------------------------------------------------------------------- | :-------------------------- |
 | [`yield return AssetSystem.LoadAssetCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Load.cs#306)       | 加载资源                    |
 | [`yield return AssetSystem.LoadSubAssetsCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Load.cs#65)    | 加载子资源                  |
-| [`yield return AssetSystem.InstGameObjectCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Inst.cs#97)   | 实例化GameObject            |
+| [`yield return AssetSystem.InstGameObjectCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Inst.cs#97)   | 实例化 GameObject            |
 | [`yield return AssetSystem.LoadRawFileTextCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Load.cs#532) | 加载原生文件文本            |
 | [`yield return AssetSystem.LoadRawFileDataCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Load.cs#521) | 加载原生文件数据            |
 | [`yield return AssetSystem.LoadSceneCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Load.cs#420)       | 加载场景 实际为异步回调加载 |
@@ -87,26 +87,26 @@ public async Task RemoteInitialize()
 | *Net Load Async Callback API (Need Support UniTask)*                                                  | *Description* |
 | :---------------------------------------------------------------------------------------------------- | :------------ |
 | [`AssetSystem.NetLoadBytes("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L121)       | 加载资源      |
-| [`AssetSystem.NetLoadAssetBundle("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L156) | 加载AB包      |
-| [`AssetSystem.NetLoadSprite("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L87)       | 加载Sprite    |
-| [`AssetSystem.NetLoadTexture("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L68)      | 加载Texture   |
-| [`AssetSystem.NetLoadAudioClip("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L139)   | 加载AudioClip |
+| [`AssetSystem.NetLoadAssetBundle("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L156) | 加载 AB 包      |
+| [`AssetSystem.NetLoadSprite("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L87)       | 加载 Sprite    |
+| [`AssetSystem.NetLoadTexture("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L68)      | 加载 Texture   |
+| [`AssetSystem.NetLoadAudioClip("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L139)   | 加载 AudioClip |
 
 
 | *Net Load Async API (Need Support UniTask)*                                                            | *Description* |
 | :----------------------------------------------------------------------------------------------------- | :------------ |
 | [`await AssetSystem.NetLoadBytesTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L320)       | 加载资源      |
-| [`await AssetSystem.NetLoadAssetBundleTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L350) | 加载AB包      |
-| [`await AssetSystem.NetLoadSpriteTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L291)      | 加载Sprite    |
-| [`await AssetSystem.NetLoadTextureTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L274)     | 加载Texture   |
-| [`await AssetSystem.NetLoadAudioClipTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L336)   | 加载AudioClip |
+| [`await AssetSystem.NetLoadAssetBundleTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L350) | 加载 AB 包      |
+| [`await AssetSystem.NetLoadSpriteTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L291)      | 加载 Sprite    |
+| [`await AssetSystem.NetLoadTextureTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L274)     | 加载 Texture   |
+| [`await AssetSystem.NetLoadAudioClipTask("location")`](../../Runtime/Basics/AssetSystem.Net.cs#L336)   | 加载 AudioClip |
 
 
 | *Net Load Coroutine API*                                                                                            | *Description* |
 | :------------------------------------------------------------------------------------------------------------------ | :------------ |
 | [`yield return AssetSystem.NetLoadBytesCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#L256)      | 加载资源      |
-| [`yield return AssetSystem.NetLoadAssetBundleCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#213) | 加载AB包      |
-| [`yield return AssetSystem.NetLoadSpriteCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#195)      | 加载Sprite    |
-| [`yield return AssetSystem.NetLoadTextureCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#179)     | 加载Texture   |
-| [`yield return AssetSystem.NetLoadAudioClipCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#228)   | 加载AudioClip |
+| [`yield return AssetSystem.NetLoadAssetBundleCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#213) | 加载 AB 包      |
+| [`yield return AssetSystem.NetLoadSpriteCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#195)      | 加载 Sprite    |
+| [`yield return AssetSystem.NetLoadTextureCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#179)     | 加载 Texture   |
+| [`yield return AssetSystem.NetLoadAudioClipCO("location", (r)=>{})`](../../Runtime/Basics/AssetSystem.Net.cs#228)   | 加载 AudioClip |
 

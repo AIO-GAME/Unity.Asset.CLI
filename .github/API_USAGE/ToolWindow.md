@@ -1,17 +1,27 @@
 ### Asset System 工具说明
->### <a name="EditorTool.EditorMode.Init"> 编辑模式/初始化 </a>
+
+> ### <a name="EditorTool.EditorMode.Init"> 编辑模式/初始化 </a>
 > <p align="center">
->    <img src="../RES/工具界面-编辑模式-初始化.png" />
-</p>
->* 当前界面为编辑模式 第一次打开工具会自动创建一份 [ASConfig](./Config.md#aiouengineasconfig)
->* 当前工具可以在 Editor 无需安装第三方插件体验使用 <b> <font color=red> 但是如果使用 AssetSystem 初始化 则必须安装第三方插件 </font> </b>
->* 第一次使用顺序为 添加资源包 添加资源组 添加收集器(收集器的文件或者文件夹可以为空 但是在转化时会自动过滤)
+> <img src="../RES/工具界面-编辑模式-初始化.png" />
+> </p>
+
+> [!NOTE]
+>
+> 1. 当前界面为编辑模式 第一次打开工具会自动创建一份 [ASConfig](./Config.md#aiouengineasconfig)
+> 2. 当前工具可以在 Editor 无需安装第三方插件体验使用
+> 3. 第一次使用顺序为 添加资源包 添加资源组 添加收集器(收集器的文件或者文件夹可以为空 但是在转化时会自动过滤)
+
+> [!IMPORTANT]
+> 
+> 1. 如果使用 AssetSystem 初始化 则必须安装第三方插件
+> 2. 如果使用 AssetSystem Remote 模式 则必须填写远端路径 否则会查找资源失败
 
 >### <a name="EditorTool.EditorMode.Collect"> 编辑模式-收集器 </a>
-><p align="center">
-><img src="../RES/工具界面-编辑模式-收集器1.png" />
-></p>
->
+> <p align="center">
+> <img src="../RES/工具界面-编辑模式-收集器1.png" />
+> </p>
+
+> [!NOTE]
 > 1. 收集器面板开关
 > 2. 收集器类型
 >     - 动态资源 (默认) 需要代码明确调用加载的资源
@@ -42,12 +52,14 @@
 > 13. 收集器 自定义数据
 >     - 用户自定义传入数据 (用于提供自定义规则使用)
 > 14. 标签 (用于标记收集器)
->     - 支持多个标签(用;分割)
+>     - 支持多个标签(用; 分割)
 
->### <a name="EditorTool.LookMode"> 查询模式 </a>
-><p align="center">
->    <img src="../RES/工具界面-查看模式.png" />
-></p>
+> ### <a name="EditorTool.LookMode"> 查询模式 </a>
+> <p align="center">
+> <img src="../RES/工具界面-查看模式.png" />
+> </p>
+
+> [!NOTE]
 > 1. 包名选择 (默认为默认包) 只能单选
 > 2. 资源组选择 (默认为默认组) 只能单选
 > 3. 筛选 搜索框 (支持模糊搜索 匹配路径 文件名 包名 资源组名 类型)
@@ -64,19 +76,21 @@
 > 14. 当前资源依赖资源列表
 > 15. 打开目标资源文件夹 Unity Project 自动选中资源
 
->### <a name="EditorTool.ConfigMode"> 配置模式 </a>
-><p align="center">
->    <img src="../RES/工具界面-配置模式.png" />
-></p>
+> ### <a name="EditorTool.ConfigMode"> 配置模式 </a>
+> <p align="center">
+> <img src="../RES/工具界面-配置模式.png" />
+> </p>
+
+> [!NOTE]
 > 1. 资源系统 资源加载模式
 >     - 编辑器模式 (编辑器 下默认)
 >     - 远端模式 (实机运行 需要配置远端服务器地址)
 >     - 本地模式 (实机运行 需要配置本地资源包路径)
-> 2. 清空Editor下 远端模式下载的资源包
-> 3. 清空Bundles 缓存
+> 2. 清空 Editor 下 远端模式下载的资源包
+> 3. 清空 Bundles 缓存
 > 4. 开启可寻址地址
-> 5. 开启资源GUID
-> 6. 开启Bundle名称唯一
+> 5. 开启资源 GUID
+> 6. 开启 Bundle 名称唯一
 > 7. 开启资源系统日志输出
 > 8. 开启资源寻址路径全部转小写
 > 9. 运行时的内置文件夹
@@ -88,12 +102,14 @@
 > 13. 资源同时加载的最大数量 (远端模式下生效) (WebGL 下无效)
 > 14. 资源加载请求超时时间 (远端模式下生效)
 > 15. 开启自动激活清单 (远端模式下生效)
-> 16. 开启URL请求附加时间搓 (远端模式下生效)
+> 16. 开启 URL 请求附加时间搓 (远端模式下生效)
 
->### <a name="EditorTool.BuildMode.Config"> 打包工具 </a>
-><p align="center">
->    <img src="../RES/工具界面-打包工具-构建设置.png" />
-></p>
+> ### <a name="EditorTool.BuildMode.Config"> 打包工具 </a>
+> <p align="center">
+> <img src="../RES/工具界面-打包工具-构建设置.png" />
+> </p>
+
+> [!NOTE]
 > 1. 是否为首包
 > 2. 是否验证构建结构
 > 3. 选择导出构建结构目录
@@ -113,28 +129,32 @@
 >     - 模拟构建模式 (编辑器模式下构建) 不会生成资源包
 > 12. 首包标签集合 (用于标记首包资源) 自动组合为首包资源组
 
->### <a name="EditorTool.BuildMode.FTP"> FTP上传 </a>
-><p align="center">
->    <img src="../RES/工具界面-打包工具-FTP上传配置.png" />
-></p>
-> 1. 校验FTP配置是否能正常连接
+> ### <a name="EditorTool.BuildMode.FTP"> FTP 上传 </a>
+> <p align="center">
+> <img src="../RES/工具界面-打包工具-FTP上传配置.png" />
+> </p>
+
+> [!NOTE]
+> 1. 校验 FTP 配置是否能正常连接
 > 2. 将构建导出目录复制到本地上传目录
 > 3. 将构建导出目录符号链接到本地上传目录
 > 4. 刷新本地上传目录
-> 5. ftp配置别名 描述
-> 6. ftp远端地址端口
-> 7. ftp远端地址账号密码
-> 8. ftp远端地址根目录
-> 9. 本地上传目录 需要遵循3层目录结构 (平台/资源包/版本号)
+> 5. ftp 配置别名 描述
+> 6. ftp 远端地址端口
+> 7. ftp 远端地址账号密码
+> 8. ftp 远端地址根目录
+> 9. 本地上传目录 需要遵循 3 层目录结构 (平台/资源包/版本号)
 > 10. 本地上传目录选择
 > 11. 打开本地上传目录
-> 12. 上传本地上传目录到远端 会更新当前上传根目录下Version/平台.json文件中的版本
+> 12. 上传本地上传目录到远端 会更新当前上传根目录下 Version/平台.json 文件中的版本
 > 13. 创建远端上传目录
 
->### <a name="EditorTool.BuildMode.FTP"> FTP上传 </a>
-><p align="center">
->    <img src="../RES/工具界面-打包工具-Google-Cloud上传配置.png" />
-></p>
+>### <a name="EditorTool.BuildMode.FTP"> FTP 上传 </a>
+> <p align="center">
+> <img src="../RES/工具界面-打包工具-Google-Cloud上传配置.png" />
+> </p>
+
+> [!NOTE]
 > 1. 名称
 > 2. 描述
 > 3. 桶路径
