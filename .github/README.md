@@ -72,59 +72,35 @@
 
 ## ⭐ About
 
-- 这是Unity的资源加载接口(CLI)包。它提供了一组命令和工具来增强效率和开发体验。
-- [x] 支持 Unity 2019.1 及以上版本
-- [x] 支持 资源 同步加载/异步加载/协程加载 接口
-- [x] 支持 资源 本地加载/远程加载 接口
-- [x] 支持 Android/iOS/Windows/Mac/WebGL
-- [x] 支持 YooAsset
-- [x] 支持 Hybrid CLR
-- [x] 支持 UniTask
-- [x] 支持 .NET 4.0 or later
+- **这是 Unity 的资源加载接口(CLI)包。它提供了一组命令和工具来增强效率和开发体验。**
+- [x] **支持 Unity 2019.1 及以上版本**
+- [x] **支持 资源 同步加载/异步加载/协程加载 接口**
+- [x] **支持 资源 本地加载/远程加载 接口**
+- [x] **支持 Android/iOS/Windows/Mac/WebGL**
+- [x] **支持 YooAsset**
+- [x] **支持 UniTask**
+- [x] **支持 .NET 4.0 or later**
 
 ## 📖 Documentation
-<table style="width:100%;">
-  <tr>
-    <th>Doc</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/AIO-GAME/Unity.Asset.CLI/wiki"></a>Wiki</a></td>
-    <td>文档目录</td>
-  </tr>
-  <tr>
-    <td><a href="./API_USAGE/AssetSystem.md">API</a></td>
-    <td>API调用说明</td>
-  </tr>
-  <tr>
-    <td><a href="./API_USAGE/Config.md">Config</a></td>
-    <td>配置讲解</td>
-  </tr>
-  <tr>
-    <td><a href="./API_USAGE/ToolWindow.md">Tool</a></td>
-    <td>工具文档</td>
-  </tr>
-</table>
 
->| Doc                                                                | Description                                                                      |
->| :----------------------------------------------------------------- | :------------------------------------------------------------------------------- |
-> |[Wiki](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)| 文档目录|
-> |[API](./API_USAGE/AssetSystem.md)| API调用说明|
-> |[Config](./API_USAGE/Config.md)| 配置讲解|
-> |[Tool](./API_USAGE/ToolWindow.md)| 工具文档|
+> | **Doc** | **Description**                                                                      |
+> | :----: | :-----: |
+> |**[Wiki](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)**| _**文档目录**_ |
+> |**[API](./API_USAGE/AssetSystem.md)** | _**API 调用说明**_|
+> |**[Config](./API_USAGE/Config.md)** | _**配置讲解说明**_|
+> |**[Tool](./API_USAGE/ToolWindow.md)** | _**工具文档**_|
 
 ## 🔗 Third-Party References & Tools
 
-> Please refer to the wiki for a list of references and tools used in this package.
-> | Doc                                                                | Description                                                                      |
-> | :----------------------------------------------------------------- | :------------------------------------------------------------------------------- |
-> | [UniTask](https://github.com/Cysharp/UniTask#readme)               | 为 Unity 提供了一个有效的分配自由的 async / await 集成。                         |
-> | [YooAsset](https://www.yooasset.com)                               | YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。 |
-> | [Hybrid CLR](https://focus-creative-games.github.io/hybridclr-doc) | 特性完整、零成本、高性能、低内存的 Unity 全平台原生 c#热更方案                   |
+> **Please refer to the wiki for a list of references and tools used in this package.**
+> | **Doc** | **Description**                                                                      |
+> | :----: | :-----: |
+> | **[UniTask](https://github.com/Cysharp/UniTask#readme)** | _**为 Unity 提供了一个有效的分配自由的 async / await 集成。**_                         |
+> | **[YooAsset](https://www.yooasset.com)**| _**YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。**_ |
 
 
 ## 📢 Thanks
 
-- 谢谢您选择我们的扩展包。
-- 如果此软件包对您有所帮助。
-- 请考虑通过添加⭐来表示支持。
+- **谢谢您选择我们的扩展包。**
+- **如果此软件包对您有所帮助。**
+- **请考虑通过添加⭐来表示支持。**
