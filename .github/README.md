@@ -100,7 +100,12 @@ Please refer to the wiki for a step-by-step guide on how to get started with thi
 
 ## 📖 Documentation
 
-For more info please see | [Documentation](./API_USAGE/AssetSystem.md) or [Wiki](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)
+>| Doc                                                                | Description                                                                      |
+>| :----------------------------------------------------------------- | :------------------------------------------------------------------------------- |
+> |[Wiki](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)| 文档目录|
+> |[API](./API_USAGE/AssetSystem.md)| API调用说明|
+> |[Config](./API_USAGE/Config.md)| 配置讲解|
+> |[Tool](./API_USAGE/ToolWindow.md)| 工具文档|
 
 ## 🤖 Demos
 
@@ -108,11 +113,10 @@ Please refer to the wiki for demo links.
 
 ## 🔗 Third-Party References & Tools
 
-Please refer to the wiki for a list of references and tools used in this package.
-
-| Doc                                                                | Description                                    |
-|:-------------------------------------------------------------------|:-----------------------------------------------|
-| [UniTask](https://github.com/Cysharp/UniTask#readme)               | 为 Unity 提供了一个有效的分配自由的 async / await 集成。          |
-| [YooAsset](https://www.yooasset.com)                               | YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。 |
-| [Hybrid CLR](https://focus-creative-games.github.io/hybridclr-doc) | 特性完整、零成本、高性能、低内存的 Unity 全平台原生 c#热更方案              |
+> Please refer to the wiki for a list of references and tools used in this package.
+> | Doc                                                                | Description                                                                      |
+> | :----------------------------------------------------------------- | :------------------------------------------------------------------------------- |
+> | [UniTask](https://github.com/Cysharp/UniTask#readme)               | 为 Unity 提供了一个有效的分配自由的 async / await 集成。                         |
+> | [YooAsset](https://www.yooasset.com)                               | YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。 |
+> | [Hybrid CLR](https://focus-creative-games.github.io/hybridclr-doc) | 特性完整、零成本、高性能、低内存的 Unity 全平台原生 c#热更方案                   |
 
