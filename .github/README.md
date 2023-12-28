@@ -79,24 +79,17 @@ openupm add com.aio.cli.asset
 
 </details>
 
-## 📢 Thanks
-
-Thank you for choosing our package. If this package helps you, please consider showing your support by adding a ⭐ to the
-repo.
-
 ## ⭐ About
 
-This is a command line interface (CLI) package for Unity. It provides a set of commands and tools to enhance the
-efficiency of Unity development.
-
-## 🖥️ Requirements
-
-- Unity 2019.1 or later
-- .NET 4.0 or later
-
-## 🧰 Getting Started
-
-Please refer to the wiki for a step-by-step guide on how to get started with this package.
+- 这是Unity的资源加载接口(CLI)包。它提供了一组命令和工具来增强效率和开发体验。
+- [x] 支持 Unity 2019.1 及以上版本
+- [x] 支持 资源 同步加载/异步加载/协程加载 接口
+- [x] 支持 资源 本地加载/远程加载 接口
+- [x] 支持 Android/iOS/Windows/Mac/WebGL
+- [x] 支持 YooAsset
+- [x] 支持 Hybrid CLR
+- [x] 支持 UniTask
+- [x] 支持 .NET 4.0 or later
 
 ## 📖 Documentation
 
@@ -107,10 +100,6 @@ Please refer to the wiki for a step-by-step guide on how to get started with thi
 > |[Config](./API_USAGE/Config.md)| 配置讲解|
 > |[Tool](./API_USAGE/ToolWindow.md)| 工具文档|
 
-## 🤖 Demos
-
-Please refer to the wiki for demo links.
-
 ## 🔗 Third-Party References & Tools
 
 > Please refer to the wiki for a list of references and tools used in this package.
@@ -120,3 +109,9 @@ Please refer to the wiki for demo links.
 > | [YooAsset](https://www.yooasset.com)                               | YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。 |
 > | [Hybrid CLR](https://focus-creative-games.github.io/hybridclr-doc) | 特性完整、零成本、高性能、低内存的 Unity 全平台原生 c#热更方案                   |
 
+
+## 📢 Thanks
+
+- 谢谢您选择我们的扩展包。
+- 如果此软件包对您有所帮助。
+- 请考虑通过添加⭐来表示支持。
