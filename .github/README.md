@@ -83,12 +83,10 @@
 
 ## 📖 Documentation
 
-> | **Doc** | **Description**                                                                      |
-> | :----: | :-----: |
-> |**[Wiki](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)**| _**文档目录**_ |
-> |**[API](./API_USAGE/AssetSystem.md)** | _**API 调用说明**_|
-> |**[Config](./API_USAGE/Config.md)** | _**配置讲解说明**_|
-> |**[Tool](./API_USAGE/ToolWindow.md)** | _**工具文档**_|
+- _**[文档目录](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)**_
+- _**[API](./API_USAGE/AssetSystem.md)**_
+- _**[配置讲解](./API_USAGE/Config.md)**_
+- _**[工具使用](./API_USAGE/ToolWindow.md)**_
 
 ## 🔗 Third-Party References & Tools
 
