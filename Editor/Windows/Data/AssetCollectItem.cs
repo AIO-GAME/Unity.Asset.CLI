@@ -174,7 +174,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 是否折叠
         /// </summary>
-        public bool Folded = true;
+        public bool Folded;
 
         /// <summary>
         /// 自定义过滤器 (分隔符标准: /)

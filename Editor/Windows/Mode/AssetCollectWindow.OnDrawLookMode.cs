@@ -312,6 +312,8 @@ namespace AIO.UEditor
             }
         }
 
+        private int LookModeCollectorsPageIndex;
+
         private void OnDrawLookModeAssetList()
         {
             var headerRect = new Rect(0, 0, ViewDetailList.width, 20);
@@ -333,10 +335,11 @@ namespace AIO.UEditor
             headerRect.x = 1;
             headerRect.width -= 2;
             LookModeCollectorsPageSize = 0;
+            LookModeCollectorsPageIndex = 0;
             foreach (var data in CurrentPageValues.CurrentPageValues)
             {
                 LookModeCollectorsPageSize += data.Size;
-                OnDrawLookDataItem(headerRect, data);
+                OnDrawLookDataItem(headerRect, data, LookModeCollectorsPageIndex++);
                 headerRect.y += headerRect.height;
             }
 
@@ -616,39 +619,8 @@ namespace AIO.UEditor
         /// <summary>
         /// 绘制资源展示面板
         /// </summary>
-        private void OnDrawLookDataItem(Rect rect, AssetDataInfo data)
+        private void OnDrawLookDataItem(Rect rect, AssetDataInfo data, int index)
         {
-            if (GUI.Button(rect, "", GEStyle.ProjectBrowserHeaderBgMiddle))
-            {
-                LookModeCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(data.AssetPath);
-                LookModeCurrentSelectAssetDataInfo = data;
-                Selection.activeObject = LookModeCurrentSelectAsset;
-                Dependencies.Clear();
-                DependenciesSize = 0;
-                foreach (var dependency in
-                         AssetDatabase.GetDependencies(LookModeCurrentSelectAssetDataInfo.AssetPath))
-                {
-                    var temp = AssetDatabase.LoadAssetAtPath<Object>(dependency);
-                    if (LookModeCurrentSelectAsset == temp) continue;
-                    Dependencies[dependency] = new DependenciesInfo
-                    {
-                        Object = temp,
-                        Type = AssetDatabase.GetMainAssetTypeAtPath(dependency)?.FullName,
-                        AssetPath = dependency,
-                        Name = temp.name,
-                        Size = new FileInfo(dependency).Length
-                    };
-                    if (string.IsNullOrEmpty(Dependencies[dependency].Type)) Dependencies[dependency].Type = "Unknown";
-                    DependenciesSize += Dependencies[dependency].Size;
-                }
-
-                DependenciesSearchText = string.Empty;
-                ViewDetailList.width = CurrentWidth / 2;
-                GUI.FocusControl(null);
-            }
-
-            OnDrawShading(rect);
-
             var rect1 = new Rect(rect)
             {
                 x = 10,
@@ -666,6 +638,10 @@ namespace AIO.UEditor
                 x = rect2.x + rect2.width,
             };
 
+            GUI.Box(rect, "", GEStyle.ProjectBrowserHeaderBgMiddle);
+            OnDrawShading(rect);
+
+            if (CurrentSelectAssetIndex == index) GUI.Box(rect, "", GEStyle.SelectionRect);
 
             EditorGUIUtility.SetIconSize(new Vector2(rect.height - 4, rect.height - 4));
             var content = EditorGUIUtility.ObjectContent(AssetDatabase.LoadMainAssetAtPath(data.AssetPath), null);
@@ -673,7 +649,60 @@ namespace AIO.UEditor
             EditorGUI.LabelField(rect1, content, EditorStyles.label);
             EditorGUI.LabelField(rect2, data.SizeStr, EditorStyles.label);
             EditorGUI.LabelField(rect3, data.GetLatestTime(), EditorStyles.label);
+
+            if (Event.current.isMouse && rect.Contains(Event.current.mousePosition))
+            {
+                if (Event.current.button == 1)
+                {
+                    GUI.FocusControl(null);
+                    onDrawLookDataItemMenu = new GenericMenu();
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Select Asset"), false, () => { Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(data.AssetPath); });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Address"), false, () => { GUIUtility.systemCopyBuffer = data.Address; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy AssetPath"), false, () => { GUIUtility.systemCopyBuffer = data.AssetPath; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy GUID"), false, () => { GUIUtility.systemCopyBuffer = data.GUID; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Type"), false, () => { GUIUtility.systemCopyBuffer = data.Type; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Tags"), false, () => { GUIUtility.systemCopyBuffer = data.Tags; });
+                    onDrawLookDataItemMenu.ShowAsContext();
+                }
+                else UpdateCurrentSelectAsset(index);
+
+                Event.current.Use();
+            }
         }
+
+        private void UpdateCurrentSelectAsset(int index)
+        {
+            GUI.FocusControl(null);
+            if (index < 0) return;
+            CurrentSelectAssetIndex = index;
+            var data = CurrentPageValues.CurrentPageValues[index];
+            LookModeCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(data.AssetPath);
+            LookModeCurrentSelectAssetDataInfo = data;
+            Dependencies.Clear();
+            DependenciesSize = 0;
+            foreach (var dependency in
+                     AssetDatabase.GetDependencies(LookModeCurrentSelectAssetDataInfo.AssetPath))
+            {
+                var temp = AssetDatabase.LoadAssetAtPath<Object>(dependency);
+                if (LookModeCurrentSelectAsset == temp) continue;
+                Dependencies[dependency] = new DependenciesInfo
+                {
+                    Object = temp,
+                    Type = AssetDatabase.GetMainAssetTypeAtPath(dependency)?.FullName,
+                    AssetPath = dependency,
+                    Name = temp.name,
+                    Size = new FileInfo(dependency).Length
+                };
+                if (string.IsNullOrEmpty(Dependencies[dependency].Type)) Dependencies[dependency].Type = "Unknown";
+                DependenciesSize += Dependencies[dependency].Size;
+            }
+
+            DependenciesSearchText = string.Empty;
+            ViewDetailList.width = CurrentWidth / 2;
+        }
+
+        private int CurrentSelectAssetIndex = 0;
+        private GenericMenu onDrawLookDataItemMenu;
 
         /// <summary>
         /// 更新资源查询模式组

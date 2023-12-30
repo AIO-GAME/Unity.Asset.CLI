@@ -267,6 +267,7 @@ namespace AIO.UEditor
                         case KeyCode.LeftArrow: // 数字键盘 右键
                             if (CurrentPageValues.PageIndex > 0)
                             {
+                                CurrentSelectAssetIndex = 0;
                                 CurrentPageValues.PageIndex -= 1;
                                 eventData.Use();
                             }
@@ -276,6 +277,7 @@ namespace AIO.UEditor
                         case KeyCode.RightArrow: // 数字键盘 左键 
                             if (CurrentPageValues.PageIndex < CurrentPageValues.PageCount - 1)
                             {
+                                CurrentSelectAssetIndex = 0;
                                 CurrentPageValues.PageIndex += 1;
                                 eventData.Use();
                             }
@@ -283,9 +285,35 @@ namespace AIO.UEditor
                             break;
 
                         case KeyCode.UpArrow: // 数字键盘 上键
+                            if (CurrentSelectAssetIndex >= 0)
+                            {
+                                CurrentSelectAssetIndex -= 1;
+                                if (CurrentSelectAssetIndex < 0)
+                                {
+                                    if (CurrentPageValues.CurrentPageValues.Length > 0)
+                                    {
+                                        CurrentSelectAssetIndex = CurrentPageValues.CurrentPageValues.Length - 1;
+                                    }
+                                    else CurrentSelectAssetIndex = 0;
+                                }
+
+                                UpdateCurrentSelectAsset(CurrentSelectAssetIndex);
+                                eventData.Use();
+                            }
+
                             break;
 
                         case KeyCode.DownArrow: // 数字键盘 下键
+                            if (CurrentPageValues.CurrentPageValues is null) break;
+                            if (CurrentSelectAssetIndex < CurrentPageValues.CurrentPageValues.Length)
+                            {
+                                CurrentSelectAssetIndex += 1;
+                                if (CurrentSelectAssetIndex >= CurrentPageValues.CurrentPageValues.Length)
+                                    CurrentSelectAssetIndex = 0;
+                                UpdateCurrentSelectAsset(CurrentSelectAssetIndex);
+                                eventData.Use();
+                            }
+
                             break;
                     }
 

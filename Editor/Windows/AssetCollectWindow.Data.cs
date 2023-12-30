@@ -387,6 +387,7 @@ namespace AIO.UEditor
 
         private GUILayoutOption GP_Width_100;
         private GUILayoutOption GP_Width_150;
+        private GUILayoutOption GP_Width_80;
         private GUILayoutOption GP_Width_75;
         private GUILayoutOption GP_Width_50;
         private GUILayoutOption GP_Width_30;
@@ -524,6 +525,7 @@ namespace AIO.UEditor
             GP_Width_150 = GUILayout.Width(150);
             GP_Width_100 = GUILayout.Width(100);
             GP_Width_75 = GUILayout.Width(75);
+            GP_Width_80 = GUILayout.Width(80);
             GP_Width_50 = GUILayout.Width(50);
             GP_Width_40 = GUILayout.Width(40);
             GP_Width_30 = GUILayout.Width(30);
