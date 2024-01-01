@@ -33,6 +33,7 @@ namespace AIO.UEditor
         {
             using (GELayout.VHorizontal(GEStyle.Toolbar))
             {
+                if (item.Path is null) GUI.enabled = false;
                 if (GELayout.Button(item.Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
                         GEStyle.TEtoolbarbutton, GP_Width_30))
                 {
@@ -41,23 +42,23 @@ namespace AIO.UEditor
                 }
 
                 item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GTOption.Width(80));
+                if (item.Path is null) GUI.enabled = true;
                 item.Path = GELayout.Field(item.Path);
 
                 if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
                 {
-                    Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors =
-                        Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Remove(item);
+                    Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Remove(item);
                     GUI.FocusControl(null);
                     return;
                 }
 
+                if (item.Path is null) GUI.enabled = false;
                 if (GELayout.Button(GC_OPEN, GEStyle.TEtoolbarbutton, 24))
                 {
                     if (item.Type == EAssetCollectItemType.MainAssetCollector)
                     {
                         var status = 1;
-                        foreach (var collector in Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                                     .Collectors)
+                        foreach (var collector in Data.CurrentGroup.Collectors)
                         {
                             if (collector.CollectPath != item.CollectPath)
                             {
@@ -80,6 +81,8 @@ namespace AIO.UEditor
                         return;
                     }
                 }
+
+                if (item.Path is null) GUI.enabled = true;
             }
 
             if (!item.Folded) return;

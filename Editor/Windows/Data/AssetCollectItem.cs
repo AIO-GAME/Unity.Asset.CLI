@@ -41,7 +41,7 @@ namespace AIO.UEditor
     ///     
     /// </summary>
     [Serializable]
-    public class AssetCollectItem : IEqualityComparer<AssetCollectItem>
+    public class AssetCollectItem : IEqualityComparer<AssetCollectItem>, IDisposable
     {
         /// <summary>
         /// 收集器类型
@@ -56,18 +56,22 @@ namespace AIO.UEditor
         /// <summary>
         /// 收集器路径
         /// </summary>
-        public Object Path;
+        public Object Path
+        {
+            get => _Path;
+            set
+            {
+                _Path = value;
+                UpdateData();
+            }
+        }
 
         /// <summary>
         /// 加载类型
         /// </summary>
         public AssetLoadType LoadType = AssetLoadType.Always;
 
-        [NonSerialized] private string _GUID;
-
-        [NonSerialized] private string _CollectPath;
-
-        [NonSerialized] private string _FileName;
+        [NonSerialized] private Object _Path;
 
         /// <summary>
         /// 自定义数据
@@ -356,7 +360,7 @@ namespace AIO.UEditor
             }
         }
 
-        public async Task CollectAssetTask(string package, string group)
+        public async void CollectAssetTask(string package, string group, Action<Dictionary<string, AssetDataInfo>> cb = null)
         {
             AssetDataInfos.Clear();
             RuleFilters.Clear();
@@ -365,97 +369,102 @@ namespace AIO.UEditor
             GroupName = group;
             if (Path is null || string.IsNullOrEmpty(CollectPath)) return;
             if (Type != EAssetCollectItemType.MainAssetCollector) return;
-
-            UpdateCollect();
-            UpdateFilter();
-
-            var data = new AssetRuleData
+            var collectRoot = AssetCollectRoot.GetOrCreate(false);
+            await Task.Factory.StartNew(() =>
             {
-                Tags = Tags,
-                UserData = UserData,
-                PackageName = package,
-                GroupName = group,
-                CollectPath = CollectPath,
-            };
-            var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
-            var info = new AssetDataInfo
-            {
-                CollectPath = data.CollectPath,
-                Tags = tags.Length == 0 ? string.Empty : string.Join(";", tags),
-            };
+                UpdateCollect();
+                UpdateFilter();
 
-            if (AssetDatabase.IsValidFolder(CollectPath)) // 判断Path是否为文件夹
-            {
-                // 获取文件夹下所有文件
-                foreach (var file in await Task.Factory.StartNew(() =>
-                             EHelper.IO.GetFilesRelativeAssetNoMeta(CollectPath, SearchOption.AllDirectories)))
+                var data = new AssetRuleData
                 {
-                    var fixedPath = file.Replace("\\", "/");
-                    var temp = System.IO.Path.GetFileName(fixedPath);
-                    var index = temp.LastIndexOf('.');
-                    if (index >= 0)
+                    Tags = Tags,
+                    UserData = UserData,
+                    PackageName = package,
+                    GroupName = group,
+                    CollectPath = CollectPath,
+                };
+                var tags = collectRoot.GetTags(PackageName, GroupName, CollectPath);
+                var info = new AssetDataInfo
+                {
+                    CollectPath = data.CollectPath,
+                    Tags = tags.Length == 0 ? string.Empty : string.Join(";", tags),
+                };
+
+                if (Directory.Exists(CollectPath)) // 判断Path是否为文件夹
+                {
+                    foreach (var file in EHelper.IO.GetFilesRelativeAssetNoMeta(CollectPath, SearchOption.AllDirectories))
                     {
-                        data.Extension = temp.Substring(index).Replace(".", "").ToLower();
+                        var fixedPath = file.Replace("\\", "/");
+                        var temp = System.IO.Path.GetFileName(fixedPath);
+                        var index = temp.LastIndexOf('.');
+                        if (index >= 0)
+                        {
+                            data.Extension = temp.Substring(index).Replace(".", "").ToLower();
+                        }
+
+                        data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
+                        if (!IsCollectAsset(data)) continue;
+                        info.Address = GetAssetAddress(data);
+                        info.AssetPath = fixedPath;
+                        info.Extension = data.Extension;
+                        AssetDataInfos[fixedPath] = info;
                     }
-
-                    data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
-                    if (!IsCollectAsset(data)) continue;
-                    info.Address = GetAssetAddress(data);
-                    info.AssetPath = fixedPath;
-                    info.Extension = data.Extension;
-                    AssetDataInfos[fixedPath] = info;
                 }
-            }
-            else
-            {
-                data.Extension = System.IO.Path.GetExtension(data.CollectPath).Replace(".", "");
-                data.AssetPath = data.CollectPath.Substring(0, data.CollectPath.Length - data.Extension.Length - 1);
-                if (!IsCollectAsset(data)) return;
-                info.Address = GetAssetAddress(data);
-                info.AssetPath = data.CollectPath;
-                info.Extension = data.Extension;
-                AssetDataInfos[data.CollectPath] = info;
-            }
-        }
+                else
+                {
+                    data.Extension = System.IO.Path.GetExtension(data.CollectPath).Replace(".", "");
+                    data.AssetPath = data.CollectPath.Substring(0, data.CollectPath.Length - data.Extension.Length - 1);
+                    if (!IsCollectAsset(data)) return;
+                    info.Address = GetAssetAddress(data);
+                    info.AssetPath = data.CollectPath;
+                    info.Extension = data.Extension;
+                    AssetDataInfos[data.CollectPath] = info;
+                }
+            });
 
+            cb?.Invoke(AssetDataInfos);
+        }
 
         /// <summary>
         /// 收集器名称
         /// </summary>
-        public string FileName
-        {
-            get
-            {
-                if (Path is null) return string.Empty;
-                if (!string.IsNullOrEmpty(_FileName)) return _FileName;
-                _FileName = System.IO.Path.GetFileName(CollectPath);
-                return _FileName;
-            }
-        }
+        public string FileName;
 
         /// <summary>
         /// 资源GUID
         /// </summary>
-        public string GUID
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_GUID)) _GUID = AssetDatabase.AssetPathToGUID(CollectPath);
-                return _GUID;
-            }
-        }
+        public string GUID;
 
         /// <summary>
         /// 收集器路径
         /// </summary>
-        public string CollectPath
+        public string CollectPath;
+
+        private void UpdateData()
         {
-            get
+            if (Path is null)
             {
-                if (Path is null) return string.Empty;
-                if (string.IsNullOrEmpty(_CollectPath)) _CollectPath = AssetDatabase.GetAssetPath(Path);
-                return _CollectPath;
+                GUID = string.Empty;
+                CollectPath = string.Empty;
+                FileName = string.Empty;
+                Folded = false;
             }
+            else
+            {
+                CollectPath = AssetDatabase.GetAssetPath(Path);
+                GUID = AssetDatabase.AssetPathToGUID(CollectPath);
+                FileName = System.IO.Path.GetFileName(CollectPath);
+            }
+        }
+
+        public void Dispose()
+        {
+            UpdateData();
+        }
+
+        public override int GetHashCode()
+        {
+            return GetHashCode(this);
         }
     }
 }

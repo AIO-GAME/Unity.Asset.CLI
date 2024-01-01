@@ -77,18 +77,6 @@ namespace AIO.UEditor
             }
         }
 
-        private string ProjectRootDir
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(_projectRootDir)) return _projectRootDir;
-                _projectRootDir = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
-                return _projectRootDir;
-            }
-        }
-
-        private string _projectRootDir;
-
         partial void OnDrawASConfig()
         {
             EditorGUILayout.LabelField("Config", GEStyle.HeaderLabel);
@@ -103,14 +91,14 @@ namespace AIO.UEditor
 
                 if (GELayout.Button("Clean Sandbox", GEStyle.toolbarbuttonRight, GP_Width_100))
                 {
-                    var sandbox = Path.Combine(ProjectRootDir, "Sandbox");
+                    var sandbox = Path.Combine(EHelper.Path.Project, "Sandbox");
                     if (Directory.Exists(sandbox))
                         AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
                 }
 
                 if (GELayout.Button("Clean Bundles", GEStyle.toolbarbuttonRight, GP_Width_100))
                 {
-                    var sandbox = Path.Combine(ProjectRootDir, "Bundles");
+                    var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
                     if (Directory.Exists(sandbox))
                         AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
                 }
@@ -138,7 +126,7 @@ namespace AIO.UEditor
 #if UNITY_STANDALONE_WIN
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    GELayout.Label($"编辑器 : {ProjectRootDir}/{Config.RuntimeRootDirectory}");
+                    GELayout.Label($"编辑器 : {EHelper.Path.Project}/{Config.RuntimeRootDirectory}");
                     GELayout.Label($"运行时 : Application.streamingAssetsPath/{Config.RuntimeRootDirectory}");
                 }
 #endif

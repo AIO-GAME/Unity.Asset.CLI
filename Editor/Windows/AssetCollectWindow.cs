@@ -41,14 +41,9 @@ namespace AIO.UEditor
         {
             AssetCollectSetting.Initialize();
 
-            if (Data is null) Data = AssetCollectRoot.GetOrCreate();
-            else Data.Save();
-
-            if (Config is null) Config = ASConfig.GetOrCreate();
-            else Config.Save();
-
-            if (BuildConfig is null) BuildConfig = ASBuildConfig.GetOrCreate();
-            else BuildConfig.Save();
+            Data = AssetCollectRoot.GetOrCreate();
+            Config = ASConfig.GetOrCreate();
+            BuildConfig = ASBuildConfig.GetOrCreate();
 
             if (_packages is null)
                 _packages = Config.Packages is null
@@ -199,11 +194,15 @@ namespace AIO.UEditor
         protected override void OnDisable()
         {
             Data.Save();
+            Config.Save();
+            BuildConfig.Save();
         }
 
         protected override void OnDispose()
         {
             Data.Save();
+            Config.Save();
+            BuildConfig.Save();
         }
 
         public override void EventMouseDown(in Event eventData)

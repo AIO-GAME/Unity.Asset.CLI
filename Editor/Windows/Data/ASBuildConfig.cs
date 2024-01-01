@@ -104,7 +104,7 @@ namespace AIO.UEditor
 
         public void Save()
         {
-            EditorUtility.SetDirty(this);
+            if (!Equals(null)) EditorUtility.SetDirty(this);
         }
     }
 }
