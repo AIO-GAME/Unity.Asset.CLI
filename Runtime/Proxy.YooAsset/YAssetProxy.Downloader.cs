@@ -349,6 +349,13 @@ namespace AIO.UEngine
                         }
                     }
 
+                    // 判断当前存储空间是否足够
+                    if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
+                    {
+                        OnDiskSpaceNotEnough?.Invoke(Report);
+                        yield break;
+                    }
+
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
                     pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;
                     pair.Value.BeginDownload();

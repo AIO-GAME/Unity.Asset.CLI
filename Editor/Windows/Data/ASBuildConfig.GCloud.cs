@@ -29,9 +29,17 @@ namespace AIO.UEditor
 
         public void AddOrNewGCloud()
         {
+            var temp = new GCloudConfig
+            {
+                DirTreeFiled = new DirTreeFiled(BuildOutputPath.Replace('\\', '/'), 3)
+                {
+                    OptionShowDepth = false,
+                    OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$",
+                }
+            };
             GCloudConfigs = GCloudConfigs is null
-                ? new GCloudConfig[] { new GCloudConfig() }
-                : GCloudConfigs.Add(new GCloudConfig());
+                ? new GCloudConfig[] { temp }
+                : GCloudConfigs.Add(temp);
         }
 
         [Serializable]

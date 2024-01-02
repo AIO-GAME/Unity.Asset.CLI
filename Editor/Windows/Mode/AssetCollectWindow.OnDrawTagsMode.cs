@@ -101,7 +101,7 @@ namespace AIO.UEditor
             {
                 if (LookModeDisplayCollectorsIndex == 0 ||
                     TagsModeDisplayCollectors[LookModeDisplayCollectorsIndex] ==
-                    data.CollectPath.Replace('\\', '/'))
+                    data.CollectPath.Replace('/', '\\').TrimEnd('\\'))
                     filter++;
             }
             else

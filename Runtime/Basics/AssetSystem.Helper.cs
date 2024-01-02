@@ -6,6 +6,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using AIO.UEngine;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -93,6 +94,52 @@ namespace AIO
         {
             if (string.IsNullOrEmpty(location)) return string.Empty;
             return Parameter.LoadPathToLower ? location.ToLower() : location;
+        }
+
+        /// <summary>
+        /// 获取可用磁盘空间
+        /// </summary>
+        /// <returns></returns>
+        public static long GetAvailableDiskSpace()
+        {
+#if UNITY_EDITOR
+
+#if UNITY_EDITOR_WIN
+            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            return drive.AvailableFreeSpace;
+#elif UNITY_EDITOR_OSX
+            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            return drive.AvailableFreeSpace;
+#else
+            return 1024;
+#endif
+
+#else
+#if UNITY_STANDALONE_WIN
+            var drive = System.IO.DriveInfo.GetDrives();
+            return drive.AvailableFreeSpace;
+
+#elif UNITY_ANDROID
+
+            try
+            {
+                var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                var unityPluginLoader = new AndroidJavaClass("java类全名");
+                return unityPluginLoader.CallStatic<long>("GetFreeDiskSpace");
+            }
+            catch (Exception e)
+            {
+                LogException(e);
+            }
+#elif UNITY_IPHONE && !UNITY_EDITOR
+            return (long)_IOS_GetFreeDiskSpace();
+
+#elif UNITY_WEBGL
+            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            return drive.AvailableFreeSpace;
+#endif
+            return 1024;
+#endif
         }
 
         #region LOG
