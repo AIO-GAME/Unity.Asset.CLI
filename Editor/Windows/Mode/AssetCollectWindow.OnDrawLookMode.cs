@@ -726,38 +726,6 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 获取组显示名称
-        /// </summary>
-        private static string[] GetGroupDisPlayNames(ICollection<AssetCollectGroup> groups)
-        {
-            var page = groups.Count > 15;
-            return (from t in groups
-                    select t.Name
-                    into groupName
-                    where !string.IsNullOrEmpty(groupName)
-                    select page
-                        ? string.Concat(char.ToUpper(groupName[0]), '/', groupName)
-                        : groupName)
-                .ToArray();
-        }
-
-        /// <summary>
-        /// 获取收集器显示名称
-        /// </summary>
-        private static string[] GetCollectorDisPlayNames(ICollection<AssetCollectItem> collectors)
-        {
-            var page = collectors.Count > 15;
-            return (from item in collectors
-                    where item.Type == EAssetCollectItemType.MainAssetCollector
-                    where !string.IsNullOrEmpty(item.CollectPath)
-                    select page
-                        ? string.Concat(char.ToUpper(item.CollectPath[0]), '/',
-                            item.CollectPath.Replace('/', '\\').TrimEnd('\\'))
-                        : item.CollectPath.Replace('/', '\\').TrimEnd('\\'))
-                .ToArray();
-        }
-
-        /// <summary>
         /// 更新资源查询模式收集器
         /// </summary>
         private void UpdateDataLookModeCollector(int packageIndex, int groupIndex)

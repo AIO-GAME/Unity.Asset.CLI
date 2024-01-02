@@ -33,7 +33,7 @@ namespace AIO.UEditor
         {
             using (GELayout.VHorizontal(GEStyle.Toolbar))
             {
-                if (item.PathP is null) GUI.enabled = false;
+                if (item.Path is null) GUI.enabled = false;
                 if (GELayout.Button(item.Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
                         GEStyle.TEtoolbarbutton, GP_Width_30))
                 {
@@ -43,9 +43,9 @@ namespace AIO.UEditor
 
                 item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GP_Width_80);
 
-                if (item.PathP is null) GUI.enabled = true;
-                item.PathP = GELayout.Field(item.PathP, GTOption.WidthMin(160));
-                if (item.PathP is null) GUI.enabled = false;
+                if (item.Path is null) GUI.enabled = true;
+                item.Path = GELayout.Field(item.Path, GTOption.WidthMin(160));
+                if (item.Path is null) GUI.enabled = false;
 
                 if (!item.Folded)
                 {
@@ -84,7 +84,7 @@ namespace AIO.UEditor
                     }
                 }
 
-                if (item.PathP is null) GUI.enabled = true;
+                if (item.Path is null) GUI.enabled = true;
                 if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
                 {
                     GUI.FocusControl(null);

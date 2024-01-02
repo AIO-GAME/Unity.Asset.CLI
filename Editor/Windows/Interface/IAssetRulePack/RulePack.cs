@@ -43,7 +43,7 @@ namespace AIO.UEditor
     /// </summary>
     public class PackSeparately : IAssetRulePack
     {
-        public string DisplayPackName => "PackName = 文件路径";
+        public string DisplayPackName => "PackRule = 文件路径";
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -63,7 +63,7 @@ namespace AIO.UEditor
     /// </summary>
     public class PackDirectory : IAssetRulePack
     {
-        public string DisplayPackName => "PackName = 父类文件夹路径";
+        public string DisplayPackName => "PackRule = 父类文件夹路径";
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -84,7 +84,7 @@ namespace AIO.UEditor
     /// </summary>
     public class PackTopDirectory : IAssetRulePack
     {
-        public string DisplayPackName => "PackName = 收集器下顶级文件夹路径";
+        public string DisplayPackName => "PackRule = 收集器下顶级文件夹路径";
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -114,7 +114,7 @@ namespace AIO.UEditor
     /// </summary>
     public class PackCollector : IAssetRulePack
     {
-        public string DisplayPackName => "PackName = 收集器路径";
+        public string DisplayPackName => "PackRule = 收集器路径";
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -135,7 +135,7 @@ namespace AIO.UEditor
     /// </summary>
     public class PackGroup : IAssetRulePack
     {
-        public string DisplayPackName => "PackName = 分组名称";
+        public string DisplayPackName => "PackRule = 分组名称";
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -152,7 +152,7 @@ namespace AIO.UEditor
     /// </summary>
     public class PackRawFile : IAssetRulePack
     {
-        public string DisplayPackName => "打包原生文件";
+        public string DisplayPackName => "PackRule = 打包原生文件";
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -169,7 +169,7 @@ namespace AIO.UEditor
     /// </summary>
     public class PackShaderVariants : IAssetRulePack
     {
-        public string DisplayPackName => "打包着色器变种集合文件";
+        public string DisplayPackName => "PackRule = 打包着色器变种集合文件";
 
         public PackRuleResult GetPackRuleResult(PackRuleData data)
         {

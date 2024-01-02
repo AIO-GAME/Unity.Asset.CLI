@@ -23,6 +23,9 @@ namespace AIO.UEditor
     /// </summary>
     public interface IAssetRulePack
     {
+        /// <summary>
+        /// 显示打包规则名称
+        /// </summary>
         string DisplayPackName { get; }
 
         /// <summary>

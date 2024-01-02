@@ -92,6 +92,101 @@ namespace AIO.UEditor
         }
 
         /// <summary>
+        /// 绘制 标签模式 资源列表
+        /// </summary>
+        partial void OnDrawTagsMode()
+        {
+            if (Data.Packages.Length == 0)
+            {
+                GELayout.HelpBox("当前无包资源数据");
+                return;
+            }
+
+            if (!LookModeShowAssetDetail) ViewDetailList.width = CurrentWidth;
+            else ViewDetailList.MaxWidth = CurrentWidth - 300;
+            ViewDetailList.height = CurrentHeight - DrawHeaderHeight;
+            ViewDetailList.IsAllowHorizontal = LookModeShowAssetDetail;
+            ViewDetailList.Draw(OnDrawLookModeAssetList, GEStyle.Badge);
+            if (LookModeShowAssetDetail)
+            {
+                ViewDetails.IsShow = true;
+                ViewDetails.x = ViewDetailList.width;
+                ViewDetails.width = CurrentWidth - ViewDetails.x;
+                ViewDetails.height = ViewDetailList.height - 3;
+                ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
+            }
+        }
+
+        /// <summary>
+        /// 更新数据 标签模式
+        /// </summary>
+        private void UpdateDataTagsMode()
+        {
+            GUI.FocusControl(null);
+            LookModeCurrentSelectAsset = null;
+
+            CurrentPageValues.Clear();
+            CurrentPageValues.PageIndex = 0;
+            CurrentTagValues.Clear();
+            LookModeCollectorsALLSize = 0;
+            LookModeCollectorsPageSize = 0;
+
+            if (Data.Packages.Length == 0) return;
+            TagsModeDisplayCollectors = new string[] { "ALL" };
+            TagsModeDisplayTypes = Array.Empty<string>();
+            TagsModeDisplayTags = Data.GetTags();
+            var collectors = new List<string>();
+            var listTypes = new List<string>();
+            foreach (var package in Data.Packages)
+            {
+                if (package.Groups is null) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group.Collectors is null) continue;
+                    var flag = !string.IsNullOrEmpty(group.Tags);
+                    collectors.AddRange(GetCollectorDisPlayNames(group.Collectors, collector => flag || !string.IsNullOrEmpty(collector.Tags)));
+                    foreach (var collector in group.Collectors)
+                    {
+                        if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (string.IsNullOrEmpty(collector.CollectPath)) continue;
+                        if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
+                        collector.CollectAssetTask(package.Name, group.Name, dic =>
+                        {
+                            foreach (var pair in dic)
+                            {
+                                listTypes.Add(pair.Value.Type);
+                                CurrentTagValues.Add(pair.Value);
+                                if (!LookModeDataFilter(pair.Value))
+                                {
+                                    CurrentPageValues.Add(pair.Value);
+                                    LookModeCollectorsALLSize += pair.Value.Size;
+                                }
+                            }
+
+                            CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
+                            TagsModeDisplayTypes = listTypes.Distinct().ToArray();
+                            Repaint();
+                        });
+                    }
+                }
+            }
+
+            if (collectors.Count > 31)
+            {
+                TagsModeDisplayCollectors = new string[collectors.Count + 1];
+                TagsModeDisplayCollectors[0] = "ALL";
+                var tempIndex = 1;
+                foreach (var key in collectors)
+                {
+                    TagsModeDisplayCollectors[tempIndex++] = key;
+                }
+            }
+            else TagsModeDisplayCollectors = collectors.ToArray();
+
+            if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
+        }
+
+        /// <summary>
         /// 标签模式 资源过滤器
         /// </summary>
         private bool TagsModeDataFilter(AssetDataInfo data)
@@ -176,95 +271,6 @@ namespace AIO.UEditor
             }
 
             return filter != 4;
-        }
-
-        partial void OnDrawTagsMode()
-        {
-            if (Data.Packages.Length == 0)
-            {
-                GELayout.HelpBox("当前无包资源数据");
-                return;
-            }
-
-            if (!LookModeShowAssetDetail) ViewDetailList.width = CurrentWidth;
-            else ViewDetailList.MaxWidth = CurrentWidth - 300;
-            ViewDetailList.height = CurrentHeight - DrawHeaderHeight;
-            ViewDetailList.IsAllowHorizontal = LookModeShowAssetDetail;
-            ViewDetailList.Draw(OnDrawLookModeAssetList, GEStyle.Badge);
-            if (LookModeShowAssetDetail)
-            {
-                ViewDetails.IsShow = true;
-                ViewDetails.x = ViewDetailList.width;
-                ViewDetails.width = CurrentWidth - ViewDetails.x;
-                ViewDetails.height = ViewDetailList.height - 3;
-                ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
-            }
-        }
-
-        private void UpdateDataTagsMode()
-        {
-            GUI.FocusControl(null);
-            LookModeCurrentSelectAsset = null;
-
-            CurrentPageValues.Clear();
-            CurrentPageValues.PageIndex = 0;
-            CurrentTagValues.Clear();
-            LookModeCollectorsALLSize = 0;
-            LookModeCollectorsPageSize = 0;
-
-            if (Data.Packages.Length == 0) return;
-            TagsModeDisplayCollectors = new string[] { "ALL" };
-            TagsModeDisplayTypes = Array.Empty<string>();
-            TagsModeDisplayTags = Data.GetTags();
-            var collectors = new List<string>();
-            var listTypes = new List<string>();
-            foreach (var package in Data.Packages)
-            {
-                if (package.Groups is null) continue;
-                foreach (var group in package.Groups)
-                {
-                    if (group.Collectors is null) continue;
-                    var flag = !string.IsNullOrEmpty(group.Tags);
-                    collectors.AddRange(GetCollectorDisPlayNames(group.Collectors));
-                    foreach (var collector in group.Collectors)
-                    {
-                        if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                        if (string.IsNullOrEmpty(collector.CollectPath)) continue;
-                        if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
-                        collector.CollectAssetTask(package.Name, group.Name, dic =>
-                        {
-                            foreach (var pair in dic)
-                            {
-                                listTypes.Add(pair.Value.Type);
-                                CurrentTagValues.Add(pair.Value);
-                                if (!LookModeDataFilter(pair.Value))
-                                {
-                                    CurrentPageValues.Add(pair.Value);
-                                    LookModeCollectorsALLSize += pair.Value.Size;
-                                }
-                            }
-
-                            CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
-                            TagsModeDisplayTypes = listTypes.Distinct().ToArray();
-                            Repaint();
-                        });
-                    }
-                }
-            }
-
-            if (collectors.Count > 31)
-            {
-                TagsModeDisplayCollectors = new string[collectors.Count + 1];
-                TagsModeDisplayCollectors[0] = "ALL";
-                var tempIndex = 1;
-                foreach (var key in collectors)
-                {
-                    TagsModeDisplayCollectors[tempIndex++] = key;
-                }
-            }
-            else TagsModeDisplayCollectors = collectors.ToArray();
-
-            if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
         }
     }
 }

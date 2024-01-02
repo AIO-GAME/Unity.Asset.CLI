@@ -116,7 +116,7 @@ namespace AIO.UEditor
                     Extension = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
                 };
                 infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
-                return collector.GetAssetAddress(infoData);
+                return collector.GetAssetAddress(infoData, ASConfig.GetOrCreate().LoadPathToLower);
             }
         }
 

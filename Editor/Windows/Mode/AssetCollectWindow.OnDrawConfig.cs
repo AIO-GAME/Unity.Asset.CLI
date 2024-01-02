@@ -14,6 +14,9 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
+        /// <summary>
+        /// 绘制 资源设置模式 导航栏
+        /// </summary>
         private void OnDrawHeaderConfigMode()
         {
             EditorGUILayout.Separator();
@@ -31,6 +34,9 @@ namespace AIO.UEditor
             }
         }
 
+        /// <summary>
+        /// 更新数据 资源设置模式
+        /// </summary>
         private void UpdateDataConfigMode()
         {
 #if SUPPORT_YOOASSET
@@ -38,7 +44,32 @@ namespace AIO.UEditor
 #endif
             Config.UpdatePackage();
         }
+        
+        /// <summary>
+        /// 绘制 资源设置模式
+        /// </summary>
+        partial void OnDrawConfigMode()
+        {
+            DoConfigDrawRect.x = 5;
+            DoConfigDrawRect.height = CurrentHeight - DrawHeaderHeight;
+            DoConfigDrawRect.width = ViewConfig.width;
+            ViewConfig.Draw(DoConfigDrawRect, () =>
+            {
+                ViewConfig.MaxWidth = CurrentWidth - ViewSetting.MinWidth;
+                OnDrawConfigScroll = GELayout.VScrollView(OnDrawASConfig, OnDrawConfigScroll);
+            }, GEStyle.INThumbnailShadow);
 
+            DoConfigDrawRect.x += ViewConfig.width;
+            DoConfigDrawRect.width = CurrentWidth - ViewConfig.width;
+            ViewSetting.width = DoConfigDrawRect.width;
+            ViewSetting.Draw(DoConfigDrawRect,
+                () => { OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll); },
+                GEStyle.INThumbnailShadow);
+        }
+
+        /// <summary>
+        /// 绘制资源设置
+        /// </summary>
         partial void OnDrawSetting()
         {
             var min = GUILayout.MinWidth(ViewSetting.MinWidth - 25);
@@ -71,6 +102,9 @@ namespace AIO.UEditor
             }
         }
 
+        /// <summary>
+        /// 绘制资源配置
+        /// </summary>
         partial void OnDrawASConfig()
         {
             EditorGUILayout.LabelField("Config", GEStyle.HeaderLabel);
@@ -154,7 +188,7 @@ namespace AIO.UEditor
                         {
                             GELayout.Label("远端资源地址", GP_Width_150);
                             if (string.IsNullOrEmpty(Config.URL)) GUI.enabled = false;
-                            GELayout.Separator();
+                            EditorGUILayout.Separator();
                             if (GELayout.Button("Open", GEStyle.toolbarbutton, GP_Width_50))
                             {
                                 Application.OpenURL(Config.URL);
@@ -211,25 +245,6 @@ namespace AIO.UEditor
 
                 if (string.IsNullOrEmpty(Config.RuntimeRootDirectory)) GUI.enabled = true;
             }
-        }
-
-        partial void OnDrawConfigMode()
-        {
-            DoConfigDrawRect.x = 5;
-            DoConfigDrawRect.height = CurrentHeight - DrawHeaderHeight;
-            DoConfigDrawRect.width = ViewConfig.width;
-            ViewConfig.Draw(DoConfigDrawRect, () =>
-            {
-                ViewConfig.MaxWidth = CurrentWidth - ViewSetting.MinWidth;
-                OnDrawConfigScroll = GELayout.VScrollView(OnDrawASConfig, OnDrawConfigScroll);
-            }, GEStyle.INThumbnailShadow);
-
-            DoConfigDrawRect.x += ViewConfig.width;
-            DoConfigDrawRect.width = CurrentWidth - ViewConfig.width;
-            ViewSetting.width = DoConfigDrawRect.width;
-            ViewSetting.Draw(DoConfigDrawRect,
-                () => { OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll); },
-                GEStyle.INThumbnailShadow);
         }
     }
 }

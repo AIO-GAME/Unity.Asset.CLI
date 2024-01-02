@@ -52,7 +52,7 @@ namespace AIO.UEditor
                     {
                         var collect = _Instance.Packages[i].Groups[j].Collectors[k];
                         if (string.IsNullOrEmpty(collect.CollectPath)) continue;
-                        collect.PathP = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
+                        collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
                     }
 
                     _Instance.Packages[i].Groups[j].Collectors = _Instance.Packages[i].Groups[j].Collectors
