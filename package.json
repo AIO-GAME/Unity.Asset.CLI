@@ -14,10 +14,10 @@
     "url": "https://github.com/AIO-GAME/Unity.Asset.CLI.git"
   },
   "dependencies": {
-    "com.aio.package": "1.0.23-preview"
+    "com.aio.package": "1.0.22-preview"
   },
   "relatedPackages": {
-    "com.aio.package": "1.0.23-preview"
+    "com.aio.package": "1.0.22-preview"
   },
   "keywords": ["Asset", "YooAsset", "Unity Asset", "Resource"],
   "author": {
