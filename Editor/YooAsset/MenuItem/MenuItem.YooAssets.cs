@@ -112,33 +112,33 @@ namespace AIO.UEditor
             }
         }
 
-        [MenuItem("YooAsset/Open/Bundles")]
-        public static async void OpenBundles()
-        {
-            var path = Application.dataPath.Replace("Assets", "Bundles");
-            if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Open.Path(path);
-        }
-
-        [MenuItem("YooAsset/Open/Sandbox")]
-        public static async void OpenSandbox()
-        {
-            var path = Application.dataPath.Replace("Assets", "Sandbox");
-            if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Open.Path(path);
-        }
-
-        [MenuItem("YooAsset/Clear/Bundles")]
-        public static async void ClearBundles()
-        {
-            var path = Application.dataPath.Replace("Assets", "Bundles");
-            if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Folder.Del(path);
-        }
-
-        [MenuItem("YooAsset/Clear/Sandbox")]
-        public static async void ClearSandbox()
-        {
-            var path = Application.dataPath.Replace("Assets", "Sandbox");
-            if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Folder.Del(path);
-        }
+        // [MenuItem("YooAsset/Open/Bundles")]
+        // public static async void OpenBundles()
+        // {
+        //     var path = Application.dataPath.Replace("Assets", "Bundles");
+        //     if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Open.Path(path);
+        // }
+        //
+        // [MenuItem("YooAsset/Open/Sandbox")]
+        // public static async void OpenSandbox()
+        // {
+        //     var path = Application.dataPath.Replace("Assets", "Sandbox");
+        //     if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Open.Path(path);
+        // }
+        //
+        // [MenuItem("YooAsset/Clear/Bundles")]
+        // public static async void ClearBundles()
+        // {
+        //     var path = Application.dataPath.Replace("Assets", "Bundles");
+        //     if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Folder.Del(path);
+        // }
+        //
+        // [MenuItem("YooAsset/Clear/Sandbox")]
+        // public static async void ClearSandbox()
+        // {
+        //     var path = Application.dataPath.Replace("Assets", "Sandbox");
+        //     if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Folder.Del(path);
+        // }
     }
 }
 #endif

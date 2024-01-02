@@ -181,9 +181,6 @@ namespace AIO.UEditor
             LookModeDataPageValueSort(ESort.AssetName, true);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private void OnDrawFirstPackageMode()
         {
             if (!Config.EnableSequenceRecord)

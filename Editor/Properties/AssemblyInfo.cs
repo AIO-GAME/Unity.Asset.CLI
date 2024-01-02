@@ -7,12 +7,12 @@ internal static class Setting
     /// <summary>
     /// 名称
     /// </summary>
-    public static string Name = "AIO.Asset";
+    public const string Name = "AIO.Asset";
 
     /// <summary>
     /// 版本
     /// </summary>
-    public static string Version = "";
+    public static string Version { get; private set; }
 
     [UnityEditor.InitializeOnLoadMethod]
     public static void Initialize()
