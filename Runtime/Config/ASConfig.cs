@@ -238,6 +238,18 @@ namespace AIO.UEngine
                     AssetDatabase.CreateAsset(instance, "Assets/Resources/ASConfig.asset");
                 }
             }
+
+#if SUPPORT_YOOASSET
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
+                assembly.GetType("AIO.UEditor.ConvertYooAsset", true)
+                    ?.GetMethod("Convert", BindingFlags.Static | BindingFlags.Public)
+                    ?.Invoke(null, new object[] { instance });
+                break;
+            }
+#endif
+
 #endif
             if (instance is null) throw new Exception("Not found ASConfig.asset ! Please create it !");
             return instance;
@@ -323,7 +335,10 @@ namespace AIO.UEngine
 
         public void Save()
         {
+            if (Equals(null)) return;
             EditorUtility.SetDirty(this);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 #endif
     }

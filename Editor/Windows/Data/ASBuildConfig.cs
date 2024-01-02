@@ -104,7 +104,10 @@ namespace AIO.UEditor
 
         public void Save()
         {
-            if (!Equals(null)) EditorUtility.SetDirty(this);
+            if (Equals(null)) return;
+            EditorUtility.SetDirty(this);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
     }
 }

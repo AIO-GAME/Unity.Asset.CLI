@@ -345,7 +345,10 @@ namespace AIO.UEditor
         public void Save()
         {
             Dispose();
-            if (!Equals(null)) EditorUtility.SetDirty(this);
+            if (Equals(null)) return;
+            EditorUtility.SetDirty(this);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         private void OnDisable()
