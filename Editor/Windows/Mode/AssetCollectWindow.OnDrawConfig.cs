@@ -4,7 +4,6 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AIO.UEngine;
@@ -15,8 +14,6 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        private List<AssetsPackageConfig> _packages;
-
         private void OnDrawHeaderConfigMode()
         {
             EditorGUILayout.Separator();
@@ -40,9 +37,6 @@ namespace AIO.UEditor
             ConvertYooAsset.Convert(Data);
 #endif
             Config.UpdatePackage();
-            _packages = Config.Packages is null
-                ? _packages
-                : Config.Packages.ToList();
         }
 
         partial void OnDrawSetting()
@@ -202,16 +196,15 @@ namespace AIO.UEditor
                         break;
                     default:
                         GUI.enabled = false;
-                        GELayout.List("资源包配置", _packages,
+                        GELayout.List("资源包配置", Config.Packages,
                             config =>
                             {
                                 config.Name = GELayout.Field(config.Name);
                                 config.IsDefault = GELayout.Toggle(config.IsDefault, GUILayout.Width(20));
                                 if (!config.IsDefault) return;
-                                foreach (var package in _packages.Where(package => config.Name != package.Name))
+                                foreach (var package in Config.Packages.Where(package => config.Name != package.Name))
                                     package.IsDefault = false;
-                            },
-                            () => new AssetsPackageConfig());
+                            });
                         GUI.enabled = true;
                         break;
                 }

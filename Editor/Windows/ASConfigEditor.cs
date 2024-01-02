@@ -43,13 +43,13 @@ namespace AIO.UEditor
             {
                 if (GELayout.Button("Clean Sandbox"))
                 {
-                    var sandbox = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Sandbox");
+                    var sandbox = Path.Combine(EHelper.Path.Project, "Sandbox");
                     if (Directory.Exists(sandbox)) AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
                 }
 
                 if (GELayout.Button("Clean Bundles"))
                 {
-                    var sandbox = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Bundles");
+                    var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
                     if (Directory.Exists(sandbox)) AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
                 }
             }

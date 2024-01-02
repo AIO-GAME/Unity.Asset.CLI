@@ -537,7 +537,6 @@ namespace AIO.UEditor
             if (config.isUploading) GUI.enabled = true;
         }
 
-
         private void OnDrawBuildFTP(ASBuildConfig.FTPConfig config)
         {
             if (!config.Folded) return;
@@ -637,9 +636,9 @@ namespace AIO.UEditor
                 "Google Cloud",
                 FoldoutUploadGCloud,
                 () => { BuildConfig.AddOrNewGCloud(); }, 0, null, new GUIContent("✚"));
-
-            FoldoutNoticeDingDing = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildNoticeDingDing,
-                "钉钉通知", FoldoutNoticeDingDing);
+            //
+            // FoldoutNoticeDingDing = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildNoticeDingDing,
+            //     "钉钉通知", FoldoutNoticeDingDing);
         }
     }
 }

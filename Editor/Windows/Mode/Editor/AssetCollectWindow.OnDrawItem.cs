@@ -107,7 +107,7 @@ namespace AIO.UEditor
                     if (Config.LoadPathToLower)
                     {
                         GUI.enabled = false;
-                        GELayout.Popup(AssetLocationFormat.ToLower, GEStyle.PreDropDown, GP_Width_80);
+                        GELayout.Popup(EAssetLocationFormat.ToLower, GEStyle.PreDropDown, GP_Width_80);
                         GUI.enabled = true;
                     }
                     else

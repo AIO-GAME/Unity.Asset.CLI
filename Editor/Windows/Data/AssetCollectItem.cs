@@ -16,27 +16,6 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
-    public enum EAssetCollectItemType
-    {
-        [InspectorName("动态资源")] MainAssetCollector,
-        [InspectorName("依赖资源")] DependAssetCollector,
-        [InspectorName("静态资源")] StaticAssetCollector,
-    }
-
-    public enum AssetLocationFormat
-    {
-        [InspectorName("默认")] None,
-        [InspectorName("小写")] ToLower,
-        [InspectorName("大写")] ToUpper,
-    }
-
-    public enum AssetLoadType
-    {
-        [InspectorName("始终")] Always,
-        [InspectorName("运行时")] Runtime,
-        [InspectorName("编辑时")] Editor,
-    }
-
     /// <summary>
     ///     
     /// </summary>
@@ -74,7 +53,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 加载类型
         /// </summary>
-        public AssetLoadType LoadType = AssetLoadType.Always;
+        public EAssetLoadType LoadType = EAssetLoadType.Always;
 
         [NonSerialized] private Object _pathP;
 
@@ -134,7 +113,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 定位格式
         /// </summary>
-        public AssetLocationFormat LocationFormat;
+        public EAssetLocationFormat LocationFormat;
 
         /// <summary>
         /// 是否有后缀
@@ -239,11 +218,11 @@ namespace AIO.UEditor
             if (ASConfig.GetOrCreate().LoadPathToLower) return address.ToLower();
             switch (LocationFormat)
             {
-                case AssetLocationFormat.ToLower:
+                case EAssetLocationFormat.ToLower:
                     return address.ToLower();
-                case AssetLocationFormat.ToUpper:
+                case EAssetLocationFormat.ToUpper:
                     return address.ToUpper();
-                case AssetLocationFormat.None:
+                case EAssetLocationFormat.None:
                 default: return address;
             }
         }

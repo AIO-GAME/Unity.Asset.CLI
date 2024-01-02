@@ -51,21 +51,21 @@ namespace AIO.UEditor
                 if (Application.isPlaying)
                 {
                     if (AssetSystem.Parameter.ASMode == EASMode.Editor &&
-                        collector.LoadType == AssetLoadType.Runtime)
+                        collector.LoadType == EAssetLoadType.Runtime)
                         return false;
 
                     if (AssetSystem.Parameter.ASMode != EASMode.Editor &&
-                        collector.LoadType == AssetLoadType.Editor)
+                        collector.LoadType == EAssetLoadType.Editor)
                         return false;
                 }
                 else
                 {
                     if (ASConfig.GetOrCreate().ASMode == EASMode.Editor &&
-                        collector.LoadType == AssetLoadType.Runtime)
+                        collector.LoadType == EAssetLoadType.Runtime)
                         return false;
 
                     if (ASConfig.GetOrCreate().ASMode != EASMode.Editor &&
-                        collector.LoadType == AssetLoadType.Editor)
+                        collector.LoadType == EAssetLoadType.Editor)
                         return false;
                 }
 
