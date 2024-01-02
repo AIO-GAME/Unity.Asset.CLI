@@ -12,7 +12,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if SUPPORT_YOOASSET
 using YooAsset.Editor;
+#endif
 
 namespace AIO.UEditor
 {
