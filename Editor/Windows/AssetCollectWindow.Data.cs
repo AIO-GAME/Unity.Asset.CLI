@@ -41,16 +41,6 @@ namespace AIO.UEditor
         private Rect DoConfigDrawRect = Rect.zero;
 
         /// <summary>
-        /// 当前选择包下标
-        /// </summary>
-        private int CurrentPackageIndex;
-
-        /// <summary>
-        /// 当前选择组下标
-        /// </summary>
-        private int CurrentGroupIndex;
-
-        /// <summary>
         /// 当前导航栏高度
         /// </summary>
         private const float DrawHeaderHeight = 25;
@@ -123,7 +113,7 @@ namespace AIO.UEditor
             [InspectorName("编辑模式")] Editor = 0,
             [InspectorName("配置管理")] Config = 1,
             [InspectorName("查询模式")] Look = 2,
-            [InspectorName("查询标签[等待优化]")] LookTags = 3,
+            [InspectorName("查询标签")] LookTags = 3,
             [InspectorName("查询首包")] LookFirstPackage = 4,
             [InspectorName("打包工具")] Build = 5,
         }
@@ -387,6 +377,7 @@ namespace AIO.UEditor
 
         private GUILayoutOption GP_Width_100;
         private GUILayoutOption GP_Width_150;
+        private GUILayoutOption GP_Width_80;
         private GUILayoutOption GP_Width_75;
         private GUILayoutOption GP_Width_50;
         private GUILayoutOption GP_Width_30;
@@ -518,12 +509,19 @@ namespace AIO.UEditor
 
         private AssetSystem.SequenceRecordQueue SequenceRecords;
 
+        private int LookModeCollectorsPageIndex;
+
+        private int CurrentSelectAssetIndex = 0;
+
+        private GenericMenu onDrawLookDataItemMenu;
+
         private void GPInit()
         {
             GP_Width_EXPAND = GUILayout.ExpandWidth(true);
             GP_Width_150 = GUILayout.Width(150);
             GP_Width_100 = GUILayout.Width(100);
             GP_Width_75 = GUILayout.Width(75);
+            GP_Width_80 = GUILayout.Width(80);
             GP_Width_50 = GUILayout.Width(50);
             GP_Width_40 = GUILayout.Width(40);
             GP_Width_30 = GUILayout.Width(30);

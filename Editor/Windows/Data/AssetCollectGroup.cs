@@ -11,7 +11,7 @@ using System.Linq;
 namespace AIO.UEditor
 {
     [Serializable]
-    public class AssetCollectGroup
+    public class AssetCollectGroup : IDisposable, IEqualityComparer<AssetCollectGroup>
     {
         /// <summary>
         /// 组名
@@ -46,7 +46,6 @@ namespace AIO.UEditor
                 .FirstOrDefault(collectItem => collectItem.CollectPath == collectPath);
         }
 
-
         public string[] GetTags()
         {
             var dictionary = new Dictionary<string, bool>();
@@ -61,6 +60,44 @@ namespace AIO.UEditor
 
             foreach (var tag in Tags.Split(';')) dictionary[tag] = true;
             return dictionary.Keys.ToArray();
+        }
+
+        public void Dispose()
+        {
+            if (Collectors is null) return;
+            foreach (var collect in Collectors) collect.Dispose();
+        }
+
+        public bool Equals(AssetCollectGroup x, AssetCollectGroup y)
+        {
+            if (x is null)
+            {
+                if (y is null) return true;
+                return false;
+            }
+
+            if (y is null) return false;
+
+            return x.GetHashCode() == y.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return GetHashCode(this);
+        }
+
+        public int GetHashCode(AssetCollectGroup obj)
+        {
+            if (obj.Equals(null)) return 0;
+            unchecked
+            {
+                var hashCode = obj.Name.GetHashCode();
+                hashCode = (hashCode * 397) ^ (!string.IsNullOrEmpty(obj.Tags) ? obj.Tags.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
+                if (obj.Collectors != null)
+                    hashCode = obj.Collectors.Aggregate(hashCode, (current, item) => (current * 397) ^ item.GetHashCode());
+                return hashCode;
+            }
         }
     }
 }

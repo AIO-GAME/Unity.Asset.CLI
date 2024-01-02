@@ -31,72 +31,78 @@ namespace AIO.UEditor
 
         partial void OnDrawItem(AssetCollectItem item)
         {
-            using (GELayout.Vertical())
+            using (GELayout.VHorizontal(GEStyle.Toolbar))
             {
-                using (GELayout.VHorizontal(GEStyle.Toolbar))
+                if (item.PathP is null) GUI.enabled = false;
+                if (GELayout.Button(item.Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
+                        GEStyle.TEtoolbarbutton, GP_Width_30))
                 {
-                    if (GELayout.Button(item.Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
-                            GEStyle.TEtoolbarbutton, GP_Width_30))
-                    {
-                        item.Folded = !item.Folded;
-                        GUI.FocusControl(null);
-                    }
+                    item.Folded = !item.Folded;
+                    GUI.FocusControl(null);
+                }
 
-                    item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GTOption.Width(80));
-                    item.Path = GELayout.Field(item.Path);
+                item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GTOption.Width(80));
+                if (item.PathP is null) GUI.enabled = true;
+                item.PathP = GELayout.Field(item.PathP);
 
-                    if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
-                    {
-                        Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors =
-                            Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Remove(item);
-                        GUI.FocusControl(null);
-                        return;
-                    }
+                if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
+                {
+                    Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Remove(item);
+                    GUI.FocusControl(null);
+                    return;
+                }
 
-                    if (GELayout.Button(GC_OPEN, GEStyle.TEtoolbarbutton, 24))
+                if (item.PathP is null) GUI.enabled = false;
+                if (GELayout.Button(GC_OPEN, GEStyle.TEtoolbarbutton, 24))
+                {
+                    if (item.Type == EAssetCollectItemType.MainAssetCollector)
                     {
-                        if (item.Type == EAssetCollectItemType.MainAssetCollector)
+                        var status = 1;
+                        foreach (var collector in Data.CurrentGroup.Collectors)
                         {
-                            var status = 1;
-                            foreach (var collector in Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                                         .Collectors)
+                            if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                            if (string.IsNullOrEmpty(item.CollectPath)) continue;
+                            if (collector.CollectPath != item.CollectPath)
                             {
-                                if (collector.CollectPath != item.CollectPath)
-                                {
-                                    status *= 2;
-                                    continue;
-                                }
-
-                                LookModeDisplayCollectorsIndex = status;
-                                break;
+                                status *= 2;
+                                continue;
                             }
 
-                            GUI.FocusControl(null);
-                            WindowMode = Mode.Look;
-                            UpdateDataLookMode();
-                            return;
+                            LookModeDisplayCollectorsIndex = status;
+                            break;
                         }
-                        else
-                        {
-                            EditorUtility.DisplayDialog("打开", "只有动态资源才能查询", "确定");
-                        }
+
+                        GUI.FocusControl(null);
+                        WindowMode = Mode.Look;
+                        UpdateDataLookMode();
+                        return;
+                    }
+                    else
+                    {
+                        EditorUtility.DisplayDialog("打开", "只有动态资源才能查询", "确定");
+                        return;
                     }
                 }
 
-                if (item.Folded) return;
+                if (item.PathP is null) GUI.enabled = true;
+            }
 
+            if (!item.Folded) return;
+
+            using (GELayout.Vertical(GEStyle.PreBackground))
+            {
                 using (GELayout.VHorizontal())
                 {
                     GELayout.Label("定位", GP_Width_25);
                     if (Config.LoadPathToLower)
                     {
                         GUI.enabled = false;
-                        GELayout.Popup(AssetLocationFormat.ToLower, GEStyle.PreDropDown, GTOption.Width(80));
+                        GELayout.Popup(AssetLocationFormat.ToLower, GEStyle.PreDropDown, GP_Width_80);
                         GUI.enabled = true;
                     }
                     else
                         item.LocationFormat =
-                            GELayout.Popup(item.LocationFormat, GEStyle.PreDropDown, GTOption.Width(80));
+                            GELayout.Popup(item.LocationFormat, GEStyle.PreDropDown, GP_Width_80);
 
                     item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays,
                         GEStyle.PreDropDown);
@@ -149,10 +155,13 @@ namespace AIO.UEditor
                         item.RuleUseFilterCustom, GTOption.Width(42));
                 }
 
-                using (GELayout.VHorizontal())
+                if (AssetCollectSetting.MapAddress.Displays[item.Address].Contains("UserData"))
                 {
-                    GELayout.Label("自定", GP_Width_25);
-                    item.UserData = GELayout.Field(item.UserData);
+                    using (GELayout.VHorizontal())
+                    {
+                        GELayout.Label("自定", GP_Width_25);
+                        item.UserData = GELayout.Field(item.UserData);
+                    }
                 }
 
                 if (item.Type == EAssetCollectItemType.MainAssetCollector)

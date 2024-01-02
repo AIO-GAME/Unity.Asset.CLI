@@ -48,7 +48,7 @@ namespace AIO.UEditor
                 }
             }
 
-            CurrentPackageIndex = BuildConfig.PackageName == null
+            Data.CurrentPackageIndex = BuildConfig.PackageName == null
                 ? 0
                 : Array.IndexOf(LookModeDisplayPackages, BuildConfig.PackageName);
 
@@ -177,16 +177,15 @@ namespace AIO.UEditor
                 using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
                 {
                     EditorGUILayout.LabelField("构建包名", GP_Width_100);
-                    CurrentPackageIndex = EditorGUILayout.Popup(CurrentPackageIndex, LookModeDisplayPackages,
-                        GEStyle.PreDropDown);
+                    Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages, GEStyle.PreDropDown);
                     if (GUI.changed)
                     {
-                        if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0)
+                        if (Data.Packages.Length <= Data.CurrentPackageIndex || Data.CurrentPackageIndex < 0)
                         {
-                            CurrentPackageIndex = 0;
+                            Data.CurrentPackageIndex = 0;
                         }
 
-                        BuildConfig.PackageName = Data.Packages[CurrentPackageIndex].Name;
+                        BuildConfig.PackageName = Data.Packages[Data.CurrentPackageIndex].Name;
                     }
                 }
 

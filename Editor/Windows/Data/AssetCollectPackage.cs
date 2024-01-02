@@ -14,7 +14,7 @@ namespace AIO.UEditor
     /// nameof(AssetCollectPackage)
     /// </summary>
     [Serializable]
-    public class AssetCollectPackage
+    public class AssetCollectPackage : IDisposable
     {
         /// <summary>
         /// 包名
@@ -58,6 +58,12 @@ namespace AIO.UEditor
             }
 
             return dictionary.Keys.ToArray();
+        }
+
+        public void Dispose()
+        {
+            if (Groups is null) return;
+            foreach (var item in Groups) item.Dispose();
         }
     }
 }

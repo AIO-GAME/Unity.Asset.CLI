@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,12 +24,12 @@ namespace AIO.UEditor
                         {
                             Name = "Default Package",
                             Description = Data.Packages.Length.ToString(),
-                            Groups = new AssetCollectGroup[] { }
+                            Groups = Array.Empty<AssetCollectGroup>()
                         });
 
                         if (Data.Packages.Length == 1)
                         {
-                            CurrentPackageIndex = 0;
+                            Data.CurrentPackageIndex = 0;
                             ViewGroupList.IsShow = true;
                         }
 
@@ -49,8 +50,8 @@ namespace AIO.UEditor
                         if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_20))
                         {
                             Data.Packages = Data.Packages.RemoveAt(i);
-                            if (--CurrentPackageIndex < 0) CurrentPackageIndex = 0;
-                            if (CurrentPackageIndex >= Data.Packages.Length) ViewGroupList.IsShow = false;
+                            if (--Data.CurrentPackageIndex < 0) Data.CurrentPackageIndex = 0;
+                            if (Data.CurrentPackageIndex >= Data.Packages.Length) ViewGroupList.IsShow = false;
                             GUI.FocusControl(null);
                             return;
                         }
@@ -59,12 +60,12 @@ namespace AIO.UEditor
                             ? Data.Packages[i].Name
                             : string.Concat(Data.Packages[i].Name, '(', Data.Packages[i].Description, ')');
 
-                        var style = CurrentPackageIndex == i
+                        var style = Data.CurrentPackageIndex == i
                             ? GEStyle.PRInsertion
                             : GEStyle.ObjectPickerTab;
                         if (GUILayout.Button(label, style, GTOption.WidthMin(100)))
                         {
-                            CurrentPackageIndex = i;
+                            Data.CurrentPackageIndex = i;
                             ViewGroupList.IsShow = true;
                             GUI.FocusControl(null);
                         }

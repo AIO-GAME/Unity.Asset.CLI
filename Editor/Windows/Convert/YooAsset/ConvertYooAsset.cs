@@ -15,9 +15,6 @@ using YooAsset.Editor;
 
 namespace AIO.UEditor
 {
-    /// <summary>
-    /// 
-    /// </summary>
     internal static class ConvertYooAsset
     {
         public static Dictionary<AssetCollectItem, bool> Collectors;
@@ -163,7 +160,7 @@ namespace AIO.UEditor
             => groups.Where(group => !group.Collectors.Equals(null)).Select(Convert);
 
         private static IEnumerable<AssetBundleCollector> Convert(IEnumerable<AssetCollectItem> collects)
-            => collects.Where(collect => !collect.Path.Equals(null)).Select(Convert);
+            => collects.Where(collect => !string.IsNullOrEmpty(collect.CollectPath)).Select(Convert);
 
         private static AssetBundleCollectorPackage Convert(AssetCollectPackage package)
             => new AssetBundleCollectorPackage

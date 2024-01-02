@@ -5,10 +5,8 @@
 |*|============|*/
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,19 +19,7 @@ namespace AIO.UEditor
         /// </summary>
         private void OnDrawHeaderTagsMode()
         {
-            if (Data.Packages.Length == 0)
-            {
-                EditorGUILayout.Separator();
-                return;
-            }
-
-            if (Data.Packages[CurrentPackageIndex].Groups.Length == 0)
-            {
-                EditorGUILayout.Separator();
-                return;
-            }
-
-            if (Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Length == 0)
+            if (!Data.IsCollectValid())
             {
                 EditorGUILayout.Separator();
                 return;
@@ -218,61 +204,67 @@ namespace AIO.UEditor
         private void UpdateDataTagsMode()
         {
             GUI.FocusControl(null);
+            LookModeCurrentSelectAsset = null;
+
             CurrentPageValues.Clear();
             CurrentPageValues.PageIndex = 0;
             CurrentTagValues.Clear();
+            LookModeCollectorsALLSize = 0;
+            LookModeCollectorsPageSize = 0;
+
             if (Data.Packages.Length == 0) return;
             TagsModeDisplayCollectors = new string[] { "ALL" };
             TagsModeDisplayTypes = Array.Empty<string>();
             TagsModeDisplayTags = Data.GetTags();
-            var collectors = new Dictionary<string, byte>();
-            var types = new Dictionary<string, byte>();
-            var Dict = new Dictionary<string, AssetDataInfo>();
+            var collectors = new List<string>();
+            var listTypes = new List<string>();
             foreach (var package in Data.Packages)
             {
-                if (package?.Groups is null) continue;
+                if (package.Groups is null) continue;
                 foreach (var group in package.Groups)
                 {
-                    if (group?.Collectors is null) continue;
+                    if (group.Collectors is null) continue;
                     var flag = !string.IsNullOrEmpty(group.Tags);
-
+                    collectors.AddRange(GetCollectorDisPlayNames(group.Collectors));
                     foreach (var collector in group.Collectors)
                     {
                         if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (string.IsNullOrEmpty(collector.CollectPath)) continue;
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
-                        collector.CollectAsset(package.Name, group.Name);
-                        collectors[collector.CollectPath.Replace('/', '\\').Trim('\\')] = 1;
-                        foreach (var pair in collector.AssetDataInfos)
+                        collector.CollectAssetTask(package.Name, group.Name, dic =>
                         {
-                            if (Dict.ContainsKey(pair.Key)) continue;
-                            CurrentTagValues.Add(pair.Value);
-                            Dict[pair.Key] = pair.Value;
-                            types[pair.Value.Type] = 1;
-                        }
+                            foreach (var pair in dic)
+                            {
+                                listTypes.Add(pair.Value.Type);
+                                CurrentTagValues.Add(pair.Value);
+                                if (!LookModeDataFilter(pair.Value))
+                                {
+                                    CurrentPageValues.Add(pair.Value);
+                                    LookModeCollectorsALLSize += pair.Value.Size;
+                                }
+                            }
+
+                            CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
+                            TagsModeDisplayTypes = listTypes.Distinct().ToArray();
+                            Repaint();
+                        });
                     }
                 }
             }
 
-            TagsModeDisplayTypes = types.Keys.ToArray();
             if (collectors.Count > 31)
             {
                 TagsModeDisplayCollectors = new string[collectors.Count + 1];
                 TagsModeDisplayCollectors[0] = "ALL";
                 var tempIndex = 1;
-                foreach (var key in collectors.Keys)
+                foreach (var key in collectors)
                 {
-                    TagsModeDisplayCollectors[tempIndex++] = key.Replace('\\', '/');
+                    TagsModeDisplayCollectors[tempIndex++] = key;
                 }
             }
-            else TagsModeDisplayCollectors = collectors.Keys.ToArray();
+            else TagsModeDisplayCollectors = collectors.ToArray();
 
             if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
-            CurrentPageValues.Clear();
-            CurrentPageValues.Add(CurrentTagValues.Where(data => !LookModeDataFilter(data)));
-            CurrentPageValues.PageIndex = 0;
-            LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
-            LookModeCollectorsPageSize = 0;
-            LookModeDataPageValueSort(ESort.LastWrite, true);
         }
     }
 }

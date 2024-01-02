@@ -22,43 +22,39 @@ namespace AIO.UEditor
                 ViewPackageList.IsShow = true;
             }
 
-            if (Data.Packages.Length <= CurrentPackageIndex || CurrentPackageIndex < 0 ||
-                Data.Packages[CurrentPackageIndex] is null)
-            {
-                GUI.FocusControl(null);
-                ViewGroupList.IsShow = false;
-            }
-            else if (!ViewGroupList.IsShow &&
-                     GUILayout.Button("⇘ Group", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
-            {
-                GUI.FocusControl(null);
-                ViewGroupList.IsShow = true;
-            }
-
             TempBuilder.Clear();
-            if (CurrentPackageIndex >= 0 && Data.Packages.Length > CurrentPackageIndex)
+            if (Data.IsPackageValid())
             {
-                TempBuilder.Append(Data.Packages[CurrentPackageIndex].Name);
-                if (!string.IsNullOrEmpty(Data.Packages[CurrentPackageIndex].Description))
+                if (!ViewGroupList.IsShow &&
+                    GUILayout.Button("⇘ Group", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
                 {
-                    TempBuilder.Append('(');
-                    TempBuilder.Append(Data.Packages[CurrentPackageIndex].Description);
-                    TempBuilder.Append(')');
+                    GUI.FocusControl(null);
+                    ViewGroupList.IsShow = true;
                 }
 
-                if (CurrentGroupIndex >= 0 && Data.Packages.Length > CurrentPackageIndex &&
-                    Data.Packages[CurrentPackageIndex].Groups.Length > CurrentGroupIndex)
+                TempBuilder.Append(Data.CurrentPackage.Name);
+                if (!string.IsNullOrEmpty(Data.CurrentPackage.Description))
                 {
-                    TempBuilder.Append(" / ");
-                    TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Name);
-                    if (!string.IsNullOrEmpty(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                            .Description))
-                    {
-                        TempBuilder.Append('(');
-                        TempBuilder.Append(Data.Packages[CurrentPackageIndex].Groups[CurrentGroupIndex]
-                            .Description);
-                        TempBuilder.Append(')');
-                    }
+                    TempBuilder.Append('(');
+                    TempBuilder.Append(Data.CurrentPackage.Description);
+                    TempBuilder.Append(')');
+                }
+            }
+            else
+            {
+                ViewGroupList.IsShow = false;
+            }
+
+
+            if (Data.IsGroupValid())
+            {
+                TempBuilder.Append(" / ");
+                TempBuilder.Append(Data.CurrentGroup.Name);
+                if (!string.IsNullOrEmpty(Data.CurrentGroup.Description))
+                {
+                    TempBuilder.Append('(');
+                    TempBuilder.Append(Data.CurrentGroup.Description);
+                    TempBuilder.Append(')');
                 }
             }
 
