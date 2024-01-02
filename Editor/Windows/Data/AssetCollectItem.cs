@@ -56,22 +56,27 @@ namespace AIO.UEditor
         /// <summary>
         /// 收集器路径
         /// </summary>
-        public Object Path
+        public Object PathP
         {
-            get => _Path;
+            get => Path;
             set
             {
-                _Path = value;
+                Path = value;
                 UpdateData();
             }
         }
+
+        /// <summary>
+        /// 收集器路径
+        /// </summary>
+        public Object Path;
 
         /// <summary>
         /// 加载类型
         /// </summary>
         public AssetLoadType LoadType = AssetLoadType.Always;
 
-        [NonSerialized] private Object _Path;
+        [NonSerialized] private Object _pathP;
 
         /// <summary>
         /// 自定义数据
@@ -144,7 +149,7 @@ namespace AIO.UEditor
             if (x.GetType() != y.GetType()) return false;
             return x.Type == y.Type &&
                    x.Tags == y.Tags &&
-                   Equals(x.Path, y.Path) &&
+                   Equals(x.PathP, y.PathP) &&
                    x.UserData == y.UserData &&
                    x.FileName == y.FileName &&
                    x.Address == y.Address &&
@@ -159,7 +164,7 @@ namespace AIO.UEditor
             {
                 var hashCode = (int)obj.Type;
                 hashCode = (hashCode * 397) ^ (obj.Tags != null ? obj.Tags.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (obj.Path != null ? obj.Path.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (obj.PathP != null ? obj.PathP.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.UserData != null ? obj.UserData.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.FileName != null ? obj.FileName.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ obj.Address.GetHashCode();
@@ -305,7 +310,7 @@ namespace AIO.UEditor
             RuleCollects.Clear();
             PackageName = package;
             GroupName = group;
-            if (Path is null || string.IsNullOrEmpty(CollectPath)) return;
+            if (PathP is null || string.IsNullOrEmpty(CollectPath)) return;
             if (Type != EAssetCollectItemType.MainAssetCollector) return;
 
             UpdateCollect();
@@ -367,7 +372,7 @@ namespace AIO.UEditor
             RuleCollects.Clear();
             PackageName = package;
             GroupName = group;
-            if (Path is null || string.IsNullOrEmpty(CollectPath)) return;
+            if (PathP is null || string.IsNullOrEmpty(CollectPath)) return;
             if (Type != EAssetCollectItemType.MainAssetCollector) return;
             var collectRoot = AssetCollectRoot.GetOrCreate(false);
             await Task.Factory.StartNew(() =>
@@ -412,11 +417,11 @@ namespace AIO.UEditor
                 }
                 else
                 {
-                    data.Extension = System.IO.Path.GetExtension(data.CollectPath).Replace(".", "");
+                    data.Extension = System.IO.Path.GetExtension(data.CollectPath).Replace(".", "").ToLower();
                     data.AssetPath = data.CollectPath.Substring(0, data.CollectPath.Length - data.Extension.Length - 1);
                     if (!IsCollectAsset(data)) return;
                     info.Address = GetAssetAddress(data);
-                    info.AssetPath = data.CollectPath;
+                    info.AssetPath = data.CollectPath.Replace("\\", "/");
                     info.Extension = data.Extension;
                     AssetDataInfos[data.CollectPath] = info;
                 }
@@ -442,7 +447,7 @@ namespace AIO.UEditor
 
         private void UpdateData()
         {
-            if (Path is null)
+            if (PathP is null)
             {
                 GUID = string.Empty;
                 CollectPath = string.Empty;
@@ -451,7 +456,7 @@ namespace AIO.UEditor
             }
             else
             {
-                CollectPath = AssetDatabase.GetAssetPath(Path);
+                CollectPath = AssetDatabase.GetAssetPath(PathP);
                 GUID = AssetDatabase.AssetPathToGUID(CollectPath);
                 FileName = System.IO.Path.GetFileName(CollectPath);
             }

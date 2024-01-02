@@ -501,7 +501,7 @@ namespace AIO.UEditor
                 foreach (var display in LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)])
                 {
                     if ((LookModeDisplayCollectorsIndex & status) == status &&
-                        display == data.CollectPath.Replace('/', '\\'))
+                        display == data.CollectPath.Replace('\\', '/').TrimEnd('/'))
                     {
                         filter++;
                         break;
@@ -733,7 +733,7 @@ namespace AIO.UEditor
                     where item.Type == EAssetCollectItemType.MainAssetCollector
                     where !string.IsNullOrEmpty(item.CollectPath)
                     select page
-                        ? string.Concat(char.ToUpper(item.CollectPath[0]), '/', item.CollectPath.Replace('/', '\\').Trim('\\'))
+                        ? string.Concat(char.ToUpper(item.CollectPath[0]), '/', item.CollectPath.Replace('/', '\\').TrimEnd('\\'))
                         : item.CollectPath)
                 .ToArray();
         }

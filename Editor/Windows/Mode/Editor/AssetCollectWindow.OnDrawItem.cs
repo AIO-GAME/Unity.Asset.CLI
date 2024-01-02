@@ -33,7 +33,7 @@ namespace AIO.UEditor
         {
             using (GELayout.VHorizontal(GEStyle.Toolbar))
             {
-                if (item.Path is null) GUI.enabled = false;
+                if (item.PathP is null) GUI.enabled = false;
                 if (GELayout.Button(item.Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
                         GEStyle.TEtoolbarbutton, GP_Width_30))
                 {
@@ -42,8 +42,8 @@ namespace AIO.UEditor
                 }
 
                 item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GTOption.Width(80));
-                if (item.Path is null) GUI.enabled = true;
-                item.Path = GELayout.Field(item.Path);
+                if (item.PathP is null) GUI.enabled = true;
+                item.PathP = GELayout.Field(item.PathP);
 
                 if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
                 {
@@ -52,7 +52,7 @@ namespace AIO.UEditor
                     return;
                 }
 
-                if (item.Path is null) GUI.enabled = false;
+                if (item.PathP is null) GUI.enabled = false;
                 if (GELayout.Button(GC_OPEN, GEStyle.TEtoolbarbutton, 24))
                 {
                     if (item.Type == EAssetCollectItemType.MainAssetCollector)
@@ -60,6 +60,8 @@ namespace AIO.UEditor
                         var status = 1;
                         foreach (var collector in Data.CurrentGroup.Collectors)
                         {
+                            if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                            if (string.IsNullOrEmpty(item.CollectPath)) continue;
                             if (collector.CollectPath != item.CollectPath)
                             {
                                 status *= 2;
@@ -82,7 +84,7 @@ namespace AIO.UEditor
                     }
                 }
 
-                if (item.Path is null) GUI.enabled = true;
+                if (item.PathP is null) GUI.enabled = true;
             }
 
             if (!item.Folded) return;
