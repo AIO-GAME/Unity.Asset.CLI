@@ -12,6 +12,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using YooAsset.Editor;
 
 namespace AIO.UEditor
 {
@@ -135,6 +136,8 @@ namespace AIO.UEditor
                             OutputRoot = BuildConfig.BuildOutputPath,
                             BuildMode = BuildConfig.BuildMode,
                         };
+                        BuildCommand.CopyBuildinFileOption = ECopyBuildinFileOption.None;
+                        BuildCommand.CopyBuildinFileTags = string.Empty;
                         YooAssetBuild.ArtBuild(BuildCommand);
                         MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
@@ -177,7 +180,8 @@ namespace AIO.UEditor
                 using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
                 {
                     EditorGUILayout.LabelField("构建包名", GP_Width_100);
-                    Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages, GEStyle.PreDropDown);
+                    Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages,
+                        GEStyle.PreDropDown);
                     if (GUI.changed)
                     {
                         if (Data.Packages.Length <= Data.CurrentPackageIndex || Data.CurrentPackageIndex < 0)
