@@ -189,15 +189,10 @@ namespace AIO.UEditor
             Data.Save();
             Config.Save();
             BuildConfig.Save();
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-        }
-
-        protected override void OnDispose()
-        {
-            Data.Save();
-            Config.Save();
-            BuildConfig.Save();
+#endif
         }
 
         public override void EventMouseDown(in Event eventData)
