@@ -135,9 +135,9 @@ namespace AIO.UEditor
                             BuildPipeline = BuildConfig.BuildPipeline,
                             OutputRoot = BuildConfig.BuildOutputPath,
                             BuildMode = BuildConfig.BuildMode,
+                            CopyBuildinFileOption = ECopyBuildinFileOption.None,
+                            CopyBuildinFileTags = string.Empty
                         };
-                        BuildCommand.CopyBuildinFileOption = ECopyBuildinFileOption.None;
-                        BuildCommand.CopyBuildinFileTags = string.Empty;
                         YooAssetBuild.ArtBuild(BuildCommand);
                         MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
@@ -149,6 +149,7 @@ namespace AIO.UEditor
 #endif
                         }
 #endif
+                        return;
                     }
                 }
 

@@ -106,8 +106,6 @@ namespace AIO.UEditor
         {
             if (Equals(null)) return;
             EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
         }
     }
 }

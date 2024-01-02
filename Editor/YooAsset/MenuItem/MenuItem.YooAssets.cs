@@ -15,7 +15,6 @@ using UnityEngine;
 namespace AIO.UEditor
 {
     public partial class MenuItem_YooAssets
-
     {
         [MenuItem("YooAsset/Create Config")]
         public static void CreateConfig()
@@ -39,8 +38,7 @@ namespace AIO.UEditor
             }
 
             var BundlesConfigDir = Path.Combine(BundlesDir, "Version");
-            if (Directory.Exists(BundlesConfigDir)) Directory.Delete(BundlesConfigDir, true);
-            Directory.CreateDirectory(BundlesConfigDir);
+            if (!Directory.Exists(BundlesConfigDir)) Directory.CreateDirectory(BundlesConfigDir);
 
             var TabelDic = new Dictionary<BuildTarget, Dictionary<string, AssetsPackageConfig>>();
             TabelDic.Add(BuildTarget.Android, new Dictionary<string, AssetsPackageConfig>());
@@ -110,7 +108,7 @@ namespace AIO.UEditor
                 if (hashtable.Value.Count <= 0) continue;
                 var filename = hashtable.Key.ToString();
                 var filePath = Path.Combine(BundlesConfigInfo.FullName, string.Concat(filename, ".json"));
-                File.WriteAllText(filePath, AHelper.Json.Serialize(hashtable.Value.Values.ToArray()));
+                AHelper.IO.WriteJsonUTF8(filePath, hashtable.Value.Values.ToArray());
             }
         }
 

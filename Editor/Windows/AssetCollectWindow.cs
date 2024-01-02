@@ -196,6 +196,8 @@ namespace AIO.UEditor
             Data.Save();
             Config.Save();
             BuildConfig.Save();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         protected override void OnDispose()

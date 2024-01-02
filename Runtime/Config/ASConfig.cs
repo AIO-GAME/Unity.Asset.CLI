@@ -243,9 +243,13 @@ namespace AIO.UEngine
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
+                var temp = assembly.GetType("AIO.UEditor.AssetCollectRoot", true)
+                    ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
+                    ?.Invoke(null, new object[] { false });
+                if (temp == null) break;
                 assembly.GetType("AIO.UEditor.ConvertYooAsset", true)
                     ?.GetMethod("Convert", BindingFlags.Static | BindingFlags.Public)
-                    ?.Invoke(null, new object[] { instance });
+                    ?.Invoke(null, new object[] { temp });
                 break;
             }
 #endif
@@ -337,8 +341,6 @@ namespace AIO.UEngine
         {
             if (Equals(null)) return;
             EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
         }
 #endif
     }
