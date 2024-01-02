@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System;
 using System.IO;
 using IAddressRule = AIO.UEditor.IAssetRuleAddress;
 
@@ -50,8 +51,15 @@ namespace AIO.UEditor
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                var obj = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(data.AssetPath);
-                return obj != null ? obj.GetInstanceID().ToString() : Path.GetFileName(data.AssetPath);
+                try
+                {
+                    var obj = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(data.AssetPath);
+                    return obj != null ? obj.GetInstanceID().ToString() : Path.GetFileName(data.AssetPath);
+                }
+                catch (Exception e)
+                {
+                    return Path.GetFileName(data.AssetPath);
+                }
             }
         }
 

@@ -26,9 +26,17 @@ namespace AIO.UEditor
 
         public void AddOrNewFTP()
         {
+            var temp = new FTPConfig
+            {
+                DirTreeFiled = new DirTreeFiled(BuildOutputPath.Replace('\\', '/'), 3)
+                {
+                    OptionShowDepth = false,
+                    OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$",
+                }
+            };
             FTPConfigs = FTPConfigs is null
-                ? new FTPConfig[] { new FTPConfig() }
-                : FTPConfigs.Add(new FTPConfig());
+                ? new FTPConfig[] { temp }
+                : FTPConfigs.Add(temp);
         }
 
         [Serializable]

@@ -11,7 +11,7 @@ using System.Linq;
 namespace AIO.UEditor
 {
     /// <summary>
-    /// nameof(AssetCollectPackage)
+    /// 资源收集包
     /// </summary>
     [Serializable]
     public class AssetCollectPackage : IDisposable

@@ -20,6 +20,89 @@ namespace AIO.UEditor
     [Serializable]
     public class AssetCollectRoot : ScriptableObject, IDisposable
     {
+        private static AssetCollectRoot _Instance;
+
+        public static void Sort()
+        {
+            for (var i = 0; i < _Instance.Packages.Length; i++)
+            {
+                if (_Instance.Packages[i] is null)
+                {
+                    _Instance.Packages[i] = new AssetCollectPackage();
+                    _Instance.Packages[i].Groups = Array.Empty<AssetCollectGroup>();
+                    continue;
+                }
+
+                if (_Instance.Packages[i].Groups is null)
+                {
+                    _Instance.Packages[i].Groups = Array.Empty<AssetCollectGroup>();
+                    continue;
+                }
+
+                for (var j = 0; j < _Instance.Packages[i].Groups.Length; j++)
+                {
+                    _Instance.Packages[i].Groups = _Instance.Packages[i].Groups
+                        .OrderByDescending(group => group.Name)
+                        .ToArray();
+                    if (_Instance.Packages[i].Groups[j].Collectors is null ||
+                        _Instance.Packages[i].Groups[j].Collectors.Length == 0)
+                        continue;
+
+                    for (var k = 0; k < _Instance.Packages[i].Groups[j].Collectors.Length; k++)
+                    {
+                        var collect = _Instance.Packages[i].Groups[j].Collectors[k];
+                        if (string.IsNullOrEmpty(collect.CollectPath)) continue;
+                        collect.PathP = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
+                    }
+
+                    _Instance.Packages[i].Groups[j].Collectors = _Instance.Packages[i].Groups[j].Collectors
+                        .OrderByDescending(collect => collect.CollectPath)
+                        .ToArray();
+                }
+            }
+
+            _Instance.Packages = _Instance.Packages.OrderByDescending(package => package.Name).ToArray();
+        }
+
+        /// <summary>
+        /// 获取资源收集配置
+        /// </summary>
+        public static AssetCollectRoot GetOrCreate(bool isSort = true)
+        {
+            if (_Instance is null)
+            {
+                var objects = EHelper.IO.GetScriptableObjects<AssetCollectRoot>();
+                if (objects != null && objects.Length > 0)
+                {
+                    foreach (var asset in objects)
+                    {
+                        if (asset is null) continue;
+                        if (asset.Packages is null)
+                        {
+                            asset.Packages = Array.Empty<AssetCollectPackage>();
+                            _Instance = asset;
+                            return _Instance;
+                        }
+
+                        _Instance = asset;
+                        break;
+                    }
+                }
+
+                if (_Instance is null)
+                {
+                    _Instance = CreateInstance<AssetCollectRoot>();
+                    _Instance.Packages = new AssetCollectPackage[] { };
+                    AssetDatabase.CreateAsset(_Instance, "Assets/Editor/AssetCollectRoot.asset");
+                    AssetDatabase.SaveAssets();
+                    return _Instance;
+                }
+            }
+
+            if (isSort) Sort();
+            return _Instance;
+        }
+
         [Description("开启地址化")] public bool EnableAddressable = true;
 
         [Description("Bundle名称唯一")] public bool UniqueBundleName = true;
@@ -30,6 +113,40 @@ namespace AIO.UEditor
         /// 资源收集配置
         /// </summary>
         [SerializeField] public AssetCollectPackage[] Packages;
+
+        public AssetCollectPackage this[int index]
+        {
+            get => Packages[index];
+            set => Packages[index] = value;
+        }
+
+        public AssetCollectPackage GetPackage(string packageName)
+        {
+            return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
+        }
+
+        public void Save()
+        {
+            Dispose();
+            if (Equals(null)) return;
+            EditorUtility.SetDirty(this);
+        }
+
+        private void OnDisable()
+        {
+            Save();
+        }
+
+        public void Dispose()
+        {
+            if (Packages is null) return;
+            foreach (var package in Packages) package.Dispose();
+        }
+
+        public sealed override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
 
         #region OnGUI
 
@@ -148,105 +265,6 @@ namespace AIO.UEditor
 
         #endregion
 
-        public sealed override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
-        public AssetCollectPackage this[int index]
-        {
-            get => Packages[index];
-            set => Packages[index] = value;
-        }
-
-        public AssetCollectPackage GetPackage(string packageName)
-        {
-            return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
-        }
-
-        private static AssetCollectRoot _Instance;
-
-        public static void Sort()
-        {
-            for (var i = 0; i < _Instance.Packages.Length; i++)
-            {
-                if (_Instance.Packages[i] is null)
-                {
-                    _Instance.Packages[i] = new AssetCollectPackage();
-                    _Instance.Packages[i].Groups = Array.Empty<AssetCollectGroup>();
-                    continue;
-                }
-
-                if (_Instance.Packages[i].Groups is null)
-                {
-                    _Instance.Packages[i].Groups = Array.Empty<AssetCollectGroup>();
-                    continue;
-                }
-
-                for (var j = 0; j < _Instance.Packages[i].Groups.Length; j++)
-                {
-                    _Instance.Packages[i].Groups = _Instance.Packages[i].Groups
-                        .OrderByDescending(group => group.Name)
-                        .ToArray();
-                    if (_Instance.Packages[i].Groups[j].Collectors is null ||
-                        _Instance.Packages[i].Groups[j].Collectors.Length == 0)
-                        continue;
-
-                    for (var k = 0; k < _Instance.Packages[i].Groups[j].Collectors.Length; k++)
-                    {
-                        var collect = _Instance.Packages[i].Groups[j].Collectors[k];
-                        if (string.IsNullOrEmpty(collect.CollectPath)) continue;
-                        collect.PathP = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
-                    }
-
-                    _Instance.Packages[i].Groups[j].Collectors = _Instance.Packages[i].Groups[j].Collectors
-                        .OrderByDescending(collect => collect.CollectPath)
-                        .ToArray();
-                }
-            }
-
-            _Instance.Packages = _Instance.Packages.OrderByDescending(package => package.Name).ToArray();
-        }
-
-        /// <summary>
-        /// 获取资源收集配置
-        /// </summary>
-        public static AssetCollectRoot GetOrCreate(bool isSort = true)
-        {
-            if (_Instance is null)
-            {
-                var objects = EHelper.IO.GetScriptableObjects<AssetCollectRoot>();
-                if (objects != null && objects.Length > 0)
-                {
-                    foreach (var asset in objects)
-                    {
-                        if (asset is null) continue;
-                        if (asset.Packages is null)
-                        {
-                            asset.Packages = Array.Empty<AssetCollectPackage>();
-                            _Instance = asset;
-                            return _Instance;
-                        }
-
-                        _Instance = asset;
-                        break;
-                    }
-                }
-
-                if (_Instance is null)
-                {
-                    _Instance = CreateInstance<AssetCollectRoot>();
-                    _Instance.Packages = new AssetCollectPackage[] { };
-                    AssetDatabase.CreateAsset(_Instance, "Assets/Editor/AssetCollectRoot.asset");
-                    AssetDatabase.SaveAssets();
-                    return _Instance;
-                }
-            }
-
-            if (isSort) Sort();
-            return _Instance;
-        }
-
         #region GetTags
 
         public string[] GetTags()
@@ -341,22 +359,5 @@ namespace AIO.UEditor
         }
 
         #endregion
-
-        public void Save()
-        {
-            Dispose();
-            if (!Equals(null)) EditorUtility.SetDirty(this);
-        }
-
-        private void OnDisable()
-        {
-            Save();
-        }
-
-        public void Dispose()
-        {
-            if (Packages is null) return;
-            foreach (var package in Packages) package.Dispose();
-        }
     }
 }

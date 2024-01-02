@@ -12,6 +12,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using YooAsset.Editor;
 
 namespace AIO.UEditor
 {
@@ -134,6 +135,8 @@ namespace AIO.UEditor
                             BuildPipeline = BuildConfig.BuildPipeline,
                             OutputRoot = BuildConfig.BuildOutputPath,
                             BuildMode = BuildConfig.BuildMode,
+                            CopyBuildinFileOption = ECopyBuildinFileOption.None,
+                            CopyBuildinFileTags = string.Empty
                         };
                         YooAssetBuild.ArtBuild(BuildCommand);
                         MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
@@ -146,6 +149,7 @@ namespace AIO.UEditor
 #endif
                         }
 #endif
+                        return;
                     }
                 }
 
@@ -177,7 +181,8 @@ namespace AIO.UEditor
                 using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
                 {
                     EditorGUILayout.LabelField("构建包名", GP_Width_100);
-                    Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages, GEStyle.PreDropDown);
+                    Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages,
+                        GEStyle.PreDropDown);
                     if (GUI.changed)
                     {
                         if (Data.Packages.Length <= Data.CurrentPackageIndex || Data.CurrentPackageIndex < 0)
@@ -532,7 +537,6 @@ namespace AIO.UEditor
             if (config.isUploading) GUI.enabled = true;
         }
 
-
         private void OnDrawBuildFTP(ASBuildConfig.FTPConfig config)
         {
             if (!config.Folded) return;
@@ -632,9 +636,9 @@ namespace AIO.UEditor
                 "Google Cloud",
                 FoldoutUploadGCloud,
                 () => { BuildConfig.AddOrNewGCloud(); }, 0, null, new GUIContent("✚"));
-
-            FoldoutNoticeDingDing = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildNoticeDingDing,
-                "钉钉通知", FoldoutNoticeDingDing);
+            //
+            // FoldoutNoticeDingDing = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildNoticeDingDing,
+            //     "钉钉通知", FoldoutNoticeDingDing);
         }
     }
 }

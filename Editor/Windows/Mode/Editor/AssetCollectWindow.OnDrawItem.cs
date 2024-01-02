@@ -41,18 +41,18 @@ namespace AIO.UEditor
                     GUI.FocusControl(null);
                 }
 
-                item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GTOption.Width(80));
-                if (item.PathP is null) GUI.enabled = true;
-                item.PathP = GELayout.Field(item.PathP);
+                item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GP_Width_80);
 
-                if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
+                if (item.PathP is null) GUI.enabled = true;
+                item.PathP = GELayout.Field(item.PathP, GTOption.WidthMin(160));
+                if (item.PathP is null) GUI.enabled = false;
+
+                if (!item.Folded)
                 {
-                    Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Remove(item);
-                    GUI.FocusControl(null);
-                    return;
+                    item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays,
+                        GEStyle.PreDropDown);
                 }
 
-                if (item.PathP is null) GUI.enabled = false;
                 if (GELayout.Button(GC_OPEN, GEStyle.TEtoolbarbutton, 24))
                 {
                     if (item.Type == EAssetCollectItemType.MainAssetCollector)
@@ -85,6 +85,16 @@ namespace AIO.UEditor
                 }
 
                 if (item.PathP is null) GUI.enabled = true;
+                if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, 24))
+                {
+                    GUI.FocusControl(null);
+                    if (EditorUtility.DisplayDialog("删除", "确定删除当前收集器?", "确定", "取消"))
+                    {
+                        Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Remove(item);
+                    }
+
+                    return;
+                }
             }
 
             if (!item.Folded) return;
@@ -97,7 +107,7 @@ namespace AIO.UEditor
                     if (Config.LoadPathToLower)
                     {
                         GUI.enabled = false;
-                        GELayout.Popup(AssetLocationFormat.ToLower, GEStyle.PreDropDown, GP_Width_80);
+                        GELayout.Popup(EAssetLocationFormat.ToLower, GEStyle.PreDropDown, GP_Width_80);
                         GUI.enabled = true;
                     }
                     else

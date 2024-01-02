@@ -4,8 +4,6 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System.Collections.Generic;
-using System.Linq;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -44,11 +42,6 @@ namespace AIO.UEditor
             Data = AssetCollectRoot.GetOrCreate();
             Config = ASConfig.GetOrCreate();
             BuildConfig = ASBuildConfig.GetOrCreate();
-
-            if (_packages is null)
-                _packages = Config.Packages is null
-                    ? new List<AssetsPackageConfig>()
-                    : Config.Packages.ToList();
 
             GCInit();
 
@@ -196,6 +189,8 @@ namespace AIO.UEditor
             Data.Save();
             Config.Save();
             BuildConfig.Save();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         protected override void OnDispose()

@@ -1,6 +1,7 @@
 ﻿#if SUPPORT_YOOASSET
 
 using System;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -102,7 +103,20 @@ namespace AIO.UEditor
                     buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
                     break;
                 case EBuildMode.IncrementalBuild:
-                    buildMode = YooAsset.Editor.EBuildMode.IncrementalBuild;
+                    var target = Path.Combine(
+                        command.OutputRoot,
+                        command.ActiveTarget.ToString(),
+                        command.BuildPackage);
+                    if (Directory.Exists(target))
+                    {
+                        buildMode = Directory.GetDirectories(target)
+                            .Where(directory => directory != "Simulate")
+                            .Any(directory => directory != "OutputCache")
+                            ? YooAsset.Editor.EBuildMode.IncrementalBuild
+                            : YooAsset.Editor.EBuildMode.ForceRebuild;
+                    }
+                    else buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
+
                     break;
                 case EBuildMode.DryRunBuild:
                     buildMode = YooAsset.Editor.EBuildMode.DryRunBuild;

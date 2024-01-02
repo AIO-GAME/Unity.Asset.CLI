@@ -497,52 +497,64 @@ namespace AIO.UEditor
             if (LookModeDisplayCollectorsIndex < 1) filter++;
             else
             {
-                var status = 1L;
-                foreach (var display in LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)])
+                if (LookModeDisplayCollectors.TryGetValue(
+                        (Data.CurrentPackageIndex, Data.CurrentGroupIndex), out var displays))
                 {
-                    if ((LookModeDisplayCollectorsIndex & status) == status &&
-                        display == data.CollectPath.Replace('\\', '/').TrimEnd('/'))
+                    var status = 1L;
+                    foreach (var display in displays)
                     {
-                        filter++;
-                        break;
-                    }
+                        if ((LookModeDisplayCollectorsIndex & status) == status &&
+                            display == data.CollectPath.Replace('/', '\\').TrimEnd('\\'))
+                        {
+                            filter++;
+                            break;
+                        }
 
-                    status *= 2;
+                        status *= 2;
+                    }
                 }
             }
 
             if (LookModeDisplayTypeIndex < 1) filter++;
             else
             {
-                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath)?.FullName;
-                if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
-                var status = 1L;
-                foreach (var display in LookModeDisplayTypes[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)])
+                if (LookModeDisplayTypes.TryGetValue(
+                        (Data.CurrentPackageIndex, Data.CurrentGroupIndex), out var displays))
                 {
-                    if ((LookModeDisplayTypeIndex & status) == status && objectType == display)
+                    var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath)?.FullName;
+                    if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
+                    var status = 1L;
+                    foreach (var display in displays)
                     {
-                        filter++;
-                        break;
-                    }
+                        if ((LookModeDisplayTypeIndex & status) == status && objectType == display)
+                        {
+                            filter++;
+                            break;
+                        }
 
-                    status *= 2;
+                        status *= 2;
+                    }
                 }
             }
 
             if (LookModeDisplayTagsIndex < 1) filter++;
             else
             {
-                var status = 1L;
-                foreach (var display in LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)])
+                if (LookModeDisplayTags.TryGetValue(
+                        (Data.CurrentPackageIndex, Data.CurrentGroupIndex), out var displays))
                 {
-                    if ((LookModeDisplayTagsIndex & status) == status &&
-                        data.Tags.Split(';').Contains(display))
+                    var status = 1L;
+                    foreach (var display in displays)
                     {
-                        filter++;
-                        break;
-                    }
+                        if ((LookModeDisplayTagsIndex & status) == status &&
+                            data.Tags.Split(';').Contains(display))
+                        {
+                            filter++;
+                            break;
+                        }
 
-                    status *= 2;
+                        status *= 2;
+                    }
                 }
             }
 
@@ -655,12 +667,18 @@ namespace AIO.UEditor
                 {
                     GUI.FocusControl(null);
                     onDrawLookDataItemMenu = new GenericMenu();
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Select Asset"), false, () => { Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(data.AssetPath); });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Address"), false, () => { GUIUtility.systemCopyBuffer = data.Address; });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy AssetPath"), false, () => { GUIUtility.systemCopyBuffer = data.AssetPath; });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy GUID"), false, () => { GUIUtility.systemCopyBuffer = data.GUID; });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Type"), false, () => { GUIUtility.systemCopyBuffer = data.Type; });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Tags"), false, () => { GUIUtility.systemCopyBuffer = data.Tags; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Select Asset"), false,
+                        () => { Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(data.AssetPath); });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Address"), false,
+                        () => { GUIUtility.systemCopyBuffer = data.Address; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy AssetPath"), false,
+                        () => { GUIUtility.systemCopyBuffer = data.AssetPath; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy GUID"), false,
+                        () => { GUIUtility.systemCopyBuffer = data.GUID; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Type"), false,
+                        () => { GUIUtility.systemCopyBuffer = data.Type; });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Tags"), false,
+                        () => { GUIUtility.systemCopyBuffer = data.Tags; });
                     onDrawLookDataItemMenu.ShowAsContext();
                 }
                 else UpdateCurrentSelectAsset(index);
@@ -733,8 +751,9 @@ namespace AIO.UEditor
                     where item.Type == EAssetCollectItemType.MainAssetCollector
                     where !string.IsNullOrEmpty(item.CollectPath)
                     select page
-                        ? string.Concat(char.ToUpper(item.CollectPath[0]), '/', item.CollectPath.Replace('/', '\\').TrimEnd('\\'))
-                        : item.CollectPath)
+                        ? string.Concat(char.ToUpper(item.CollectPath[0]), '/',
+                            item.CollectPath.Replace('/', '\\').TrimEnd('\\'))
+                        : item.CollectPath.Replace('/', '\\').TrimEnd('\\'))
                 .ToArray();
         }
 
