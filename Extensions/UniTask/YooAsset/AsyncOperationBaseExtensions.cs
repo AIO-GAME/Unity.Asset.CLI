@@ -35,7 +35,8 @@ namespace Cysharp.Threading.Tasks
             );
         }
 
-        sealed class AsyncOperationBaserConfiguredSource : IUniTaskSource,
+        sealed class AsyncOperationBaserConfiguredSource : 
+            IUniTaskSource,
             IPlayerLoopItem,
             ITaskPoolNode<AsyncOperationBaserConfiguredSource>
         {
