@@ -16,7 +16,7 @@ namespace AIO.UEditor
             var Packages = new DirectoryInfo(EHelper.Path.Packages);
             try
             {
-                EditorUtility.DisplayProgressBar("插件", "正在安装插件", 0);
+                EditorUtility.DisplayProgressBar("插件", "正在安装插件 YooAsset 1.5.7", 0);
                 var result = await PrGit.Clone.Tag(
                     Path.Combine(Packages.FullName),
                     "https://github.com/tuyoogame/YooAsset.git", "1.5.7");
