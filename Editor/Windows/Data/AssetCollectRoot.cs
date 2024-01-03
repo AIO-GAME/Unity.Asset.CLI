@@ -48,13 +48,6 @@ namespace AIO.UEditor
                         _Instance.Packages[i].Groups[j].Collectors.Length == 0)
                         continue;
 
-                    for (var k = 0; k < _Instance.Packages[i].Groups[j].Collectors.Length; k++)
-                    {
-                        var collect = _Instance.Packages[i].Groups[j].Collectors[k];
-                        if (string.IsNullOrEmpty(collect.CollectPath)) continue;
-                        collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
-                    }
-
                     _Instance.Packages[i].Groups[j].Collectors = _Instance.Packages[i].Groups[j].Collectors
                         .OrderByDescending(collect => collect.CollectPath)
                         .ToArray();
@@ -100,6 +93,7 @@ namespace AIO.UEditor
             }
 
             if (isSort) Sort();
+
             return _Instance;
         }
 

@@ -29,8 +29,6 @@ namespace AIO.UEditor
 
         protected override void OnAwake()
         {
-            Data = AssetCollectRoot.GetOrCreate();
-            Selection.activeObject = Data;
         }
 
         partial void GCInit();
@@ -40,6 +38,25 @@ namespace AIO.UEditor
             AssetCollectSetting.Initialize();
 
             Data = AssetCollectRoot.GetOrCreate();
+            Selection.activeObject = Data;
+            foreach (var package in Data.Packages)
+            {
+                if (package?.Groups is null) continue;
+
+                foreach (var group in package.Groups)
+                {
+                    if (group?.Collectors is null ||
+                        group.Collectors.Length == 0)
+                        continue;
+
+                    foreach (var collect in group.Collectors)
+                    {
+                        if (string.IsNullOrEmpty(collect.CollectPath)) continue;
+                        collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
+                    }
+                }
+            }
+
             Config = ASConfig.GetOrCreate();
             BuildConfig = ASBuildConfig.GetOrCreate();
 
@@ -75,7 +92,7 @@ namespace AIO.UEditor
                         break;
                 }
 
-                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
+                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_120, GP_Height_20);
 
                 if (!GUI.changed) return;
                 if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
@@ -262,6 +279,7 @@ namespace AIO.UEditor
                         case KeyCode.LeftArrow: // 数字键盘 右键
                             if (CurrentPageValues.PageIndex > 0)
                             {
+                                GUI.FocusControl(null);
                                 CurrentSelectAssetIndex = 0;
                                 CurrentPageValues.PageIndex -= 1;
                                 eventData.Use();
@@ -272,6 +290,7 @@ namespace AIO.UEditor
                         case KeyCode.RightArrow: // 数字键盘 左键 
                             if (CurrentPageValues.PageIndex < CurrentPageValues.PageCount - 1)
                             {
+                                GUI.FocusControl(null);
                                 CurrentSelectAssetIndex = 0;
                                 CurrentPageValues.PageIndex += 1;
                                 eventData.Use();
@@ -282,6 +301,7 @@ namespace AIO.UEditor
                         case KeyCode.UpArrow: // 数字键盘 上键
                             if (CurrentSelectAssetIndex >= 0)
                             {
+                                GUI.FocusControl(null);
                                 CurrentSelectAssetIndex -= 1;
                                 if (CurrentSelectAssetIndex < 0)
                                 {
@@ -302,6 +322,7 @@ namespace AIO.UEditor
                             if (CurrentPageValues.CurrentPageValues is null) break;
                             if (CurrentSelectAssetIndex < CurrentPageValues.CurrentPageValues.Length)
                             {
+                                GUI.FocusControl(null);
                                 CurrentSelectAssetIndex += 1;
                                 if (CurrentSelectAssetIndex >= CurrentPageValues.CurrentPageValues.Length)
                                     CurrentSelectAssetIndex = 0;
@@ -317,6 +338,7 @@ namespace AIO.UEditor
                 case Mode.Config:
                     if (eventData.control && keyCode == KeyCode.S)
                     {
+                        GUI.FocusControl(null);
                         Config.Save();
                         eventData.Use();
 #if UNITY_2021_1_OR_NEWER
@@ -330,6 +352,7 @@ namespace AIO.UEditor
                 case Mode.Editor:
                     if (eventData.control && keyCode == KeyCode.S)
                     {
+                        GUI.FocusControl(null);
                         Data.Save();
                         eventData.Use();
 #if UNITY_2021_1_OR_NEWER
@@ -343,6 +366,7 @@ namespace AIO.UEditor
                 case Mode.Build:
                     if (eventData.control && keyCode == KeyCode.S)
                     {
+                        GUI.FocusControl(null);
                         BuildConfig.Save();
                         eventData.Use();
 #if UNITY_2021_1_OR_NEWER
@@ -353,6 +377,55 @@ namespace AIO.UEditor
                     }
 
                     break;
+            }
+
+            if (eventData.control)
+            {
+                switch (keyCode)
+                {
+                    case KeyCode.Keypad1:
+                    case KeyCode.Alpha1:
+                        GUI.FocusControl(null);
+                        WindowMode = Mode.Editor;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.Keypad2:
+                    case KeyCode.Alpha2:
+                        GUI.FocusControl(null);
+                        WindowMode = Mode.Config;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.Keypad3:
+                    case KeyCode.Alpha3:
+                        GUI.FocusControl(null);
+                        WindowMode = Mode.Look;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.Keypad4:
+                    case KeyCode.Alpha4:
+                        GUI.FocusControl(null);
+                        WindowMode = Mode.LookTags;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.Keypad5:
+                    case KeyCode.Alpha5:
+                        GUI.FocusControl(null);
+                        WindowMode = Mode.LookFirstPackage;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.Keypad6:
+                    case KeyCode.Alpha6:
+                        GUI.FocusControl(null);
+                        WindowMode = Mode.Build;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                }
             }
         }
 

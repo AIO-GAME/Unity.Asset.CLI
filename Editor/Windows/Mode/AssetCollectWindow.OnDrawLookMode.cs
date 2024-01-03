@@ -22,7 +22,9 @@ namespace AIO.UEditor
         /// </summary>
         private void OnDrawHeaderLookMode()
         {
-            if (Data.Packages.Length == 0)
+            if (Data.Packages.Length == 0 ||
+                LookModeDisplayPackages is null ||
+                LookModeDisplayPackages.Length == 0)
             {
                 EditorGUILayout.Separator();
                 return;
@@ -43,7 +45,7 @@ namespace AIO.UEditor
             {
                 if (!LookModeDisplayGroups.ContainsKey(packageName))
                 {
-                    GetGroupDisPlayNames(Data.CurrentPackage.Groups);
+                    LookModeDisplayGroups[packageName] = GetGroupDisPlayNames(Data.CurrentPackage.Groups);
                 }
             }
 
@@ -502,17 +504,17 @@ namespace AIO.UEditor
             var filter = 0;
             if (IsFilterCollectors(
                     LookModeDisplayCollectorsIndex, data.CollectPath,
-                    LookModeDisplayCollectors.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
+                    LookModeDisplayCollectors?.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
                         Array.Empty<string>()))
                ) filter++;
 
             if (IsFilterTypes(LookModeDisplayTypeIndex, data.AssetPath,
-                    LookModeDisplayTypes.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
+                    LookModeDisplayTypes?.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
                         Array.Empty<string>()))
                ) filter++;
 
             if (IsFilterTags(LookModeDisplayTagsIndex, data.Tags.Split(';', ',', ' '),
-                    LookModeDisplayTags.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
+                    LookModeDisplayTags?.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
                         Array.Empty<string>()))
                ) filter++;
 

@@ -73,13 +73,13 @@
 ## ⭐ About
 
 - **这是 Unity 的资源加载接口(CLI)包。它提供了一组命令和工具来增强效率和开发体验。**
-- [✅] **支持 Unity 2019.1 及以上版本**
-- [✅] **支持 资源 同步加载/异步加载/协程加载 接口**
-- [✅] **支持 资源 本地加载/远程加载 接口**
-- [✅] **支持 Android/iOS/Windows/Mac/WebGL**
-- [✅] **支持 YooAsset**
-- [✅] **支持 UniTask**
-- [✅] **支持 .NET 4.0 or later**
+- ✅ **支持 Unity 2019.1 及以上版本**
+- ✅ **支持 资源 同步加载/异步加载/协程加载 接口**
+- ✅ **支持 资源 本地加载/远程加载 接口**
+- ✅ **支持 Android/iOS/Windows/Mac/WebGL**
+- ✅ **支持 YooAsset**
+- ✅ **支持 UniTask**
+- ✅ **支持 .NET 4.0 or later**
 
 ## 📖 Documentation
 
@@ -95,7 +95,6 @@
 | :----: | :-----: |
 | **[UniTask](https://github.com/Cysharp/UniTask#readme)** | _**为 Unity 提供了一个有效的分配自由的 async / await 集成。**_                         |
 | **[YooAsset](https://www.yooasset.com)**| _**YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。**_ |
-
 
 ## 📢 Thanks
 
