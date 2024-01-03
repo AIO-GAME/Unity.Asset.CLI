@@ -48,15 +48,12 @@ namespace AIO.UEditor
             return _builder.ToString().Replace('\\', '/');
         }
 
-
         private void OnDrawBuildFTP()
         {
             if (BuildConfig.FTPConfigs is null || BuildConfig.FTPConfigs.Length == 0) return;
             using (var scope = new EditorGUILayout.ScrollViewScope(OnDrawConfigFTPScroll))
             {
                 OnDrawConfigFTPScroll = scope.scrollPosition;
-
-
                 for (var i = BuildConfig.FTPConfigs.Length - 1; i >= 0; i--)
                 {
                     using (GELayout.Vertical(GEStyle.INThumbnailShadow))

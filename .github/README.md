@@ -73,20 +73,20 @@
 ## ⭐ About
 
 - **这是 Unity 的资源加载接口(CLI)包。它提供了一组命令和工具来增强效率和开发体验。**
-- [x] **支持 Unity 2019.1 及以上版本**
-- [x] **支持 资源 同步加载/异步加载/协程加载 接口**
-- [x] **支持 资源 本地加载/远程加载 接口**
-- [x] **支持 Android/iOS/Windows/Mac/WebGL**
-- [x] **支持 YooAsset**
-- [x] **支持 UniTask**
-- [x] **支持 .NET 4.0 or later**
+- [✅] **支持 Unity 2019.1 及以上版本**
+- [✅] **支持 资源 同步加载/异步加载/协程加载 接口**
+- [✅] **支持 资源 本地加载/远程加载 接口**
+- [✅] **支持 Android/iOS/Windows/Mac/WebGL**
+- [✅] **支持 YooAsset**
+- [✅] **支持 UniTask**
+- [✅] **支持 .NET 4.0 or later**
 
 ## 📖 Documentation
 
-- _**[文档目录](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)**_
-- _**[API](./API_USAGE/AssetSystem.md)**_
-- _**[配置讲解](./API_USAGE/Config.md)**_
-- _**[工具使用](./API_USAGE/ToolWindow.md)**_
+- [_**文档目录**_](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)
+- [_**API**_](./API_USAGE/AssetSystem.md)
+- [_**配置讲解**_](./API_USAGE/Config.md)
+- [_**工具使用**_](./API_USAGE/ToolWindow.md)
 
 ## 🔗 Third-Party References & Tools
 

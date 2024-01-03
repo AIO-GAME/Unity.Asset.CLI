@@ -102,45 +102,6 @@ namespace AIO.UEditor
             }, GEStyle.TEtoolbarbutton, GP_Width_25);
         }
 
-        private bool FirstPackageModeDataFilter(AssetDataInfo data)
-        {
-            var filter = 0;
-            if (LookModeDisplayTypeIndex < 1) filter++;
-            else
-            {
-                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath)?.FullName;
-                if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
-                var status = 1L;
-                foreach (var display in TagsModeDisplayTypes)
-                {
-                    if ((LookModeDisplayTypeIndex & status) == status && objectType == display)
-                    {
-                        filter++;
-                        break;
-                    }
-
-                    status *= 2;
-                }
-            }
-
-            if (string.IsNullOrEmpty(SearchText)) filter++;
-            else
-            {
-                if (data.AssetPath.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase) ||
-                    data.Address.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    filter++;
-                }
-                else if (SearchText.Contains(data.AssetPath, StringComparison.CurrentCultureIgnoreCase) ||
-                         SearchText.Contains(data.Address, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    filter++;
-                }
-            }
-
-            return filter != 2;
-        }
-
         private async void SyncSequenceRecords()
         {
             SearchText = string.Empty;
@@ -230,6 +191,18 @@ namespace AIO.UEditor
                     ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
                 }
             }
+        }
+
+        private bool FirstPackageModeDataFilter(AssetDataInfo data)
+        {
+            var filter = 0;
+            if (IsFilterTypes(LookModeDisplayTypeIndex, data.AssetPath, TagsModeDisplayTypes))
+                filter++;
+
+            if (IsFilterSearch(SearchText, data))
+                filter++;
+
+            return filter != 2;
         }
     }
 }

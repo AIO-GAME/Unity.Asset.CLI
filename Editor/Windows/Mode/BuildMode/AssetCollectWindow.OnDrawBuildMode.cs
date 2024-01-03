@@ -146,8 +146,6 @@ namespace AIO.UEditor
                     if (GUILayout.Button("构建资源", GEStyle.toolbarbutton, GP_Width_75))
                     {
                         SaveScene();
-
-
 #if SUPPORT_YOOASSET
                         ConvertYooAsset.Convert(Data);
                         var BuildCommand = new YooAssetBuildCommand

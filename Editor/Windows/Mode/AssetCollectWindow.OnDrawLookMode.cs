@@ -84,10 +84,18 @@ namespace AIO.UEditor
                         LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
                         GEStyle.PreDropDown, GP_Width_100);
                 }
+                else if (LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length >= 31)
+                {
+                    LookModeDisplayCollectorsIndex = EditorGUILayout.Popup(LookModeDisplayCollectorsIndex,
+                        LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
+                        GEStyle.PreDropDown, GP_Width_100);
+                }
                 else
+                {
                     LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
                         LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
                         GEStyle.PreDropDown, GP_Width_100);
+                }
             }
             else LookModeDisplayCollectorsIndex = 0;
 
@@ -116,11 +124,12 @@ namespace AIO.UEditor
                         LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
                         GEStyle.PreDropDown, GP_Width_100);
                 }
-
                 else
+                {
                     LookModeDisplayTagsIndex = EditorGUILayout.MaskField(LookModeDisplayTagsIndex,
                         LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
                         GEStyle.PreDropDown, GP_Width_100);
+                }
             }
             else LookModeDisplayTagsIndex = 0;
 
@@ -419,7 +428,6 @@ namespace AIO.UEditor
                     }
                 }
 
-
                 if (Dependencies.Count > 0)
                 {
                     using (new EditorGUILayout.VerticalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
@@ -444,7 +452,6 @@ namespace AIO.UEditor
                                 }
                             }
                         }
-
 
                         LookModeShowAssetDetailScroll = GELayout.BeginScrollView(LookModeShowAssetDetailScroll);
                         foreach (var dependency in Dependencies)
@@ -482,7 +489,6 @@ namespace AIO.UEditor
                     }
                 }
 
-
                 EditorGUILayout.Space();
                 EditorGUILayout.Separator();
             }
@@ -494,84 +500,24 @@ namespace AIO.UEditor
         private bool LookModeDataFilter(AssetDataInfo data)
         {
             var filter = 0;
-            if (LookModeDisplayCollectorsIndex < 1) filter++;
-            else
-            {
-                if (LookModeDisplayCollectors.TryGetValue(
-                        (Data.CurrentPackageIndex, Data.CurrentGroupIndex), out var displays))
-                {
-                    var status = 1L;
-                    foreach (var display in displays)
-                    {
-                        if ((LookModeDisplayCollectorsIndex & status) == status &&
-                            display == data.CollectPath.Replace('/', '\\').TrimEnd('\\'))
-                        {
-                            filter++;
-                            break;
-                        }
+            if (IsFilterCollectors(
+                    LookModeDisplayCollectorsIndex, data.CollectPath,
+                    LookModeDisplayCollectors.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
+                        Array.Empty<string>()))
+               ) filter++;
 
-                        status *= 2;
-                    }
-                }
-            }
+            if (IsFilterTypes(LookModeDisplayTypeIndex, data.AssetPath,
+                    LookModeDisplayTypes.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
+                        Array.Empty<string>()))
+               ) filter++;
 
-            if (LookModeDisplayTypeIndex < 1) filter++;
-            else
-            {
-                if (LookModeDisplayTypes.TryGetValue(
-                        (Data.CurrentPackageIndex, Data.CurrentGroupIndex), out var displays))
-                {
-                    var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath)?.FullName;
-                    if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
-                    var status = 1L;
-                    foreach (var display in displays)
-                    {
-                        if ((LookModeDisplayTypeIndex & status) == status && objectType == display)
-                        {
-                            filter++;
-                            break;
-                        }
+            if (IsFilterTags(LookModeDisplayTagsIndex, data.Tags.Split(';', ',', ' '),
+                    LookModeDisplayTags.GetOrDefault((Data.CurrentPackageIndex, Data.CurrentGroupIndex),
+                        Array.Empty<string>()))
+               ) filter++;
 
-                        status *= 2;
-                    }
-                }
-            }
-
-            if (LookModeDisplayTagsIndex < 1) filter++;
-            else
-            {
-                if (LookModeDisplayTags.TryGetValue(
-                        (Data.CurrentPackageIndex, Data.CurrentGroupIndex), out var displays))
-                {
-                    var status = 1L;
-                    foreach (var display in displays)
-                    {
-                        if ((LookModeDisplayTagsIndex & status) == status &&
-                            data.Tags.Split(';').Contains(display))
-                        {
-                            filter++;
-                            break;
-                        }
-
-                        status *= 2;
-                    }
-                }
-            }
-
-            if (string.IsNullOrEmpty(SearchText)) filter++;
-            else
-            {
-                if (data.AssetPath.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase) ||
-                    data.Address.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    filter++;
-                }
-                else if (SearchText.Contains(data.AssetPath, StringComparison.CurrentCultureIgnoreCase) ||
-                         SearchText.Contains(data.Address, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    filter++;
-                }
-            }
+            if (IsFilterSearch(SearchText, data))
+                filter++;
 
             return filter != 4;
         }
@@ -744,8 +690,8 @@ namespace AIO.UEditor
                 LookModeDisplayTags[(i, j)] = Data.Packages[i].Groups[j].GetTags();
                 LookModeDisplayGroups[LookModeDisplayPackages[i]] = GetGroupDisPlayNames(Data.Packages[i].Groups);
                 LookModeDisplayCollectors[(i, j)] = GetCollectorDisPlayNames(Data.Packages[i].Groups[j].Collectors);
+                LookModeDisplayCollectors[(i, j)] = GetCollectorDisPlayNames(LookModeDisplayCollectors[(i, j)]);
             });
-
 
             LookModeData[(i, j)] = new List<AssetDataInfo>();
             var listTypes = new List<string>();

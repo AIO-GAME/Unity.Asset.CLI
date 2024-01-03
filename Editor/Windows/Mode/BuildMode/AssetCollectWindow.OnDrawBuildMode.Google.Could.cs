@@ -12,7 +12,6 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        
         private string GetGCItemDes(ASBuildConfig.GCloudConfig config, int i)
         {
             _builder.Clear();
@@ -145,6 +144,5 @@ namespace AIO.UEditor
 
             if (config.isUploading) GUI.enabled = true;
         }
-
     }
 }
