@@ -22,7 +22,9 @@ namespace AIO.UEditor
         /// </summary>
         private void OnDrawHeaderLookMode()
         {
-            if (Data.Packages.Length == 0)
+            if (Data.Packages.Length == 0 ||
+                LookModeDisplayPackages is null ||
+                LookModeDisplayPackages.Length == 0)
             {
                 EditorGUILayout.Separator();
                 return;

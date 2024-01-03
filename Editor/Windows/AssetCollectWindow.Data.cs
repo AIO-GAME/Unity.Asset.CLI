@@ -110,12 +110,12 @@ namespace AIO.UEditor
         /// </summary>
         public enum Mode
         {
-            [InspectorName("编辑模式")] Editor = 0,
-            [InspectorName("配置管理")] Config = 1,
-            [InspectorName("查询模式")] Look = 2,
-            [InspectorName("查询标签")] LookTags = 3,
-            [InspectorName("查询首包")] LookFirstPackage = 4,
-            [InspectorName("打包工具")] Build = 5,
+            [InspectorName(" 编辑模式 Ctrl + Q")] Editor = 0,
+            [InspectorName(" 配置管理 Ctrl + W")] Config = 1,
+            [InspectorName(" 查询模式 Ctrl + E")] Look = 2,
+            [InspectorName(" 查询标签 Ctrl + A")] LookTags = 3,
+            [InspectorName(" 查询首包 Ctrl + D")] LookFirstPackage = 4,
+            [InspectorName(" 打包工具 Ctrl + F")] Build = 5,
         }
 
         /// <summary>
@@ -376,6 +376,7 @@ namespace AIO.UEditor
         private Hashtable TempTable = new Hashtable();
 
         private GUILayoutOption GP_Width_100;
+        private GUILayoutOption GP_Width_120;
         private GUILayoutOption GP_Width_150;
         private GUILayoutOption GP_Width_80;
         private GUILayoutOption GP_Width_75;
@@ -518,6 +519,7 @@ namespace AIO.UEditor
         private void GPInit()
         {
             GP_Width_EXPAND = GUILayout.ExpandWidth(true);
+            GP_Width_120 = GUILayout.Width(120);
             GP_Width_150 = GUILayout.Width(150);
             GP_Width_100 = GUILayout.Width(100);
             GP_Width_75 = GUILayout.Width(75);

@@ -75,7 +75,7 @@ namespace AIO.UEditor
                         break;
                 }
 
-                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
+                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_120, GP_Height_20);
 
                 if (!GUI.changed) return;
                 if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
@@ -353,6 +353,43 @@ namespace AIO.UEditor
                     }
 
                     break;
+            }
+
+            if (eventData.control)
+            {
+                switch (keyCode)
+                {
+                    case KeyCode.Q:
+                        WindowMode = Mode.Editor;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.W:
+                        WindowMode = Mode.Config;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.E:
+                        WindowMode = Mode.Look;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.A:
+                        WindowMode = Mode.LookTags;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.D:
+                        WindowMode = Mode.LookFirstPackage;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                    case KeyCode.F:
+                        WindowMode = Mode.Build;
+                        UpdateData();
+                        eventData.Use();
+                        break;
+                }
             }
         }
 
