@@ -4,7 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System.IO;
+using System;
 using UnityEngine;
 
 namespace AIO
@@ -36,7 +36,7 @@ namespace AIO
                 var unityPluginLoader = new AndroidJavaClass("java类全名");
                 return unityPluginLoader.CallStatic<bool>("HasReadPermission");
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 LogException(e);
             }
@@ -71,7 +71,7 @@ namespace AIO
                 var unityPluginLoader = new AndroidJavaClass("java类全名");
                 return unityPluginLoader.CallStatic<bool>("HasWritePermission");
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 LogException(e);
             }

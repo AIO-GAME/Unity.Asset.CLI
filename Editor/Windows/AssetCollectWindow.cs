@@ -190,8 +190,14 @@ namespace AIO.UEditor
             Config.Save();
             BuildConfig.Save();
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+#if UNITY_2021_1_OR_NEWER
+            AssetDatabase.SaveAssetIfDirty(Data);
+            AssetDatabase.SaveAssetIfDirty(Config);
+            AssetDatabase.SaveAssetIfDirty(BuildConfig);
+#else
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+#endif
 #endif
         }
 
