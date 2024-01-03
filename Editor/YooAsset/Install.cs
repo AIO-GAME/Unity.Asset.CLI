@@ -10,7 +10,7 @@ namespace AIO.UEditor
 {
     internal static partial class Install
     {
-        [MenuItem("AIO/CLI/Install/YooAsset", false, 0)]
+        [MenuItem("AIO/CLI/Install/YooAsset[1.5.7]", false, 0)]
         internal static async void YooAssetRunAsync()
         {
             var Packages = new DirectoryInfo(EHelper.Path.Packages);
