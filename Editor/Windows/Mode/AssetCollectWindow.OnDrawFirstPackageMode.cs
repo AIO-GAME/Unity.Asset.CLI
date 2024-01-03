@@ -151,7 +151,7 @@ namespace AIO.UEditor
             {
                 var content = new GUIContent("请启用序列记录功能");
                 var size = GEStyle.HeaderButton.CalcSize(content) * 3;
-                var rect = new Rect(Center.position - size / 2, size);
+                var rect = new Rect(Center.position - (size / 2), size);
                 GELayout.Button(rect, content, () =>
                 {
                     GUI.FocusControl(null);

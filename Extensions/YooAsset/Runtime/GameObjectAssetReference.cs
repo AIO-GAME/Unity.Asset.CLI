@@ -39,7 +39,6 @@ public class GameObjectAssetReferenceInspector : UnityEditor.Editor
 }
 #endif
 
-
 public class GameObjectAssetReference : MonoBehaviour
 {
 	[HideInInspector]

@@ -6,7 +6,6 @@
 #define YOOASSET
 #endif
 
-
 #if UNITASK
 using Cysharp.Threading.Tasks;
 using ATask = Cysharp.Threading.Tasks.UniTask;
@@ -145,7 +144,6 @@ namespace AIO.UEngine.YooAsset
                 if (!await LoadCheckOPTask(operation)) return null;
                 AddHandle(location, operation);
             }
-
 
             return operation.GetAssetObject<TObject>();
         }

@@ -170,7 +170,7 @@ namespace AIO.UEditor
         /// </summary>
         private static void OnDrawShading(Rect rect)
         {
-            if (Mathf.FloorToInt((rect.y - 4f) / rect.height % 2f) != 0) return;
+            if (Mathf.FloorToInt(((rect.y - 4f) / rect.height) % 2f) != 0) return;
             var rect2 = new Rect(rect);
             rect2.width += rect.x + rect.height;
             rect2.height += 1f;
@@ -351,6 +351,7 @@ namespace AIO.UEditor
                         AssetDatabase.SaveAssets();
 #endif
                     }
+
                     break;
             }
         }

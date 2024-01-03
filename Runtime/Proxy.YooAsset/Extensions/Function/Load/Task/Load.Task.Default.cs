@@ -58,13 +58,11 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-
 #if UNITASK
         public static UniTask<TObject[]> LoadSubAssetsDefaultTask<TObject>(string location) where TObject : Object
 #else
         public static Task<TObject[]> LoadSubAssetsDefaultTask<TObject>(string location) where TObject : Object
 #endif
-
         {
             return LoadSubAssetsTask<TObject>(DefaultPackageName, location);
         }

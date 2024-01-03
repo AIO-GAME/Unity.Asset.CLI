@@ -64,7 +64,6 @@ namespace AIO.UEditor
                     TagsModeDisplayTags, GEStyle.PreDropDown, GP_Width_100);
             }
 
-
             if (GUI.changed)
             {
                 if (

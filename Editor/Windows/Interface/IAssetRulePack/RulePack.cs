@@ -37,10 +37,12 @@ namespace AIO.UEditor
 
     /// <summary>
     /// 以文件路径作为资源包名
+    /// </summary>
+    /// <remarks>
     /// 注意：每个文件独自打资源包
     /// 例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop_image_backgroud.bundle"
     /// 例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view_main.bundle"
-    /// </summary>
+    /// </remarks>
     public class PackSeparately : IAssetRulePack
     {
         public string DisplayPackName => "PackRule = 文件路径";

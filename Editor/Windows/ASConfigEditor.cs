@@ -67,7 +67,6 @@ namespace AIO.UEditor
                         }
                     }
 
-
                     Target.URL = GELayout.AreaText(Target.URL, GUILayout.Height(50));
 
                     if (Target.EnableSequenceRecord)
