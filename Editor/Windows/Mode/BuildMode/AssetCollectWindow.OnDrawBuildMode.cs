@@ -164,7 +164,12 @@ namespace AIO.UEditor
                         MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 #else
-                        if (EditorUtility.DisplayDialogComplex("提示", "当前没有导入资源实现工具", "导入 YooAsset", "导入其他", "取消") == 0)
+                        if (EditorUtility.DisplayDialogComplex(
+                            "提示",
+                            "当前没有导入资源实现工具",
+                            "导入 YooAsset (1.5.7)",
+                            "导入 XAsset (unknown)",
+                            "取消") == 0)
                         {
 #if !SUPPORT_YOOASSET
                             Install.YooAssetRunAsync();
