@@ -13,9 +13,7 @@ namespace AIO.UEditor
         [MenuItem("AIO/CLI/Install/YooAsset", false, 0)]
         internal static async void YooAssetRunAsync()
         {
-            var Root = Directory.GetParent(Application.dataPath);
-            if (Root is null) throw new Exception("Application.dataPath is null");
-            var Packages = new DirectoryInfo(Path.Combine(Root.FullName, "Packages"));
+            var Packages = new DirectoryInfo(EHelper.Path.Packages);
             try
             {
                 EditorUtility.DisplayProgressBar("插件", "正在安装插件", 0);
