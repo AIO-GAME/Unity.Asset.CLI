@@ -110,12 +110,12 @@ namespace AIO.UEditor
         /// </summary>
         public enum Mode
         {
-            [InspectorName(" 编辑模式 Ctrl + Alpha1")] Editor = 0,
-            [InspectorName(" 配置管理 Ctrl + Alpha2")] Config = 1,
-            [InspectorName(" 查询模式 Ctrl + Alpha3")] Look = 2,
-            [InspectorName(" 查询标签 Ctrl + Alpha4")] LookTags = 3,
-            [InspectorName(" 查询首包 Ctrl + Alpha5")] LookFirstPackage = 4,
-            [InspectorName(" 打包工具 Ctrl + Alpha6")] Build = 5,
+            [InspectorName(" 编辑模式 [Ctrl + Alpha1\\Number1]")] Editor = 0,
+            [InspectorName(" 配置管理 [Ctrl + Alpha2\\Number2]")] Config = 1,
+            [InspectorName(" 查询模式 [Ctrl + Alpha3\\Number3]")] Look = 2,
+            [InspectorName(" 查询标签 [Ctrl + Alpha4\\Number4]")] LookTags = 3,
+            [InspectorName(" 查询首包 [Ctrl + Alpha5\\Number5]")] LookFirstPackage = 4,
+            [InspectorName(" 打包工具 [Ctrl + Alpha6\\Number6]")] Build = 5,
         }
 
         /// <summary>
