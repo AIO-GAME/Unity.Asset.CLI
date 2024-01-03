@@ -65,7 +65,7 @@ namespace AIO.UEditor
 {
     internal static partial class UnInstall
     {
-        [MenuItem("AIO/CLI/UnInstall/YooAsset", false, 0)]
+        [MenuItem("AIO/CLI/UnInstall/YooAsset[1.5.7]", false, 0)]
         internal static async void YooAssetRunAsync()
         {
             var Root = Directory.GetParent(Application.dataPath);
