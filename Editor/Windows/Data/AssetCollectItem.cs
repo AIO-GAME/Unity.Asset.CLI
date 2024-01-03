@@ -341,6 +341,7 @@ namespace AIO.UEditor
             PackageName = package;
             GroupName = group;
             if (string.IsNullOrEmpty(CollectPath)) return;
+            if (!File.Exists(CollectPath) || !Directory.Exists(CollectPath)) return;
             if (CollectPath.Contains("Resources/") || CollectPath.EndsWith("Resources"))
             {
                 Debug.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
@@ -368,7 +369,11 @@ namespace AIO.UEditor
             if (Path is null) Folded = false;
             else
             {
-                CollectPath = AssetDatabase.GetAssetPath(Path);
+                var temp = AssetDatabase.GetAssetPath(Path);
+                if (string.IsNullOrEmpty(temp)) return;
+                if (!File.Exists(temp)) return;
+                if (!Directory.Exists(temp)) return;
+                CollectPath = temp;
                 GUID = AssetDatabase.AssetPathToGUID(CollectPath);
                 FileName = System.IO.Path.GetFileName(CollectPath);
             }

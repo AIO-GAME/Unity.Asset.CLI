@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AIO.UEngine;
+using UnityEditor;
 using UnityEngine;
 using YooAsset.Editor;
 
@@ -160,7 +161,10 @@ namespace AIO.UEditor
             => groups.Where(group => !group.Collectors.Equals(null)).Select(Convert);
 
         private static IEnumerable<AssetBundleCollector> Convert(IEnumerable<AssetCollectItem> collects)
-            => collects.Where(collect => !string.IsNullOrEmpty(collect.CollectPath)).Select(Convert);
+            => collects.Where(collect =>
+                !string.IsNullOrEmpty(collect.CollectPath) &&
+                (File.Exists(collect.CollectPath) || Directory.Exists(collect.CollectPath))
+            ).Select(Convert);
 
         private static AssetBundleCollectorPackage Convert(AssetCollectPackage package)
             => new AssetBundleCollectorPackage
@@ -233,6 +237,43 @@ namespace AIO.UEditor
                 }
 
                 AssetBundleCollectorSettingData.Setting.Packages.Add(package);
+            }
+
+            for (var i = AssetBundleCollectorSettingData.Setting.Packages.Count - 1; i >= 0; i--)
+            {
+                var package = AssetBundleCollectorSettingData.Setting.Packages[i];
+                if (package.Groups is null)
+                {
+                    AssetBundleCollectorSettingData.Setting.Packages.RemoveAt(i);
+                    continue;
+                }
+
+                for (var j = package.Groups.Count - 1; j >= 0; j--)
+                {
+                    var group = package.Groups[j];
+                    if (group.Collectors is null)
+                    {
+                        package.Groups.RemoveAt(j);
+                        continue;
+                    }
+
+                    for (var k = package.Groups[j].Collectors.Count - 1; k >= 0; k--)
+                    {
+                        var collector = package.Groups[j].Collectors[k];
+                        if (string.IsNullOrEmpty(collector.CollectPath) ||
+                            (!File.Exists(collector.CollectPath) && !Directory.Exists(collector.CollectPath)))
+                        {
+                            package.Groups[j].Collectors.RemoveAt(k);
+                        }
+                    }
+
+                    if (group.Collectors.Count == 0) package.Groups.RemoveAt(j);
+                }
+
+                if (package.Groups.Count == 0)
+                {
+                    AssetBundleCollectorSettingData.Setting.Packages.RemoveAt(i);
+                }
             }
         }
     }
