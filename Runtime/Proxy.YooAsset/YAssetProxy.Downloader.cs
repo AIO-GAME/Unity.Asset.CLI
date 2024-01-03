@@ -351,26 +351,25 @@ namespace AIO.UEngine
                         }
                     }
 
-                    // 检查磁盘空间是否足够
-                    if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
-                    {
-                        OnDiskSpaceNotEnough?.Invoke(Report);
-                        yield break;
-                    }
-
-                    // 检查是否有写入权限
-                    if (!AssetSystem.GetHasWritePermission())
-                    {
-                        OnWritePermissionNot?.Invoke(Report);
-                        yield break;
-                    }
-
-                    if (!AssetSystem.GetHasReadPermission())
-                    {
-                        OnReadPermissionNot?.Invoke(Report);
-                        yield break;
-                    }
-
+                    // // 检查磁盘空间是否足够
+                    // if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
+                    // {
+                    //     OnDiskSpaceNotEnough?.Invoke(Report);
+                    //     yield break;
+                    // }
+                    //
+                    // // 检查是否有写入权限
+                    // if (!AssetSystem.GetHasWritePermission())
+                    // {
+                    //     OnWritePermissionNot?.Invoke(Report);
+                    //     yield break;
+                    // }
+                    //
+                    // if (!AssetSystem.GetHasReadPermission())
+                    // {
+                    //     OnReadPermissionNot?.Invoke(Report);
+                    //     yield break;
+                    // }
 
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
                     pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;

@@ -332,7 +332,8 @@ namespace AIO.UEditor
             }
         }
 
-        public async void CollectAssetTask(string package, string group, Action<Dictionary<string, AssetDataInfo>> cb = null)
+        public async void CollectAssetTask(string package, string group,
+            Action<Dictionary<string, AssetDataInfo>> cb = null)
         {
             AssetDataInfos.Clear();
             RuleFilters.Clear();
@@ -364,13 +365,7 @@ namespace AIO.UEditor
 
         private void UpdateData()
         {
-            if (Path is null)
-            {
-                GUID = string.Empty;
-                CollectPath = string.Empty;
-                FileName = string.Empty;
-                Folded = false;
-            }
+            if (Path is null) Folded = false;
             else
             {
                 CollectPath = AssetDatabase.GetAssetPath(Path);
