@@ -52,7 +52,7 @@ namespace AIO.UEditor
                     {
                         var collect = _Instance.Packages[i].Groups[j].Collectors[k];
                         if (string.IsNullOrEmpty(collect.CollectPath)) continue;
-                        collect.PathP = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
+                        collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
                     }
 
                     _Instance.Packages[i].Groups[j].Collectors = _Instance.Packages[i].Groups[j].Collectors
@@ -359,5 +359,23 @@ namespace AIO.UEditor
         }
 
         #endregion
+
+        public void FoldoutOff()
+        {
+            if (Packages is null) return;
+            foreach (var package in Packages)
+            {
+                if (package?.Groups is null) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group?.Collectors is null) continue;
+                    foreach (var item in group.Collectors)
+                    {
+                        if (item is null) continue;
+                        item.Folded = false;
+                    }
+                }
+            }
+        }
     }
 }

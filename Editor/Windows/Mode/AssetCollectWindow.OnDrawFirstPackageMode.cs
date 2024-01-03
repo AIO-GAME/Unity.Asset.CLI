@@ -181,11 +181,11 @@ namespace AIO.UEditor
             LookModeDataPageValueSort(ESort.AssetName, true);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private void OnDrawFirstPackageMode()
         {
+            GUI.FocusControl(null);
+            LookModeCurrentSelectAsset = null;
+
             if (!Config.EnableSequenceRecord)
             {
                 var content = new GUIContent("请启用序列记录功能");

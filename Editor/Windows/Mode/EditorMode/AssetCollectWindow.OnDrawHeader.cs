@@ -76,6 +76,11 @@ namespace AIO.UEditor
             }
 #endif
 
+            if (GUILayout.Button(GC_FOLDOUT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                Data.FoldoutOff();
+            }
+            
             if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
@@ -86,7 +91,17 @@ namespace AIO.UEditor
             {
                 GUI.FocusControl(null);
                 Data.Save();
-                EditorUtility.DisplayDialog("保存", "保存成功", "确定");
+                if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
+                {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+#if UNITY_2020_1_OR_NEWER
+                    AssetDatabase.SaveAssetIfDirty(Data);
+#else
+                    AssetDatabase.SaveAssets();
+#endif                    
+#endif
+
+                }
             }
         }
 

@@ -5,7 +5,6 @@
 |*|============|*/
 
 using System;
-using System.IO;
 using UnityEngine;
 
 namespace AIO
@@ -23,8 +22,8 @@ namespace AIO
 #if UNITY_WEBGL // WebGL 不需要权限
             return true;
 #elif UNITY_STANDALONE_WIN
-            var drive = System.IO.DriveInfo.GetDrives();
-            return drive[0].IsReady;
+            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            return drive.IsReady;
 #elif UNITY_STANDALONE_OSX // Mac
             var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
@@ -37,7 +36,7 @@ namespace AIO
                 var unityPluginLoader = new AndroidJavaClass("java类全名");
                 return unityPluginLoader.CallStatic<bool>("HasReadPermission");
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 LogException(e);
             }
@@ -58,8 +57,8 @@ namespace AIO
 #if UNITY_WEBGL // WebGL 不需要权限
             return true;
 #elif  UNITY_STANDALONE_WIN
-            var drive = System.IO.DriveInfo.GetDrives();
-            return drive[0].IsReady;
+            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            return drive.IsReady;
 #elif  UNITY_STANDALONE_OSX // Mac
             var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
@@ -72,7 +71,7 @@ namespace AIO
                 var unityPluginLoader = new AndroidJavaClass("java类全名");
                 return unityPluginLoader.CallStatic<bool>("HasWritePermission");
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 LogException(e);
             }
@@ -87,8 +86,7 @@ namespace AIO
         /// <returns></returns>
         public static long GetAvailableDiskSpace()
         {
-#if UNITY_EDITOR
-
+#if !UNITY_EDITOR
 #if UNITY_EDITOR_WIN
             var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
@@ -101,11 +99,10 @@ namespace AIO
 
 #else
 #if UNITY_STANDALONE_WIN
-            var drive = System.IO.DriveInfo.GetDrives();
+            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
 
 #elif UNITY_ANDROID
-
             try
             {
                 var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");

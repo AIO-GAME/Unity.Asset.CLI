@@ -4,9 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -22,21 +20,14 @@ namespace AIO.UEditor
             Selection.activeObject = ASConfig.GetOrCreate();
         }
 
-        private List<AssetsPackageConfig> _packages;
         private bool FoldoutAutoRecord = true;
         private string RecordQueueSizeStr = "0 bytes";
 
         protected override void OnActivation()
         {
-            if (_packages is null)
-                _packages = Target.Packages is null
-                    ? new List<AssetsPackageConfig>()
-                    : Target.Packages.ToList();
-
             UpdateRecordQueue();
         }
 
-        // ReSharper disable Unity.PerformanceAnalysis
         protected override void OnGUI()
         {
             using (GELayout.VHorizontal())
@@ -138,19 +129,12 @@ namespace AIO.UEditor
                         }
                     }
 
-
                     break;
                 default:
-                    GELayout.List("资源包配置", _packages,
-                        config =>
-                        {
-                            config.Name = GELayout.Field(config.Name);
-                            config.IsDefault = GELayout.Toggle(config.IsDefault, GUILayout.Width(20));
-                            if (!config.IsDefault) return;
-                            foreach (var package in _packages.Where(package => config.Name != package.Name))
-                                package.IsDefault = false;
-                        },
-                        () => new AssetsPackageConfig());
+                    GUI.enabled = false;
+                    GELayout.List("资源包配置", Target.Packages, config => { config.Name = GELayout.Field(config.Name); },
+                        null);
+                    GUI.enabled = true;
                     GELayout.Button("Update", Update);
                     break;
             }
@@ -166,14 +150,10 @@ namespace AIO.UEditor
         private void Update()
         {
             Target.UpdatePackage();
-            _packages = Target.Packages is null
-                ? _packages
-                : Target.Packages.ToList();
         }
 
         protected override void OnChange()
         {
-            Target.Packages = _packages.ToArray();
         }
     }
 }

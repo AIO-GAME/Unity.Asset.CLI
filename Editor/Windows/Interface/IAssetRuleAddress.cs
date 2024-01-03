@@ -11,6 +11,14 @@ namespace AIO.UEditor
     /// </summary>
     public interface IAssetRuleAddress
     {
+        /// <summary>
+        /// 是否允许多线程
+        /// </summary>
+        bool AllowThread { get; }
+        
+        /// <summary>
+        /// 显示的资源地址名称
+        /// </summary>
         string DisplayAddressName { get; }
         
         /// <summary>
