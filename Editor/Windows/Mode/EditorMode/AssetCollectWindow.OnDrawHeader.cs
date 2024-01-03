@@ -45,7 +45,6 @@ namespace AIO.UEditor
                 ViewGroupList.IsShow = false;
             }
 
-
             if (Data.IsGroupValid())
             {
                 TempBuilder.Append(" / ");
@@ -80,7 +79,7 @@ namespace AIO.UEditor
             {
                 Data.FoldoutOff();
             }
-            
+
             if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
@@ -98,9 +97,8 @@ namespace AIO.UEditor
                     AssetDatabase.SaveAssetIfDirty(Data);
 #else
                     AssetDatabase.SaveAssets();
-#endif                    
 #endif
-
+#endif
                 }
             }
         }

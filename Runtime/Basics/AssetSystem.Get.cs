@@ -4,7 +4,6 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
-using System;
 using UnityEngine;
 
 namespace AIO
@@ -22,10 +21,10 @@ namespace AIO
 #if UNITY_WEBGL // WebGL 不需要权限
             return true;
 #elif UNITY_STANDALONE_WIN
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.IsReady;
 #elif UNITY_STANDALONE_OSX // Mac
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
 #elif UNITY_IOS || UNITY_IPHONE // IOS
             return true;
@@ -57,10 +56,10 @@ namespace AIO
 #if UNITY_WEBGL // WebGL 不需要权限
             return true;
 #elif  UNITY_STANDALONE_WIN
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.IsReady;
 #elif  UNITY_STANDALONE_OSX // Mac
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
 #elif  UNITY_IOS || UNITY_IPHONE // IOS
             return true;
@@ -88,10 +87,10 @@ namespace AIO
         {
 #if !UNITY_EDITOR
 #if UNITY_EDITOR_WIN
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
 #elif UNITY_EDITOR_OSX
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
 #else
             return 1024;
@@ -99,7 +98,7 @@ namespace AIO
 
 #else
 #if UNITY_STANDALONE_WIN
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
 
 #elif UNITY_ANDROID
@@ -109,7 +108,7 @@ namespace AIO
                 var unityPluginLoader = new AndroidJavaClass("java类全名");
                 return unityPluginLoader.CallStatic<long>("GetFreeDiskSpace");
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 LogException(e);
             }
@@ -117,7 +116,7 @@ namespace AIO
             return (long)_IOS_GetFreeDiskSpace();
 
 #elif UNITY_WEBGL
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
 #endif
             return 1024;

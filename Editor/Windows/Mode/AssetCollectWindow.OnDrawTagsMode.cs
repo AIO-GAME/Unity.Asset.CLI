@@ -34,14 +34,22 @@ namespace AIO.UEditor
 
             if (TagsModeDisplayCollectors.Length > 0)
             {
-                if (TagsModeDisplayCollectors.Length > 31)
+                if (TagsModeDisplayCollectors.Length == 1)
+                {
+                    LookModeDisplayCollectorsIndex = 0;
+                    EditorGUILayout.Popup(0, TagsModeDisplayCollectors,
+                        GEStyle.PreDropDown, GP_Width_100);
+                }
+                else if (TagsModeDisplayCollectors.Length >= 31)
                 {
                     LookModeDisplayCollectorsIndex = EditorGUILayout.Popup(LookModeDisplayCollectorsIndex,
                         TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
                 }
                 else
+                {
                     LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
                         TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
+                }
             }
 
             if (TagsModeDisplayTypes.Length > 0)
@@ -55,7 +63,6 @@ namespace AIO.UEditor
                 LookModeDisplayTagsIndex = EditorGUILayout.MaskField(LookModeDisplayTagsIndex,
                     TagsModeDisplayTags, GEStyle.PreDropDown, GP_Width_100);
             }
-
 
             if (GUI.changed)
             {
@@ -144,7 +151,8 @@ namespace AIO.UEditor
                 {
                     if (group.Collectors is null) continue;
                     var flag = !string.IsNullOrEmpty(group.Tags);
-                    collectors.AddRange(GetCollectorDisPlayNames(group.Collectors, collector => flag || !string.IsNullOrEmpty(collector.Tags)));
+                    collectors.AddRange(GetCollectorDisPlayNames(group.Collectors,
+                        collector => flag || !string.IsNullOrEmpty(collector.Tags)));
                     foreach (var collector in group.Collectors)
                     {
                         if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
@@ -171,18 +179,7 @@ namespace AIO.UEditor
                 }
             }
 
-            if (collectors.Count > 31)
-            {
-                TagsModeDisplayCollectors = new string[collectors.Count + 1];
-                TagsModeDisplayCollectors[0] = "ALL";
-                var tempIndex = 1;
-                foreach (var key in collectors)
-                {
-                    TagsModeDisplayCollectors[tempIndex++] = key;
-                }
-            }
-            else TagsModeDisplayCollectors = collectors.ToArray();
-
+            TagsModeDisplayCollectors = GetCollectorDisPlayNames(collectors);
             if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
         }
 
@@ -192,83 +189,17 @@ namespace AIO.UEditor
         private bool TagsModeDataFilter(AssetDataInfo data)
         {
             var filter = 0;
-            if (TagsModeDisplayCollectors.Length > 31)
-            {
-                if (LookModeDisplayCollectorsIndex == 0 ||
-                    TagsModeDisplayCollectors[LookModeDisplayCollectorsIndex] ==
-                    data.CollectPath.Replace('/', '\\').TrimEnd('\\'))
-                    filter++;
-            }
-            else
-            {
-                if (LookModeDisplayCollectorsIndex < 1) filter++;
-                else
-                {
-                    var status = 1L;
-                    foreach (var display in TagsModeDisplayCollectors)
-                    {
-                        if ((LookModeDisplayCollectorsIndex & status) == status &&
-                            display == data.CollectPath.Replace('/', '\\'))
-                        {
-                            filter++;
-                            break;
-                        }
+            if (IsFilterCollectors(LookModeDisplayCollectorsIndex, data.CollectPath, TagsModeDisplayCollectors))
+                filter++;
 
-                        status *= 2;
-                    }
-                }
-            }
+            if (IsFilterTypes(LookModeDisplayTypeIndex, data.AssetPath, TagsModeDisplayTypes))
+                filter++;
 
+            if (IsFilterTags(LookModeDisplayTagsIndex, data.Tags.Split(';', ',', ' '), TagsModeDisplayTags))
+                filter++;
 
-            if (LookModeDisplayTypeIndex < 1) filter++;
-            else
-            {
-                var objectType = AssetDatabase.GetMainAssetTypeAtPath(data.AssetPath)?.FullName;
-                if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
-                var status = 1L;
-                foreach (var display in TagsModeDisplayTypes)
-                {
-                    if ((LookModeDisplayTypeIndex & status) == status && objectType == display)
-                    {
-                        filter++;
-                        break;
-                    }
-
-                    status *= 2;
-                }
-            }
-
-            if (LookModeDisplayTagsIndex < 1) filter++;
-            else
-            {
-                var status = 1L;
-                foreach (var display in TagsModeDisplayTags)
-                {
-                    if ((LookModeDisplayTagsIndex & status) == status &&
-                        data.Tags.Split(';').Contains(display))
-                    {
-                        filter++;
-                        break;
-                    }
-
-                    status *= 2;
-                }
-            }
-
-            if (string.IsNullOrEmpty(SearchText)) filter++;
-            else
-            {
-                if (data.AssetPath.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase) ||
-                    data.Address.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    filter++;
-                }
-                else if (SearchText.Contains(data.AssetPath, StringComparison.CurrentCultureIgnoreCase) ||
-                         SearchText.Contains(data.Address, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    filter++;
-                }
-            }
+            if (IsFilterSearch(SearchText, data))
+                filter++;
 
             return filter != 4;
         }

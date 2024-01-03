@@ -18,9 +18,6 @@ using YooAsset;
 
 namespace AIO
 {
-    /// <summary>
-    /// nameof(SequenceRecord)
-    /// </summary>
     public partial class AssetSystem
     {
         /// <summary>

@@ -243,7 +243,6 @@ namespace AIO.UEditor
                 return false;
             }
 
-
             return Packages[CurrentPackageIndex].Groups.Length > 0;
         }
 

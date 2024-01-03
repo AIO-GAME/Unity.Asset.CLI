@@ -21,7 +21,6 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
     /// </summary>
     public List<TObject> AssetObjects { private set; get; }
 
-
     public LoadAssetsByTagOperation(string tag)
     {
         _tag = tag;

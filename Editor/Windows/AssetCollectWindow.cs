@@ -170,7 +170,7 @@ namespace AIO.UEditor
         /// </summary>
         private static void OnDrawShading(Rect rect)
         {
-            if (Mathf.FloorToInt((rect.y - 4f) / rect.height % 2f) != 0) return;
+            if (Mathf.FloorToInt(((rect.y - 4f) / rect.height) % 2f) != 0) return;
             var rect2 = new Rect(rect);
             rect2.width += rect.x + rect.height;
             rect2.height += 1f;
@@ -315,9 +315,43 @@ namespace AIO.UEditor
                     break;
                 }
                 case Mode.Config:
+                    if (eventData.control && keyCode == KeyCode.S)
+                    {
+                        Config.Save();
+                        eventData.Use();
+#if UNITY_2021_1_OR_NEWER
+                        AssetDatabase.SaveAssetIfDirty(Config);
+#else
+                        AssetDatabase.SaveAssets();
+#endif
+                    }
+
+                    break;
                 case Mode.Editor:
+                    if (eventData.control && keyCode == KeyCode.S)
+                    {
+                        Data.Save();
+                        eventData.Use();
+#if UNITY_2021_1_OR_NEWER
+                        AssetDatabase.SaveAssetIfDirty(Data);
+#else
+                        AssetDatabase.SaveAssets();
+#endif
+                    }
+
+                    break;
                 case Mode.Build:
-                default:
+                    if (eventData.control && keyCode == KeyCode.S)
+                    {
+                        BuildConfig.Save();
+                        eventData.Use();
+#if UNITY_2021_1_OR_NEWER
+                        AssetDatabase.SaveAssetIfDirty(BuildConfig);
+#else
+                        AssetDatabase.SaveAssets();
+#endif
+                    }
+
                     break;
             }
         }
