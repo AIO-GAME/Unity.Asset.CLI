@@ -92,7 +92,7 @@ namespace AIO.UEditor
                         break;
                 }
 
-                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_120, GP_Height_20);
+                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
 
                 if (!GUI.changed) return;
                 if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
