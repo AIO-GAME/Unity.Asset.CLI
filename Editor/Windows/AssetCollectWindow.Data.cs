@@ -6,6 +6,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using AIO.UEngine;
 using UnityEditor;
@@ -127,6 +128,11 @@ namespace AIO.UEditor
         /// Header中间显示信息
         /// </summary>
         private readonly StringBuilder TempBuilder = new StringBuilder();
+
+        /// <summary>
+        /// 磁盘信息
+        /// </summary>
+        private DriveInfo Disk;
 
         #endregion
 

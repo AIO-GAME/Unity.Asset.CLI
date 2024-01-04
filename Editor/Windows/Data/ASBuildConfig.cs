@@ -10,23 +10,24 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7-")]
+    [HelpURL(
+        "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7-")]
     public partial class ASBuildConfig : ScriptableObject
     {
         /// <summary>
-        /// 首次打包
+        /// 自动清理缓存数量
         /// </summary>
-        public bool FirstPack;
+        [InspectorName("自动清理缓存数量")] public int AutoCleanCacheNum = 5;
 
         /// <summary>
         /// 打包管线
         /// </summary>
-        public EBuildPipeline BuildPipeline;
+        [InspectorName("打包管线")] public EBuildPipeline BuildPipeline;
 
         /// <summary>
         /// 构建模式
         /// </summary>
-        public EBuildMode BuildMode;
+        [InspectorName("构建模式")] public EBuildMode BuildMode;
 
         /// <summary>
         /// 构建版本号
