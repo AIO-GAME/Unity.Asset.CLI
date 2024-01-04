@@ -17,6 +17,8 @@ using UnityEditor;
 
 namespace AIO.UEngine
 {
+    [HelpURL(
+        "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
     [DebuggerNonUserCode]
     public class ASConfig : ScriptableObject
     {
