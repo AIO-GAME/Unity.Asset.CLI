@@ -54,33 +54,18 @@ namespace AIO
         public static bool GetHasReadPermission()
         {
 #if UNITY_EDITOR
-            return true;
+#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
+            return new DriveInfo(SandboxRootDirectory).IsReady;
+#endif
 #else
-#if UNITY_WEBGL // WebGL 不需要权限
+#if UNITY_IOS || UNITY_IPHONE || UNITY_ANDROID || UNITY_WEBGL
             return true;
-#elif UNITY_STANDALONE_WIN
-            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
-            return drive.IsReady;
-#elif UNITY_STANDALONE_OSX // Mac
-            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
-            return drive.AvailableFreeSpace;
-#elif UNITY_IOS || UNITY_IPHONE // IOS
-            return true;
-#elif UNITY_ANDROID
-            try
-            {
-                var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                var unityPluginLoader = new AndroidJavaClass("java类全名");
-                return unityPluginLoader.CallStatic<bool>("HasReadPermission");
-            }
-            catch (System.Exception e)
-            {
-                LogException(e);
-            }
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            return new DriveInfo(SandboxRootDirectory).IsReady;
 #endif
-
+#endif
+            Debug.LogWarning("Platform not support");
             return false;
-#endif
         }
 
         /// <summary>
@@ -89,32 +74,18 @@ namespace AIO
         public static bool GetHasWritePermission()
         {
 #if UNITY_EDITOR
-            return true;
+#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
+            return new DriveInfo(SandboxRootDirectory).IsReady;
+#endif
 #else
-#if UNITY_WEBGL // WebGL 不需要权限
+#if UNITY_IOS || UNITY_IPHONE || UNITY_ANDROID || UNITY_WEBGL
             return true;
-#elif  UNITY_STANDALONE_WIN
-            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
-            return drive.IsReady;
-#elif  UNITY_STANDALONE_OSX // Mac
-            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
-            return drive.AvailableFreeSpace;
-#elif  UNITY_IOS || UNITY_IPHONE // IOS
-            return true;
-#elif UNITY_ANDROID // Android
-            try
-            {
-                var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                var unityPluginLoader = new AndroidJavaClass("java类全名");
-                return unityPluginLoader.CallStatic<bool>("HasWritePermission");
-            }
-            catch (System.Exception e)
-            {
-                LogException(e);
-            }
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            return new DriveInfo(SandboxRootDirectory).IsReady;
 #endif
+#endif
+            Debug.LogWarning("Platform not support");
             return false;
-#endif
         }
 
         /// <summary>
@@ -123,42 +94,30 @@ namespace AIO
         /// <returns></returns>
         public static long GetAvailableDiskSpace()
         {
-#if !UNITY_EDITOR
-#if UNITY_EDITOR_WIN
-            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
-            return drive.AvailableFreeSpace;
-#elif UNITY_EDITOR_OSX
-            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
-            return drive.AvailableFreeSpace;
-#else
-            return 1024;
+#if UNITY_EDITOR
+#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
+            return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
 #endif
-
 #else
-#if UNITY_STANDALONE_WIN
-            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
-            return drive.AvailableFreeSpace;
-
+#if UNITY_IOS || UNITY_IPHONE || UNITY_WEBGL
+            return 0;
 #elif UNITY_ANDROID
             try
-            {
-                var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                var unityPluginLoader = new AndroidJavaClass("java类全名");
+            { 
+                var unityPluginLoader = new AndroidJavaClass("IOHelper");
                 return unityPluginLoader.CallStatic<long>("GetFreeDiskSpace");
             }
             catch (System.Exception e)
             {
-                LogException(e);
+                Debug.LogException(e);
+                return 0;
             }
-#elif UNITY_IPHONE && !UNITY_EDITOR
-            return (long)_IOS_GetFreeDiskSpace();
-
-#elif UNITY_WEBGL
-            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
-            return drive.AvailableFreeSpace;
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
 #endif
-            return 1024;
 #endif
+            Debug.LogWarning("Platform not support");
+            return 0;
         }
     }
 }
