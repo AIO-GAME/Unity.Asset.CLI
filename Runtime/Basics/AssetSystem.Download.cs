@@ -12,42 +12,6 @@ using AIO.UEngine;
 
 namespace AIO
 {
-    internal class ASDownloaderEmpty : AOperation, IASDownloader
-    {
-        public bool Flow => false;
-
-        public ASDownloaderEmpty(DownlandAssetEvent dEvent)
-        {
-            Event = dEvent;
-        }
-
-        public IEnumerator UpdateHeader()
-        {
-            yield break;
-        }
-
-        public void CollectNeedAll()
-        {
-            AssetSystem.WhiteAll = true;
-        }
-
-        public void CollectNeedTag(params string[] tags)
-        {
-            AssetSystem.AddWhite(AssetSystem.GetAssetInfos(tags));
-        }
-
-        public void CollectNeedRecord()
-        {
-            AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(x => x.Location));
-        }
-
-        public IEnumerator WaitCo()
-        {
-            Event.OnComplete?.Invoke(Report);
-            yield break;
-        }
-    }
-
     public partial class AssetSystem
     {
         private static IASDownloader Downloader;
@@ -66,6 +30,7 @@ namespace AIO
         /// <summary>
         /// 预下载指定标签资源
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadTag(string tag, DownlandAssetEvent dEvent = default)
         {
             yield return DownloadTag(new[] { tag }, dEvent);
@@ -74,6 +39,7 @@ namespace AIO
         /// <summary>
         /// 预下载指定标签资源
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadTagWithRecord(string tag, DownlandAssetEvent dEvent = default)
         {
             yield return DownloadTagWithRecord(new[] { tag }, dEvent);
@@ -82,6 +48,7 @@ namespace AIO
         /// <summary>
         /// 预下载指定标签资源
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadTag(IEnumerable<string> tag, DownlandAssetEvent dEvent = default)
         {
             var enumerable = tag as string[] ?? tag.ToArray();
@@ -101,6 +68,7 @@ namespace AIO
         /// <summary>
         /// 预下载指定标签资源 + 记录序列资源
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadTagWithRecord(IEnumerable<string> tag, DownlandAssetEvent dEvent = default)
         {
             var enumerable = tag as string[] ?? tag.ToArray();
@@ -125,6 +93,7 @@ namespace AIO
         /// <summary>
         /// 预下载记录序列资源
         /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadRecord(DownlandAssetEvent dEvent = default)
         {
             if (Parameter.ASMode == EASMode.Remote)

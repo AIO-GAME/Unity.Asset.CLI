@@ -6,10 +6,14 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using AIO.UEngine;
+using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace AIO
 {
@@ -25,16 +29,6 @@ namespace AIO
         public static IEnumerator Initialize<T>(ASConfig config) where T : AssetProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), config);
-        }
-
-        public static ICollection<string> GetAssetInfos(string tag)
-        {
-            return Proxy.GetAssetInfos(tag);
-        }
-
-        public static ICollection<string> GetAssetInfos(IEnumerable<string> tag)
-        {
-            return Proxy.GetAssetInfos(tag);
         }
 
         /// <summary>
@@ -77,6 +71,15 @@ namespace AIO
         {
             IsInitialized = false;
             Parameter = config;
+            BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, Parameter.RuntimeRootDirectory);
+            SandboxRootDirectory =
+#if UNITY_EDITOR
+                string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
+                    Path.DirectorySeparatorChar, "Sandbox", Path.DirectorySeparatorChar,
+                    EditorUserBuildSettings.activeBuildTarget.ToString());
+#else
+                Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory);
+#endif
             Proxy = proxy;
             if (Parameter.ASMode == EASMode.Remote)
                 yield return Parameter.UpdatePackageRemote();

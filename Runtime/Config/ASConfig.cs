@@ -119,14 +119,13 @@ namespace AIO.UEngine
         public IEnumerator UpdatePackageRemote()
         {
             if (ASMode != EASMode.Remote) yield break;
-            {
-                if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
-                var remote = Path.Combine(URL, "Version",
-                    string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks));
+            if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
+            var remote = Path.Combine(
+                URL, "Version",
+                string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks));
 
-                yield return AssetSystem.NetLoadStringCO(remote,
-                    data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
-            }
+            yield return AssetSystem.NetLoadStringCO(remote,
+                data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
         }
 
         public void Check()

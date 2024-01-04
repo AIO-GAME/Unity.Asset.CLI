@@ -16,8 +16,8 @@ namespace AIO.UEditor
     [GWindow("资源收集管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
         Group = "Tools",
         Menu = "AIO/Window/Asset",
-        MinSizeHeight = 550,
-        MinSizeWidth = 1000
+        MinSizeHeight = 450,
+        MinSizeWidth = 750
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
@@ -25,10 +25,6 @@ namespace AIO.UEditor
         public static void OpenWindow()
         {
             EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
-        }
-
-        protected override void OnAwake()
-        {
         }
 
         partial void GCInit();
