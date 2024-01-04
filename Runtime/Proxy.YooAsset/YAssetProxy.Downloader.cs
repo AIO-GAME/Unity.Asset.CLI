@@ -262,6 +262,60 @@ namespace AIO.UEngine
                 return operations.GetEnumerator();
             }
 
+            protected override async Task OnWaitAsync()
+            {
+                foreach (var pair in ResourceDownloaderOperations)
+                {
+                    TempDownloadName = pair.Key;
+                    CurrentInfo = string.Format("Resource Download -> [{0}]", pair.Key);
+                    TempDownloadBytes = CurrentValue;
+
+                    while (State != EProgressState.Running)
+                    {
+                        switch (State)
+                        {
+                            case EProgressState.Finish:
+                            case EProgressState.Fail:
+                                return;
+                            case EProgressState.Cancel:
+                                Event.OnError?.Invoke(new TaskCanceledException());
+                                Event.OnComplete?.Invoke(Report);
+                                return;
+                            case EProgressState.Pause:
+                                await Task.Delay(100);
+                                return;
+                        }
+                    }
+
+                    // 检查磁盘空间是否足够
+                    if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
+                    {
+                        OnDiskSpaceNotEnough?.Invoke(Report);
+                        return;
+                    }
+                 
+                    pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
+                    pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;
+                    pair.Value.BeginDownload();
+                    await pair.Value.Task;
+                }
+
+                State = EProgressState.Finish;
+
+                if (OpenDownloadAll)
+                {
+                    AssetSystem.WhiteAll = true;
+                }
+                else
+                {
+                    if (Tags.Count > 0)
+                        AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
+
+                    if (OpenRecord)
+                        AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(record => record.Location));
+                }
+            }
+
             protected override void OnPause()
             {
                 foreach (var operation in ResourceDownloaderOperations)
@@ -351,26 +405,13 @@ namespace AIO.UEngine
                         }
                     }
 
-                    // // 检查磁盘空间是否足够
-                    // if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
-                    // {
-                    //     OnDiskSpaceNotEnough?.Invoke(Report);
-                    //     yield break;
-                    // }
-                    //
-                    // // 检查是否有写入权限
-                    // if (!AssetSystem.GetHasWritePermission())
-                    // {
-                    //     OnWritePermissionNot?.Invoke(Report);
-                    //     yield break;
-                    // }
-                    //
-                    // if (!AssetSystem.GetHasReadPermission())
-                    // {
-                    //     OnReadPermissionNot?.Invoke(Report);
-                    //     yield break;
-                    // }
-
+                    // 检查磁盘空间是否足够
+                    if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
+                    {
+                        OnDiskSpaceNotEnough?.Invoke(Report);
+                        yield break;
+                    }
+     
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
                     pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;
                     pair.Value.BeginDownload();
