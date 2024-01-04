@@ -73,13 +73,21 @@
 ## ⭐ About
 
 - **这是 Unity 的资源加载接口(CLI)包。它提供了一组命令和工具来增强效率和开发体验。**
-- ✅ **支持 Unity 2019.1 及以上版本**
-- ✅ **支持 资源 同步加载/异步加载/协程加载 接口**
-- ✅ **支持 资源 本地加载/远程加载 接口**
-- ✅ **支持 Android/iOS/Windows/Mac/WebGL**
-- ✅ **支持 YooAsset**
-- ✅ **支持 UniTask**
-- ✅ **支持 .NET 4.0 or later**
+> [!IMPORTANT]
+> - ✅ **支持 Unity 2019.1 及以上版本**
+> - ✅ **支持 资源 同步加载/异步加载/协程加载 接口**
+> - ✅ **支持 资源 本地模式/远程模式/编译器模式 接口**
+> - ✅ **支持 空包 首包 整包 自定义分包**
+> - ✅ **支持 Android/iOS/Windows/Mac/WebGL**
+> - ✅ **支持 CI/CD 流水线资源打包**
+> - ✅ **支持 .NET 4.0 or later**
+> - ✅ **支持 il2cpp**
+> - ✅ **支持 Unity 增量构建**
+> - ✅ **支持 [UniTask](https://github.com/Cysharp/UniTask)**
+> - ✅ **支持 [YooAsset](https://github.com/tuyoogame/YooAsset)**
+> - ❌ **支持 [XAsset](https://github.com/xasset/xasset)**
+> - ❌ **支持 [Addressable](https://github.com/Unity-Technologies/Addressables-Sample)**
+> - ❌ **支持 自定义代理第三方插件**
 
 ## 📖 Documentation
 
@@ -93,6 +101,7 @@
 **Please refer to the wiki for a list of references and tools used in this package.**
 | **Doc** | **Description**                                                                      |
 | :----: | :-----: |
+| **[Common](https://github.com/AIO-GAME/Common)**| _**C# Unity 通用基础函数库,用于帮助研发团队快速构建框架。**_ |
 | **[UniTask](https://github.com/Cysharp/UniTask#readme)** | _**为 Unity 提供了一个有效的分配自由的 async / await 集成。**_                         |
 | **[YooAsset](https://www.yooasset.com)**| _**YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。**_ |
 
