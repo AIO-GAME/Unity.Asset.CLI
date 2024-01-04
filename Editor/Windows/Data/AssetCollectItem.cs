@@ -341,13 +341,14 @@ namespace AIO.UEditor
             PackageName = package;
             GroupName = group;
             if (string.IsNullOrEmpty(CollectPath)) return;
-            if (!File.Exists(CollectPath) || !Directory.Exists(CollectPath)) return;
-            if (CollectPath.Contains("Resources/") || CollectPath.EndsWith("Resources"))
+            if (!File.Exists(CollectPath) && !Directory.Exists(CollectPath)) return;
+            if (CollectPath.Contains("/Resources/") || CollectPath.EndsWith("Resources"))
             {
                 Debug.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
                 return;
             }
 
+         
             if (Type != EAssetCollectItemType.MainAssetCollector) return;
             var tags = AssetCollectRoot.GetOrCreate(false).GetTags(PackageName, GroupName, CollectPath);
             var pathToLower = ASConfig.GetOrCreate().LoadPathToLower;

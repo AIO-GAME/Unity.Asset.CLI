@@ -131,6 +131,7 @@ namespace AIO
 
             public async void Dispose()
             {
+                if (Records is null) return;
 #if UNITY_EDITOR
                 if (Enable) await AHelper.IO.WriteJsonUTF8Async(LOCAL_PATH, Records);
 #endif

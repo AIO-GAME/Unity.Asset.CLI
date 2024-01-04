@@ -111,9 +111,11 @@ namespace AIO.UEditor
                         GEStyle.PreDropDown, GP_Width_100);
                 }
                 else
+                {
                     LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
                         LookModeDisplayTypes[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
                         GEStyle.PreDropDown, GP_Width_100);
+                }
             }
             else LookModeDisplayTypeIndex = 0;
 
@@ -680,8 +682,10 @@ namespace AIO.UEditor
         {
             var i = packageIndex;
             var j = groupIndex;
-            if (Data.Packages.Length <= i || i < 0) return;
-            if (Data.Packages[i].Groups.Length <= j || j < 0) return;
+            if (Data.Packages is null || i < 0) return;
+            if (Data.Packages.Length <= i) return;
+            if (Data.Packages[i] is null || Data.Packages[i].Groups is null || j < 0) return;
+            if (Data.Packages[i].Groups.Length <= j) return;
 
             LookModeDisplayGroups[LookModeDisplayPackages[i]] = Array.Empty<string>();
             LookModeDisplayCollectors[(i, j)] = Array.Empty<string>();
@@ -699,26 +703,23 @@ namespace AIO.UEditor
             var listTypes = new List<string>();
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
             {
-                var collector = Data.Packages[i].Groups[j].Collectors[k];
-                if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                if (string.IsNullOrEmpty(collector.CollectPath)) continue;
-                collector.CollectAssetTask(Data.Packages[i].Name, Data.Packages[i].Groups[j].Name, dic =>
-                {
-                    foreach (var pair in dic)
+                Data.Packages[i].Groups[j].Collectors[k].CollectAssetTask(
+                    Data.Packages[i].Name,
+                    Data.Packages[i].Groups[j].Name,
+                    dic =>
                     {
-                        listTypes.Add(pair.Value.Type);
-                        LookModeData[(i, j)].Add(pair.Value);
-                        if (!LookModeDataFilter(pair.Value))
+                        foreach (var pair in dic)
                         {
+                            listTypes.Add(pair.Value.Type);
+                            LookModeData[(i, j)].Add(pair.Value);
                             CurrentPageValues.Add(pair.Value);
                             LookModeCollectorsALLSize += pair.Value.Size;
                         }
-                    }
 
-                    CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
-                    LookModeDisplayTypes[(i, j)] = listTypes.Distinct().ToArray();
-                    Repaint();
-                });
+                        LookModeDisplayTypes[(i, j)] = listTypes.Distinct().ToArray();
+                        CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
+                        Repaint();
+                    });
             }
         }
 

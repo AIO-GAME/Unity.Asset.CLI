@@ -155,8 +155,6 @@ namespace AIO.UEditor
                         collector => flag || !string.IsNullOrEmpty(collector.Tags)));
                     foreach (var collector in group.Collectors)
                     {
-                        if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                        if (string.IsNullOrEmpty(collector.CollectPath)) continue;
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
                         collector.CollectAssetTask(package.Name, group.Name, dic =>
                         {
