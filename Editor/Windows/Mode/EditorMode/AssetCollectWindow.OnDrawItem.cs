@@ -44,13 +44,23 @@ namespace AIO.UEditor
                 item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GP_Width_80);
 
                 if (item.Path is null) GUI.enabled = true;
-                item.Path = GELayout.Field(item.Path, GTOption.WidthMin(160));
+                item.Path = GELayout.Field(item.Path, GTOption.Width(120));
                 if (item.Path is null) GUI.enabled = false;
 
                 if (!item.Folded)
                 {
                     item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays,
                         GEStyle.PreDropDown);
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(item.CollectPath))
+                    {
+                        if (GELayout.Button(item.CollectPath, GEStyle.toolbarbutton))
+                        {
+                            _ = PrPlatform.Open.Path(item.CollectPath).Async();
+                        }
+                    }
                 }
 
                 if (GELayout.Button(GC_OPEN, GEStyle.TEtoolbarbutton, 24))
