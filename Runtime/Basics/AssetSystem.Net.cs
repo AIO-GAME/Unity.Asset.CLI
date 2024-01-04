@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+using Sprite = UnityEngine.Sprite;
 #if SUPPORT_UNITASK
 using Cysharp.Threading.Tasks;
 #endif
@@ -47,7 +48,7 @@ namespace AIO
 #else
             if (operation.isHttpError || operation.isNetworkError)
             {
-                Debug.Log($"{ERROR_NET_UNKNOWN} {operation.url} -> {operation.error}");
+                Debug.LogError($"{ERROR_NET_UNKNOWN} {operation.url} -> {operation.error}");
                 return false;
             }
 #endif
@@ -70,10 +71,9 @@ namespace AIO
             using (var uwr = UnityWebRequestTexture.GetTexture(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    cb?.Invoke(DownloadHandlerTexture.GetContent(uwr));
-                else
-                    cb?.Invoke(null);
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? DownloadHandlerTexture.GetContent(uwr)
+                    : null);
             }
         }
 
@@ -89,10 +89,9 @@ namespace AIO
             using (var uwr = UnityWebRequestTexture.GetTexture(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    cb?.Invoke(Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot));
-                else
-                    cb?.Invoke(null);
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
+                    : null);
             }
         }
 
@@ -106,10 +105,9 @@ namespace AIO
             using (var uwr = UnityWebRequest.Get(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    cb?.Invoke(uwr.downloadHandler.text);
-                else
-                    cb?.Invoke(null);
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? uwr.downloadHandler.text
+                    : string.Empty);
             }
         }
 
@@ -123,10 +121,9 @@ namespace AIO
             using (var uwr = UnityWebRequest.Get(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    cb?.Invoke(uwr.downloadHandler.data);
-                else
-                    cb?.Invoke(null);
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? uwr.downloadHandler.data
+                    : Array.Empty<byte>());
             }
         }
 
@@ -141,10 +138,9 @@ namespace AIO
             using (var uwr = UnityWebRequestMultimedia.GetAudioClip(url, audioType))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    cb?.Invoke(DownloadHandlerAudioClip.GetContent(uwr));
-                else
-                    cb?.Invoke(null);
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? DownloadHandlerAudioClip.GetContent(uwr)
+                    : null);
             }
         }
 
@@ -158,10 +154,9 @@ namespace AIO
             using (var uwr = UnityWebRequestAssetBundle.GetAssetBundle(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    cb?.Invoke(DownloadHandlerAssetBundle.GetContent(uwr));
-                else
-                    cb?.Invoke(null);
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? DownloadHandlerAssetBundle.GetContent(uwr)
+                    : null);
             }
         }
 
@@ -181,7 +176,9 @@ namespace AIO
             using (var uwr = UnityWebRequestTexture.GetTexture(url))
             {
                 yield return uwr.SendWebRequest();
-                if (LoadCheckNet(uwr)) cb.Invoke(DownloadHandlerTexture.GetContent(uwr));
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? DownloadHandlerTexture.GetContent(uwr)
+                    : null);
             }
         }
 
@@ -197,11 +194,9 @@ namespace AIO
             using (var uwr = UnityWebRequestTexture.GetTexture(url))
             {
                 yield return uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                {
-                    var tempSprite = Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot);
-                    cb?.Invoke(tempSprite);
-                }
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
+                    : null);
             }
         }
 
@@ -215,7 +210,9 @@ namespace AIO
             using (var uwr = UnityWebRequestAssetBundle.GetAssetBundle(url))
             {
                 yield return uwr.SendWebRequest();
-                if (LoadCheckNet(uwr)) cb?.Invoke(DownloadHandlerAssetBundle.GetContent(uwr));
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? DownloadHandlerAssetBundle.GetContent(uwr)
+                    : null);
             }
         }
 
@@ -230,7 +227,9 @@ namespace AIO
             using (var uwr = UnityWebRequestMultimedia.GetAudioClip(url, audioType))
             {
                 yield return uwr.SendWebRequest();
-                if (LoadCheckNet(uwr)) cb?.Invoke(DownloadHandlerAudioClip.GetContent(uwr));
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? DownloadHandlerAudioClip.GetContent(uwr)
+                    : null);
             }
         }
 
@@ -244,7 +243,9 @@ namespace AIO
             using (var uwr = UnityWebRequest.Get(url))
             {
                 yield return uwr.SendWebRequest();
-                cb?.Invoke(LoadCheckNet(uwr) ? uwr.downloadHandler.text : string.Empty);
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? uwr.downloadHandler.text
+                    : string.Empty);
             }
         }
 
@@ -258,7 +259,9 @@ namespace AIO
             using (var uwr = UnityWebRequest.Get(url))
             {
                 yield return uwr.SendWebRequest();
-                cb?.Invoke(LoadCheckNet(uwr) ? uwr.downloadHandler.data : Array.Empty<byte>());
+                cb?.Invoke(LoadCheckNet(uwr)
+                    ? uwr.downloadHandler.data
+                    : Array.Empty<byte>());
             }
         }
 
@@ -276,9 +279,9 @@ namespace AIO
             using (var uwr = UnityWebRequestTexture.GetTexture(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    return DownloadHandlerTexture.GetContent(uwr);
-                return null;
+                return LoadCheckNet(uwr)
+                    ? DownloadHandlerTexture.GetContent(uwr)
+                    : null;
             }
         }
 
@@ -293,9 +296,9 @@ namespace AIO
             using (var uwr = UnityWebRequestTexture.GetTexture(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    return Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot);
-                return null;
+                return LoadCheckNet(uwr)
+                    ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
+                    : null;
             }
         }
 
@@ -308,8 +311,9 @@ namespace AIO
             using (var uwr = UnityWebRequest.Get(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr)) return uwr.downloadHandler.text;
-                return null;
+                return LoadCheckNet(uwr)
+                    ? uwr.downloadHandler.text
+                    : string.Empty;
             }
         }
 
@@ -322,8 +326,9 @@ namespace AIO
             using (var uwr = UnityWebRequest.Get(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr)) return uwr.downloadHandler.data;
-                return null;
+                return LoadCheckNet(uwr)
+                    ? uwr.downloadHandler.data
+                    : Array.Empty<byte>();
             }
         }
 
@@ -337,9 +342,9 @@ namespace AIO
             using (var uwr = UnityWebRequestMultimedia.GetAudioClip(url, audioType))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr))
-                    return DownloadHandlerAudioClip.GetContent(uwr);
-                return null;
+                return LoadCheckNet(uwr)
+                    ? DownloadHandlerAudioClip.GetContent(uwr)
+                    : null;
             }
         }
 
@@ -352,8 +357,9 @@ namespace AIO
             using (var uwr = UnityWebRequestAssetBundle.GetAssetBundle(url))
             {
                 await uwr.SendWebRequest();
-                if (LoadCheckNet(uwr)) return DownloadHandlerAssetBundle.GetContent(uwr);
-                return null;
+                return LoadCheckNet(uwr)
+                    ? DownloadHandlerAssetBundle.GetContent(uwr)
+                    : null;
             }
         }
 

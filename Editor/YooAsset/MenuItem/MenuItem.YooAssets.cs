@@ -14,18 +14,12 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public partial class MenuItem_YooAssets
+    public static class MenuItem_YooAssets
     {
         [MenuItem("YooAsset/Create Config")]
         public static void CreateConfig()
         {
-            var BundlesDir = Application.dataPath.Replace("Assets", "Bundles");
-            if (!Directory.Exists(BundlesDir))
-            {
-                Debug.LogWarningFormat("Bundles 目录不存在 : 无需创建配置文件");
-                return;
-            }
-
+            var BundlesDir = Path.Combine(EHelper.Path.Project, "Bundles");
             CreateConfig(BundlesDir);
         }
 
@@ -40,13 +34,15 @@ namespace AIO.UEditor
             var BundlesConfigDir = Path.Combine(BundlesDir, "Version");
             if (!Directory.Exists(BundlesConfigDir)) Directory.CreateDirectory(BundlesConfigDir);
 
-            var TabelDic = new Dictionary<BuildTarget, Dictionary<string, AssetsPackageConfig>>();
-            TabelDic.Add(BuildTarget.Android, new Dictionary<string, AssetsPackageConfig>());
-            TabelDic.Add(BuildTarget.WebGL, new Dictionary<string, AssetsPackageConfig>());
-            TabelDic.Add(BuildTarget.iOS, new Dictionary<string, AssetsPackageConfig>());
-            TabelDic.Add(BuildTarget.StandaloneWindows, new Dictionary<string, AssetsPackageConfig>());
-            TabelDic.Add(BuildTarget.StandaloneWindows64, new Dictionary<string, AssetsPackageConfig>());
-            TabelDic.Add(BuildTarget.StandaloneOSX, new Dictionary<string, AssetsPackageConfig>());
+            var TabelDic = new Dictionary<BuildTarget, Dictionary<string, AssetsPackageConfig>>
+            {
+                { BuildTarget.Android, new Dictionary<string, AssetsPackageConfig>() },
+                { BuildTarget.WebGL, new Dictionary<string, AssetsPackageConfig>() },
+                { BuildTarget.iOS, new Dictionary<string, AssetsPackageConfig>() },
+                { BuildTarget.StandaloneWindows, new Dictionary<string, AssetsPackageConfig>() },
+                { BuildTarget.StandaloneWindows64, new Dictionary<string, AssetsPackageConfig>() },
+                { BuildTarget.StandaloneOSX, new Dictionary<string, AssetsPackageConfig>() }
+            };
 
             var BundlesInfo = new DirectoryInfo(BundlesDir);
             var versions = new List<DirectoryInfo>();
@@ -71,12 +67,9 @@ namespace AIO.UEditor
                              SearchOption.TopDirectoryOnly))
                 {
                     versions.Clear();
-                    foreach (var VersionInfo in PackageInfo.GetDirectories("*", SearchOption.TopDirectoryOnly))
-                    {
-                        if (VersionInfo.Name.StartsWith("OutputCache")) continue;
-                        if (VersionInfo.Name.StartsWith("Simulate")) continue;
-                        versions.Add(VersionInfo);
-                    }
+                    versions.AddRange(PackageInfo.GetDirectories("*", SearchOption.TopDirectoryOnly)
+                        .Where(VersionInfo => !VersionInfo.Name.EndsWith("OutputCache"))
+                        .Where(VersionInfo => !VersionInfo.Name.EndsWith("Simulate")));
 
                     if (versions.Count <= 0) continue;
                     var last = AHelper.IO.GetLastWriteTimeUtc(versions);
@@ -111,34 +104,6 @@ namespace AIO.UEditor
                 AHelper.IO.WriteJsonUTF8(filePath, hashtable.Value.Values.ToArray());
             }
         }
-
-        // [MenuItem("YooAsset/Open/Bundles")]
-        // public static async void OpenBundles()
-        // {
-        //     var path = Application.dataPath.Replace("Assets", "Bundles");
-        //     if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Open.Path(path);
-        // }
-        //
-        // [MenuItem("YooAsset/Open/Sandbox")]
-        // public static async void OpenSandbox()
-        // {
-        //     var path = Application.dataPath.Replace("Assets", "Sandbox");
-        //     if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Open.Path(path);
-        // }
-        //
-        // [MenuItem("YooAsset/Clear/Bundles")]
-        // public static async void ClearBundles()
-        // {
-        //     var path = Application.dataPath.Replace("Assets", "Bundles");
-        //     if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Folder.Del(path);
-        // }
-        //
-        // [MenuItem("YooAsset/Clear/Sandbox")]
-        // public static async void ClearSandbox()
-        // {
-        //     var path = Application.dataPath.Replace("Assets", "Sandbox");
-        //     if (AHelper.IO.ExistsFolder(path)) await PrPlatform.Folder.Del(path);
-        // }
     }
 }
 #endif

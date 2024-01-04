@@ -25,6 +25,8 @@ namespace AIO.UEditor
         /// </summary>
         private void UpdateDataBuildMode()
         {
+            // 获取当前文件磁盘剩余空间
+            Disk = new DriveInfo(Path.GetPathRoot(EHelper.Path.Project));
             LookModeDisplayPackages = Data.Packages.Select(x => x.Name).ToArray();
             BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
             Tags = Data.GetTags();
@@ -51,6 +53,9 @@ namespace AIO.UEditor
         /// </summary>
         partial void OnDrawHeaderBuildMode()
         {
+            EditorGUILayout.LabelField($"     磁盘剩余空间:{Disk.AvailableFreeSpace.ToConverseStringFileSize()}",
+                GEStyle.HeaderLabel);
+
             EditorGUILayout.Separator();
             if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
@@ -112,7 +117,6 @@ namespace AIO.UEditor
                         return;
                     }
 
-                    BuildConfig.FirstPack = GELayout.ToggleLeft("首包", BuildConfig.FirstPack, GP_Width_50);
                     BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
 
                     EditorGUILayout.Separator();
@@ -158,10 +162,9 @@ namespace AIO.UEditor
                             OutputRoot = BuildConfig.BuildOutputPath,
                             BuildMode = BuildConfig.BuildMode,
                             CopyBuildinFileOption = ECopyBuildinFileOption.None,
-                            CopyBuildinFileTags = string.Empty
+                            CopyBuildinFileTags = BuildConfig.FirstPackTag
                         };
                         YooAssetBuild.ArtBuild(BuildCommand);
-                        MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 #else
                         if (EditorUtility.DisplayDialogComplex(
@@ -256,6 +259,12 @@ namespace AIO.UEditor
                     }
 
                     if (CurrentTagIndex != 0) GELayout.HelpBox(BuildConfig.FirstPackTag);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
+                {
+                    EditorGUILayout.LabelField("缓存清理数量", GP_Width_100);
+                    BuildConfig.AutoCleanCacheNum = GELayout.Slider(BuildConfig.AutoCleanCacheNum, 1, 20);
                 }
             }
         }

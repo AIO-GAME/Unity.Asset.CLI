@@ -3,8 +3,10 @@
 using System;
 using System.IO;
 using System.Linq;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using YooAsset;
 using YooAsset.Editor;
 
@@ -55,23 +57,6 @@ namespace AIO.UEditor
             ArtBuild(buildArgs);
         }
 
-        /// <summary>
-        /// 修改配置
-        /// </summary>
-        public static void ChangeSetting()
-        {
-        }
-
-        /// <summary>
-        /// 构建版本相关
-        /// </summary>
-        /// <returns></returns>
-        private static string GetBuildPackageVersion()
-        {
-            var totalMinutes = DateTime.Now.Hour * 60 + DateTime.Now.Minute;
-            return DateTime.Now.ToString("yyyy-MM-dd") + "-" + totalMinutes;
-        }
-
         private static IEncryptionServices CreateEncryptionServicesInstance(string EncryptionClassName)
         {
             if (string.IsNullOrEmpty(EncryptionClassName)) return null;
@@ -82,7 +67,6 @@ namespace AIO.UEditor
 
         public static void ArtBuild(YooAssetBuildCommand command)
         {
-            Debug.Log(AHelper.Json.Serialize(command));
             YooAsset.Editor.EBuildPipeline buildPipeline;
             switch (command.BuildPipeline)
             {
@@ -109,11 +93,40 @@ namespace AIO.UEditor
                         command.BuildPackage);
                     if (Directory.Exists(target))
                     {
-                        buildMode = Directory.GetDirectories(target)
-                            .Where(directory => directory != "Simulate")
-                            .Any(directory => directory != "OutputCache")
-                            ? YooAsset.Editor.EBuildMode.IncrementalBuild
-                            : YooAsset.Editor.EBuildMode.ForceRebuild;
+                        var dirs = Directory.GetDirectories(target)
+                            .Where(directory => !directory.EndsWith("Simulate") && !directory.EndsWith("OutputCache"))
+                            .ToArray();
+                        if (dirs.Length > 0)
+                        {
+                            // 如果为增量更新 则判断是否需要清理缓存 
+                            buildMode = YooAsset.Editor.EBuildMode.IncrementalBuild;
+                            var cleanCacheNum = ASBuildConfig.GetOrCreate().AutoCleanCacheNum;
+                            if (dirs.Length >= cleanCacheNum)
+                            {
+                                var caches = dirs.SortQuick((s, t) =>
+                                {
+                                    // 如果缓存数量大于等于设置的缓存数量 则清理缓存 缓存清理机制为删除最早的缓存
+                                    var st = Directory.GetCreationTimeUtc(s);
+                                    var tt = Directory.GetCreationTimeUtc(t);
+                                    var result = tt.CompareTo(st);
+                                    if (result == 0) // 如果时间相同 则比较名称
+                                    {
+                                        result = string.Compare(
+                                            Path.GetFileName(s),
+                                            Path.GetFileName(t),
+                                            StringComparison.CurrentCulture);
+                                    }
+
+                                    return result;
+                                });
+
+                                for (var index = 0; index < dirs.Length - cleanCacheNum + 1; index++)
+                                {
+                                    Directory.Delete(caches[index], true);
+                                }
+                            }
+                        }
+                        else buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
                     }
                     else buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
 
@@ -136,16 +149,21 @@ namespace AIO.UEditor
                 CompressOption = command.CompressOption,
                 OutputNameStyle = command.OutputNameStyle,
                 SharedPackRule = new ZeroRedundancySharedPackRule(),
-                CopyBuildinFileOption = command.CopyBuildinFileOption,
                 CopyBuildinFileTags = command.CopyBuildinFileTags,
                 VerifyBuildingResult = command.VerifyBuildingResult,
                 PackageVersion = command.PackageVersion,
                 BuildOutputRoot = command.OutputRoot,
-                StreamingAssetsRoot = Application.streamingAssetsPath,
+                StreamingAssetsRoot = Path.Combine(
+                    Application.streamingAssetsPath,
+                    ASConfig.GetOrCreate().RuntimeRootDirectory),
                 DisableWriteTypeTree = false
             };
 
-            if (string.IsNullOrEmpty(command.EncyptionClassName))
+            buildParameters.CopyBuildinFileOption = !string.IsNullOrEmpty(buildParameters.CopyBuildinFileTags)
+                ? ECopyBuildinFileOption.ClearAndCopyByTags
+                : ECopyBuildinFileOption.None;
+
+            if (!string.IsNullOrEmpty(command.EncyptionClassName))
                 buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
 
             if (command.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
@@ -156,16 +174,22 @@ namespace AIO.UEditor
                 };
             }
 
+            Debug.Log(AHelper.Json.Serialize(buildParameters));
+
             var builder = new AssetBundleBuilder();
             var buildResult = builder.Run(buildParameters);
             if (buildResult.Success)
             {
-                EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
-                MenuItem_YooAssets.CreateConfig();
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
+                else EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
+                MenuItem_YooAssets.CreateConfig(buildParameters.BuildOutputRoot);
             }
             else
             {
-                EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+                    Debug.LogError($"构建失败 {buildResult.ErrorInfo}");
+                else
+                    EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
             }
         }
     }

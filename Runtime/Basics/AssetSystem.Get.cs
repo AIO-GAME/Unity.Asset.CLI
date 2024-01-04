@@ -4,12 +4,50 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace AIO
 {
     public partial class AssetSystem
     {
+        /// <summary>
+        /// 运行时 内置文件目录 
+        /// </summary>
+        /// <remarks>
+        /// (Application.streamingAssetsPath)/RuntimeRootDirectory
+        /// </remarks>
+        public static string BuildInRootDirectory { get; private set; }
+
+        /// <summary>
+        /// 运行时 缓存文件目录 
+        /// </summary>
+        /// <remarks>
+        /// (Application.persistentDataPath)/RuntimeRootDirectory
+        /// </remarks>
+        public static string SandboxRootDirectory { get; private set; }
+
+        /// <summary>
+        /// 获取指定标签资源可寻址列表
+        /// </summary>
+        /// <param name="tag">资源标签</param>
+        /// <returns>寻址列表</returns>
+        public static ICollection<string> GetAssetInfos(string tag)
+        {
+            return Proxy.GetAssetInfos(tag);
+        }
+
+        /// <summary>
+        /// 获取指定标签资源可寻址列表
+        /// </summary>
+        /// <param name="tag">资源标签</param>
+        /// <returns>寻址列表</returns>
+        public static ICollection<string> GetAssetInfos(IEnumerable<string> tag)
+        {
+            return Proxy.GetAssetInfos(tag);
+        }
+
         /// <summary>
         /// 获取是否有读取权限
         /// </summary>
@@ -98,7 +136,7 @@ namespace AIO
 
 #else
 #if UNITY_STANDALONE_WIN
-            var drive = new System.IO.DriveInfo(Application.dataPath.Substring(0, 1));
+            var drive = new DriveInfo(Application.dataPath.Substring(0, 1));
             return drive.AvailableFreeSpace;
 
 #elif UNITY_ANDROID
