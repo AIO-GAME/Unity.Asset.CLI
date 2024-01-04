@@ -162,7 +162,7 @@ namespace AIO.UEditor
                             OutputRoot = BuildConfig.BuildOutputPath,
                             BuildMode = BuildConfig.BuildMode,
                             CopyBuildinFileOption = ECopyBuildinFileOption.None,
-                            CopyBuildinFileTags = string.Empty
+                            CopyBuildinFileTags = BuildConfig.FirstPackTag
                         };
                         YooAssetBuild.ArtBuild(BuildCommand);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");

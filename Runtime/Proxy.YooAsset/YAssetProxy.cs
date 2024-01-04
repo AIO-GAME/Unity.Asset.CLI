@@ -7,10 +7,7 @@
 #if SUPPORT_YOOASSET
 using System;
 using System.Collections;
-using System.IO;
 using AIO.UEngine.YooAsset;
-using UnityEditor;
-using UnityEngine;
 using YooAsset;
 
 namespace AIO.UEngine
@@ -40,24 +37,14 @@ namespace AIO.UEngine
 
         private static YAssetParameters GetParameter(YAssetPackage package)
         {
-            var BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, AssetSystem.Parameter.RuntimeRootDirectory);
-            var SandboxRootDirectory =
-#if UNITY_EDITOR
-                string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
-                    Path.DirectorySeparatorChar, "Sandbox", Path.DirectorySeparatorChar,
-                    EditorUserBuildSettings.activeBuildTarget.ToString());
-#else
-                Path.Combine(Application.persistentDataPath, AssetSystem.Parameter.RuntimeRootDirectory);
-#endif
-
             YAssetParameters yAssetFlow;
             switch (AssetSystem.Parameter.ASMode)
             {
                 case EASMode.Remote:
                     yAssetFlow = new YAssetParametersRemote(AssetSystem.Parameter)
                     {
-                        BuildInRootDirectory = BuildInRootDirectory,
-                        SandboxRootDirectory = SandboxRootDirectory,
+                        BuildInRootDirectory = AssetSystem.BuildInRootDirectory,
+                        SandboxRootDirectory = AssetSystem.SandboxRootDirectory,
                         DeliveryQueryServices = EventDeliveryQueryServices == null
                             ? new ResolverDeliveryQueryServices()
                             : EventDeliveryQueryServices.Invoke(),
@@ -79,8 +66,8 @@ namespace AIO.UEngine
                 case EASMode.Local:
                     yAssetFlow = new YAssetParametersLocal(AssetSystem.Parameter)
                     {
-                        BuildInRootDirectory = BuildInRootDirectory,
-                        SandboxRootDirectory = SandboxRootDirectory,
+                        BuildInRootDirectory = AssetSystem.BuildInRootDirectory,
+                        SandboxRootDirectory = AssetSystem.SandboxRootDirectory,
                     };
                     break;
                 default:

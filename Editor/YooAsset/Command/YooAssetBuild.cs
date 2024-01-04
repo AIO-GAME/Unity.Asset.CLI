@@ -3,8 +3,10 @@
 using System;
 using System.IO;
 using System.Linq;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using YooAsset;
 using YooAsset.Editor;
 
@@ -55,23 +57,6 @@ namespace AIO.UEditor
             ArtBuild(buildArgs);
         }
 
-        /// <summary>
-        /// 修改配置
-        /// </summary>
-        public static void ChangeSetting()
-        {
-        }
-
-        /// <summary>
-        /// 构建版本相关
-        /// </summary>
-        /// <returns></returns>
-        private static string GetBuildPackageVersion()
-        {
-            var totalMinutes = DateTime.Now.Hour * 60 + DateTime.Now.Minute;
-            return DateTime.Now.ToString("yyyy-MM-dd") + "-" + totalMinutes;
-        }
-
         private static IEncryptionServices CreateEncryptionServicesInstance(string EncryptionClassName)
         {
             if (string.IsNullOrEmpty(EncryptionClassName)) return null;
@@ -82,7 +67,6 @@ namespace AIO.UEditor
 
         public static void ArtBuild(YooAssetBuildCommand command)
         {
-            Debug.Log(AHelper.Json.Serialize(command));
             YooAsset.Editor.EBuildPipeline buildPipeline;
             switch (command.BuildPipeline)
             {
@@ -165,16 +149,21 @@ namespace AIO.UEditor
                 CompressOption = command.CompressOption,
                 OutputNameStyle = command.OutputNameStyle,
                 SharedPackRule = new ZeroRedundancySharedPackRule(),
-                CopyBuildinFileOption = command.CopyBuildinFileOption,
                 CopyBuildinFileTags = command.CopyBuildinFileTags,
                 VerifyBuildingResult = command.VerifyBuildingResult,
                 PackageVersion = command.PackageVersion,
                 BuildOutputRoot = command.OutputRoot,
-                StreamingAssetsRoot = Application.streamingAssetsPath,
+                StreamingAssetsRoot = Path.Combine(
+                    Application.streamingAssetsPath,
+                    ASConfig.GetOrCreate().RuntimeRootDirectory),
                 DisableWriteTypeTree = false
             };
 
-            if (string.IsNullOrEmpty(command.EncyptionClassName))
+            buildParameters.CopyBuildinFileOption = !string.IsNullOrEmpty(buildParameters.CopyBuildinFileTags)
+                ? ECopyBuildinFileOption.ClearAndCopyByTags
+                : ECopyBuildinFileOption.None;
+
+            if (!string.IsNullOrEmpty(command.EncyptionClassName))
                 buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
 
             if (command.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
@@ -185,16 +174,22 @@ namespace AIO.UEditor
                 };
             }
 
+            Debug.Log(AHelper.Json.Serialize(buildParameters));
+
             var builder = new AssetBundleBuilder();
             var buildResult = builder.Run(buildParameters);
             if (buildResult.Success)
             {
-                EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
+                else EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
                 MenuItem_YooAssets.CreateConfig(buildParameters.BuildOutputRoot);
             }
             else
             {
-                EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+                    Debug.LogError($"构建失败 {buildResult.ErrorInfo}");
+                else
+                    EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
             }
         }
     }
