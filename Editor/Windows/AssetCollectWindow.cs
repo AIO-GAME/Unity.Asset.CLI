@@ -17,7 +17,7 @@ namespace AIO.UEditor
         Group = "Tools",
         Menu = "AIO/Window/Asset",
         MinSizeHeight = 450,
-        MinSizeWidth = 750
+        MinSizeWidth = 800
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
