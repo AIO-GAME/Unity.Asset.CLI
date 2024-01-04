@@ -88,6 +88,16 @@ namespace AIO
             return false;
         }
 
+#if UNITY_IOS || UNITY_IPHONE
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern double _IOS_GetFreeDiskSpace();
+#endif
+
+#if UNITY_WEBGL
+        // [System.Runtime.InteropServices.DllImport("__Internal")]
+        // private static extern double _WEBGL_GetFreeDiskSpace();
+#endif
+
         /// <summary>
         /// 获取可用磁盘空间
         /// </summary>
@@ -99,8 +109,10 @@ namespace AIO
             return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
 #endif
 #else
-#if UNITY_IOS || UNITY_IPHONE || UNITY_WEBGL
+#if UNITY_WEBGL
             return 0;
+#elif UNITY_IOS || UNITY_IPHONE
+            return (long)_IOS_GetFreeDiskSpace();
 #elif UNITY_ANDROID
             try
             { 
