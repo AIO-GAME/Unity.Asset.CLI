@@ -5,12 +5,15 @@
 
 #if SUPPORT_YOOASSET
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AIO.UEngine;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
+using YooAsset.Editor;
 
 namespace AIO.UEditor
 {
@@ -75,20 +78,32 @@ namespace AIO.UEditor
                     var last = AHelper.IO.GetLastWriteTimeUtc(versions);
                     if (Enum.TryParse<BuildTarget>(PlatformInfo.Name, out var enums))
                     {
-                        if (TabelDic[enums].ContainsKey(PackageInfo.Name))
+                        if (!TabelDic[enums].ContainsKey(PackageInfo.Name))
+                            TabelDic[enums].Add(PackageInfo.Name, new AssetsPackageConfig());
+
+                        TabelDic[enums][PackageInfo.Name].Version = last.Name;
+                        TabelDic[enums][PackageInfo.Name].Name = PackageInfo.Name;
+                        var table = AHelper.IO.ReadJson<Hashtable>(
+                            Path.Combine(last.FullName, $"BuildReport_{PackageInfo.Name}_{last.Name}.json"));
+                        if (table == null) continue;
+                        foreach (var item in table)
                         {
-                            TabelDic[enums][PackageInfo.Name].Version = last.Name;
-                            TabelDic[enums][PackageInfo.Name].Name = PackageInfo.Name;
-                        }
-                        else
-                        {
-                            TabelDic[enums].Add(PackageInfo.Name, new AssetsPackageConfig
+                            if (item is not DictionaryEntry entry) continue;
+                            if (entry.Key.ToString() != "Summary") continue;
+                            switch (entry.Value.To<JObject>().Value<int>("CompressOption"))
                             {
-                                Version = last.Name,
-                                Name = PackageInfo.Name,
-                                IsDefault = false,
-                                IsSidePlayWithDownload = false,
-                            });
+                                case (int)ECompressOption.LZMA:
+                                    TabelDic[enums][PackageInfo.Name].CompressMode = ECompressMode.LZMA;
+                                    break;
+                                case (int)ECompressOption.LZ4:
+                                    TabelDic[enums][PackageInfo.Name].CompressMode = ECompressMode.LZ4;
+                                    break;
+                                default:
+                                    TabelDic[enums][PackageInfo.Name].CompressMode = ECompressMode.None;
+                                    break;
+                            }
+
+                            break;
                         }
                     }
                     else Debug.LogWarningFormat("未知平台 : {0}", PackageInfo.Name);

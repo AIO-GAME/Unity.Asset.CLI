@@ -40,7 +40,7 @@ namespace AIO.UEditor
                 buildArgs.CopyBuildinFileOption = ECopyBuildinFileOption.None;
 
             if (Enum.IsDefined(typeof(ECompressOption), buildArgs.CompressOption))
-                buildArgs.CompressOption = ECompressOption.LZ4;
+                buildArgs.CompressOption = ECompressMode.LZ4;
 
             if (Enum.IsDefined(typeof(EBuildPipeline), buildArgs.BuildPipeline))
                 buildArgs.BuildPipeline =
@@ -146,7 +146,6 @@ namespace AIO.UEditor
                 BuildPipeline = buildPipeline,
                 BuildMode = buildMode,
                 PackageName = command.BuildPackage,
-                CompressOption = command.CompressOption,
                 OutputNameStyle = command.OutputNameStyle,
                 SharedPackRule = new ZeroRedundancySharedPackRule(),
                 CopyBuildinFileTags = command.CopyBuildinFileTags,
@@ -158,6 +157,19 @@ namespace AIO.UEditor
                     ASConfig.GetOrCreate().RuntimeRootDirectory),
                 DisableWriteTypeTree = false
             };
+            switch (command.CompressOption)
+            {
+                case ECompressMode.None:
+                    buildParameters.CompressOption = ECompressOption.Uncompressed;
+                    break;
+                case ECompressMode.LZMA:
+                    buildParameters.CompressOption = ECompressOption.LZMA;
+                    break;
+                case ECompressMode.LZ4:
+                    buildParameters.CompressOption = ECompressOption.LZ4;
+                    break;
+            }
+
 
             buildParameters.CopyBuildinFileOption = !string.IsNullOrEmpty(buildParameters.CopyBuildinFileTags)
                 ? ECopyBuildinFileOption.ClearAndCopyByTags
