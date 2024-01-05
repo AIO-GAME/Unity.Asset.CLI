@@ -35,28 +35,31 @@ namespace AIO.UEngine.YooAsset
 
         protected sealed override InitializeParameters GetParameters()
         {
-            var initParameters = new WebPlayModeParameters();
-            initParameters.DecryptionServices = DecryptionServices;
-            initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;
-            initParameters.QueryServices = QueryServices;
-            initParameters.RemoteServices = RemoteServices;
+            var initParameters = new WebPlayModeParameters
+            {
+                DecryptionServices = DecryptionServices,
+                LoadingMaxTimeSlice = LoadingMaxTimeSlice,
+                BuildinQueryServices = QueryServices,
+                RemoteServices = RemoteServices
+            };
             return initParameters;
         }
 #else
-
         private const EPlayMode MODE = EPlayMode.HostPlayMode;
 
         protected sealed override InitializeParameters GetParameters()
         {
-            var initParameters = new HostPlayModeParameters();
-            initParameters.DecryptionServices = DecryptionServices;
-            initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;
-            initParameters.DownloadFailedTryAgain = DownloadFailedTryAgain;
-            initParameters.BuildinQueryServices = QueryServices;
-            initParameters.DeliveryQueryServices = DeliveryQueryServices;
-            initParameters.BuildinRootDirectory = BuildInRootDirectory;
-            initParameters.SandboxRootDirectory = SandboxRootDirectory;
-            initParameters.RemoteServices = RemoteServices;
+            var initParameters = new HostPlayModeParameters
+            {
+                DecryptionServices = DecryptionServices,
+                LoadingMaxTimeSlice = LoadingMaxTimeSlice,
+                DownloadFailedTryAgain = DownloadFailedTryAgain,
+                BuildinQueryServices = QueryServices,
+                DeliveryQueryServices = DeliveryQueryServices,
+                BuildinRootDirectory = BuildInRootDirectory,
+                SandboxRootDirectory = SandboxRootDirectory,
+                RemoteServices = RemoteServices
+            };
             return initParameters;
         }
 #endif

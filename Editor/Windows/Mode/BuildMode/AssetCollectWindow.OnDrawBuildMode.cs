@@ -166,16 +166,23 @@ namespace AIO.UEditor
                         YooAssetBuild.ArtBuild(BuildCommand);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 #else
-                        if (EditorUtility.DisplayDialogComplex(
-                            "提示",
-                            "当前没有导入资源实现工具",
-                            "导入 YooAsset (1.5.7)",
-                            "导入 XAsset (unknown)",
-                            "取消") == 0)
+                        switch (EditorUtility.DisplayDialogComplex(
+                                    "提示",
+                                    "当前没有导入资源实现工具",
+                                    $"导入 YooAsset [{Ghost.YooAsset.Version}]",
+                                    "取消",
+                                    $"导入 YooAsset [{Ghost.YooAsset.Version}][CN]"))
                         {
-#if !SUPPORT_YOOASSET
-                            Install.YooAssetRunAsync();
-#endif
+                            case 0:
+                                Ghost.YooAsset.Install();
+                                Console.WriteLine("导入 YooAsset");
+                                return;
+                            case 1: // 取消
+                                break;
+                            case 2:
+                                Ghost.YooAsset.InstallCN();
+                                Console.WriteLine("导入 YooAsset[CN]");
+                                break;
                         }
 #endif
                         return;

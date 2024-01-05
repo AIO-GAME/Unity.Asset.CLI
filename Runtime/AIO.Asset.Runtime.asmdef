@@ -10,7 +10,9 @@
         "YooAsset",
         "Unity.TextMeshPro",
         "DOTween.Modules",
-        "AIO.Core.Runtime"
+        "AIO.Core.Runtime",
+        "UnityEditor.UI",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

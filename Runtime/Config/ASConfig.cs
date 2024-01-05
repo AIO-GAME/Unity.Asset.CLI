@@ -176,7 +176,13 @@ namespace AIO.UEngine
 
         private static ASConfig GetResource()
         {
-            return Resources.LoadAll<ASConfig>("ASConfig").FirstOrDefault(item => item is not null);
+            return Resources.LoadAll<ASConfig>("ASConfig").FirstOrDefault(item =>
+#if UNITY_2020_1_OR_NEWER
+                    item is not null
+#else
+                    !(item is null)
+#endif
+            );
         }
 
         /// <summary>
