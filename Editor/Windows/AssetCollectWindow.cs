@@ -33,28 +33,32 @@ namespace AIO.UEditor
         {
             AssetCollectSetting.Initialize();
 
-            Data = AssetCollectRoot.GetOrCreate();
-            Selection.activeObject = Data;
-            foreach (var package in Data.Packages)
+            if (Data is null)
             {
-                if (package?.Groups is null) continue;
-
-                foreach (var group in package.Groups)
+                Data = AssetCollectRoot.GetOrCreate();
+                Selection.activeObject = Data;
+                foreach (var package in Data.Packages)
                 {
-                    if (group?.Collectors is null ||
-                        group.Collectors.Length == 0)
-                        continue;
+                    if (package?.Groups is null) continue;
 
-                    foreach (var collect in group.Collectors)
+                    foreach (var group in package.Groups)
                     {
-                        if (string.IsNullOrEmpty(collect.CollectPath)) continue;
-                        collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
+                        if (group?.Collectors is null ||
+                            group.Collectors.Length == 0)
+                            continue;
+
+                        foreach (var collect in group.Collectors)
+                        {
+                            if (string.IsNullOrEmpty(collect.CollectPath)) continue;
+                            collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
+                        }
                     }
                 }
+
+                Config = ASConfig.GetOrCreate();
+                BuildConfig = ASBuildConfig.GetOrCreate();
             }
 
-            Config = ASConfig.GetOrCreate();
-            BuildConfig = ASBuildConfig.GetOrCreate();
 
             GCInit();
 
@@ -202,16 +206,8 @@ namespace AIO.UEditor
             Data.Save();
             Config.Save();
             BuildConfig.Save();
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-#if UNITY_2021_1_OR_NEWER
-            AssetDatabase.SaveAssetIfDirty(Data);
-            AssetDatabase.SaveAssetIfDirty(Config);
-            AssetDatabase.SaveAssetIfDirty(BuildConfig);
-#else
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-#endif
-#endif
         }
 
         public override void EventMouseDown(in Event eventData)
@@ -336,12 +332,8 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         Config.Save();
-                        eventData.Use();
-#if UNITY_2021_1_OR_NEWER
-                        AssetDatabase.SaveAssetIfDirty(Config);
-#else
                         AssetDatabase.SaveAssets();
-#endif
+                        eventData.Use();
                     }
 
                     break;
@@ -350,12 +342,8 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         Data.Save();
-                        eventData.Use();
-#if UNITY_2021_1_OR_NEWER
-                        AssetDatabase.SaveAssetIfDirty(Data);
-#else
                         AssetDatabase.SaveAssets();
-#endif
+                        eventData.Use();
                     }
 
                     break;
@@ -364,12 +352,8 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         BuildConfig.Save();
-                        eventData.Use();
-#if UNITY_2021_1_OR_NEWER
-                        AssetDatabase.SaveAssetIfDirty(BuildConfig);
-#else
                         AssetDatabase.SaveAssets();
-#endif
+                        eventData.Use();
                     }
 
                     break;

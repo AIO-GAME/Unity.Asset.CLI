@@ -1,7 +1,15 @@
 ﻿using System;
+using UnityEngine;
 
 namespace AIO.UEngine
 {
+    public enum ECompressMode
+    {
+        [InspectorName("Uncompressed")] None = 0,
+        [InspectorName("LZMA")] LZMA,
+        [InspectorName("LZ4")] LZ4,
+    }
+
     [Serializable]
     public class AssetsPackageConfig
     {
@@ -21,18 +29,18 @@ namespace AIO.UEngine
         public bool IsDefault;
 
         /// <summary>
-        /// 资源包动态下载加载
+        /// 压缩方式
         /// </summary>
-        public bool IsSidePlayWithDownload ;
+        public ECompressMode CompressMode;
 
         public override string ToString()
         {
             return string.Format(
-                "Name : {0} , Version : {1} , IsDefault : {2} , IsSidePlayWithDownload : {3}",
+                "Name : {0} , Version : {1} , IsDefault : {2} , CompressMode : {3}",
                 Name,
                 Version,
                 IsDefault,
-                IsSidePlayWithDownload
+                CompressMode
             );
         }
     }

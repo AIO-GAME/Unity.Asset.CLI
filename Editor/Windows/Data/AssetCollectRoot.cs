@@ -18,8 +18,9 @@ namespace AIO.UEditor
     /// 资源收集配置
     /// </summary>
     [Serializable]
-    [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#asset-system-%E5%B7%A5%E5%85%B7%E8%AF%B4%E6%98%8E")]
-    public class AssetCollectRoot : ScriptableObject, IDisposable
+    [HelpURL(
+        "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#asset-system-%E5%B7%A5%E5%85%B7%E8%AF%B4%E6%98%8E")]
+    public class AssetCollectRoot : ScriptableObject
     {
         private static AssetCollectRoot _Instance;
 
@@ -122,20 +123,21 @@ namespace AIO.UEditor
 
         public void Save()
         {
-            Dispose();
             if (Equals(null)) return;
+            for (var index = 0; index < Packages.Length; index++)
+            {
+                Packages[index].Dispose();
+            }
+
             EditorUtility.SetDirty(this);
+#if UNITY_2021_1_OR_NEWER
+            AssetDatabase.SaveAssetIfDirty(this);
+#endif
         }
 
         private void OnDisable()
         {
             Save();
-        }
-
-        public void Dispose()
-        {
-            if (Packages is null) return;
-            foreach (var package in Packages) package.Dispose();
         }
 
         public sealed override int GetHashCode()

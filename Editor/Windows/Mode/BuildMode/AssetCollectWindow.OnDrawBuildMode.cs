@@ -156,12 +156,11 @@ namespace AIO.UEditor
                         {
                             PackageVersion = BuildConfig.BuildVersion,
                             BuildPackage = BuildConfig.PackageName,
-                            EncyptionClassName = "",
+                            CompressOption = BuildConfig.CompressedMode,
                             ActiveTarget = BuildConfig.BuildTarget,
                             BuildPipeline = BuildConfig.BuildPipeline,
                             OutputRoot = BuildConfig.BuildOutputPath,
                             BuildMode = BuildConfig.BuildMode,
-                            CopyBuildinFileOption = ECopyBuildinFileOption.None,
                             CopyBuildinFileTags = BuildConfig.FirstPackTag
                         };
                         YooAssetBuild.ArtBuild(BuildCommand);
@@ -230,6 +229,13 @@ namespace AIO.UEditor
                 {
                     EditorGUILayout.LabelField("构建管线", GP_Width_100);
                     BuildConfig.BuildPipeline = GELayout.Popup(BuildConfig.BuildPipeline, GEStyle.PreDropDown);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
+                {
+                    EditorGUILayout.LabelField("压缩模式", GP_Width_100);
+                    BuildConfig.CompressedMode = GELayout.Popup(BuildConfig.CompressedMode,
+                        GEStyle.PreDropDown);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))

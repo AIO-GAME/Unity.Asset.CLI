@@ -1,5 +1,6 @@
 ﻿#if SUPPORT_YOOASSET
 
+using AIO.UEngine;
 using UnityEditor;
 using YooAsset.Editor;
 
@@ -88,7 +89,7 @@ namespace AIO.UEditor
         public string BuildPackage = string.Empty;
 
         [Argument(C_COMPRESS_OPTION, EArgLabel.Enum)]
-        public ECompressOption CompressOption = ECompressOption.LZ4;
+        public ECompressMode CompressOption = ECompressMode.LZ4;
 
         [Argument(C_OUTPUT_NAME_STYLE, EArgLabel.Enum)]
         public EOutputNameStyle OutputNameStyle = EOutputNameStyle.BundleName_HashName;

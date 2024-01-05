@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AIO.UEngine.YooAsset;
 using UnityEngine;
@@ -293,7 +294,7 @@ namespace AIO.UEngine
                         OnDiskSpaceNotEnough?.Invoke(Report);
                         return;
                     }
-                 
+
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
                     pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;
                     pair.Value.BeginDownload();
@@ -364,12 +365,11 @@ namespace AIO.UEngine
                 CurrentValue = TempDownloadBytes + currentDownloadBytes;
             }
 
+            private Dictionary<string, string> ErrorDict = new Dictionary<string, string>();
+
             private void OnUpdateDownloadError(string filename, string error)
             {
-                State = EProgressState.Fail;
-                foreach (var operation in ResourceDownloaderOperations)
-                    operation.Value.CancelDownload();
-                Event.OnError?.Invoke(new SystemException($"下载资源包文件失败 -> [{filename} -> {error}]"));
+                ErrorDict.Add(filename, error);
             }
 
             public IEnumerator WaitCo()
@@ -411,7 +411,7 @@ namespace AIO.UEngine
                         OnDiskSpaceNotEnough?.Invoke(Report);
                         yield break;
                     }
-     
+
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
                     pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;
                     pair.Value.BeginDownload();
@@ -433,7 +433,31 @@ namespace AIO.UEngine
                         AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(record => record.Location));
                 }
 
-                Finish();
+                if (ErrorDict.Count > 0)
+                {
+                    State = EProgressState.Fail;
+                    if (Event.OnError != null)
+                    {
+                        var str = new StringBuilder("下载资源包文件失败\n");
+                        foreach (var pair in ErrorDict)
+                        {
+                            AssetSystem.LogError($"下载资源包文件失败 -> [{pair.Key} -> {pair.Value}]");
+                            str.AppendLine(pair.Key);
+                        }
+
+                        Event.OnError.Invoke(new SystemException(str.ToString()));
+                    }
+#if UNITY_EDITOR
+                    else
+                    {
+                        foreach (var pair in ErrorDict)
+                        {
+                            AssetSystem.LogError($"下载资源包文件失败 -> [{pair.Key} -> {pair.Value}]");
+                        }
+                    }
+#endif
+                }
+                else Finish();
             }
 
 

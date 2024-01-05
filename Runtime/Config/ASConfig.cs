@@ -35,17 +35,17 @@ namespace AIO.UEngine
         /// <summary>
         /// 自动激活清单
         /// </summary>
-        public bool AutoSaveVersion;
+        public bool AutoSaveVersion = true;
 
         /// <summary>
         /// URL请求附加时间搓
         /// </summary>
-        public bool AppendTimeTicks;
+        public bool AppendTimeTicks = true;
 
         /// <summary>
         /// 加载路径转小写
         /// </summary>
-        public bool LoadPathToLower;
+        public bool LoadPathToLower = true;
 
         /// <summary>
         /// 自动序列记录
@@ -82,28 +82,6 @@ namespace AIO.UEngine
         /// 运行时内置文件根目录
         /// </summary>
         public string RuntimeRootDirectory = "BuiltinFiles";
-
-        public ASConfig(string url)
-        {
-            URL = url;
-            ASMode = EASMode.Remote;
-            AutoSaveVersion = true;
-            AppendTimeTicks = true;
-            LoadPathToLower = true;
-            EnableSequenceRecord = true;
-            OutputLog = false;
-        }
-
-        public ASConfig()
-        {
-            URL = string.Empty;
-            ASMode = EASMode.Local;
-            AutoSaveVersion = true;
-            AppendTimeTicks = true;
-            EnableSequenceRecord = true;
-            LoadPathToLower = true;
-            OutputLog = false;
-        }
 
         /// <summary>
         /// 获取远程资源包地址
@@ -198,15 +176,7 @@ namespace AIO.UEngine
 
         private static ASConfig GetResource()
         {
-            ASConfig config = null;
-            foreach (var item in Resources.LoadAll<ASConfig>("ASConfig"))
-            {
-                if (item is null) continue;
-                config = item;
-                break;
-            }
-
-            return config;
+            return Resources.LoadAll<ASConfig>("ASConfig").FirstOrDefault(item => item is not null);
         }
 
         /// <summary>
@@ -254,8 +224,9 @@ namespace AIO.UEngine
                 break;
             }
 #endif
-
+            EditorUtility.SetDirty(instance);
 #endif
+
             if (instance is null) throw new Exception("Not found ASConfig.asset ! Please create it !");
             return instance;
         }
@@ -298,9 +269,8 @@ namespace AIO.UEngine
         /// 获取本地资源包配置
         /// </summary>
         /// <param name="loadPathToLower">路径小写</param>
-        /// <param name="outputLog">日志输出</param>
         /// <returns>资源配置</returns>
-        public static ASConfig GetLocal(bool loadPathToLower = false, bool outputLog = false)
+        public static ASConfig GetLocal(bool loadPathToLower = false)
         {
             if (instance != null) return instance;
             instance = GetResource();
@@ -309,7 +279,6 @@ namespace AIO.UEngine
                 instance = CreateInstance<ASConfig>();
                 instance.ASMode = EASMode.Local;
                 instance.LoadPathToLower = loadPathToLower;
-                instance.OutputLog = outputLog;
             }
 
             return instance;
@@ -321,9 +290,8 @@ namespace AIO.UEngine
         /// 获取编辑器资源包配置
         /// </summary>
         /// <param name="loadPathToLower">路径小写</param>
-        /// <param name="outputLog">日志输出</param>
         /// <returns>资源配置</returns>
-        public static ASConfig GetEditor(bool loadPathToLower = false, bool outputLog = false)
+        public static ASConfig GetEditor(bool loadPathToLower = false)
         {
             if (instance != null) return instance;
             instance = GetResource();
@@ -332,9 +300,9 @@ namespace AIO.UEngine
                 instance = CreateInstance<ASConfig>();
                 instance.ASMode = EASMode.Editor;
                 instance.LoadPathToLower = loadPathToLower;
-                instance.OutputLog = outputLog;
             }
 
+            EditorUtility.SetDirty(instance);
             return instance;
         }
 
@@ -342,6 +310,9 @@ namespace AIO.UEngine
         {
             if (Equals(null)) return;
             EditorUtility.SetDirty(this);
+#if UNITY_2021_1_OR_NEWER
+            AssetDatabase.SaveAssetIfDirty(this);
+#endif
         }
 #endif
     }

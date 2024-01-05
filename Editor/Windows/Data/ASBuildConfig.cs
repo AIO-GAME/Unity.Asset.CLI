@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System.IO;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
@@ -47,7 +48,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 压缩模式
         /// </summary>
-        public string CompressedModeName;
+        public ECompressMode CompressedMode;
 
         /// <summary>
         /// 首包标签集合
@@ -108,6 +109,9 @@ namespace AIO.UEditor
         {
             if (Equals(null)) return;
             EditorUtility.SetDirty(this);
+#if UNITY_2021_1_OR_NEWER
+            AssetDatabase.SaveAssetIfDirty(this);
+#endif
         }
     }
 }
