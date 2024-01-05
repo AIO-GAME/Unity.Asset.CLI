@@ -19,7 +19,9 @@
   "overrideReferences": false,
   "references": [
     "UniTask",
-    "YooAsset"
+    "YooAsset",
+    "UnityEditor.UI",
+    "UnityEngine.UI"
   ],
   "name": "UniTask.YooAsset",
   "excludePlatforms": [],

@@ -61,6 +61,11 @@ namespace AIO.UEditor
                             _ = PrPlatform.Open.Path(item.CollectPath).Async();
                         }
                     }
+                    else
+                    {
+                        item.Folded = false;
+                        return;
+                    }
                 }
 
                 if (GELayout.Button(GC_OPEN, GEStyle.TEtoolbarbutton, 24))

@@ -37,18 +37,9 @@ namespace AIO.UEditor
             var BundlesConfigDir = Path.Combine(BundlesDir, "Version");
             if (!Directory.Exists(BundlesConfigDir)) Directory.CreateDirectory(BundlesConfigDir);
 
-            var TabelDic = new Dictionary<BuildTarget, Dictionary<string, AssetsPackageConfig>>
-            {
-                { BuildTarget.Android, new Dictionary<string, AssetsPackageConfig>() },
-                { BuildTarget.WebGL, new Dictionary<string, AssetsPackageConfig>() },
-                { BuildTarget.iOS, new Dictionary<string, AssetsPackageConfig>() },
-                { BuildTarget.StandaloneWindows, new Dictionary<string, AssetsPackageConfig>() },
-                { BuildTarget.StandaloneWindows64, new Dictionary<string, AssetsPackageConfig>() },
-                { BuildTarget.StandaloneOSX, new Dictionary<string, AssetsPackageConfig>() }
-            };
-
             var BundlesInfo = new DirectoryInfo(BundlesDir);
-            var versions = new List<DirectoryInfo>();
+            var Versions = new List<DirectoryInfo>();
+            var TabelDic = new Dictionary<BuildTarget, Dictionary<string, AssetsPackageConfig>>();
 
             foreach (var PlatformInfo in BundlesInfo.GetDirectories("*", SearchOption.TopDirectoryOnly))
             {
@@ -69,27 +60,26 @@ namespace AIO.UEditor
                 foreach (var PackageInfo in new DirectoryInfo(PlatformInfo.FullName).GetDirectories("*",
                              SearchOption.TopDirectoryOnly))
                 {
-                    versions.Clear();
-                    versions.AddRange(PackageInfo.GetDirectories("*", SearchOption.TopDirectoryOnly)
+                    Versions.Clear();
+                    Versions.AddRange(PackageInfo.GetDirectories("*", SearchOption.TopDirectoryOnly)
                         .Where(VersionInfo => !VersionInfo.Name.EndsWith("OutputCache"))
                         .Where(VersionInfo => !VersionInfo.Name.EndsWith("Simulate")));
 
-                    if (versions.Count <= 0) continue;
-                    var last = AHelper.IO.GetLastWriteTimeUtc(versions);
+                    if (Versions.Count <= 0) continue;
                     if (Enum.TryParse<BuildTarget>(PlatformInfo.Name, out var enums))
                     {
+                        if (!TabelDic.ContainsKey(enums)) TabelDic[enums] = new Dictionary<string, AssetsPackageConfig>();
                         if (!TabelDic[enums].ContainsKey(PackageInfo.Name))
                             TabelDic[enums].Add(PackageInfo.Name, new AssetsPackageConfig());
 
+                        var last = AHelper.IO.GetLastWriteTimeUtc(Versions);
                         TabelDic[enums][PackageInfo.Name].Version = last.Name;
                         TabelDic[enums][PackageInfo.Name].Name = PackageInfo.Name;
-                        var table = AHelper.IO.ReadJson<Hashtable>(
-                            Path.Combine(last.FullName, $"BuildReport_{PackageInfo.Name}_{last.Name}.json"));
-                        if (table == null) continue;
-                        foreach (var item in table)
+                        var table = AHelper.IO.ReadJson<Hashtable>(Path.Combine(last.FullName, $"BuildReport_{PackageInfo.Name}_{last.Name}.json"));
+                        if (table is null) continue;
+                        foreach (var entry in table.Cast<DictionaryEntry>()
+                                     .Where(entry => entry.Key.ToString() == "Summary"))
                         {
-                            if (item is not DictionaryEntry entry) continue;
-                            if (entry.Key.ToString() != "Summary") continue;
                             switch (entry.Value.To<JObject>().Value<int>("CompressOption"))
                             {
                                 case (int)ECompressOption.LZMA:
@@ -110,13 +100,13 @@ namespace AIO.UEditor
                 }
             }
 
-            var BundlesConfigInfo = new DirectoryInfo(BundlesConfigDir);
-            foreach (var hashtable in TabelDic)
+            foreach (var tabel in TabelDic
+                         .Where(hashtable => hashtable.Value.Count > 0))
             {
-                if (hashtable.Value.Count <= 0) continue;
-                var filename = hashtable.Key.ToString();
-                var filePath = Path.Combine(BundlesConfigInfo.FullName, string.Concat(filename, ".json"));
-                AHelper.IO.WriteJsonUTF8(filePath, hashtable.Value.Values.ToArray());
+                AHelper.IO.WriteJsonUTF8(
+                    Path.Combine(BundlesConfigDir, string.Concat(tabel.Key, ".json")),
+                    tabel.Value.Values.ToArray()
+                );
             }
         }
     }

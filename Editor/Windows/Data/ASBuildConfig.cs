@@ -28,7 +28,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 构建模式
         /// </summary>
-        [InspectorName("构建模式")] public EBuildMode BuildMode;
+        [InspectorName("构建模式")] public EBuildMode BuildMode = EBuildMode.IncrementalBuild;
 
         /// <summary>
         /// 构建版本号

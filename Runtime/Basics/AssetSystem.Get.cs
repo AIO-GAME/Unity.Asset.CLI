@@ -54,18 +54,25 @@ namespace AIO
         public static bool GetHasReadPermission()
         {
 #if UNITY_EDITOR
+
 #if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
             return new DriveInfo(SandboxRootDirectory).IsReady;
+#else
+            Debug.LogWarning("Platform not support");
+            return false;
 #endif
+
 #else
 #if UNITY_IOS || UNITY_IPHONE || UNITY_ANDROID || UNITY_WEBGL
             return true;
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
-            return new DriveInfo(SandboxRootDirectory).IsReady;
-#endif
-#endif
+            return new DriveInfo(SandboxRootDirectory).IsReady;      
+#else
             Debug.LogWarning("Platform not support");
             return false;
+#endif
+
+#endif
         }
 
         /// <summary>
@@ -74,18 +81,25 @@ namespace AIO
         public static bool GetHasWritePermission()
         {
 #if UNITY_EDITOR
+
 #if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
             return new DriveInfo(SandboxRootDirectory).IsReady;
+#else
+            Debug.LogWarning("Platform not support");
+            return false;
 #endif
+
 #else
 #if UNITY_IOS || UNITY_IPHONE || UNITY_ANDROID || UNITY_WEBGL
             return true;
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new DriveInfo(SandboxRootDirectory).IsReady;
-#endif
-#endif
+#else
             Debug.LogWarning("Platform not support");
             return false;
+#endif
+
+#endif
         }
 
 #if UNITY_IOS || UNITY_IPHONE
@@ -105,9 +119,14 @@ namespace AIO
         public static long GetAvailableDiskSpace()
         {
 #if UNITY_EDITOR
+
 #if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
             return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
+#else
+            Debug.LogWarning("Platform not support");
+            return 0;
 #endif
+
 #else
 #if UNITY_WEBGL
             return 0;
@@ -126,10 +145,11 @@ namespace AIO
             }
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
-#endif
-#endif
+#else
             Debug.LogWarning("Platform not support");
             return 0;
+#endif
+#endif
         }
     }
 }

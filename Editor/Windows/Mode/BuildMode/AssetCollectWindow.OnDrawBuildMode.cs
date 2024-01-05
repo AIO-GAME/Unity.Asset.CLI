@@ -127,6 +127,8 @@ namespace AIO.UEditor
 
                     if (GUILayout.Button("打开目录", GEStyle.toolbarbutton, GP_Width_75))
                     {
+                        if (!Directory.Exists(BuildConfig.BuildOutputPath))
+                            Directory.CreateDirectory(BuildConfig.BuildOutputPath);
                         PrPlatform.Open.Path(BuildConfig.BuildOutputPath).Async();
                         return;
                     }
@@ -152,7 +154,7 @@ namespace AIO.UEditor
                         SaveScene();
 #if SUPPORT_YOOASSET
                         ConvertYooAsset.Convert(Data);
-                        var BuildCommand = new YooAssetBuildCommand
+                        var buildCommand = new YooAssetBuildCommand
                         {
                             PackageVersion = BuildConfig.BuildVersion,
                             BuildPackage = BuildConfig.PackageName,
@@ -163,19 +165,26 @@ namespace AIO.UEditor
                             BuildMode = BuildConfig.BuildMode,
                             CopyBuildinFileTags = BuildConfig.FirstPackTag
                         };
-                        YooAssetBuild.ArtBuild(BuildCommand);
+                        YooAssetBuild.ArtBuild(buildCommand);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 #else
-                        if (EditorUtility.DisplayDialogComplex(
-                            "提示",
-                            "当前没有导入资源实现工具",
-                            "导入 YooAsset (1.5.7)",
-                            "导入 XAsset (unknown)",
-                            "取消") == 0)
+                        switch (EditorUtility.DisplayDialogComplex(
+                                    "提示",
+                                    "当前没有导入资源实现工具",
+                                    $"导入 YooAsset [{Ghost.YooAsset.Version}]",
+                                    "取消",
+                                    $"导入 YooAsset [{Ghost.YooAsset.Version}][CN]"))
                         {
-#if !SUPPORT_YOOASSET
-                            Install.YooAssetRunAsync();
-#endif
+                            case 0:
+                                Ghost.YooAsset.Install();
+                                Console.WriteLine("导入 YooAsset");
+                                return;
+                            case 1: // 取消
+                                break;
+                            case 2:
+                                Ghost.YooAsset.InstallCN();
+                                Console.WriteLine("导入 YooAsset[CN]");
+                                break;
                         }
 #endif
                         return;

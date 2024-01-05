@@ -16,7 +16,11 @@
         "Unity.Addressables.Editor",
         "Unity.ResourceManager",
         "AIO.Core.Runtime",
-        "AIO.Core.Editor"
+        "AIO.Core.Editor",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

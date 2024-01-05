@@ -348,7 +348,7 @@ namespace AIO.UEditor
                 return;
             }
 
-         
+
             if (Type != EAssetCollectItemType.MainAssetCollector) return;
             var tags = AssetCollectRoot.GetOrCreate(false).GetTags(PackageName, GroupName, CollectPath);
             var pathToLower = ASConfig.GetOrCreate().LoadPathToLower;
@@ -372,8 +372,7 @@ namespace AIO.UEditor
             {
                 var temp = AssetDatabase.GetAssetPath(Path);
                 if (string.IsNullOrEmpty(temp)) return;
-                if (!File.Exists(temp)) return;
-                if (!Directory.Exists(temp)) return;
+                if (!File.Exists(temp) && !Directory.Exists(temp)) return;
                 CollectPath = temp;
                 GUID = AssetDatabase.AssetPathToGUID(CollectPath);
                 FileName = System.IO.Path.GetFileName(CollectPath);
