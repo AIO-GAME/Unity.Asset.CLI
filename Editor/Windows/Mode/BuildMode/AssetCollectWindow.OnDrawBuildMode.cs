@@ -127,6 +127,8 @@ namespace AIO.UEditor
 
                     if (GUILayout.Button("打开目录", GEStyle.toolbarbutton, GP_Width_75))
                     {
+                        if (!Directory.Exists(BuildConfig.BuildOutputPath))
+                            Directory.CreateDirectory(BuildConfig.BuildOutputPath);
                         PrPlatform.Open.Path(BuildConfig.BuildOutputPath).Async();
                         return;
                     }
@@ -152,7 +154,7 @@ namespace AIO.UEditor
                         SaveScene();
 #if SUPPORT_YOOASSET
                         ConvertYooAsset.Convert(Data);
-                        var BuildCommand = new YooAssetBuildCommand
+                        var buildCommand = new YooAssetBuildCommand
                         {
                             PackageVersion = BuildConfig.BuildVersion,
                             BuildPackage = BuildConfig.PackageName,
@@ -163,7 +165,7 @@ namespace AIO.UEditor
                             BuildMode = BuildConfig.BuildMode,
                             CopyBuildinFileTags = BuildConfig.FirstPackTag
                         };
-                        YooAssetBuild.ArtBuild(BuildCommand);
+                        YooAssetBuild.ArtBuild(buildCommand);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 #else
                         switch (EditorUtility.DisplayDialogComplex(
