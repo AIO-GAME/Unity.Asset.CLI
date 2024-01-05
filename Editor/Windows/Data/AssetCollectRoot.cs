@@ -129,9 +129,9 @@ namespace AIO.UEditor
                 Packages[index].Dispose();
             }
 
-            EditorUtility.SetDirty(_Instance);
+            EditorUtility.SetDirty(this);
 #if UNITY_2021_1_OR_NEWER
-            AssetDatabase.SaveAssetIfDirty(_Instance);
+            AssetDatabase.SaveAssetIfDirty(this);
 #endif
         }
 

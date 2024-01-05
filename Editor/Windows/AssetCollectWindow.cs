@@ -332,12 +332,8 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         Config.Save();
-                        eventData.Use();
-#if UNITY_2021_1_OR_NEWER
-                        AssetDatabase.SaveAssetIfDirty(Config);
-#else
                         AssetDatabase.SaveAssets();
-#endif
+                        eventData.Use();
                     }
 
                     break;
@@ -346,12 +342,8 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         Data.Save();
-                        eventData.Use();
-#if UNITY_2021_1_OR_NEWER
-                        AssetDatabase.SaveAssetIfDirty(Data);
-#else
                         AssetDatabase.SaveAssets();
-#endif
+                        eventData.Use();
                     }
 
                     break;
@@ -360,12 +352,8 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         BuildConfig.Save();
-                        eventData.Use();
-#if UNITY_2021_1_OR_NEWER
-                        AssetDatabase.SaveAssetIfDirty(BuildConfig);
-#else
                         AssetDatabase.SaveAssets();
-#endif
+                        eventData.Use();
                     }
 
                     break;
