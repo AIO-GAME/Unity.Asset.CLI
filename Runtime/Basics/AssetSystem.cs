@@ -39,10 +39,10 @@ namespace AIO
         {
 #if SUPPORT_YOOASSET
             Proxy = new YAssetProxy();
+            yield return Initialize(Proxy, config);
 #else
             throw new Exception("Not Found Other Asset Proxy! Please Input Asset Proxy!");
 #endif
-            yield return Initialize(Proxy, config);
         }
 
         /// <summary>
