@@ -32,7 +32,7 @@ namespace AIO
         public static void UnloadAsset(string location)
         {
             Proxy?.FreeHandle(SettingToLocalPath(location));
-            LogFormat("Asset System Free Asset Handle Release : {0}", location);
+            Log("Free Asset Handle Release : {0}", location);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator UnloadSceneCO(string location, Action onLoadComplete)
         {
-            LogFormat("Asset System Free Scene Handle Release : {0}", location);
+            Log("Free Scene Handle Release : {0}", location);
             return Proxy.UnloadSceneCO(SettingToLocalPath(location), onLoadComplete);
         }
 
@@ -67,7 +67,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task UnloadSceneTask(string location)
         {
-            LogFormat("Asset System Free Scene Handle Release : {0}", location);
+            Log("Free Scene Handle Release : {0}", location);
             return Proxy.UnloadSceneTask(SettingToLocalPath(location));
         }
     }

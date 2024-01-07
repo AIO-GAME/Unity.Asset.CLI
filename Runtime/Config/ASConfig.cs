@@ -216,7 +216,6 @@ namespace AIO.UEngine
                 }
             }
 
-#if SUPPORT_YOOASSET
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
@@ -224,12 +223,12 @@ namespace AIO.UEngine
                     ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
                     ?.Invoke(null, new object[] { false });
                 if (temp == null) break;
-                assembly.GetType("AIO.UEditor.ConvertYooAsset", true)
-                    ?.GetMethod("Convert", BindingFlags.Static | BindingFlags.Public)
-                    ?.Invoke(null, new object[] { temp });
+                assembly.GetType("AIO.UEditor.AssetProxyEditor", true)
+                    ?.GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
+                    ?.Invoke(null, new object[] { temp, false });
                 break;
             }
-#endif
+
             EditorUtility.SetDirty(instance);
 #endif
 

@@ -21,7 +21,7 @@ namespace AIO
         {
             var package = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(Setting).Assembly);
             var packageJson = AHelper.IO.ReadJsonUTF8<JObject>(package.resolvedPath + "/package.json");
-            Version = packageJson["version"].ToString();
+            Version = packageJson.Value<string>("version");
         }
     }
 }

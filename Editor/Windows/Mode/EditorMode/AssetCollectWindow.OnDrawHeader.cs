@@ -59,13 +59,12 @@ namespace AIO.UEditor
 
             GUILayout.Label(TempBuilder.ToString(), GEStyle.toolbarbuttonRight, GP_Height_20, GP_Width_EXPAND);
 
-#if SUPPORT_YOOASSET
-            if (GUILayout.Button(GC_ToConvert_YooAsset, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            if (GUILayout.Button(GC_ToConvert, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
                 try
                 {
-                    ConvertYooAsset.Convert(Data);
+                    AssetProxyEditor.ConvertConfig(Data, true);
                     EditorUtility.DisplayDialog("转换", "转换 YooAsset 成功", "确定");
                 }
                 catch (Exception e)
@@ -73,7 +72,6 @@ namespace AIO.UEditor
                     EditorUtility.DisplayDialog("转换", "转换 YooAsset 失败\n" + e.Message, "确定");
                 }
             }
-#endif
 
             if (GUILayout.Button(GC_FOLDOUT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {

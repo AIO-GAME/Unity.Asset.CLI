@@ -10,9 +10,6 @@ using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-#if SUPPORT_YOOASSET
-using YooAsset.Editor;
-#endif
 
 namespace AIO.UEditor
 {
@@ -141,52 +138,17 @@ namespace AIO.UEditor
                         return;
                     }
 
-#if SUPPORT_YOOASSET
                     if (GUILayout.Button("生成配置", GEStyle.toolbarbutton, GP_Width_75))
                     {
-                        MenuItem_YooAssets.CreateConfig(BuildConfig.BuildOutputPath);
+                        AssetProxyEditor.CreateConfig(BuildConfig.BuildOutputPath, true);
                         return;
                     }
-#endif
+
                     if (Application.isPlaying) GUI.enabled = false;
                     if (GUILayout.Button("构建资源", GEStyle.toolbarbutton, GP_Width_75))
                     {
-                        SaveScene();
-#if SUPPORT_YOOASSET
-                        ConvertYooAsset.Convert(Data);
-                        var buildCommand = new YooAssetBuildCommand
-                        {
-                            PackageVersion = BuildConfig.BuildVersion,
-                            BuildPackage = BuildConfig.PackageName,
-                            CompressOption = BuildConfig.CompressedMode,
-                            ActiveTarget = BuildConfig.BuildTarget,
-                            BuildPipeline = BuildConfig.BuildPipeline,
-                            OutputRoot = BuildConfig.BuildOutputPath,
-                            BuildMode = BuildConfig.BuildMode,
-                            CopyBuildinFileTags = BuildConfig.FirstPackTag
-                        };
-                        YooAssetBuild.ArtBuild(buildCommand);
+                        AssetProxyEditor.BuildArt(BuildConfig, true);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-#else
-                        switch (EditorUtility.DisplayDialogComplex(
-                                    "提示",
-                                    "当前没有导入资源实现工具",
-                                    $"导入 YooAsset [{Ghost.YooAsset.Version}]",
-                                    "取消",
-                                    $"导入 YooAsset [{Ghost.YooAsset.Version}][CN]"))
-                        {
-                            case 0:
-                                Ghost.YooAsset.Install();
-                                Console.WriteLine("导入 YooAsset");
-                                return;
-                            case 1: // 取消
-                                break;
-                            case 2:
-                                Ghost.YooAsset.InstallCN();
-                                Console.WriteLine("导入 YooAsset[CN]");
-                                break;
-                        }
-#endif
                         return;
                     }
 
