@@ -12,9 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEngine;
-#if SUPPORT_YOOASSET
-using YooAsset;
-#endif
 
 namespace AIO
 {
@@ -129,7 +126,11 @@ namespace AIO
                 UpdateLocal();
             }
 
-            public async void Dispose()
+            public
+#if UNITY_EDITOR
+                async
+#endif
+                void Dispose()
             {
                 if (Records is null) return;
 #if UNITY_EDITOR
@@ -166,25 +167,6 @@ namespace AIO
 
             public int Count => Records?.Count ?? 0;
             public bool IsReadOnly => false;
-
-#if SUPPORT_YOOASSET
-            public Dictionary<string, List<AssetInfo>> ToYoo()
-            {
-                var list = new Dictionary<string, List<AssetInfo>>();
-                if (Records is null) return list;
-                foreach (var record in Records)
-                {
-                    var info = YooAssets.GetPackage(record.PackageName).GetAssetInfo(record.Location);
-                    if (info is null) continue;
-                    if (!YooAssets.GetPackage(record.PackageName).IsNeedDownloadFromRemote(info)) continue;
-                    if (!list.ContainsKey(record.PackageName)) list.Add(record.PackageName, new List<AssetInfo>());
-                    if (list[record.PackageName].Contains(info)) continue;
-                    list[record.PackageName].Add(info);
-                }
-
-                return list;
-            }
-#endif
 
             public void Save()
             {
@@ -238,13 +220,6 @@ namespace AIO
             /// 记录数量
             /// </summary>
             public int Count;
-
-#if SUPPORT_YOOASSET
-            public static implicit operator AssetInfo(SequenceRecord record)
-            {
-                return YooAssets.GetPackage(record.PackageName).GetAssetInfo(record.Location);
-            }
-#endif
 
             public override string ToString()
             {

@@ -11,9 +11,6 @@ using System.IO;
 using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace AIO
 {
@@ -35,14 +32,50 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
+        public static IEnumerator Initialize()
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.IsAbstract) continue;
+                    if (typeof(AssetProxy).IsAssignableFrom(type))
+                    {
+                        Proxy = (AssetProxy)Activator.CreateInstance(type);
+                        break;
+                    }
+                }
+            }
+
+            if (Proxy is null)
+                throw new Exception("Not Found Other Asset Proxy! Please Input Asset Proxy!");
+
+            yield return Initialize(Proxy, ASConfig.GetOrCreate());
+        }
+
+        /// <summary>
+        /// 系统初始化
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize(ASConfig config)
         {
-#if SUPPORT_YOOASSET
-            Proxy = new YAssetProxy();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.IsAbstract) continue;
+                    if (typeof(AssetProxy).IsAssignableFrom(type))
+                    {
+                        Proxy = (AssetProxy)Activator.CreateInstance(type);
+                        break;
+                    }
+                }
+            }
+
+            if (Proxy is null)
+                throw new Exception("Not Found Other Asset Proxy! Please Input Asset Proxy!");
+
             yield return Initialize(Proxy, config);
-#else
-            throw new Exception("Not Found Other Asset Proxy! Please Input Asset Proxy!");
-#endif
         }
 
         /// <summary>
@@ -76,7 +109,7 @@ namespace AIO
 #if UNITY_EDITOR
                 string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
                     Path.DirectorySeparatorChar, "Sandbox", Path.DirectorySeparatorChar,
-                    EditorUserBuildSettings.activeBuildTarget.ToString());
+                    UnityEditor.EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
                 Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory);
 #endif

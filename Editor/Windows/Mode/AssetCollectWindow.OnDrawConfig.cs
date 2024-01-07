@@ -39,9 +39,7 @@ namespace AIO.UEditor
         /// </summary>
         private void UpdateDataConfigMode()
         {
-#if SUPPORT_YOOASSET
-            ConvertYooAsset.Convert(Data);
-#endif
+            AssetProxyEditor.ConvertConfig(Data);
             Config.UpdatePackage();
         }
         

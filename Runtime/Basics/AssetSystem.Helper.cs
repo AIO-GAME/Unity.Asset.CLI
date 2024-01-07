@@ -4,12 +4,9 @@
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
-using System;
 using System.Diagnostics;
-using System.IO;
 using AIO.UEngine;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -81,6 +78,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">寻址地址</param>
         /// <returns>Ture 已经加载 False 未加载</returns>
+        [DebuggerNonUserCode, DebuggerHidden]
         public static bool IsAlreadyLoad(string location)
         {
             return Proxy.IsAlreadyLoad(SettingToLocalPath(location));
@@ -90,63 +88,11 @@ namespace AIO
         /// 根据设置 获取资源定位地址
         /// </summary>
         /// <param name="location">资源定位地址</param>
+        [DebuggerNonUserCode, DebuggerHidden]
         private static string SettingToLocalPath(string location)
         {
             if (string.IsNullOrEmpty(location)) return string.Empty;
             return Parameter.LoadPathToLower ? location.ToLower() : location;
         }
-
-        #region LOG
-
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
-        internal static void LogException(Exception e)
-        {
-            if (Parameter.OutputLog) Debug.LogException(e);
-        }
-
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
-        internal static void LogException(string e)
-        {
-            if (Parameter.OutputLog) Debug.LogException(new SystemException(e));
-        }
-
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
-        internal static void LogException(string format, params object[] args)
-        {
-            if (Parameter.OutputLog)
-                Debug.LogException(new SystemException(string.Format(format, args)));
-        }
-
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
-        internal static void Log(string e)
-        {
-            if (Parameter.OutputLog) Debug.Log(e);
-        }
-
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
-        internal static void LogWarning(string e)
-        {
-            if (Parameter.OutputLog) Debug.LogWarning(e);
-        }
-
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
-        internal static void LogFormat(string format, params object[] args)
-        {
-            if (Parameter.OutputLog) Debug.LogFormat(format, args);
-        }
-
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
-        internal static void LogError(string e)
-        {
-            if (Parameter.OutputLog) Debug.LogError(e);
-        }
-
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump]
-        internal static void LogErrorFormat(string format, params object[] args)
-        {
-            if (Parameter.OutputLog) Debug.LogErrorFormat(format, args);
-        }
-
-        #endregion
     }
 }

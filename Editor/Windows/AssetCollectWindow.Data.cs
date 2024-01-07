@@ -468,12 +468,10 @@ namespace AIO.UEditor
         /// </summary>
         private GUIContent GC_SAVE;
 
-#if SUPPORT_YOOASSET
         /// <summary>
         /// 界面内容 - 
         /// </summary>
-        private GUIContent GC_ToConvert_YooAsset;
-#endif
+        private GUIContent GC_ToConvert;
 
         private GUIContent GC_Select_ASConfig;
 
@@ -545,9 +543,7 @@ namespace AIO.UEditor
             ViewRectUpdate();
             GPInit();
 
-#if SUPPORT_YOOASSET
-            GC_ToConvert_YooAsset = GEContent.NewApp("Yooasset", "转换为Yooasset资源");
-#endif
+            GC_ToConvert = GEContent.NewApp("Yooasset", "转换为第三方配置文件");
 
             GC_SAVE = GEContent.NewBuiltin("d_SaveAs", "保存");
             GC_LookMode_Object_Select = GEContent.NewBuiltin("d_scenepicking_pickable_hover", "选择指向指定资源");

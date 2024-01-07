@@ -38,7 +38,7 @@ namespace AIO
             AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(x => x.Location));
         }
 
-        public IEnumerator WaitCo()
+        protected override IEnumerator OnWaitCo()
         {
             Event.OnComplete?.Invoke(Report);
             yield break;

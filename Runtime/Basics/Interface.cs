@@ -82,10 +82,5 @@ namespace AIO
         /// 收集需要下载的序列
         /// </summary>
         void CollectNeedRecord();
-
-        /// <summary>
-        /// 等待下载完成
-        /// </summary>
-        IEnumerator WaitCo();
     }
 }

@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace AIO.UEditor
 {
-    internal static class AssetCollectSetting
+    public static class AssetCollectSetting
     {
         public static DisplayList<IAssetRuleAddress> MapAddress;
         public static DisplayList<IAssetRuleFilter> MapCollect;

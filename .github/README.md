@@ -105,6 +105,11 @@
 | **[UniTask](https://github.com/Cysharp/UniTask#readme)** | _**为 Unity 提供了一个有效的分配自由的 async / await 集成。**_                         |
 | **[YooAsset](https://www.yooasset.com)**| _**YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。**_ |
 
+## ✨ 贡献者
+
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
+
 ## 📢 Thanks
 
 - **谢谢您选择我们的扩展包。**

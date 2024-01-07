@@ -224,20 +224,6 @@ namespace AIO.UEditor
             EditorUtility.DisplayDialog("提示", handle ? "连接成功" : "连接失败", "确定");
         }
 
-        private static void SaveScene()
-        {
-            var currentScene = SceneManager.GetSceneAt(0);
-            if (!string.IsNullOrEmpty(currentScene.path))
-            {
-                var scene = SceneManager.GetSceneByPath(currentScene.path);
-                if (scene.isDirty) // 获取当前场景的修改状态
-                {
-                    if (EditorUtility.DisplayDialog("提示", "当前场景未保存,是否保存?", "保存", "取消"))
-                    {
-                        EditorSceneManager.SaveScene(scene);
-                    }
-                }
-            }
-        }
+ 
     }
 }
