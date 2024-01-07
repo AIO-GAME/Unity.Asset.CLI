@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@gmail.com
 |*|============|*/
 
+#if SUPPORT_YOOASSET
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -142,3 +143,5 @@ namespace AIO.UEditor.CLI
         }
     }
 }
+
+#endif
