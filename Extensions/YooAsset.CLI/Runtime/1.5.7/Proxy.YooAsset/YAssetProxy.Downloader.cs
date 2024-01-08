@@ -84,7 +84,7 @@ namespace AIO.UEngine
 
             private bool AllowReachableCarrier;
 
-            public bool Flow => Packages.Count > 0;
+            public bool Flow => Packages?.Count > 0;
 
             protected override void OnDispose()
             {
@@ -275,17 +275,12 @@ namespace AIO.UEngine
 
             #endregion
 
-            private static IEnumerator WaitCO(IEnumerable<AsyncOperationBase> operations)
-            {
-                return operations.GetEnumerator();
-            }
-
             protected override async Task OnWaitAsync()
             {
                 foreach (var pair in ResourceDownloaderOperations)
                 {
                     TempDownloadName = pair.Key;
-                    CurrentInfo = string.Format("Resource Download -> [{0}]", pair.Key);
+                    CurrentInfo = $"Resource Download -> [{pair.Key}]";
                     TempDownloadBytes = CurrentValue;
 
                     while (State != EProgressState.Running)
@@ -476,25 +471,6 @@ namespace AIO.UEngine
                 }
                 else Finish();
             }
-
-
-            #region End
-
-            private void UpdatePreDownloadContentEnd()
-            {
-                foreach (var pair in PreDownloadContentOperations.Keys.ToArray())
-                {
-                    if (PreDownloadContentOperations[pair].Status != EOperationStatus.Succeed)
-                    {
-                        AssetSystem.Log($"请检查本地网络，有新的游戏内容需要更新！-> {pair}");
-                        break;
-                    }
-
-                    PreDownloadContentOperations.Remove(pair);
-                }
-            }
-
-            #endregion
         }
     }
 }
