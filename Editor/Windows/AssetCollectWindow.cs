@@ -21,7 +21,11 @@ namespace AIO.UEditor
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
-        [LnkTools("Asset Window", "#00BFFF", "d_Folder Icon", LnkToolsMode.AllMode, 0)]
+        [LnkTools(
+            Tooltip = "Asset Window",
+            BackgroundColor = "#616161",
+            IconResource = "Setting/icon_interests"
+        )]
         public static void OpenWindow()
         {
             EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
