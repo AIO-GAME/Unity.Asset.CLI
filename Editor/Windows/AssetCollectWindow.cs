@@ -22,9 +22,9 @@ namespace AIO.UEditor
     public partial class AssetCollectWindow : GraphicWindow
     {
         [LnkTools(
-            Tooltip = "Asset Window",
+            Tooltip = "AIO 资源管理工具",
             BackgroundColor = "#616161",
-            IconResource = "Setting/icon_interests"
+            IconResource = "Editor/Setting/project-file"
         )]
         public static void OpenWindow()
         {
