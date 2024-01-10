@@ -49,9 +49,13 @@ namespace AIO.UEditor
                     {
                         if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_20))
                         {
-                            Data.Packages = Data.Packages.RemoveAt(i);
-                            if (--Data.CurrentPackageIndex < 0) Data.CurrentPackageIndex = 0;
-                            if (Data.CurrentPackageIndex >= Data.Packages.Length) ViewGroupList.IsShow = false;
+                            if (EditorUtility.DisplayDialog("Delete Package", $"Are you sure you want to delete {Data.Packages[i].Name}?", "Yes", "No"))
+                            {
+                                Data.Packages = Data.Packages.RemoveAt(i);
+                                if (--Data.CurrentPackageIndex < 0) Data.CurrentPackageIndex = 0;
+                                if (Data.CurrentPackageIndex >= Data.Packages.Length) ViewGroupList.IsShow = false;
+                            }
+
                             GUI.FocusControl(null);
                             return;
                         }

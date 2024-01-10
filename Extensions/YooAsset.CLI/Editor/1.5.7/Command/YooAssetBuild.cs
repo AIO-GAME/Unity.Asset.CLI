@@ -197,7 +197,7 @@ namespace AIO.UEditor.CLI
 
             Debug.Log(AHelper.Json.Serialize(buildParameters));
 
-            var builder = new YooAsset.Editor.AssetBundleBuilder();
+            var builder = new AssetBundleBuilder();
             var buildResult = builder.Run(buildParameters);
             if (buildResult.Success)
             {

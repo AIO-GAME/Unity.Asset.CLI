@@ -59,6 +59,19 @@ namespace AIO.UEditor
             Editor.BuildArt(config);
         }
 
+        public static void BuildArt(AssetBuildCommand command, bool isTips = false)
+        {
+            if (Editor is null)
+            {
+                if (isTips) TipsInstall();
+                return;
+            }
+
+            SaveScene();
+
+            Editor.BuildArt(command);
+        }
+
         public static void ConvertConfig(AssetCollectRoot config, bool isTips = false)
         {
             if (Editor is null)
@@ -93,9 +106,10 @@ namespace AIO.UEditor
             private void Awake()
             {
                 // 位置显示在屏幕中间
+                var temp = Screen.currentResolution;
                 position = new Rect(
-                    Screen.currentResolution.width / 2,
-                    Screen.currentResolution.height / 2,
+                    temp.width / 2f,
+                    temp.height / 2f,
                     300,
                     50);
             }
