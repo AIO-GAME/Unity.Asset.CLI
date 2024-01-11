@@ -111,7 +111,6 @@ namespace AIO.UEditor
                         if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_50))
                             BuildConfig.BuildOutputPath =
                                 EditorUtility.OpenFolderPanel("请选择导出路径", BuildConfig.BuildOutputPath, "");
-                        return;
                     }
 
                     BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
@@ -127,7 +126,6 @@ namespace AIO.UEditor
                         if (!Directory.Exists(BuildConfig.BuildOutputPath))
                             Directory.CreateDirectory(BuildConfig.BuildOutputPath);
                         PrPlatform.Open.Path(BuildConfig.BuildOutputPath).Async();
-                        return;
                     }
 
                     if (GUILayout.Button("清空缓存", GEStyle.toolbarbutton, GP_Width_75))
@@ -135,13 +133,11 @@ namespace AIO.UEditor
                         var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
                         if (Directory.Exists(sandbox))
                             AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
-                        return;
                     }
 
                     if (GUILayout.Button("生成配置", GEStyle.toolbarbutton, GP_Width_75))
                     {
                         AssetProxyEditor.CreateConfig(BuildConfig.BuildOutputPath, true);
-                        return;
                     }
 
                     if (Application.isPlaying) GUI.enabled = false;
@@ -149,7 +145,6 @@ namespace AIO.UEditor
                     {
                         AssetProxyEditor.BuildArt(BuildConfig, true);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                        return;
                     }
 
                     if (Application.isPlaying) GUI.enabled = true;

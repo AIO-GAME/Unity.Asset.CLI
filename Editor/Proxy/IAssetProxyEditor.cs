@@ -4,6 +4,8 @@
 |*|E-Mail:     |*| xinansky99@gmail.com
 |*|============|*/
 
+using System.Threading.Tasks;
+
 namespace AIO.UEditor
 {
     public interface IAssetProxyEditor
@@ -56,11 +58,11 @@ namespace AIO.UEditor
         /// Tips:
         /// 需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        void UploadGCloud(ASBuildConfig.GCloudConfig config);
+        Task UploadGCloud(ASUploadGCloudConfig config);
         
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        void UploadFtp(ASBuildConfig.FTPConfig config);
+        Task UploadFtp(ASUploadFTPConfig config);
     }
 }

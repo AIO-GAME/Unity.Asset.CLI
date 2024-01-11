@@ -46,6 +46,35 @@ namespace AIO.UEditor
             Editor.CreateConfig(BundlesDir);
         }
 
+        /// <summary>
+        /// 上传到GCloud
+        /// </summary>
+        public static void UploadGCloud(ASUploadGCloudConfig config, bool isTips = false)
+        {
+            if (Editor is null)
+            {
+                if (isTips) TipsInstall();
+                return;
+            }
+
+            Editor.UploadGCloud(config);
+        }
+
+
+        /// <summary>
+        /// 上传到Ftp
+        /// </summary>
+        public static void UploadFtp(ASUploadFTPConfig config, bool isTips = false)
+        {
+            if (Editor is null)
+            {
+                if (isTips) TipsInstall();
+                return;
+            }
+
+            Editor.UploadFtp(config);
+        }
+
         public static void BuildArt(ASBuildConfig config, bool isTips = false)
         {
             if (Editor is null)

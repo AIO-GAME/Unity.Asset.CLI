@@ -227,13 +227,6 @@ namespace AIO.UEditor.CLI
 
         private const string Manifest = "Manifest.json";
 
-        [LnkTools(IconResource = "Editor/Icon/App/Microsoft")]
-        public static void Test()
-        {
-            MergeToLatest("E:\\Project\\AIO\\20230116f1\\Bundles\\StandaloneWindows64\\Default Package",
-                "2024-01-11-105025");
-        }
-
         /// <summary>
         /// 生成清单文件
         /// </summary>
@@ -252,35 +245,33 @@ namespace AIO.UEditor.CLI
                 .Where(filePath => filePath != Manifest)
                 .ToDictionary(filePath => filePath, filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
 
-            AHelper.IO.WriteJson(manifestPath, DirectorySort(hashtable));
+            AHelper.IO.WriteJson(manifestPath, hashtable.Sort());
         }
 
         /// <summary>
         /// 对比清单文件
         /// </summary>
-        /// <param name="currentPath">当前清单文件夹</param>
-        /// <param name="latestPath">最新清单文件夹</param>
+        /// <param name="current">当前清单</param>
+        /// <param name="target">对比清单</param>
         /// <returns>
         /// [Item1 : 新增文件列表]
         /// [Item2 : 删除文件列表]
         /// [Item3 : 修改文件列表]
         /// </returns>
-        private static Tuple<
+        public static Tuple<
                 IDictionary<string, string>,
                 IDictionary<string, string>,
                 IDictionary<string, string>>
-            ComparisonManifest(string currentPath, string latestPath)
+            ComparisonManifest(Dictionary<string, string> current, Dictionary<string, string> target)
         {
             var delete = new Dictionary<string, string>(); // 删除
             var change = new Dictionary<string, string>(); // 修改
-            var current = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(currentPath, Manifest));
-            var latest = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(latestPath, Manifest));
 
             var add = current
-                .Where(item => !latest.ContainsKey(item.Key))
+                .Where(item => !target.ContainsKey(item.Key))
                 .ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
 
-            foreach (var item in latest) // 遍历最新版本清单
+            foreach (var item in target) // 遍历最新版本清单
             {
                 if (!current.ContainsKey(item.Key)) // 删除
                 {
@@ -299,6 +290,27 @@ namespace AIO.UEditor.CLI
                 IDictionary<string, string>,
                 IDictionary<string, string>
             >(add, delete, change);
+        }
+
+        /// <summary>
+        /// 对比清单文件
+        /// </summary>
+        /// <param name="currentPath">当前清单文件夹</param>
+        /// <param name="latestPath">最新清单文件夹</param>
+        /// <returns>
+        /// [Item1 : 新增文件列表]
+        /// [Item2 : 删除文件列表]
+        /// [Item3 : 修改文件列表]
+        /// </returns>
+        public static Tuple<
+                IDictionary<string, string>,
+                IDictionary<string, string>,
+                IDictionary<string, string>>
+            ComparisonManifest(string currentPath, string latestPath)
+        {
+            var current = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(currentPath, Manifest));
+            var latest = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(latestPath, Manifest));
+            return ComparisonManifest(current, latest);
         }
 
         private static void MergeToLatestExe(string currentPath, string latestPath, string latestManifestPath)
@@ -350,17 +362,7 @@ namespace AIO.UEditor.CLI
                 }
             }
 
-            AHelper.IO.WriteJson(latestManifestPath, DirectorySort(latest));
-        }
-
-        /// <summary>
-        /// 目录排序
-        /// </summary>
-        private static Dictionary<string, string> DirectorySort(IDictionary<string, string> data)
-        {
-            var keys = data.Keys.ToList();
-            keys.Sort((s, s1) => string.Compare(s, s1, StringComparison.CurrentCulture));
-            return keys.ToDictionary(key => key, key => data[key]);
+            AHelper.IO.WriteJson(latestManifestPath, latest.Sort());
         }
 
         /// <summary>

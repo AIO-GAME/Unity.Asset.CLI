@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using AIO.UEngine;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -18,7 +19,7 @@ using YooAsset.Editor;
 
 namespace AIO.UEditor.CLI
 {
-    internal class AssetProxyEditor_Yoo_157 : IAssetProxyEditor
+    internal partial class AssetProxyEditor_Yoo_157 : IAssetProxyEditor
     {
         public string Version => Ghost.YooAsset.Version;
         public string Scopes => Ghost.YooAsset.Scopes;
@@ -65,17 +66,28 @@ namespace AIO.UEditor.CLI
         /// Tips:
         /// 需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        public void UploadGCloud(ASBuildConfig.GCloudConfig config)
+        public async Task UploadGCloud(ASUploadGCloudConfig config)
         {
-            throw new NotImplementedException();
+            await UploadGCloudAsync(config);
+        }
+
+        [LnkTools(IconResource = "Editor/Icon/App/Microsoft")]
+        public static async void Test()
+        {
+            var config = new ASUploadGCloudConfig();
+            config.RemotePath = "rol-files/AIO";
+            config.PackageName = "Default Package";
+            config.MetaData = "--cache-control=no-cache";
+            config.IsUploadLatest = true;
+            await UploadGCloudAsync(config);
         }
 
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public void UploadFtp(ASBuildConfig.FTPConfig config)
+        public async Task UploadFtp(ASUploadFTPConfig config)
         {
-            throw new NotImplementedException();
+            await UploadFtpAsync(config);
         }
 
         [MenuItem("YooAsset/Create Config")]
