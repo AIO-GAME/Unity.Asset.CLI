@@ -12,10 +12,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
+using AIO.YamlDotNet.Serialization;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using YooAsset.Editor;
+using Object = System.Object;
 
 namespace AIO.UEditor.CLI
 {
@@ -71,16 +73,46 @@ namespace AIO.UEditor.CLI
             await UploadGCloudAsync(config);
         }
 
-        [LnkTools(IconResource = "Editor/Icon/App/Microsoft")]
-        public static async void Test()
+        protected class MonoImporter
         {
-            var config = new ASUploadGCloudConfig();
-            config.RemotePath = "rol-files/AIO";
-            config.PackageName = "Default Package";
-            config.MetaData = "--cache-control=no-cache";
-            config.IsUploadLatest = true;
-            await UploadGCloudAsync(config);
+            [YamlMember(typeof(Icon), ScalarStyle = YamlDotNet.Core.ScalarStyle.Any)]
+            public Icon icon { get; set; }
+
+            public MonoImporter(string guid)
+            {
+                icon = new Icon(guid);
+            }
+
+            public class Icon
+            {
+                [YamlMember(typeof(int), ScalarStyle = YamlDotNet.Core.ScalarStyle.Plain)]
+                public int fileID { get; set; }
+
+                [YamlMember(typeof(string), ScalarStyle = YamlDotNet.Core.ScalarStyle.Plain)]
+                public string guid { get; set; }
+
+                [YamlMember(typeof(int), ScalarStyle = YamlDotNet.Core.ScalarStyle.Plain)]
+                public int type { get; set; }
+
+                public Icon(string guid)
+                {
+                    fileID = 2800000;
+                    type = 3;
+                    this.guid = guid;
+                }
+            }
         }
+
+        // [LnkTools(IconResource = "Editor/Icon/App/Microsoft")]
+        // public static async void Test()
+        // {
+        //     // var config = new ASUploadGCloudConfig();
+        //     // config.RemotePath = "rol-files/AIO";
+        //     // config.PackageName = "Default Package";
+        //     // config.MetaData = "--cache-control=no-cache";
+        //     // config.IsUploadLatest = true;
+        //     // await UploadGCloudAsync(config);
+        // }
 
         /// <summary>
         /// 上传到Ftp
