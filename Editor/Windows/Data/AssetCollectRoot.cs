@@ -10,7 +10,6 @@ using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
@@ -20,6 +19,7 @@ namespace AIO.UEditor
     [Serializable]
     [HelpURL(
         "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#asset-system-%E5%B7%A5%E5%85%B7%E8%AF%B4%E6%98%8E")]
+    [Icon("Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
     public class AssetCollectRoot : ScriptableObject
     {
         private static AssetCollectRoot _Instance;
@@ -121,6 +121,7 @@ namespace AIO.UEditor
             return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
         }
 
+        
         public void Save()
         {
             if (Equals(null)) return;

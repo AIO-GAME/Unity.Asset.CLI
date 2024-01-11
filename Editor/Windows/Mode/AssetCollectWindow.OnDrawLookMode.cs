@@ -49,6 +49,12 @@ namespace AIO.UEditor
                 }
             }
 
+            if (LookModeDisplayGroups.ContainsKey(packageName))
+            {
+                EditorGUILayout.Separator();
+                return;
+            }
+
             if (Data.CurrentGroupIndex >= LookModeDisplayGroups[packageName].Length)
                 Data.CurrentGroupIndex = LookModeDisplayGroups[packageName].Length - 1;
 

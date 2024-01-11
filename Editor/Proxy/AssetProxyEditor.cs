@@ -1,12 +1,13 @@
 /*|============|*|
-|*|Author:     |*| xinan                
-|*|Date:       |*| 2024-01-07               
+|*|Author:     |*| xinan
+|*|Date:       |*| 2024-01-07
 |*|E-Mail:     |*| xinansky99@gmail.com
 |*|============|*/
 
 using System;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace AIO.UEditor
@@ -45,6 +46,35 @@ namespace AIO.UEditor
             Editor.CreateConfig(BundlesDir);
         }
 
+        /// <summary>
+        /// 上传到GCloud
+        /// </summary>
+        public static void UploadGCloud(ASUploadGCloudConfig config, bool isTips = false)
+        {
+            if (Editor is null)
+            {
+                if (isTips) TipsInstall();
+                return;
+            }
+
+            Editor.UploadGCloud(config);
+        }
+
+
+        /// <summary>
+        /// 上传到Ftp
+        /// </summary>
+        public static void UploadFtp(ASUploadFTPConfig config, bool isTips = false)
+        {
+            if (Editor is null)
+            {
+                if (isTips) TipsInstall();
+                return;
+            }
+
+            Editor.UploadFtp(config);
+        }
+
         public static void BuildArt(ASBuildConfig config, bool isTips = false)
         {
             if (Editor is null)
@@ -56,6 +86,19 @@ namespace AIO.UEditor
             SaveScene();
 
             Editor.BuildArt(config);
+        }
+
+        public static void BuildArt(AssetBuildCommand command, bool isTips = false)
+        {
+            if (Editor is null)
+            {
+                if (isTips) TipsInstall();
+                return;
+            }
+
+            SaveScene();
+
+            Editor.BuildArt(command);
         }
 
         public static void ConvertConfig(AssetCollectRoot config, bool isTips = false)
@@ -72,51 +115,63 @@ namespace AIO.UEditor
         private static void SaveScene()
         {
             var currentScene = SceneManager.GetSceneAt(0);
-            if (!string.IsNullOrEmpty(currentScene.path))
+            if (string.IsNullOrEmpty(currentScene.path)) return;
+            var scene = SceneManager.GetSceneByPath(currentScene.path);
+            if (!scene.isDirty) return; // 获取当前场景的修改状态
+            if (EditorUtility.DisplayDialog("提示", "当前场景未保存,是否保存?", "保存", "取消"))
+                EditorSceneManager.SaveScene(scene);
+        }
+
+        private class InstallPopup : EditorWindow
+        {
+            private enum Types
             {
-                var scene = SceneManager.GetSceneByPath(currentScene.path);
-                if (scene.isDirty) // 获取当前场景的修改状态
+                [InspectorName("YooAsset [Latest]")] YooAsset,
+            }
+
+            private bool isCN;
+            private Types type;
+
+            private void Awake()
+            {
+                // 位置显示在屏幕中间
+                var temp = Screen.currentResolution;
+                position = new Rect(
+                    temp.width / 2f,
+                    temp.height / 2f,
+                    300,
+                    50);
+            }
+
+            private void OnGUI()
+            {
+                GELayout.Separator();
+                using (GELayout.VHorizontal())
                 {
-                    if (EditorUtility.DisplayDialog("提示", "当前场景未保存,是否保存?", "保存", "取消"))
+                    type = GELayout.Popup(type);
+                    isCN = GELayout.ToggleLeft("国区", isCN, GUILayout.Width(45));
+                }
+
+                GELayout.Separator();
+                if (GELayout.Button("确定"))
+                {
+                    switch (type)
                     {
-                        EditorSceneManager.SaveScene(scene);
+                        case Types.YooAsset:
+                            EHelper.Ghost.OpenupmInstall("com.tuyoogame.yooasset", "1.5.7", isCN);
+                            break;
                     }
+
+                    Close();
                 }
             }
         }
 
         private static void TipsInstall()
         {
-            // switch (EditorUtility.DisplayDialogComplex(
-            //             "提示",
-            //             "当前没有导入资源实现工具",
-            //             $"导入 YooAsset [{Ghost.YooAsset.Version}]",
-            //             "取消",
-            //             $"导入 YooAsset [{Ghost.YooAsset.Version}][CN]"))
-            // {
-            //     case 0:
-            //         Ghost.YooAsset.Install();
-            //         Console.WriteLine("导入 YooAsset");
-            //         return;
-            //     case 1: // 取消
-            //         break;
-            //     case 2:
-            //         Ghost.YooAsset.InstallCN();
-            //         Console.WriteLine("导入 YooAsset[CN]");
-            //         break;
-            // }
+            var window = ScriptableObject.CreateInstance<InstallPopup>();
+            window.titleContent = new GUIContent("提示");
+            window.ShowUtility();
         }
-    }
-
-    public interface IAssetProxyEditor
-    {
-        string Version { get; }
-        string Scopes { get; }
-        string Name { get; }
-
-        void ConvertConfig(AssetCollectRoot config);
-        void CreateConfig(string BundlesDir);
-
-        void BuildArt(ASBuildConfig config);
     }
 }

@@ -543,7 +543,7 @@ namespace AIO.UEditor
             ViewRectUpdate();
             GPInit();
 
-            GC_ToConvert = GEContent.NewApp("Yooasset", "转换为第三方配置文件");
+            GC_ToConvert = GEContent.NewSettingCustom("Editor/Icon/Yooasset", "转换为第三方配置文件");
 
             GC_SAVE = GEContent.NewBuiltin("d_SaveAs", "保存");
             GC_LookMode_Object_Select = GEContent.NewBuiltin("d_scenepicking_pickable_hover", "选择指向指定资源");
@@ -560,14 +560,14 @@ namespace AIO.UEditor
             GC_ADD = GEContent.NewSetting("新增", "添加元素");
             GC_DEL = GEContent.NewSetting("删除", "删除元素");
             GC_CLEAR = GEContent.NewSetting("cancel", "清空元素");
-            GC_OPEN = GEContent.NewSetting("操作", "打开");
+            GC_OPEN = GEContent.NewSettingCustom("Editor/Setting/icon_information", "打开指定查询模式");
             GC_SyncData = GEContent.NewSetting("下载", "下载");
             GC_LookMode_Data_Sort = GEContent.NewSetting("ic_sort", "排序方式");
-            GC_LookMode_Page_MaxLeft = GEContent.NewSetting("Arrows_Arrow_Big_Left", "跳转到第一页");
-            GC_LookMode_Page_Left = GEContent.NewSetting("Arrows_Arrow_Left_Bar", "上一页");
-            GC_LookMode_Page_MaxRight = GEContent.NewSetting("Arrows_Arrow_Right_Bar", "跳转到最后一页");
-            GC_LookMode_Page_Right = GEContent.NewSetting("Arrows_Arrow_Big_Right", "下一页");
-            GC_LookMode_Page_Size = GEContent.NewSetting("操作", "设置页面大小");
+            GC_LookMode_Page_MaxLeft = GEContent.NewSettingCustom("Editor/Icon/Arrows/Arrow_Big_Left", "跳转到第一页");
+            GC_LookMode_Page_Left = GEContent.NewSettingCustom("Editor/Icon/Arrows/Arrow_Left_Bar", "上一页");
+            GC_LookMode_Page_MaxRight = GEContent.NewSettingCustom("Editor/Icon/Arrows/Arrow_Right_Bar", "跳转到最后一页");
+            GC_LookMode_Page_Right = GEContent.NewSettingCustom("Editor/Icon/Arrows/Arrow_Big_Right", "下一页");
+            GC_LookMode_Page_Size = GEContent.NewSettingCustom("Editor/Setting/icon_setting_2", "设置页面大小");
 
             GC_LookMode_Detail_Tags = new GUIContent("Tags", "资源标签");
             GC_LookMode_Detail_GUID = new GUIContent("GUID", "资源GUID");

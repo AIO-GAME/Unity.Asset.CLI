@@ -33,42 +33,47 @@ namespace AIO.UEditor
         /// <summary>
         /// 构建版本号
         /// </summary>
-        public string BuildVersion;
+        [InspectorName("版本号")] public string BuildVersion;
 
         /// <summary>
         /// 资源包名称
         /// </summary>
-        public string PackageName;
+        [InspectorName("构建资源包名称")] public string PackageName;
 
         /// <summary>
         /// 加密模式
         /// </summary>
-        public string EncyptionClassName;
+        [InspectorName("加密模式")] public string EncyptionClassName;
 
         /// <summary>
         /// 压缩模式
         /// </summary>
-        public ECompressMode CompressedMode;
+        [InspectorName("压缩模式")] public ECompressMode CompressedMode;
 
         /// <summary>
         /// 首包标签集合
         /// </summary>
-        public string FirstPackTag;
+        [InspectorName("首包标签集合")] public string FirstPackTag;
 
         /// <summary>
         /// 验证构建结果
         /// </summary>
-        public bool ValidateBuild;
+        [InspectorName("验证构建结果")] public bool ValidateBuild;
 
         /// <summary>
         /// 构建结果输出路径
         /// </summary>
-        public string BuildOutputPath;
+        [InspectorName("构建结果输出路径")] public string BuildOutputPath;
 
         /// <summary>
         /// 构建平台
         /// </summary>
-        public BuildTarget BuildTarget;
+        [InspectorName("构建平台")] public BuildTarget BuildTarget;
+
+        /// <summary>
+        /// 将资源包合并对比至Latest 文件夹
+        /// </summary>
+        [InspectorName("将资源包合并对比至Latest")] public bool MergeToLatest;
 
         private static ASBuildConfig _instance;
 

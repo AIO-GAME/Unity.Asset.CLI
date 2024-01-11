@@ -1,6 +1,6 @@
 /*|============|*|
-|*|Author:     |*| xinan                
-|*|Date:       |*| 2024-01-07               
+|*|Author:     |*| xinan
+|*|Date:       |*| 2024-01-07
 |*|E-Mail:     |*| xinansky99@gmail.com
 |*|============|*/
 
@@ -75,6 +75,14 @@ namespace AIO.UEditor
         /// 构建版本
         /// </summary>
         public const string C_PACKAGE_VERSION = PREFIX + nameof(PackageVersion);
+
+        /// <summary>
+        /// 合并对比至Latest
+        /// </summary>
+        public const string C_MERGE_TO_LATEST = PREFIX + nameof(MergeToLatest);
+
+        [Argument(C_MERGE_TO_LATEST, EArgLabel.Bool)]
+        public bool MergeToLatest = false;
 
         [Argument(C_VERIFY_BUILDING_RESULT, EArgLabel.Bool)]
         public bool VerifyBuildingResult = true;

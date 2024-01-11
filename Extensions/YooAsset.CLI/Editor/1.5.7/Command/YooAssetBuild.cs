@@ -1,6 +1,8 @@
 ﻿#if SUPPORT_YOOASSET
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AIO.UEngine;
@@ -197,10 +199,19 @@ namespace AIO.UEditor.CLI
 
             Debug.Log(AHelper.Json.Serialize(buildParameters));
 
-            var builder = new YooAsset.Editor.AssetBundleBuilder();
+            var builder = new AssetBundleBuilder();
             var buildResult = builder.Run(buildParameters);
             if (buildResult.Success)
             {
+                if (command.MergeToLatest)
+                {
+                    MergeToLatest(Path.Combine(
+                            buildParameters.BuildOutputRoot,
+                            buildParameters.BuildTarget.ToString(),
+                            buildParameters.PackageName),
+                        buildParameters.PackageVersion);
+                }
+
                 if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
                 else EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
                 AssetProxyEditor.CreateConfig(buildParameters.BuildOutputRoot);
@@ -212,6 +223,175 @@ namespace AIO.UEditor.CLI
                 else
                     EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
             }
+        }
+
+        private const string Manifest = "Manifest.json";
+
+        /// <summary>
+        /// 生成清单文件
+        /// </summary>
+        /// <param name="dir">目标路径</param>
+        /// <param name="isAgain">重新生成</param>
+        private static void ManifestGenerate(string dir, bool isAgain = false)
+        {
+            var manifestPath = Path.Combine(dir, Manifest);
+            if (File.Exists(manifestPath) && !isAgain)
+            {
+                Debug.LogWarning($"Manifest 文件已存在 : {dir} 文件夹不需要重新生成");
+                return;
+            }
+
+            var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories)
+                .Where(filePath => filePath != Manifest)
+                .ToDictionary(filePath => filePath, filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
+
+            AHelper.IO.WriteJson(manifestPath, hashtable.Sort());
+        }
+
+        /// <summary>
+        /// 对比清单文件
+        /// </summary>
+        /// <param name="current">当前清单</param>
+        /// <param name="target">对比清单</param>
+        /// <returns>
+        /// [Item1 : 新增文件列表]
+        /// [Item2 : 删除文件列表]
+        /// [Item3 : 修改文件列表]
+        /// </returns>
+        public static Tuple<
+                IDictionary<string, string>,
+                IDictionary<string, string>,
+                IDictionary<string, string>>
+            ComparisonManifest(Dictionary<string, string> current, Dictionary<string, string> target)
+        {
+            var delete = new Dictionary<string, string>(); // 删除
+            var change = new Dictionary<string, string>(); // 修改
+
+            var add = current
+                .Where(item => !target.ContainsKey(item.Key))
+                .ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
+
+            foreach (var item in target) // 遍历最新版本清单
+            {
+                if (!current.ContainsKey(item.Key)) // 删除
+                {
+                    delete.Add(item.Key.ToString(), item.Value.ToString());
+                    continue;
+                }
+
+                if (current[item.Key].ToString() != item.Value.ToString()) // 修改
+                {
+                    change.Add(item.Key.ToString(), item.Value.ToString());
+                }
+            }
+
+            return Tuple.Create<
+                IDictionary<string, string>,
+                IDictionary<string, string>,
+                IDictionary<string, string>
+            >(add, delete, change);
+        }
+
+        /// <summary>
+        /// 对比清单文件
+        /// </summary>
+        /// <param name="currentPath">当前清单文件夹</param>
+        /// <param name="latestPath">最新清单文件夹</param>
+        /// <returns>
+        /// [Item1 : 新增文件列表]
+        /// [Item2 : 删除文件列表]
+        /// [Item3 : 修改文件列表]
+        /// </returns>
+        public static Tuple<
+                IDictionary<string, string>,
+                IDictionary<string, string>,
+                IDictionary<string, string>>
+            ComparisonManifest(string currentPath, string latestPath)
+        {
+            var current = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(currentPath, Manifest));
+            var latest = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(latestPath, Manifest));
+            return ComparisonManifest(current, latest);
+        }
+
+        private static void MergeToLatestExe(string currentPath, string latestPath, string latestManifestPath)
+        {
+            var tuple = ComparisonManifest(currentPath, latestPath);
+            var latest = AHelper.IO.ReadJson<Dictionary<string, string>>(latestManifestPath);
+            foreach (var pair in tuple.Item1) // 新增
+            {
+                latest[pair.Key] = pair.Value;
+                var source = Path.Combine(currentPath, pair.Key);
+                if (File.Exists(source))
+                {
+                    var target = Path.Combine(latestPath, pair.Key);
+                    Console.WriteLine($"新增文件 : {target}");
+                    File.Copy(source, target, true);
+                }
+                else
+                {
+                    if (EHelper.IsCMD()) Debug.LogError($"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源");
+                    else EditorUtility.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
+                    return;
+                }
+            }
+
+            foreach (var pair in tuple.Item2) // 删除
+            {
+                latest.Remove(pair.Key);
+                var target = Path.Combine(latestPath, pair.Key);
+                if (!File.Exists(target)) continue;
+                Console.WriteLine($"删除文件 : {target}");
+                File.Delete(target);
+            }
+
+            foreach (var pair in tuple.Item3) // 修改
+            {
+                latest[pair.Key] = pair.Value;
+                var source = Path.Combine(currentPath, pair.Key);
+                if (File.Exists(source))
+                {
+                    var target = Path.Combine(latestPath, pair.Key);
+                    Console.WriteLine($"修改文件 : {target}");
+                    File.Copy(source, target, true);
+                }
+                else
+                {
+                    if (EHelper.IsCMD()) Debug.LogError($"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源");
+                    else EditorUtility.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
+                    return;
+                }
+            }
+
+            AHelper.IO.WriteJson(latestManifestPath, latest.Sort());
+        }
+
+        /// <summary>
+        /// 合并到最新版本
+        /// </summary>
+        /// <param name="rootPath">根目录</param>
+        /// <param name="version">版本号</param>
+        private static void MergeToLatest(string rootPath, string version)
+        {
+            var currentPath = Path.Combine(rootPath, version);
+            ManifestGenerate(currentPath);
+
+            var latestPath = Path.Combine(rootPath, "Latest");
+            if (!Directory.Exists(latestPath)) // 如果不存在 则将当前版本资源全部复制至 Latest
+            {
+                Directory.CreateDirectory(latestPath);
+                AHelper.IO.CopyFolderAll(currentPath, latestPath);
+                return;
+            }
+
+            var latestManifestPath = Path.Combine(latestPath, Manifest);
+            if (!File.Exists(latestManifestPath))
+            {
+                if (EHelper.IsCMD()) Debug.LogError($"最新版本清单文件不存在 : {latestManifestPath} 请请重新构建资源");
+                else EditorUtility.DisplayDialog("Error", $"最新版本清单文件不存在 : {latestManifestPath} 请请重新构建资源", "确定");
+                return;
+            }
+
+            MergeToLatestExe(currentPath, latestPath, latestManifestPath);
         }
     }
 }

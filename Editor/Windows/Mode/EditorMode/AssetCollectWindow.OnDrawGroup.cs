@@ -54,10 +54,14 @@ namespace AIO.UEditor
                     {
                         if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_20))
                         {
-                            Data.CurrentPackage.Groups = Data.CurrentPackage.Groups.RemoveAt(i);
-                            if (--Data.CurrentGroupIndex < 0) Data.CurrentGroupIndex = 0;
-                            if (Data.CurrentGroupIndex >= Data.Packages[Data.CurrentPackageIndex].Groups.Length)
-                                ViewGroupList.IsShow = false;
+                            if (EditorUtility.DisplayDialog("Delete Group", $"Are you sure you want to delete {Data.Packages[i].Name}?", "Yes", "No"))
+                            {
+                                Data.CurrentPackage.Groups = Data.CurrentPackage.Groups.RemoveAt(i);
+                                if (--Data.CurrentGroupIndex < 0) Data.CurrentGroupIndex = 0;
+                                if (Data.CurrentGroupIndex >= Data.Packages[Data.CurrentPackageIndex].Groups.Length)
+                                    ViewGroupList.IsShow = false;
+                            }
+
                             GUI.FocusControl(null);
                             return;
                         }

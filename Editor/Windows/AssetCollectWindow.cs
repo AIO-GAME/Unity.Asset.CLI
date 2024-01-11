@@ -21,7 +21,10 @@ namespace AIO.UEditor
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
-        [LnkTools("Asset Window", "#00BFFF", "d_Folder Icon", LnkToolsMode.AllMode, 0)]
+        [LnkTools(
+            Tooltip = "AIO 资源管理工具",
+            IconResource = "Editor/Icon/Asset"
+        )]
         public static void OpenWindow()
         {
             EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
@@ -71,7 +74,6 @@ namespace AIO.UEditor
             {
                 switch (WindowMode)
                 {
-                    default:
                     case Mode.Editor:
                         OnDrawHeaderEditorMode();
                         break;
@@ -113,7 +115,6 @@ namespace AIO.UEditor
                 case Mode.Config:
                     UpdateDataConfigMode();
                     break;
-                default:
                 case Mode.Editor:
 
                     break;
@@ -142,7 +143,6 @@ namespace AIO.UEditor
 
             switch (WindowMode)
             {
-                default:
                 case Mode.Editor:
                     OnDrawEditorMode();
                     break;
