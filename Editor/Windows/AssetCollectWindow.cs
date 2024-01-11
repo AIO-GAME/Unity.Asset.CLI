@@ -23,8 +23,7 @@ namespace AIO.UEditor
     {
         [LnkTools(
             Tooltip = "AIO 资源管理工具",
-            BackgroundColor = "#616161",
-            IconResource = "Editor/Setting/project-file"
+            IconResource = "Editor/Icon/Asset"
         )]
         public static void OpenWindow()
         {
@@ -75,7 +74,6 @@ namespace AIO.UEditor
             {
                 switch (WindowMode)
                 {
-                    default:
                     case Mode.Editor:
                         OnDrawHeaderEditorMode();
                         break;
@@ -117,7 +115,6 @@ namespace AIO.UEditor
                 case Mode.Config:
                     UpdateDataConfigMode();
                     break;
-                default:
                 case Mode.Editor:
 
                     break;
@@ -146,7 +143,6 @@ namespace AIO.UEditor
 
             switch (WindowMode)
             {
-                default:
                 case Mode.Editor:
                     OnDrawEditorMode();
                     break;

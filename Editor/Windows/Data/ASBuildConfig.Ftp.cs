@@ -134,11 +134,10 @@ namespace AIO.UEditor
                     var text = await AHelper.FTP.GetTextAsync(version, User, Pass);
                     var data = AHelper.Json.Deserialize<List<AssetsPackageConfig>>(text);
                     var exists = false;
-                    foreach (var item in data.Where(item => item.Name == two))
+                    if (data.Exists(item => item.Name == two))
                     {
                         exists = true;
-                        item.Version = three;
-                        break;
+                        data.First(item => item.Name == two).Version = three;
                     }
 
                     if (!exists)

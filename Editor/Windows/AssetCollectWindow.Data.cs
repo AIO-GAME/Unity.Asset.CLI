@@ -543,7 +543,7 @@ namespace AIO.UEditor
             ViewRectUpdate();
             GPInit();
 
-            GC_ToConvert = GEContent.NewApp("Yooasset", "转换为第三方配置文件");
+            GC_ToConvert = GEContent.NewSettingCustom("Editor/Icon/Yooasset", "转换为第三方配置文件");
 
             GC_SAVE = GEContent.NewBuiltin("d_SaveAs", "保存");
             GC_LookMode_Object_Select = GEContent.NewBuiltin("d_scenepicking_pickable_hover", "选择指向指定资源");

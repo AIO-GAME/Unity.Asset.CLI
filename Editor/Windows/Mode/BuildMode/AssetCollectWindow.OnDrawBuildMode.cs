@@ -115,7 +115,7 @@ namespace AIO.UEditor
                     }
 
                     BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
-
+                    BuildConfig.MergeToLatest = GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest, GP_Width_100);
                     EditorGUILayout.Separator();
 
                     if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_75))

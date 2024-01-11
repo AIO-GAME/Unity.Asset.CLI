@@ -50,7 +50,8 @@ namespace AIO.UEditor.CLI
                 BuildPipeline = config.BuildPipeline,
                 OutputRoot = config.BuildOutputPath,
                 BuildMode = config.BuildMode,
-                CopyBuildinFileTags = config.FirstPackTag
+                CopyBuildinFileTags = config.FirstPackTag,
+                MergeToLatest = config.MergeToLatest,
             };
             YooAssetBuild.ArtBuild(buildCommand);
         }
