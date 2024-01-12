@@ -17,9 +17,9 @@ using UnityEditor;
 
 namespace AIO.UEngine
 {
+    [Serializable]
     [HelpURL(
         "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
-    [DebuggerNonUserCode]
     public class ASConfig : ScriptableObject
     {
         /// <summary>
@@ -216,17 +216,20 @@ namespace AIO.UEngine
                 }
             }
 
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            if (Application.isPlaying)
             {
-                if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
-                var temp = assembly.GetType("AIO.UEditor.AssetCollectRoot", true)
-                    ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
-                    ?.Invoke(null, new object[] { false });
-                if (temp == null) break;
-                assembly.GetType("AIO.UEditor.AssetProxyEditor", true)
-                    ?.GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
-                    ?.Invoke(null, new object[] { temp, false });
-                break;
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
+                    var temp = assembly.GetType("AIO.UEditor.AssetCollectRoot", true)
+                        ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
+                        ?.Invoke(null, new object[] { false });
+                    if (temp == null) break;
+                    assembly.GetType("AIO.UEditor.AssetProxyEditor", true)
+                        ?.GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
+                        ?.Invoke(null, new object[] { temp, false });
+                    break;
+                }
             }
 
             EditorUtility.SetDirty(instance);
@@ -314,9 +317,10 @@ namespace AIO.UEngine
         public void Save()
         {
             if (Equals(null)) return;
-            EditorUtility.SetDirty(this);
 #if UNITY_2021_1_OR_NEWER
             AssetDatabase.SaveAssetIfDirty(this);
+#else
+            EditorUtility.SetDirty(this);
 #endif
         }
 #endif

@@ -19,7 +19,11 @@ namespace AIO.UEditor
     [Serializable]
     [HelpURL(
         "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#asset-system-%E5%B7%A5%E5%85%B7%E8%AF%B4%E6%98%8E")]
-    [Icon("Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
+#if UNITY_2021_1_OR_NEWER
+    [Icon(  "Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
+#else
+    [ScriptIcon(IconRelative = "Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
+#endif
     public class AssetCollectRoot : ScriptableObject
     {
         private static AssetCollectRoot _Instance;
@@ -99,16 +103,17 @@ namespace AIO.UEditor
             return _Instance;
         }
 
-        [Description("开启地址化")] public bool EnableAddressable = true;
+        [InspectorName("开启地址化")] public bool EnableAddressable = true;
 
-        [Description("Bundle名称唯一")] public bool UniqueBundleName = true;
+        [InspectorName("Bundle名称唯一")] public bool UniqueBundleName = true;
 
-        [Description("包含资源GUID")] public bool IncludeAssetGUID;
+        [InspectorName("包含资源GUID")] public bool IncludeAssetGUID;
 
         /// <summary>
         /// 资源收集配置
         /// </summary>
-        [SerializeField] public AssetCollectPackage[] Packages;
+        [InspectorName("收集包")] [SerializeField]
+        public AssetCollectPackage[] Packages;
 
         public AssetCollectPackage this[int index]
         {
@@ -121,18 +126,17 @@ namespace AIO.UEditor
             return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
         }
 
-        
         public void Save()
         {
             if (Equals(null)) return;
-            for (var index = 0; index < Packages.Length; index++)
+            for (var index = Packages.Length - 1; index >= 0; index--)
             {
                 Packages[index].Dispose();
             }
-
-            EditorUtility.SetDirty(this);
 #if UNITY_2021_1_OR_NEWER
             AssetDatabase.SaveAssetIfDirty(this);
+#else
+            EditorUtility.SetDirty(this);
 #endif
         }
 
@@ -141,22 +145,17 @@ namespace AIO.UEditor
             Save();
         }
 
-        public sealed override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
         #region OnGUI
 
         /// <summary>
         /// 当前选择包下标
         /// </summary>
-        public int CurrentPackageIndex;
+        [HideInInspector] public int CurrentPackageIndex;
 
         /// <summary>
         /// 当前选择组下标
         /// </summary>
-        public int CurrentGroupIndex;
+        [HideInInspector] public int CurrentGroupIndex;
 
         public AssetCollectPackage CurrentPackage
         {
@@ -164,7 +163,7 @@ namespace AIO.UEditor
             {
                 if (Packages is null || Packages.Length == 0)
                 {
-                    Packages = new AssetCollectPackage[]
+                    Packages = new[]
                     {
                         new AssetCollectPackage()
                         {
@@ -193,9 +192,9 @@ namespace AIO.UEditor
             {
                 if (CurrentPackage.Groups is null || CurrentPackage.Groups.Length == 0)
                 {
-                    CurrentPackage.Groups = new AssetCollectGroup[]
+                    CurrentPackage.Groups = new[]
                     {
-                        new AssetCollectGroup()
+                        new AssetCollectGroup
                         {
                             Name = "Default Group",
                             Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -360,17 +359,18 @@ namespace AIO.UEditor
         public void FoldoutOff()
         {
             if (Packages is null) return;
-            foreach (var package in Packages)
+            foreach (var package in Packages
+                         .Where(package => !(package is null))
+                         .Where(package => !(package.Groups is null)))
             {
-                if (package?.Groups is null) continue;
-                foreach (var group in package.Groups)
+                foreach (var group in package.Groups
+                             .Where(group => !(group is null))
+                             .Where(group => !(group.Collectors is null)))
                 {
-                    if (group?.Collectors is null) continue;
-                    foreach (var item in group.Collectors)
-                    {
-                        if (item is null) continue;
-                        item.Folded = false;
-                    }
+                    foreach (var item in group.Collectors
+                                 .Where(item => !(item is null))
+                                 .Where(item => !item.Folded)
+                            ) item.Folded = false;
                 }
             }
         }

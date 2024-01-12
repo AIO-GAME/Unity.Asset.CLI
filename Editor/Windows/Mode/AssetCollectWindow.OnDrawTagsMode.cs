@@ -25,7 +25,10 @@ namespace AIO.UEditor
                 return;
             }
 
-            SearchText = EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
+            SearchText = CurrentTagValues.Count > 300
+                ? EditorGUILayout.DelayedTextField(SearchText, GEStyle.SearchTextField)
+                : EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
+
             if (GUILayout.Button(GC_CLEAR, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
                 GUI.FocusControl(null);

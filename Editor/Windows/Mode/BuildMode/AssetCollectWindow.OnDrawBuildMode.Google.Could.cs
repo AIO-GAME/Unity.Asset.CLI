@@ -1,7 +1,7 @@
 /*|============|*|
-|*|Author:     |*| xinan                
-|*|Date:       |*| 2024-01-03               
-|*|E-Mail:     |*| 1398581458@qq.com     
+|*|Author:     |*| xinan
+|*|Date:       |*| 2024-01-03
+|*|E-Mail:     |*| 1398581458@qq.com
 |*|============|*/
 
 using System.IO;
@@ -48,6 +48,7 @@ namespace AIO.UEditor
         private void OnDrawBuildGCloud()
         {
             if (BuildConfig.GCloudConfigs is null || BuildConfig.GCloudConfigs.Length == 0) return;
+
             using (var scope = new EditorGUILayout.ScrollViewScope(OnDrawConfigGCScroll))
             {
                 OnDrawConfigGCScroll = scope.scrollPosition;
@@ -124,6 +125,18 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
+                EditorGUILayout.LabelField("Env : gcloud local", GP_Width_100);
+                config.GCLOUD_PATH = GELayout.FieldDelayed(config.GCLOUD_PATH);
+            }
+
+            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
+            {
+                EditorGUILayout.LabelField("Env : gsutil local", GP_Width_100);
+                config.GSUTIL_PATH = GELayout.FieldDelayed(config.GSUTIL_PATH);
+            }
+
+            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
+            {
                 EditorGUILayout.LabelField("储存桶:元数据", GP_Width_100);
                 config.BUCKET_NAME = GELayout.FieldDelayed(config.BUCKET_NAME);
                 config.MetaData = GELayout.FieldDelayed(config.MetaData);
@@ -138,7 +151,7 @@ namespace AIO.UEditor
                 else if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
                 {
                     GUI.FocusControl(null);
-                    config.Upload();
+                    _ = config.Upload();
                 }
             }
 

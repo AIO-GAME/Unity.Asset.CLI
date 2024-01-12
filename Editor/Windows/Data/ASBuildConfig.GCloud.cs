@@ -5,15 +5,9 @@
 |*|============|*/
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using AIO.UEngine;
 using UnityEditor;
-using UnityEngine;
-using Console = System.Console;
 
 namespace AIO.UEditor
 {
@@ -22,6 +16,16 @@ namespace AIO.UEditor
     /// </summary>
     public class ASUploadGCloudConfig
     {
+        /// <summary>
+        /// Gcloud 路径
+        /// </summary>
+        public string GCLOUD_PATH = "gcloud";
+
+        /// <summary>
+        /// Gsutil 路径
+        /// </summary>
+        public string GSUTIL_PATH = "gsutil";
+
         /// <summary>
         /// 是否上传Latest
         /// </summary>
@@ -65,7 +69,7 @@ namespace AIO.UEditor
         /// --content-disposition=disposition
         /// </remarks>
         public string MetaData;
-        
+
         /// <summary>
         /// 远端相对目录
         /// </summary>
@@ -80,9 +84,9 @@ namespace AIO.UEditor
                 if (string.IsNullOrEmpty(version))
                     throw new ArgumentNullException($"{version} is null or empty");
 
-                if (string.IsNullOrEmpty(RemotePath))
-                    return Path.Combine(BuildTarget.ToString(), PackageName, version);
-                return Path.Combine(RemotePath, BuildTarget.ToString(), PackageName, version);
+                return string.IsNullOrEmpty(RemotePath)
+                    ? Path.Combine(BuildTarget.ToString(), PackageName, version)
+                    : Path.Combine(RemotePath, BuildTarget.ToString(), PackageName, version);
             }
         }
 
@@ -135,13 +139,23 @@ namespace AIO.UEditor
                 }
             };
             GCloudConfigs = GCloudConfigs is null
-                ? new GCloudConfig[] { temp }
+                ? new[] { temp }
                 : GCloudConfigs.Add(temp);
         }
 
         [Serializable]
         public class GCloudConfig
         {
+            /// <summary>
+            /// Gcloud 路径
+            /// </summary>
+            public string GCLOUD_PATH = "gcloud";
+
+            /// <summary>
+            /// Gsutil 路径
+            /// </summary>
+            public string GSUTIL_PATH = "gsutil";
+
             /// <summary>
             /// 是否显示
             /// </summary>
@@ -185,90 +199,17 @@ namespace AIO.UEditor
             /// <summary>
             /// 上传首包配置
             /// </summary>
-            public async Task UploadFirstPack(string target)
+            public async Task UploadFirstPack(string location)
             {
+                PrGCloud.Gcloud = GCLOUD_PATH;
+                PrGCloud.Gsutil = GSUTIL_PATH;
                 var result = await PrGCloud.UploadFileAsync(
                     AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(BUCKET_NAME),
-                    target,
+                    location,
                     MetaData);
                 EditorUtility.DisplayDialog("提示", result
-                    ? $"上传成功 "
-                    : $"上传失败", "确定");
-            }
-
-            /// <summary>
-            /// 更新配置版本
-            /// </summary>
-            public async Task UploadVersion()
-            {
-                var one = DirTreeFiled[0];
-                if (string.IsNullOrEmpty(one))
-                {
-                    EditorUtility.DisplayDialog("提示", "上传目录 平台 不能为空", "确定");
-                    return;
-                }
-
-                var two = DirTreeFiled[1];
-                if (string.IsNullOrEmpty(two))
-                {
-                    EditorUtility.DisplayDialog("提示", "上传目录 包名 不能为空", "确定");
-                    return;
-                }
-
-                var three = DirTreeFiled[2];
-                if (string.IsNullOrEmpty(three))
-                {
-                    EditorUtility.DisplayDialog("提示", "上传目录 版本 不能为空", "确定");
-                    return;
-                }
-
-                string content;
-                var saveToLocation = $"{EHelper.Path.Temp}/{one}.json";
-                var BUCKET_PATH = string.Concat(BUCKET_NAME, '/', "Version/", one, ".json");
-                await PrGCloud.DownloadFileAsync(
-                    BUCKET_PATH,
-                    saveToLocation);
-
-                if (File.Exists(saveToLocation))
-                {
-                    var data = AHelper.IO.ReadJson<List<AssetsPackageConfig>>(saveToLocation);
-                    var exists = false;
-                    foreach (var item in data.Where(item => item.Name == two))
-                    {
-                        exists = true;
-                        item.Version = three;
-                        break;
-                    }
-
-                    if (!exists)
-                    {
-                        data.Add(new AssetsPackageConfig
-                        {
-                            Name = two,
-                            Version = three,
-                        });
-                    }
-
-                    content = AHelper.Json.Serialize(data);
-                }
-                else
-                {
-                    content = AHelper.Json.Serialize(new[]
-                    {
-                        new AssetsPackageConfig
-                        {
-                            Name = two,
-                            Version = three,
-                        }
-                    });
-                }
-
-                AHelper.IO.WriteText(saveToLocation, content, Encoding.UTF8);
-                await PrGCloud.UploadFileAsync(
-                    BUCKET_PATH,
-                    saveToLocation, MetaData
-                );
-                AHelper.IO.DeleteFile(saveToLocation);
+                    ? "上传成功 "
+                    : "上传失败", "确定");
             }
 
             public override string ToString()
@@ -276,7 +217,7 @@ namespace AIO.UEditor
                 return string.IsNullOrEmpty(Name) ? BUCKET_NAME : Name;
             }
 
-            public async void Upload()
+            public async Task Upload()
             {
                 if (string.IsNullOrEmpty(BUCKET_NAME))
                 {
@@ -312,14 +253,14 @@ namespace AIO.UEditor
                 }
 
                 isUploading = true;
-                await PrGCloud.UploadDirAsync(
-                    string.Concat(BUCKET_NAME, '/', one, '/', two, '/', three),
-                    DirTreeFiled.GetFullPath(),
-                    MetaData
-                );
-
-                await UploadVersion();
-                EditorUtility.DisplayDialog("提示", "上传成功", "确定");
+                var config = new ASUploadGCloudConfig();
+                config.RemotePath = BUCKET_NAME;
+                config.PackageName = two;
+                config.Version = three;
+                config.BuildTarget = (BuildTarget)Enum.Parse(typeof(BuildTarget), one, false);
+                config.MetaData = MetaData;
+                config.LocalFullPath = DirTreeFiled.DirPath;
+                await AssetProxyEditor.UploadGCloud(config);
                 isUploading = false;
             }
         }
