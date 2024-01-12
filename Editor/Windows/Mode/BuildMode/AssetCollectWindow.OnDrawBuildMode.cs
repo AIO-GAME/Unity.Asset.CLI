@@ -142,6 +142,7 @@ namespace AIO.UEditor
                     if (Application.isPlaying) GUI.enabled = false;
                     if (GUILayout.Button("构建资源", GEStyle.toolbarbutton, GP_Width_75))
                     {
+                        AssetProxyEditor.ConvertConfig(Data, true);
                         AssetProxyEditor.BuildArt(BuildConfig, true);
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                     }
