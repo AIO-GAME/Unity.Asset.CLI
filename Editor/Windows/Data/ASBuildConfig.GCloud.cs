@@ -320,8 +320,6 @@ namespace AIO.UEditor
                 config.MetaData = MetaData;
                 config.LocalFullPath = DirTreeFiled.DirPath;
                 await AssetProxyEditor.UploadGCloud(config);
-                await UploadVersion();
-                EditorUtility.DisplayDialog("提示", "上传成功", "确定");
                 isUploading = false;
             }
         }
