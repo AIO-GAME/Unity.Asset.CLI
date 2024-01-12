@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AIO.UEngine;
-using UnityEngine;
 using YooAsset.Editor;
 
 namespace AIO.UEditor.CLI
@@ -37,16 +35,29 @@ namespace AIO.UEditor.CLI
         }
 
         private static IEnumerable<AssetBundleCollectorPackage> Convert(IEnumerable<AssetCollectPackage> packages)
-            => packages.Where(package => !package.Groups.Equals(null)).Select(Convert);
+            => packages is null
+                ? Array.Empty<AssetBundleCollectorPackage>()
+                : packages
+                    .Where(package => !package.Equals(null))
+                    .Where(package => !package.Groups.Equals(null))
+                    .Select(Convert);
 
         private static IEnumerable<AssetBundleCollectorGroup> Convert(IEnumerable<AssetCollectGroup> groups)
-            => groups.Where(group => !group.Collectors.Equals(null)).Select(Convert);
+            => groups is null
+                ? Array.Empty<AssetBundleCollectorGroup>()
+                : groups
+                    .Where(group => !group.Equals(null))
+                    .Where(group => !group.Collectors.Equals(null))
+                    .Select(Convert);
 
         private static IEnumerable<AssetBundleCollector> Convert(IEnumerable<AssetCollectItem> collects)
-            => collects.Where(collect =>
-                !string.IsNullOrEmpty(collect.CollectPath) &&
-                (File.Exists(collect.CollectPath) || Directory.Exists(collect.CollectPath))
-            ).Select(Convert);
+            => collects is null
+                ? Array.Empty<AssetBundleCollector>()
+                : collects
+                    .Where(collect => !collect.Equals(null))
+                    .Where(collect => !string.IsNullOrEmpty(collect.CollectPath))
+                    .Where(collect => File.Exists(collect.CollectPath) || Directory.Exists(collect.CollectPath))
+                    .Select(Convert);
 
         private static AssetBundleCollectorPackage Convert(AssetCollectPackage package) =>
             new AssetBundleCollectorPackage
@@ -94,6 +105,7 @@ namespace AIO.UEditor.CLI
 
         private static void PackageRemoveRepeat(AssetCollectRoot asset)
         {
+            if (asset.Packages is null) return;
             var YPackages = AssetBundleCollectorSettingData.Setting.Packages;
             foreach (var APackage in asset.Packages)
             {
@@ -130,12 +142,13 @@ namespace AIO.UEditor.CLI
 
         private static void PackageRemoveEmpty()
         {
-            for (var i = AssetBundleCollectorSettingData.Setting.Packages.Count - 1; i >= 0; i--)
+            var packages = AssetBundleCollectorSettingData.Setting.Packages;
+            for (var i = packages.Count - 1; i >= 0; i--)
             {
-                var package = AssetBundleCollectorSettingData.Setting.Packages[i];
+                var package = packages[i];
                 if (package.Groups is null)
                 {
-                    AssetBundleCollectorSettingData.Setting.Packages.RemoveAt(i);
+                    packages.RemoveAt(i);
                     continue;
                 }
 
@@ -150,16 +163,19 @@ namespace AIO.UEditor.CLI
                     for (var k = package.Groups[j].Collectors.Count - 1; k >= 0; k--)
                     {
                         var collector = package.Groups[j].Collectors[k];
-                        if (string.IsNullOrEmpty(collector.CollectPath) ||
-                            (!File.Exists(collector.CollectPath) && !Directory.Exists(collector.CollectPath)))
+                        if (!AHelper.IO.Exists(collector.CollectPath))
+                        {
                             package.Groups[j].Collectors.RemoveAt(k);
+                        }
                     }
 
                     if (package.Groups[j].Collectors.Count == 0) package.Groups.RemoveAt(j);
                 }
 
-                if (package.Groups.Count == 0) AssetBundleCollectorSettingData.Setting.Packages.RemoveAt(i);
+                if (package.Groups.Count == 0) packages.RemoveAt(i);
             }
+
+            AssetBundleCollectorSettingData.Setting.Packages = packages;
         }
 
         public static void Convert(AssetCollectRoot asset)

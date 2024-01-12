@@ -182,7 +182,7 @@ namespace AIO.UEditor.CLI
             else
             {
                 EditorUtility.ClearProgressBar();
-                EditorUtility.DisplayDialog("Info", succeed ? $"资源上传完成" : "资源上传失败", "确定");
+                EditorUtility.DisplayDialog("Info", succeed ? "资源上传完成" : "资源上传失败", "确定");
             }
         }
     }

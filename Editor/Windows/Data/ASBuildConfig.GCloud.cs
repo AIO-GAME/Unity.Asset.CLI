@@ -23,6 +23,16 @@ namespace AIO.UEditor
     public class ASUploadGCloudConfig
     {
         /// <summary>
+        /// Gcloud 路径
+        /// </summary>
+        public string GCLOUD_PATH = "gcloud";
+
+        /// <summary>
+        /// Gsutil 路径
+        /// </summary>
+        public string GSUTIL_PATH = "gsutil";
+
+        /// <summary>
         /// 是否上传Latest
         /// </summary>
         /// [Ture:上传Latest]
@@ -142,6 +152,16 @@ namespace AIO.UEditor
         [Serializable]
         public class GCloudConfig
         {
+            /// <summary>
+            /// Gcloud 路径
+            /// </summary>
+            public string GCLOUD_PATH = "gcloud";
+
+            /// <summary>
+            /// Gsutil 路径
+            /// </summary>
+            public string GSUTIL_PATH = "gsutil";
+
             /// <summary>
             /// 是否显示
             /// </summary>

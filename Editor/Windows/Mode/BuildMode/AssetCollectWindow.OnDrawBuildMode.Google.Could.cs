@@ -48,6 +48,7 @@ namespace AIO.UEditor
         private void OnDrawBuildGCloud()
         {
             if (BuildConfig.GCloudConfigs is null || BuildConfig.GCloudConfigs.Length == 0) return;
+            
             using (var scope = new EditorGUILayout.ScrollViewScope(OnDrawConfigGCScroll))
             {
                 OnDrawConfigGCScroll = scope.scrollPosition;
@@ -120,6 +121,18 @@ namespace AIO.UEditor
                 EditorGUILayout.LabelField("名称:描述", GP_Width_100);
                 config.Name = GELayout.FieldDelayed(config.Name);
                 config.Description = GELayout.FieldDelayed(config.Description);
+            }
+
+            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
+            {
+                EditorGUILayout.LabelField("Env : gcloud local", GP_Width_100);
+                config.GCLOUD_PATH = GELayout.FieldDelayed(config.GCLOUD_PATH);
+            }
+
+            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
+            {
+                EditorGUILayout.LabelField("Env : gsutil local", GP_Width_100);
+                config.GSUTIL_PATH = GELayout.FieldDelayed(config.GSUTIL_PATH);
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
