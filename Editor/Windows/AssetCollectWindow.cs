@@ -14,6 +14,7 @@ namespace AIO.UEditor
     /// 资源管理窗口
     /// </summary>
     [GWindow("资源收集管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
+        IconResource = "Editor/Icon/Asset",
         Group = "Tools",
         Menu = "AIO/Window/Asset",
         MinSizeHeight = 450,

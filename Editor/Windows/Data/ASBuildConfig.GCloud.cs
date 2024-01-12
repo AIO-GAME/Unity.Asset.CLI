@@ -65,7 +65,7 @@ namespace AIO.UEditor
         /// --content-disposition=disposition
         /// </remarks>
         public string MetaData;
-        
+
         /// <summary>
         /// 远端相对目录
         /// </summary>
@@ -312,12 +312,14 @@ namespace AIO.UEditor
                 }
 
                 isUploading = true;
-                await PrGCloud.UploadDirAsync(
-                    string.Concat(BUCKET_NAME, '/', one, '/', two, '/', three),
-                    DirTreeFiled.GetFullPath(),
-                    MetaData
-                );
-
+                var config = new ASUploadGCloudConfig();
+                config.RemotePath = BUCKET_NAME;
+                config.PackageName = two;
+                config.Version = three;
+                config.BuildTarget = Enum.Parse<BuildTarget>(one);
+                config.MetaData = MetaData;
+                config.LocalFullPath = DirTreeFiled.DirPath;
+                await AssetProxyEditor.UploadGCloud(config);
                 await UploadVersion();
                 EditorUtility.DisplayDialog("提示", "上传成功", "确定");
                 isUploading = false;

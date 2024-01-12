@@ -88,8 +88,7 @@ namespace AIO.UEditor
                 FoldoutUploadGCloud,
                 () => { BuildConfig.AddOrNewGCloud(); }, 0, null, new GUIContent("✚"));
 
-            // FoldoutNoticeDingDing = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildNoticeDingDing,
-            //     "钉钉通知", FoldoutNoticeDingDing);
+            // FoldoutNoticeDingDing = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildNoticeDingDing, "钉钉通知", FoldoutNoticeDingDing);
         }
 
         /// <summary>
@@ -241,11 +240,11 @@ namespace AIO.UEditor
             }
         }
 
-        private void OnDrawBuildNoticeDingDing()
-        {
-            // 钉钉 WebHook
-            // 钉钉 Secret(请选择加签方式 内容过滤可能导致消息丢失)
-            // 钉钉 通知事件类型列表
-        }
+        // private void OnDrawBuildNoticeDingDing()
+        // {
+        //     // 钉钉 WebHook
+        //     // 钉钉 Secret(请选择加签方式 内容过滤可能导致消息丢失)
+        //     // 钉钉 通知事件类型列表
+        // }
     }
 }

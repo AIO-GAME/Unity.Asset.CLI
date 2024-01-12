@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -49,7 +50,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 上传到GCloud
         /// </summary>
-        public static void UploadGCloud(ASUploadGCloudConfig config, bool isTips = false)
+        public static async Task UploadGCloud(ASUploadGCloudConfig config, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -57,14 +58,14 @@ namespace AIO.UEditor
                 return;
             }
 
-            Editor.UploadGCloud(config);
+            await Editor.UploadGCloud(config);
         }
 
 
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public static void UploadFtp(ASUploadFTPConfig config, bool isTips = false)
+        public static async Task UploadFtp(ASUploadFTPConfig config, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -72,7 +73,7 @@ namespace AIO.UEditor
                 return;
             }
 
-            Editor.UploadFtp(config);
+            await Editor.UploadFtp(config);
         }
 
         public static void BuildArt(ASBuildConfig config, bool isTips = false)

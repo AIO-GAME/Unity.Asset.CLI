@@ -8,8 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
@@ -136,6 +139,47 @@ namespace AIO.UEditor.CLI
                 else progress = current => { EditorUtility.DisplayProgressBar("上传进度", current.ToString(), 0.4f); };
                 succeed = await PrGCloud.UploadDirAsync(config.RemoteRelative, localFull, config.MetaData, progress);
             }
+
+            string VersionContent;
+            var Version_Path =
+                string.Concat(config.RemotePath, '/', "Version/", config.BuildTarget.ToString(), ".json");
+
+            if (EHelper.IsCMD()) Console.WriteLine($"[GCloud] 更新远端平台版本 : : {Version_Path}");
+            else EditorUtility.DisplayProgressBar("上传进度", $"[GCloud] 更新远端平台版本 : : {Version_Path}", 0.95f);
+
+            if (await PrGCloud.ExistsAsync(Version_Path))
+            {
+                VersionContent = await PrGCloud.ReadTextAsync(Version_Path);
+                var data = AHelper.Json.Deserialize<List<AssetsPackageConfig>>(VersionContent);
+                var data2 = data.Find(item => item.Name == config.PackageName);
+                if (data2 is null)
+                {
+                    data.Add(new AssetsPackageConfig
+                    {
+                        Name = config.PackageName,
+                        Version = config.Version
+                    });
+                }
+                else data2.Version = config.Version;
+
+                VersionContent = AHelper.Json.Serialize(data);
+            }
+            else
+            {
+                VersionContent = AHelper.Json.Serialize(new[]
+                {
+                    new AssetsPackageConfig
+                    {
+                        Name = config.PackageName,
+                        Version = config.Version
+                    }
+                });
+            }
+
+            var VersionTemp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            await AHelper.IO.WriteUTF8Async(VersionTemp, VersionContent);
+            await PrGCloud.UploadFileAsync(Version_Path, VersionTemp, config.MetaData);
+            AHelper.IO.DeleteFile(VersionTemp);
 
             if (EHelper.IsCMD()) Debug.Log(succeed ? "资源上传完成" : "资源上传失败");
             else
