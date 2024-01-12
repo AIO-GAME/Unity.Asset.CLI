@@ -226,7 +226,7 @@ namespace AIO.UEditor
             if (RuleUseFilterCustom)
             {
                 if (!string.IsNullOrEmpty(RuleFilter))
-                    RuleCustomFilter = RuleFilter?.Split(';');
+                    RuleCustomFilter = RuleFilter.Split(';');
             }
             else if (RuleFilterIndex < 0)
             {
@@ -249,7 +249,7 @@ namespace AIO.UEditor
             if (RuleUseCollectCustom)
             {
                 if (!string.IsNullOrEmpty(RuleCollect))
-                    RuleCustomCollect = RuleCollect?.Split(';');
+                    RuleCustomCollect = RuleCollect.Split(';');
             }
             else if (RuleCollectIndex < 0)
             {
@@ -367,12 +367,12 @@ namespace AIO.UEditor
 
         private void UpdateData()
         {
-            if (Path is null) Folded = false;
+            if (_Path is null) Folded = false;
             else
             {
-                var temp = AssetDatabase.GetAssetPath(Path);
+                var temp = AssetDatabase.GetAssetPath(_Path);
                 if (string.IsNullOrEmpty(temp)) return;
-                if (!File.Exists(temp) && !Directory.Exists(temp)) return;
+                if (!AHelper.IO.Exists(temp)) return;
                 CollectPath = temp;
                 GUID = AssetDatabase.AssetPathToGUID(CollectPath);
                 FileName = System.IO.Path.GetFileName(CollectPath);
@@ -381,6 +381,9 @@ namespace AIO.UEditor
 
         public void Dispose()
         {
+            AssetDataInfos?.Clear();
+            RuleFilters?.Clear();
+            RuleCollects?.Clear();
             UpdateData();
         }
 

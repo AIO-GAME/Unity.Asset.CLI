@@ -33,6 +33,72 @@ namespace AIO.UEditor
 
         partial void GCInit();
 
+        partial void OnDrawHeader()
+        {
+            using (new GUILayout.HorizontalScope())
+            {
+                switch (WindowMode)
+                {
+                    case Mode.Editor:
+                        OnDrawHeaderEditorMode();
+                        break;
+                    case Mode.Config:
+                        OnDrawHeaderConfigMode();
+                        break;
+                    case Mode.Look:
+                        OnDrawHeaderLookMode();
+                        break;
+                    case Mode.Build:
+                        OnDrawHeaderBuildMode();
+                        break;
+                    case Mode.LookTags:
+                        OnDrawHeaderTagsMode();
+                        break;
+                    case Mode.LookFirstPackage:
+                        OnDrawHeaderFirstPackageMode();
+                        break;
+                }
+
+                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
+
+                if (GUI.changed)
+                {
+                    if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
+                    GUI.FocusControl(null);
+                    UpdateData();
+                    TempTable[nameof(WindowMode)] = WindowMode;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 更新数据
+        /// </summary>
+        protected void UpdateData()
+        {
+            switch (WindowMode)
+            {
+                case Mode.Config:
+                    UpdateDataConfigMode();
+                    break;
+                case Mode.Editor:
+
+                    break;
+                case Mode.Look:
+                    UpdateDataLookMode();
+                    break;
+                case Mode.Build:
+                    UpdateDataBuildMode();
+                    break;
+                case Mode.LookTags:
+                    UpdateDataTagsMode();
+                    break;
+                case Mode.LookFirstPackage:
+                    UpdateDataFirstPackageMode();
+                    break;
+            }
+        }
+
         protected override void OnActivation()
         {
             AssetCollectSetting.Initialize();
@@ -69,74 +135,9 @@ namespace AIO.UEditor
             UpdateData();
         }
 
-        partial void OnDrawHeader()
-        {
-            using (GELayout.VHorizontal())
-            {
-                switch (WindowMode)
-                {
-                    case Mode.Editor:
-                        OnDrawHeaderEditorMode();
-                        break;
-                    case Mode.Config:
-                        OnDrawHeaderConfigMode();
-                        break;
-                    case Mode.Look:
-                        OnDrawHeaderLookMode();
-                        break;
-                    case Mode.Build:
-                        OnDrawHeaderBuildMode();
-                        break;
-                    case Mode.LookTags:
-                        OnDrawHeaderTagsMode();
-                        break;
-                    case Mode.LookFirstPackage:
-                        OnDrawHeaderFirstPackageMode();
-                        break;
-                }
-
-                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
-
-                if (!GUI.changed) return;
-                if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
-                GUI.FocusControl(null);
-                UpdateData();
-
-                TempTable[nameof(WindowMode)] = WindowMode;
-            }
-        }
-
-        /// <summary>
-        /// 更新数据
-        /// </summary>
-        protected void UpdateData()
-        {
-            switch (WindowMode)
-            {
-                case Mode.Config:
-                    UpdateDataConfigMode();
-                    break;
-                case Mode.Editor:
-
-                    break;
-                case Mode.Look:
-                    UpdateDataLookMode();
-                    break;
-                case Mode.Build:
-                    UpdateDataBuildMode();
-                    break;
-                case Mode.LookTags:
-                    UpdateDataTagsMode();
-                    break;
-                case Mode.LookFirstPackage:
-                    UpdateDataFirstPackageMode();
-                    break;
-            }
-        }
-
         protected override void OnDraw()
         {
-            using (new EditorGUILayout.HorizontalScope(
+            using (new GUILayout.HorizontalScope(
                        GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
             {
                 OnDrawHeader();
@@ -168,47 +169,11 @@ namespace AIO.UEditor
             OnOpenEvent();
         }
 
-        #region 绘制
-
-        partial void OnDrawConfigMode();
-        partial void OnDrawEditorMode();
-        partial void OnDrawTagsMode();
-        partial void OnDrawBuildMode();
-        partial void OnDrawLookMode();
-        partial void OnDrawHeader();
-        partial void OnDrawSetting();
-        partial void OnDrawPackage();
-        partial void OnDrawGroup();
-        partial void OnDrawGroupList();
-        partial void OnDrawItem(AssetCollectItem item);
-        partial void OnDrawASConfig();
-
-        /// <summary>
-        /// 绘制资源 阴影
-        /// </summary>
-        private static void OnDrawShading(Rect rect)
-        {
-            if (Mathf.FloorToInt(((rect.y - 4f) / rect.height) % 2f) != 0) return;
-            var rect2 = new Rect(rect);
-            rect2.width += rect.x + rect.height;
-            rect2.height += 1f;
-            rect2.x = 0f;
-            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
-            rect2.height = 1f;
-            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
-            rect2.y += rect.height;
-            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
-        }
-
-        #endregion
-
         protected override void OnDisable()
         {
             Data.Save();
             Config.Save();
             BuildConfig.Save();
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
         }
 
         public override void EventMouseDown(in Event eventData)
@@ -418,5 +383,39 @@ namespace AIO.UEditor
             ViewPackageList.CancelHorizontal();
             ViewSetting.CancelHorizontal();
         }
+
+        #region 绘制
+
+        partial void OnDrawConfigMode();
+        partial void OnDrawEditorMode();
+        partial void OnDrawTagsMode();
+        partial void OnDrawBuildMode();
+        partial void OnDrawLookMode();
+        partial void OnDrawHeader();
+        partial void OnDrawSetting();
+        partial void OnDrawPackage();
+        partial void OnDrawGroup();
+        partial void OnDrawGroupList();
+        partial void OnDrawItem(AssetCollectItem item);
+        partial void OnDrawASConfig();
+
+        /// <summary>
+        /// 绘制资源 阴影
+        /// </summary>
+        private static void OnDrawShading(Rect rect)
+        {
+            if (Mathf.FloorToInt(((rect.y - 4f) / rect.height) % 2f) != 0) return;
+            var rect2 = new Rect(rect);
+            rect2.width += rect.x + rect.height;
+            rect2.height += 1f;
+            rect2.x = 0f;
+            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
+            rect2.height = 1f;
+            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
+            rect2.y += rect.height;
+            EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
+        }
+
+        #endregion
     }
 }

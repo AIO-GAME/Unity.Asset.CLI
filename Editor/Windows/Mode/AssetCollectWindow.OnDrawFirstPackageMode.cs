@@ -91,15 +91,17 @@ namespace AIO.UEditor
             }
 
             OnDrawHeaderLookPageSetting();
-
-            GELayout.Button(GC_SAVE, () => { SequenceRecords.Save(); }, GEStyle.TEtoolbarbutton, GP_Width_25);
-            GELayout.Button(GC_REFRESH, () =>
+            if (Config.EnableSequenceRecord)
             {
-                SearchText = string.Empty;
-                LookModeDisplayTypeIndex = 0;
-                SequenceRecords.UpdateLocal();
-                UpdatePageValuesFirstPackageMode();
-            }, GEStyle.TEtoolbarbutton, GP_Width_25);
+                GELayout.Button(GC_SAVE, () => { SequenceRecords.Save(); }, GEStyle.TEtoolbarbutton, GP_Width_25);
+                GELayout.Button(GC_REFRESH, () =>
+                {
+                    SearchText = string.Empty;
+                    LookModeDisplayTypeIndex = 0;
+                    SequenceRecords.UpdateLocal();
+                    UpdatePageValuesFirstPackageMode();
+                }, GEStyle.TEtoolbarbutton, GP_Width_25);
+            }
         }
 
         private async void SyncSequenceRecords()

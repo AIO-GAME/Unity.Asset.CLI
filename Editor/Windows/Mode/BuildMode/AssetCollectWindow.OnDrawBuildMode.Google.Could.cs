@@ -1,7 +1,7 @@
 /*|============|*|
-|*|Author:     |*| xinan                
-|*|Date:       |*| 2024-01-03               
-|*|E-Mail:     |*| 1398581458@qq.com     
+|*|Author:     |*| xinan
+|*|Date:       |*| 2024-01-03
+|*|E-Mail:     |*| 1398581458@qq.com
 |*|============|*/
 
 using System.IO;
@@ -48,7 +48,7 @@ namespace AIO.UEditor
         private void OnDrawBuildGCloud()
         {
             if (BuildConfig.GCloudConfigs is null || BuildConfig.GCloudConfigs.Length == 0) return;
-            
+
             using (var scope = new EditorGUILayout.ScrollViewScope(OnDrawConfigGCScroll))
             {
                 OnDrawConfigGCScroll = scope.scrollPosition;
@@ -151,7 +151,7 @@ namespace AIO.UEditor
                 else if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
                 {
                     GUI.FocusControl(null);
-                    config.Upload();
+                    _ = config.Upload();
                 }
             }
 

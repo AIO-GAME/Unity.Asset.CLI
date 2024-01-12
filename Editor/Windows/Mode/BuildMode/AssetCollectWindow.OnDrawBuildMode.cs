@@ -23,7 +23,7 @@ namespace AIO.UEditor
         private void UpdateDataBuildMode()
         {
             // 获取当前文件磁盘剩余空间
-            Disk = new DriveInfo(Path.GetPathRoot(EHelper.Path.Project));
+            Disk = new DriveInfo(EHelper.Path.Project);
             LookModeDisplayPackages = Data.Packages.Select(x => x.Name).ToArray();
             BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
             Tags = Data.GetTags();
@@ -64,7 +64,15 @@ namespace AIO.UEditor
             {
                 GUI.FocusControl(null);
                 BuildConfig.Save();
-                EditorUtility.DisplayDialog("保存", "保存成功", "确定");
+                if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
+                {
+#if UNITY_2020_1_OR_NEWER
+                    AssetDatabase.SaveAssetIfDirty(BuildConfig);
+#else
+                    AssetDatabase.SaveAssets();
+#endif
+                    AssetDatabase.Refresh();
+                }
             }
         }
 
@@ -113,7 +121,8 @@ namespace AIO.UEditor
                     }
 
                     BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
-                    BuildConfig.MergeToLatest = GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest, GP_Width_100);
+                    BuildConfig.MergeToLatest =
+                        GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest, GP_Width_100);
                     EditorGUILayout.Separator();
 
                     if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_75))
@@ -142,9 +151,16 @@ namespace AIO.UEditor
                     if (Application.isPlaying) GUI.enabled = false;
                     if (GUILayout.Button("构建资源", GEStyle.toolbarbutton, GP_Width_75))
                     {
-                        AssetProxyEditor.ConvertConfig(Data, true);
-                        AssetProxyEditor.BuildArt(BuildConfig, true);
-                        BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                        try
+                        {
+                            AssetProxyEditor.ConvertConfig(Data, false);
+                            AssetProxyEditor.BuildArt(BuildConfig, true);
+                            BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                        }
+                        catch (Exception)
+                        {
+                            BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                        }
                     }
 
                     if (Application.isPlaying) GUI.enabled = true;

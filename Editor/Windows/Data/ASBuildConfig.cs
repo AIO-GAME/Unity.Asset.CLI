@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System;
 using System.IO;
 using AIO.UEngine;
 using UnityEditor;
@@ -11,6 +12,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
+    [Serializable]
     [HelpURL(
         "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7-")]
     public partial class ASBuildConfig : ScriptableObject
@@ -113,9 +115,10 @@ namespace AIO.UEditor
         public void Save()
         {
             if (Equals(null)) return;
-            EditorUtility.SetDirty(this);
 #if UNITY_2021_1_OR_NEWER
             AssetDatabase.SaveAssetIfDirty(this);
+#else
+            EditorUtility.SetDirty(this);
 #endif
         }
     }

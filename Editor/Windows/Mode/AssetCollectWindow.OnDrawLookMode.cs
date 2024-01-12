@@ -182,14 +182,6 @@ namespace AIO.UEditor
             }
 
             OnDrawHeaderLookPageSetting();
-
-            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
-            {
-                LookModeCurrentSelectAsset = null;
-                SearchText = string.Empty;
-                LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
-                UpdateDataLookMode();
-            }
         }
 
         /// <summary>
@@ -235,6 +227,14 @@ namespace AIO.UEditor
             if (GUILayout.Button(GC_LookMode_Page_Size, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
                 LookDataPageSizeMenu.ShowAsContext();
+            }
+
+            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
+            {
+                LookModeCurrentSelectAsset = null;
+                SearchText = string.Empty;
+                LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
+                UpdateDataLookMode();
             }
         }
 

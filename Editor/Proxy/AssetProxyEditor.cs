@@ -104,12 +104,13 @@ namespace AIO.UEditor
             Editor.BuildArt(command);
         }
 
-        public static void ConvertConfig(AssetCollectRoot config, bool isTips = false)
+        public static void ConvertConfig(AssetCollectRoot config, bool ignoreTips = true)
         {
             if (Editor is null)
             {
-                if (isTips) TipsInstall();
-                return;
+                if (ignoreTips) return;
+                TipsInstall();
+                throw new Exception("未安装 第三方 插件");
             }
 
             Editor.ConvertConfig(config);
@@ -121,7 +122,8 @@ namespace AIO.UEditor
             if (string.IsNullOrEmpty(currentScene.path)) return;
             var scene = SceneManager.GetSceneByPath(currentScene.path);
             if (!scene.isDirty) return; // 获取当前场景的修改状态
-            if (EditorUtility.DisplayDialog("提示", "当前场景未保存,是否保存?", "保存", "取消"))
+            if (EHelper.IsCMD()) EditorSceneManager.SaveScene(scene);
+            else if (EditorUtility.DisplayDialog("提示", "当前场景未保存,是否保存?", "保存", "取消"))
                 EditorSceneManager.SaveScene(scene);
         }
 
@@ -175,6 +177,7 @@ namespace AIO.UEditor
             var window = ScriptableObject.CreateInstance<InstallPopup>();
             window.titleContent = new GUIContent("提示");
             window.ShowUtility();
+            window.Focus();
         }
     }
 }

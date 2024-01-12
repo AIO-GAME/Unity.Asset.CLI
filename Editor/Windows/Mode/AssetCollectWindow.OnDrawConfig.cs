@@ -29,8 +29,16 @@ namespace AIO.UEditor
             if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
-                Data.Save();
-                EditorUtility.DisplayDialog("保存", "保存成功", "确定");
+                Config.Save();
+                if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
+                {
+#if UNITY_2020_1_OR_NEWER
+                    AssetDatabase.SaveAssetIfDirty(Config);
+#else
+                    AssetDatabase.SaveAssets();
+#endif
+                    AssetDatabase.Refresh();
+                }
             }
         }
 
@@ -42,7 +50,7 @@ namespace AIO.UEditor
             AssetProxyEditor.ConvertConfig(Data);
             Config.UpdatePackage();
         }
-        
+
         /// <summary>
         /// 绘制 资源设置模式
         /// </summary>
