@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -20,7 +19,7 @@ namespace AIO.UEditor
     [HelpURL(
         "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#asset-system-%E5%B7%A5%E5%85%B7%E8%AF%B4%E6%98%8E")]
 #if UNITY_2021_1_OR_NEWER
-    [Icon(  "Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
+    [Icon("Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
 #else
     [ScriptIcon(IconRelative = "Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
 #endif
@@ -372,6 +371,55 @@ namespace AIO.UEditor
                                  .Where(item => !item.Folded)
                             ) item.Folded = false;
                 }
+            }
+        }
+
+        [MenuItem("Assets/Asset System Find Address", true, 1000)]
+        private static bool IsSelectAsset()
+        {
+            return Selection.activeObject != null &&
+                   AssetDatabase.Contains(Selection.activeObject) &&
+                   !AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(Selection.activeObject)); // 不能是文件夹
+        }
+
+        /// <summary>
+        /// 根据GUID查找资源可寻址路径
+        /// </summary>
+        [MenuItem("Assets/Asset System Find Address", false, 1000)]
+        public static void FindAssetLocal()
+        {
+            var obj = Selection.activeObject;
+            var path = AssetDatabase.GetAssetPath(obj);
+            var guid = AssetDatabase.AssetPathToGUID(path);
+            if (string.IsNullOrEmpty(guid)) return;
+            var root = GetOrCreate();
+            var list = new List<string>();
+            foreach (var package in root.Packages)
+            {
+                if (package is null) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group is null) continue;
+                    foreach (var item in group.Collectors)
+                    {
+                        if (item is null) continue;
+                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (!path.StartsWith(item.CollectPath)) continue;
+                        // 是否是否被过滤
+                        var address = item.GetAddress(path);
+                        if (string.IsNullOrEmpty(address)) continue;
+                        list.Add(address);
+                    }
+                }
+            }
+
+            if (list.Count == 0)
+            {
+                Debug.Log($"未找到资源{path}的可寻址路径");
+            }
+            else
+            {
+                Debug.Log($"资源:{path}\n可寻址路径为:\n{string.Join("\n", list)}");
             }
         }
     }

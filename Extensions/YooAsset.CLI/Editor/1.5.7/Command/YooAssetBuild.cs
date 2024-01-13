@@ -1,7 +1,6 @@
 ﻿#if SUPPORT_YOOASSET
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -275,13 +274,13 @@ namespace AIO.UEditor.CLI
             {
                 if (!current.ContainsKey(item.Key)) // 删除
                 {
-                    delete.Add(item.Key.ToString(), item.Value.ToString());
+                    delete.Add(item.Key, item.Value);
                     continue;
                 }
 
-                if (current[item.Key].ToString() != item.Value.ToString()) // 修改
+                if (current[item.Key] != item.Value) // 修改
                 {
-                    change.Add(item.Key.ToString(), item.Value.ToString());
+                    change.Add(item.Key, item.Value);
                 }
             }
 
@@ -351,7 +350,6 @@ namespace AIO.UEditor.CLI
                 if (File.Exists(source))
                 {
                     var target = Path.Combine(latestPath, pair.Key);
-                    Console.WriteLine($"修改文件 : {target}");
                     File.Copy(source, target, true);
                 }
                 else
@@ -379,7 +377,7 @@ namespace AIO.UEditor.CLI
             if (!Directory.Exists(latestPath)) // 如果不存在 则将当前版本资源全部复制至 Latest
             {
                 Directory.CreateDirectory(latestPath);
-                AHelper.IO.CopyFolderAll(currentPath, latestPath);
+                AHelper.IO.CopyDirAll(currentPath, latestPath);
                 return;
             }
 

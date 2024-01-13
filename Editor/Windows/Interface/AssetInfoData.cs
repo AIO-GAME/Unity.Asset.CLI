@@ -55,7 +55,7 @@ namespace AIO
                     }
                     else if (Directory.Exists(AssetPath))
                     {
-                        _size = AHelper.IO.GetFolderLength(AssetPath);
+                        _size = AHelper.IO.GetDirLength(AssetPath);
                     }
                     else _size = -1;
                 }
@@ -101,7 +101,7 @@ namespace AIO
                     if (File.Exists(AssetPath))
                         _lastWriteTime = AHelper.IO.GetFileLastWriteTimeUtc(AssetPath);
                     else if (Directory.Exists(AssetPath))
-                        _lastWriteTime = AHelper.IO.GetFolderLastWriteTimeUtc(AssetPath);
+                        _lastWriteTime = AHelper.IO.GetDirLastWriteTimeUtc(AssetPath);
                     else _lastWriteTime = DateTime.MinValue;
                 }
 

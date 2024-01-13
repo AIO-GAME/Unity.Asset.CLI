@@ -391,7 +391,9 @@ namespace AIO.UEditor
         #region Common
 
         private Hashtable TempTable = new Hashtable();
-
+        private GUILayoutOption GP_MAX_Width_100;
+        private GUILayoutOption GP_MIN_Width_50;
+        
         private GUILayoutOption GP_Width_100;
         private GUILayoutOption GP_Width_120;
         private GUILayoutOption GP_Width_150;
@@ -533,6 +535,8 @@ namespace AIO.UEditor
 
         private void GPInit()
         {
+            GP_MAX_Width_100 = GUILayout.MaxWidth(100);
+            GP_MIN_Width_50 = GUILayout.MinWidth(50);
             GP_Width_EXPAND = GUILayout.ExpandWidth(true);
             GP_Width_120 = GUILayout.Width(120);
             GP_Width_150 = GUILayout.Width(150);

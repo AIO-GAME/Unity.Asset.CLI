@@ -127,14 +127,14 @@ namespace AIO.UEditor
                 {
                     var sandbox = Path.Combine(EHelper.Path.Project, "Sandbox");
                     if (Directory.Exists(sandbox))
-                        AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
+                        AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
                 }
 
                 if (GELayout.Button("Clean Bundles", GEStyle.toolbarbuttonRight, GP_Width_100))
                 {
                     var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
                     if (Directory.Exists(sandbox))
-                        AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
+                        AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
                 }
             }
 

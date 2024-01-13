@@ -7,7 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
@@ -186,7 +185,7 @@ namespace AIO.UEditor
 
             // 判断收集规则是否符合条件 如果不符合则跳过
             if (RuleCollects.Count != 0 &&
-                !RuleCollects.Any(filter => filter.IsCollectAsset(data))
+                !RuleCollects.Exists(filter => filter.IsCollectAsset(data))
                ) return false;
 
             // 判断自定义收集规则等
@@ -196,7 +195,7 @@ namespace AIO.UEditor
 
             // 判断过滤规则是否符合条件 如果符合则跳过
             if (RuleFilters.Count != 0 &&
-                RuleFilters.Any(filter => filter.IsCollectAsset(data))
+                RuleFilters.Exists(filter => filter.IsCollectAsset(data))
                ) return false;
 
             // 判断自定义过滤规则等
@@ -205,6 +204,54 @@ namespace AIO.UEditor
                ) return false;
 
             return true;
+        }
+
+        public string GetAddress(string assetPath)
+        {
+            UpdateCollect();
+            UpdateFilter();
+            var data = new AssetRuleData
+            {
+                Tags = Tags,
+                UserData = UserData,
+                PackageName = PackageName,
+                GroupName = GroupName,
+                CollectPath = CollectPath,
+            };
+            var index = assetPath.LastIndexOf('.');
+            if (index >= 0)
+            {
+                data.Extension = assetPath.Substring(index).Replace(".", "").ToLower();
+            }
+
+            data.AssetPath = assetPath.Substring(0, assetPath.Length - data.Extension.Length - 1);
+            return IsCollectAsset(data) ? GetAssetAddress(data, ASConfig.GetOrCreate().LoadPathToLower) : string.Empty;
+        }
+
+        /// <summary>
+        /// 是否存在指定资源
+        /// </summary>
+        /// <param name="assetPath">资源相对路径</param>
+        /// <returns>Ture:存在 False:不存在</returns>
+        public bool Exist(string assetPath)
+        {
+            UpdateFilter();
+            var data = new AssetRuleData
+            {
+                Tags = Tags,
+                UserData = UserData,
+                PackageName = PackageName,
+                GroupName = GroupName,
+                CollectPath = CollectPath,
+            };
+            var index = assetPath.LastIndexOf('.');
+            if (index >= 0)
+            {
+                data.Extension = assetPath.Substring(index).Replace(".", "").ToLower();
+            }
+
+            data.AssetPath = assetPath.Substring(0, assetPath.Length - data.Extension.Length - 1);
+            return IsCollectAsset(data);
         }
 
         public string GetAssetAddress(AssetRuleData data, bool pathToLower = false)
@@ -337,7 +384,7 @@ namespace AIO.UEditor
             }
         }
 
-        public async void CollectAssetTask(string package, string group,
+        public async Task CollectAssetTask(string package, string group,
             Action<Dictionary<string, AssetDataInfo>> cb = null)
         {
             AssetDataInfos.Clear();

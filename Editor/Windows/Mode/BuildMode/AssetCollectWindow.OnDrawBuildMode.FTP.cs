@@ -92,8 +92,8 @@ namespace AIO.UEditor
                                         if (EditorUtility.DisplayDialog("提示", $"{source}\n复制\n{target}", "确定",
                                                 "取消"))
                                         {
-                                            if (AHelper.IO.ExistsFolder(target))
-                                                AHelper.IO.DeleteFolder(target, SearchOption.AllDirectories, true);
+                                            if (AHelper.IO.ExistsDir(target))
+                                                AHelper.IO.DeleteDir(target, SearchOption.AllDirectories, true);
                                             PrPlatform.Folder.Copy(target, source).Async();
                                             return;
                                         }
@@ -110,7 +110,7 @@ namespace AIO.UEditor
                                                 "取消"))
                                         {
                                             IExecutor executor = null;
-                                            if (AHelper.IO.ExistsFolder(target))
+                                            if (AHelper.IO.ExistsDir(target))
                                                 executor = PrPlatform.Folder.Del(target);
                                             var symbolic = executor is null
                                                 ? PrPlatform.Folder.Symbolic(target, source)
