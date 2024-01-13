@@ -231,7 +231,7 @@ namespace AIO.UEditor.CLI
                 EngineeringPathPath.Add(BuildTarget, new YooAssetUnityArgs(BuildTarget));
             BuildInFilePlatform = Path.Combine(Commond.OutputRoot, BuildTarget.ToString())
                 .Replace('/', Path.DirectorySeparatorChar);
-            YooAssetPackageNames = AHelper.IO.GetFoldersName(BuildInFilePlatform).ToList();
+            YooAssetPackageNames = AHelper.IO.GetDirsName(BuildInFilePlatform).ToList();
             Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 
             EHelper.Prefs.SaveJson(typeof(YooAssetGraphicRect).FullName, EngineeringPathPath);
@@ -246,7 +246,7 @@ namespace AIO.UEditor.CLI
         public void OnDrawRight(float widthHalf, float widthQuarter)
         {
             GELayout.Vertical(Command0, GEStyle.INThumbnailShadow);
-            if (AHelper.IO.ExistsFolder(Commond.OutputRoot))
+            if (AHelper.IO.ExistsDir(Commond.OutputRoot))
             {
                 GELayout.Vertical(Command1, GEStyle.INThumbnailShadow);
                 GELayout.Vertical(Command2, GEStyle.INThumbnailShadow);
@@ -268,9 +268,9 @@ namespace AIO.UEditor.CLI
                     Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                 }
 
-                if (AHelper.IO.ExistsFolder(BuildInFilePlatform))
+                if (AHelper.IO.ExistsDir(BuildInFilePlatform))
                 {
-                    if (AHelper.IO.ExistsFolder(EngineeringPathPath[BuildTarget].OutputRoot) &&
+                    if (AHelper.IO.ExistsDir(EngineeringPathPath[BuildTarget].OutputRoot) &&
                         YooAssetPackageTarget.Count == 0)
                     {
                         if (GELayout.Button("组合资源包\n目标工程", 100, 25))
@@ -347,8 +347,8 @@ namespace AIO.UEditor.CLI
                 {
                     var source = Commond.OutputRoot.Trim('/', '\\');
                     var target = LocalStoragePath.Trim('/', '\\');
-                    if (AHelper.IO.ExistsFolder(target))
-                        AHelper.IO.DeleteFolder(target, SearchOption.AllDirectories, true);
+                    if (AHelper.IO.ExistsDir(target))
+                        AHelper.IO.DeleteDir(target, SearchOption.AllDirectories, true);
                     PrPlatform.Folder.Copy(target, source).Async();
                 }
 
@@ -357,7 +357,7 @@ namespace AIO.UEditor.CLI
                     var source = Commond.OutputRoot.Trim('/', '\\');
                     var target = LocalStoragePath.Trim('/', '\\');
                     IExecutor executor = null;
-                    if (AHelper.IO.ExistsFolder(target))
+                    if (AHelper.IO.ExistsDir(target))
                         executor = PrPlatform.Folder.Del(target);
                     var symbolic = executor is null
                         ? PrPlatform.Folder.Symbolic(target, source)
@@ -387,7 +387,7 @@ namespace AIO.UEditor.CLI
 
         private void Command3()
         {
-            if (!AHelper.IO.ExistsFolder(BuildInFilePlatform)) return;
+            if (!AHelper.IO.ExistsDir(BuildInFilePlatform)) return;
             using (GELayout.VHorizontal())
             {
                 GELayout.Label("组合资源 StreamingAssets", GEStyle.DDHeaderStyle, GTOption.Height(25));
@@ -415,7 +415,7 @@ namespace AIO.UEditor.CLI
                         {
                             var package = Path.Combine(BuildInFilePlatform,
                                 YooAssetPackageNames[YooAssetPackageIndex]);
-                            var list = AHelper.IO.GetFoldersName(package)
+                            var list = AHelper.IO.GetDirsName(package)
                                 .Where(file => !file.StartsWith("OutputCache")).ToList();
                             YooAssetPackageVersionTarget.Add(YooAssetPackageNames[YooAssetPackageIndex], list);
                         }

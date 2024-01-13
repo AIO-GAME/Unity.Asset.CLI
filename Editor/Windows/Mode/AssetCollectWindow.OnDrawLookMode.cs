@@ -31,8 +31,7 @@ namespace AIO.UEditor
             }
 
             Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages,
-                GEStyle.PreDropDown,
-                GP_Width_100);
+                GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
 
             if (!Data.IsGroupValid())
             {
@@ -60,7 +59,7 @@ namespace AIO.UEditor
 
             Data.CurrentGroupIndex = EditorGUILayout.Popup(
                 Data.CurrentGroupIndex, LookModeDisplayGroups[packageName],
-                GEStyle.PreDropDown, GP_Width_100);
+                GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
 
             if (!Data.IsCollectValid())
             {
@@ -93,19 +92,19 @@ namespace AIO.UEditor
                     LookModeDisplayCollectorsIndex = 0;
                     EditorGUILayout.Popup(0,
                         LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
-                        GEStyle.PreDropDown, GP_Width_100);
+                        GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
                 }
                 else if (LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length >= 31)
                 {
                     LookModeDisplayCollectorsIndex = EditorGUILayout.Popup(LookModeDisplayCollectorsIndex,
                         LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
-                        GEStyle.PreDropDown, GP_Width_100);
+                        GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
                 }
                 else
                 {
                     LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
                         LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
-                        GEStyle.PreDropDown, GP_Width_100);
+                        GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
                 }
             }
             else LookModeDisplayCollectorsIndex = 0;
@@ -117,13 +116,13 @@ namespace AIO.UEditor
                     LookModeDisplayTypeIndex = 0;
                     EditorGUILayout.Popup(0,
                         LookModeDisplayTypes[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
-                        GEStyle.PreDropDown, GP_Width_100);
+                        GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
                 }
                 else
                 {
                     LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
                         LookModeDisplayTypes[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
-                        GEStyle.PreDropDown, GP_Width_100);
+                        GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
                 }
             }
             else LookModeDisplayTypeIndex = 0;
@@ -135,13 +134,13 @@ namespace AIO.UEditor
                     LookModeDisplayTagsIndex = 0;
                     EditorGUILayout.Popup(0,
                         LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
-                        GEStyle.PreDropDown, GP_Width_100);
+                        GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
                 }
                 else
                 {
                     LookModeDisplayTagsIndex = EditorGUILayout.MaskField(LookModeDisplayTagsIndex,
                         LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)],
-                        GEStyle.PreDropDown, GP_Width_100);
+                        GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
                 }
             }
             else LookModeDisplayTagsIndex = 0;
@@ -182,6 +181,14 @@ namespace AIO.UEditor
             }
 
             OnDrawHeaderLookPageSetting();
+
+            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
+            {
+                LookModeCurrentSelectAsset = null;
+                SearchText = string.Empty;
+                LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
+                UpdateDataLookMode();
+            }
         }
 
         /// <summary>
@@ -227,14 +234,6 @@ namespace AIO.UEditor
             if (GUILayout.Button(GC_LookMode_Page_Size, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
                 LookDataPageSizeMenu.ShowAsContext();
-            }
-
-            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
-            {
-                LookModeCurrentSelectAsset = null;
-                SearchText = string.Empty;
-                LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
-                UpdateDataLookMode();
             }
         }
 
@@ -397,29 +396,24 @@ namespace AIO.UEditor
                     EditorGUILayout.LabelField(GC_LookMode_Detail_Asset, GP_Width_100);
                     EditorGUILayout.ObjectField(LookModeCurrentSelectAsset, LookModeCurrentSelectAsset.GetType(),
                         false);
-                    if (GELayout.Button(GC_OPEN_FOLDER, GEStyle.IconButton, 16))
-                        EditorUtility.RevealInFinder(LookModeCurrentSelectAssetDataInfo.AssetPath);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_GUID, GP_Width_100);
                     EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.GUID);
-                    GELayout.ButtonCopy(GC_COPY, LookModeCurrentSelectAssetDataInfo.GUID, 16, GEStyle.IconButton);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_Type, GP_Width_100);
                     EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Type);
-                    GELayout.ButtonCopy(GC_COPY, LookModeCurrentSelectAssetDataInfo.Type, 16, GEStyle.IconButton);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_Path, GP_Width_100);
                     EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.AssetPath);
-                    GELayout.ButtonCopy(GC_COPY, LookModeCurrentSelectAssetDataInfo.AssetPath, 16, GEStyle.IconButton);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
@@ -428,7 +422,6 @@ namespace AIO.UEditor
                     var timer =
                         LookModeCurrentSelectAssetDataInfo.LastWriteTime.ToString("yyyy-MM-dd hh:mm:ss");
                     EditorGUILayout.LabelField(timer);
-                    GELayout.ButtonCopy(GC_COPY, timer, 16, GEStyle.IconButton);
                 }
 
                 if (!string.IsNullOrEmpty(LookModeCurrentSelectAssetDataInfo.Tags))
@@ -626,6 +619,10 @@ namespace AIO.UEditor
                 {
                     GUI.FocusControl(null);
                     onDrawLookDataItemMenu = new GenericMenu();
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Open Default Asset"), false,
+                        () => { EditorUtility.OpenWithDefaultApp(data.AssetPath); });
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("Open Local Folder"), false,
+                        () => { EditorUtility.RevealInFinder(data.AssetPath); });
                     onDrawLookDataItemMenu.AddItem(new GUIContent("Select Asset"), false,
                         () => { Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(data.AssetPath); });
                     onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Address"), false,
@@ -712,7 +709,7 @@ namespace AIO.UEditor
             var listTypes = new List<string>();
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
             {
-                Data.Packages[i].Groups[j].Collectors[k].CollectAssetTask(
+                _ = Data.Packages[i].Groups[j].Collectors[k].CollectAssetTask(
                     Data.Packages[i].Name,
                     Data.Packages[i].Groups[j].Name,
                     dic =>

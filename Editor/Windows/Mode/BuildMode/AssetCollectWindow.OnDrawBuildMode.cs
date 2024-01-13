@@ -140,7 +140,7 @@ namespace AIO.UEditor
                     {
                         var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
                         if (Directory.Exists(sandbox))
-                            AHelper.IO.DeleteFolder(sandbox, SearchOption.AllDirectories, true);
+                            AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
                     }
 
                     if (GUILayout.Button("生成配置", GEStyle.toolbarbutton, GP_Width_75))

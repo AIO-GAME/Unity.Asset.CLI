@@ -37,7 +37,7 @@ namespace AIO.UEditor.CLI
 #elif UNITY_2020
                 VersionIndex = 3;
 #elif UNITY_2021
-                VersionIndex = 4;
+            VersionIndex = 4;
 #elif UNITY_2022
                 VersionIndex = 5;
 #elif UNITY_2023
@@ -63,7 +63,7 @@ namespace AIO.UEditor.CLI
                 return;
             }
 
-            if (AHelper.IO.ExistsFolder(Path.Combine(packageRoot, buildTarget.ToString())))
+            if (AHelper.IO.ExistsDir(Path.Combine(packageRoot, buildTarget.ToString())))
             {
                 Debug.LogError("请设置YooAsset资源包根目录 -> " + buildTarget);
                 return;
@@ -76,8 +76,8 @@ namespace AIO.UEditor.CLI
             }
 
             var output = Application.streamingAssetsPath.PathCombine(ASConfig.GetOrCreate().RuntimeRootDirectory);
-            if (AHelper.IO.ExistsFolder(output)) await PrPlatform.Folder.Del(output).Async();
-            AHelper.IO.CreateFolder(output);
+            if (AHelper.IO.ExistsDir(output)) await PrPlatform.Folder.Del(output).Async();
+            AHelper.IO.CreateDir(output);
             foreach (var package in packages)
             {
                 var packagePath = Path.Combine(output, package.Key);
@@ -98,7 +98,7 @@ namespace AIO.UEditor.CLI
                 return;
             }
 
-            if (AHelper.IO.ExistsFolder(Path.Combine(packageRoot, buildTarget.ToString())))
+            if (AHelper.IO.ExistsDir(Path.Combine(packageRoot, buildTarget.ToString())))
             {
                 Debug.LogError("请设置YooAsset资源包根目录 -> " + buildTarget);
                 return;
@@ -141,8 +141,8 @@ namespace AIO.UEditor.CLI
             }
 
             if (string.IsNullOrEmpty(output)) return;
-            if (AHelper.IO.ExistsFolder(output)) await PrPlatform.Folder.Del(output).Async();
-            AHelper.IO.CreateFolder(output);
+            if (AHelper.IO.ExistsDir(output)) await PrPlatform.Folder.Del(output).Async();
+            AHelper.IO.CreateDir(output);
             foreach (var package in packages)
             {
                 var packagePath = Path.Combine(output, package.Key);
