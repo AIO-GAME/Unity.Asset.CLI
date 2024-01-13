@@ -393,7 +393,7 @@ namespace AIO.UEditor
             var guid = AssetDatabase.AssetPathToGUID(path);
             if (string.IsNullOrEmpty(guid)) return;
             var root = GetOrCreate();
-            var list = new List<string>();
+            var list = new List<(string, string, string)>();
             foreach (var package in root.Packages)
             {
                 if (package is null) continue;
@@ -408,18 +408,20 @@ namespace AIO.UEditor
                         // 是否是否被过滤
                         var address = item.GetAddress(path);
                         if (string.IsNullOrEmpty(address)) continue;
-                        list.Add(address);
+                        list.Add((package.Name, group.Name, address));
                     }
                 }
             }
 
-            if (list.Count == 0)
-            {
-                Debug.Log($"未找到资源{path}的可寻址路径");
-            }
+            if (list.Count == 0) Debug.Log($"未找到资源{path}的可寻址路径");
             else
             {
-                Debug.Log($"资源:{path}\n可寻址路径为:\n{string.Join("\n", list)}");
+                var str = string.Join("\n", list.Select(tuple => @$"
+Package : {tuple.Item1}
+Group   : {tuple.Item2}
+Address : {tuple.Item3}
+"));
+                Debug.Log($"资源{path}的可寻址路径:\n{str}");
             }
         }
     }
