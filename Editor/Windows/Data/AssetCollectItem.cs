@@ -58,6 +58,11 @@ namespace AIO.UEditor
         public string CollectPath;
 
         /// <summary>
+        /// 收集器全路径
+        /// </summary>
+        public string FullPath => System.IO.Path.Combine(EHelper.Path.Project, CollectPath).Replace("\\", "/");
+
+        /// <summary>
         /// 自定义数据
         /// </summary>
         public string UserData;
@@ -340,8 +345,7 @@ namespace AIO.UEditor
             RuleCollects.Clear();
             PackageName = package;
             GroupName = group;
-            if (string.IsNullOrEmpty(CollectPath)) return;
-            if (!File.Exists(CollectPath) && !Directory.Exists(CollectPath)) return;
+            if (!AHelper.IO.Exists(FullPath)) return;
             if (CollectPath.Contains("/Resources/") || CollectPath.EndsWith("Resources"))
             {
                 Debug.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
