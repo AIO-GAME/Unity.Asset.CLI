@@ -171,9 +171,9 @@ namespace AIO.UEditor
 
         protected override void OnDisable()
         {
-            Data.Save();
-            Config.Save();
-            BuildConfig.Save();
+            Data?.Save();
+            Config?.Save();
+            BuildConfig?.Save();
         }
 
         public override void EventMouseDown(in Event eventData)
