@@ -29,6 +29,11 @@ namespace AIO.UEditor
         string DisplayPackName { get; }
 
         /// <summary>
+        /// 打包规则优先级
+        /// </summary>
+        int Priority { get; }
+        
+        /// <summary>
         /// 获取打包规则结果
         /// </summary>
         AssetRulePackResult GetPackRuleResult(AssetRuleData data);

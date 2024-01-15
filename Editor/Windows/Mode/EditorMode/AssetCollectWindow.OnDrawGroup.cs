@@ -82,7 +82,14 @@ namespace AIO.UEditor
                         {
                             Data.CurrentGroupIndex = i;
                             ViewGroupList.IsShow = true;
-                            Data.CurrentGroup.Refresh();
+
+                            if (Data.CurrentGroup.Length > 0)
+                            {
+                                Data.CurrentGroup.Refresh();
+                                CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
+                            }
+                            else CurrentCurrentCollectorsIndex = 0;
+
                             GUI.FocusControl(null);
                         }
                     }

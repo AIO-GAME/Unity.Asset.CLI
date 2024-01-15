@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
@@ -34,13 +35,28 @@ namespace AIO.UEditor
         /// </summary>
         public AssetCollectItem[] Collectors;
 
+        /// <summary>
+        /// 获取资源收集器数量
+        /// </summary>
+        public int Length
+        {
+            get
+            {
+                if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
+                return Collectors.Length;
+            }
+        }
+
+        /// <summary>
+        /// 刷新资源
+        /// </summary>
         public void Refresh()
         {
-            if (Collectors is null || Collectors.Length == 0) return;
+            if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
             foreach (var collect in Collectors)
             {
                 if (!AHelper.IO.Exists(collect.CollectPath)) continue;
-                collect.Path = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(collect.CollectPath);
+                collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
             }
         }
 
@@ -50,38 +66,68 @@ namespace AIO.UEditor
             set => Collectors[index] = value;
         }
 
+        /// <summary>
+        /// 获取资源收集器
+        /// </summary>
+        /// <param name="collectPath">收集器资源路径 会被转化成 GUID</param>
+        /// <returns>收集器</returns>
         public AssetCollectItem GetCollector(string collectPath)
         {
-            return Collectors
-                .Where(collectItem => !(collectItem is null))
-                .FirstOrDefault(collectItem => collectItem.CollectPath == collectPath);
-        }
-
-        public string[] GetTags()
-        {
-            var dictionary = new Dictionary<string, bool>();
-            foreach (var collect in Collectors)
+            if (Collectors is null)
             {
-                if (collect.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                if (string.IsNullOrEmpty(collect.Tags)) continue;
-                foreach (var tag in collect.Tags.Split(';')) dictionary[tag] = true;
+                Collectors = Array.Empty<AssetCollectItem>();
+                return null;
             }
 
-            if (string.IsNullOrEmpty(Tags)) return dictionary.Keys.ToArray();
-
-            foreach (var tag in Tags.Split(';')) dictionary[tag] = true;
-            return dictionary.Keys.ToArray();
+            var guid = AssetDatabase.AssetPathToGUID(collectPath);
+            return Collectors
+                .Where(collectItem => collectItem != null)
+                .FirstOrDefault(collectItem => collectItem.GUID == guid);
         }
 
+        /// <summary>
+        /// 获取资源收集器
+        /// </summary>
+        /// <param name="guid">收集器资源路径GUID</param>
+        /// <returns>收集器</returns>
+        public AssetCollectItem GetCollectorGUID(string guid)
+        {
+            if (Collectors is null)
+            {
+                Collectors = Array.Empty<AssetCollectItem>();
+                return null;
+            }
+
+            return Collectors
+                .Where(collectItem => collectItem != null)
+                .FirstOrDefault(collectItem => collectItem.GUID == guid);
+        }
+
+        /// <summary>
+        /// 获取所有标签
+        /// </summary>
+        /// <returns>标签列表</returns>
+        public string[] GetTags()
+        {
+            var dictionary = new List<string>();
+            foreach (var collect in Collectors) dictionary.AddRange(collect.GetTags());
+            if (string.IsNullOrEmpty(Tags)) return dictionary.Distinct().ToArray();
+            dictionary.AddRange(Tags.Split(';', ' ', ','));
+            return dictionary.Distinct().ToArray();
+        }
+
+        /// <summary>
+        /// 保存
+        /// </summary>
         public void Save()
         {
-            if (Collectors is null || Collectors.Length == 0) return;
+            if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
             foreach (var collect in Collectors) collect.UpdateData();
         }
 
         public void Dispose()
         {
-            if (Collectors is null || Collectors.Length == 0) return;
+            if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
             foreach (var collect in Collectors) collect.Dispose();
         }
 

@@ -11,10 +11,10 @@ namespace AIO.UEditor
 {
     public static class AssetCollectSetting
     {
-        public static DisplayList<IAssetRuleAddress> MapAddress;
-        public static DisplayList<IAssetRuleFilter> MapCollect;
-        public static DisplayList<IAssetRuleFilter> MapFilter;
-        public static DisplayList<IAssetRulePack> MapPacks;
+        public static DisplayList<IAssetRuleAddress> MapAddress { get; private set; }
+        public static DisplayList<IAssetRuleFilter> MapCollect { get; private set; }
+        public static DisplayList<IAssetRuleFilter> MapFilter { get; private set; }
+        public static DisplayList<IAssetRulePack> MapPacks { get; private set; }
 
         public static void Initialize()
         {

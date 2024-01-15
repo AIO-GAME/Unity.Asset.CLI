@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace AIO.UEditor
     /// <summary>
     /// 资源收集配置
     /// </summary>
+    [Description("资源收集配置")]
     [Serializable]
     [HelpURL(
         "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#asset-system-%E5%B7%A5%E5%85%B7%E8%AF%B4%E6%98%8E")]
@@ -27,39 +29,60 @@ namespace AIO.UEditor
     {
         private static AssetCollectRoot _Instance;
 
-        public static void Sort()
+        /// <summary>
+        /// 获取资源包数量
+        /// </summary>
+        public int Length
         {
-            for (var i = 0; i < _Instance.Packages.Length; i++)
+            get
             {
-                if (_Instance.Packages[i] is null)
+                if (Packages is null) Packages = Array.Empty<AssetCollectPackage>();
+                return Packages.Length;
+            }
+        }
+
+        /// <summary>
+        /// 资源收集器排序
+        /// </summary>
+        public void Sort()
+        {
+            if (Packages is null)
+            {
+                Packages = Array.Empty<AssetCollectPackage>();
+                return;
+            }
+
+            for (var i = 0; i < Packages.Length; i++)
+            {
+                if (Packages[i] is null)
                 {
-                    _Instance.Packages[i] = new AssetCollectPackage();
-                    _Instance.Packages[i].Groups = Array.Empty<AssetCollectGroup>();
+                    Packages[i] = new AssetCollectPackage();
+                    Packages[i].Groups = Array.Empty<AssetCollectGroup>();
                     continue;
                 }
 
-                if (_Instance.Packages[i].Groups is null)
+                if (Packages[i].Groups is null)
                 {
-                    _Instance.Packages[i].Groups = Array.Empty<AssetCollectGroup>();
+                    Packages[i].Groups = Array.Empty<AssetCollectGroup>();
                     continue;
                 }
 
-                for (var j = 0; j < _Instance.Packages[i].Groups.Length; j++)
+                for (var j = 0; j < Packages[i].Groups.Length; j++)
                 {
-                    _Instance.Packages[i].Groups = _Instance.Packages[i].Groups
+                    Packages[i].Groups = Packages[i].Groups
                         .OrderByDescending(group => group.Name)
                         .ToArray();
-                    if (_Instance.Packages[i].Groups[j].Collectors is null ||
-                        _Instance.Packages[i].Groups[j].Collectors.Length == 0)
+                    if (Packages[i].Groups[j].Collectors is null ||
+                        Packages[i].Groups[j].Collectors.Length == 0)
                         continue;
 
-                    _Instance.Packages[i].Groups[j].Collectors = _Instance.Packages[i].Groups[j].Collectors
+                    Packages[i].Groups[j].Collectors = Packages[i].Groups[j].Collectors
                         .OrderByDescending(collect => collect.CollectPath)
                         .ToArray();
                 }
             }
 
-            _Instance.Packages = _Instance.Packages.OrderByDescending(package => package.Name).ToArray();
+            Packages = Packages.OrderByDescending(package => package.Name).ToArray();
         }
 
         /// <summary>
@@ -127,7 +150,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 获取资源收集配置
         /// </summary>
-        public static AssetCollectRoot GetOrCreate(bool isSort = true)
+        public static AssetCollectRoot GetOrCreate()
         {
             if (_Instance is null)
             {
@@ -158,8 +181,6 @@ namespace AIO.UEditor
                     return _Instance;
                 }
             }
-
-            if (isSort) Sort();
 
             return _Instance;
         }

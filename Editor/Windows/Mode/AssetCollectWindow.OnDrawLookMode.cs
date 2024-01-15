@@ -301,19 +301,19 @@ namespace AIO.UEditor
         /// </summary>
         partial void OnDrawLookMode()
         {
-            if (Data.Packages.Length == 0)
+            if (Data.Length == 0)
             {
                 GELayout.HelpBox("当前无包资源数据");
                 return;
             }
 
-            if (Data.CurrentPackage.Groups.Length == 0)
+            if (Data.CurrentPackage.Length == 0)
             {
                 GELayout.HelpBox("当前无组资源数据");
                 return;
             }
 
-            if (Data.CurrentGroup.Collectors.Length == 0)
+            if (Data.CurrentGroup.Length == 0)
             {
                 GELayout.HelpBox("当前无收集器资源数据");
                 return;
@@ -530,32 +530,47 @@ namespace AIO.UEditor
 
         private void OnDrawLookModeHeader(Rect rect)
         {
-            var rect1 = new Rect(rect)
+            var rect4 = new Rect(rect)
             {
-                x = 0,
-                width = rect.width - 160,
+                width = 80,
+                x = rect.width - 80
             };
 
-            var rect2 = new Rect(rect)
+            var rect3 = new Rect(rect4)
             {
-                x = rect1.x + rect1.width,
+                x = rect4.x - 80,
                 width = 80
             };
 
-            var rect3 = new Rect(rect2)
+            var rect2 = new Rect(rect3);
+            if (LookModeShowAssetDetail)
             {
-                x = rect2.x + rect2.width,
+                rect2.width = 0;
+                rect2.x = rect3.x;
+            }
+            else
+            {
+                rect2.width = (rect.width - rect3.width - rect4.width) / 2 - 100;
+                rect2.x = rect3.x - rect2.width;
+            }
+
+            var rect1 = new Rect(rect2)
+            {
+                x = 0,
+                width = rect2.x
             };
 
+
             GUI.Box(rect1, "", GEStyle.TEtoolbarbutton);
-            GUI.Box(rect2, "", GEStyle.TEtoolbarbutton);
+            if (!LookModeShowAssetDetail) GUI.Box(rect2, "", GEStyle.TEtoolbarbutton);
             GUI.Box(rect3, "", GEStyle.TEtoolbarbutton);
+            GUI.Box(rect4, "", GEStyle.TEtoolbarbutton);
 
             var rect1Content = new GUIContent(
                 $"    Asset[{LookModeCollectorsPageSize.ToConverseStringFileSize()}\\{LookModeCollectorsALLSize.ToConverseStringFileSize()}]");
-            var rect2Content = new GUIContent("    Size");
-            var rect3Content = new GUIContent("    Ago");
-
+            var rect3Content = new GUIContent("    Size");
+            var rect4Content = new GUIContent("    Ago");
+            var rect2Content = new GUIContent("    AssetPath");
             if (LookModeSortEnableAssetName) rect1Content.image = GC_LookMode_Data_Sort.image;
             else if (LookModeSortEnableSize) rect2Content.image = GC_LookMode_Data_Sort.image;
             else if (LookModeSortEnableLastWrite) rect3Content.image = GC_LookMode_Data_Sort.image;
@@ -566,13 +581,15 @@ namespace AIO.UEditor
                 LookModeDataPageValueSort(ESort.AssetName, LookModeSortEnableAssetNameToMin);
             }
 
-            if (GUI.Button(rect2, rect2Content, GEStyle.HeaderLabel))
+            if (!LookModeShowAssetDetail) GUI.Label(rect2, rect2Content, GEStyle.HeaderLabel);
+
+            if (GUI.Button(rect3, rect3Content, GEStyle.HeaderLabel))
             {
                 LookModeSortEnableSizeToMin = !LookModeSortEnableSizeToMin;
                 LookModeDataPageValueSort(ESort.FileSize, LookModeSortEnableSizeToMin);
             }
 
-            if (GUI.Button(rect3, rect3Content, GEStyle.HeaderLabel))
+            if (GUI.Button(rect4, rect4Content, GEStyle.HeaderLabel))
             {
                 LookModeSortEnableLastWriteToMin = !LookModeSortEnableLastWriteToMin;
                 LookModeDataPageValueSort(ESort.LastWrite, LookModeSortEnableLastWriteToMin);
@@ -584,21 +601,34 @@ namespace AIO.UEditor
         /// </summary>
         private void OnDrawLookDataItem(Rect rect, AssetDataInfo data, int index)
         {
-            var rect1 = new Rect(rect)
+            var rect4 = new Rect(rect)
+            {
+                width = 80,
+                x = rect.width - 80 + 10
+            };
+
+            var rect3 = new Rect(rect4)
+            {
+                x = rect4.x - 80,
+                width = 80 + 10
+            };
+
+            var rect2 = new Rect(rect3);
+            if (LookModeShowAssetDetail)
+            {
+                rect2.width = 0;
+                rect2.x = rect3.x;
+            }
+            else
+            {
+                rect2.width = (rect.width - rect3.width - rect4.width) / 2 - 100 +10;
+                rect2.x = rect3.x - rect2.width;
+            }
+
+            var rect1 = new Rect(rect2)
             {
                 x = 10,
-                width = rect.width - 160
-            };
-
-            var rect2 = new Rect(rect)
-            {
-                x = rect1.x + rect1.width,
-                width = 80
-            };
-
-            var rect3 = new Rect(rect2)
-            {
-                x = rect2.x + rect2.width,
+                width = rect2.x - 10
             };
 
             GUI.Box(rect, "", GEStyle.ProjectBrowserHeaderBgMiddle);
@@ -610,8 +640,10 @@ namespace AIO.UEditor
             var content = EditorGUIUtility.ObjectContent(AssetDatabase.LoadMainAssetAtPath(data.AssetPath), null);
             content.text = data.Address;
             EditorGUI.LabelField(rect1, content, EditorStyles.label);
-            EditorGUI.LabelField(rect2, data.SizeStr, EditorStyles.label);
-            EditorGUI.LabelField(rect3, data.GetLatestTime(), EditorStyles.label);
+            if (!LookModeShowAssetDetail) EditorGUI.LabelField(rect2, data.AssetPath, EditorStyles.label);
+
+            EditorGUI.LabelField(rect3, data.SizeStr, EditorStyles.label);
+            EditorGUI.LabelField(rect4, data.GetLatestTime(), EditorStyles.label);
 
             if (Event.current.isMouse && rect.Contains(Event.current.mousePosition))
             {
@@ -619,28 +651,68 @@ namespace AIO.UEditor
                 {
                     GUI.FocusControl(null);
                     onDrawLookDataItemMenu = new GenericMenu();
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Open Default Asset"), false,
-                        () => { EditorUtility.OpenWithDefaultApp(data.AssetPath); });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Open Local Folder"), false,
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("打开 资源所在文件夹"), false,
                         () => { EditorUtility.RevealInFinder(data.AssetPath); });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Select Asset"), false,
-                        () => { Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(data.AssetPath); });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Address"), false,
+                    if (AHelper.IO.ExistsFile(data.AssetPath))
+                    {
+                        onDrawLookDataItemMenu.AddItem(new GUIContent("打开 使用默认程序打开"), false,
+                            () => { EditorUtility.OpenWithDefaultApp(data.AssetPath); });
+                        onDrawLookDataItemMenu.AddItem(new GUIContent("选择 资源"), false,
+                            () => { Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(data.AssetPath); });
+                    }
+
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("复制 可寻址路径"), false,
                         () => { GUIUtility.systemCopyBuffer = data.Address; });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy AssetPath"), false,
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("复制 资源路径"), false,
                         () => { GUIUtility.systemCopyBuffer = data.AssetPath; });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy GUID"), false,
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("复制 GUID"), false,
                         () => { GUIUtility.systemCopyBuffer = data.GUID; });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Type"), false,
+                    onDrawLookDataItemMenu.AddItem(new GUIContent("复制 资源类型"), false,
                         () => { GUIUtility.systemCopyBuffer = data.Type; });
-                    onDrawLookDataItemMenu.AddItem(new GUIContent("Copy Tags"), false,
-                        () => { GUIUtility.systemCopyBuffer = data.Tags; });
+                    if (!string.IsNullOrEmpty(data.Tags))
+                    {
+                        onDrawLookDataItemMenu.AddItem(new GUIContent("复制 标签列表"), false,
+                            () => { GUIUtility.systemCopyBuffer = data.Tags; });
+                    }
+
+                    if (Config.EnableSequenceRecord)
+                    {
+                        onDrawLookDataItemMenu.AddItem(new GUIContent("添加 首包列表"), false, () =>
+                        {
+                            if (SequenceRecords is null)
+                                SequenceRecords = new AssetSystem.SequenceRecordQueue(true);
+                            if (SequenceRecords.ExistsLocal()) SequenceRecords.UpdateLocal();
+                            SequenceRecords.Add(new AssetSystem.SequenceRecord
+                            {
+                                AssetPath = data.AssetPath,
+                                Location = data.Address,
+                                PackageName = Data.CurrentPackage.Name,
+                                Bytes = data.Size,
+                                Count = 1,
+                                Time = DateTime.MinValue
+                            });
+                            SequenceRecords.Save();
+                        });
+                    }
+
                     onDrawLookDataItemMenu.ShowAsContext();
                 }
-                else UpdateCurrentSelectAsset(index);
+                else
+                {
+                    UpdateCurrentSelectAsset(index);
+                }
 
                 Event.current.Use();
             }
+        }
+
+        private void CancelCurrentSelectAsset()
+        {
+            GUI.FocusControl(null);
+            LookModeCurrentSelectAsset = null;
+            Dependencies.Clear();
+            DependenciesSize = 0;
+            DependenciesSearchText = string.Empty;
         }
 
         private void UpdateCurrentSelectAsset(int index)

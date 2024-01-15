@@ -41,22 +41,37 @@ namespace AIO.UEditor
         private void OnDrawItem()
         {
             if (!Data.IsCollectValid()) return;
-            for (var i = Data.CurrentGroup.Collectors.Length - 1;
-                 i >= 0;
-                 i--)
+            using (var sp = new EditorGUILayout.ScrollViewScope(OnDrawItemListScroll))
             {
-                OnDrawItem(Data.CurrentGroup.Collectors[i]);
-                EditorGUILayout.Space();
+                OnDrawItemListScroll = sp.scrollPosition;
+                for (var i = Data.CurrentGroup.Collectors.Length - 1;
+                     i >= 0;
+                     i--)
+                {
+                    if (CurrentCurrentCollectorsIndex == i)
+                    {
+                        using (new EditorGUILayout.VerticalScope(GEStyle.SelectionRect))
+                        {
+                            OnDrawItem(Data.CurrentGroup.Collectors[i], i);
+                        }
+                    }
+                    else OnDrawItem(Data.CurrentGroup.Collectors[i], i);
+
+                    EditorGUILayout.Space();
+                }
             }
         }
 
         partial void OnDrawGroupList()
         {
-            if (Data.Packages.Length <= 0) return;
+            if (Data.Length <= 0) return;
             using (new EditorGUILayout.VerticalScope(GEStyle.GridList))
             {
                 EditorGUILayout.Space();
-                FoldoutPackageInfo = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawPackageInfo, "Data Info", FoldoutPackageInfo);
+                FoldoutPackageInfo = GELayout.VFoldoutHeaderGroupWithHelp(
+                    OnDrawPackageInfo,
+                    "Data Info",
+                    FoldoutPackageInfo);
 
                 EditorGUILayout.Space();
                 var content = new GUIContent($"Collectors ({Data.CurrentGroup.Collectors.Length})");
@@ -64,7 +79,12 @@ namespace AIO.UEditor
                     OnDrawItem,
                     content,
                     FoldoutCollectors,
-                    () => { Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Add(new AssetCollectItem()); },
+                    () =>
+                    {
+                        CurrentCurrentCollectorsIndex = Data.CurrentGroup.Collectors.Length;
+                        OnDrawItemListScroll.y = 0;
+                        Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Add(new AssetCollectItem());
+                    },
                     0,
                     null,
                     new GUIContent("✚")

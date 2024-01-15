@@ -73,6 +73,11 @@ namespace AIO.UEditor
                 }
             }
 
+            if (GUILayout.Button(GC_SORT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                Data.Sort();
+            }
+
             if (GUILayout.Button(GC_MERGE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 if (EditorUtility.DisplayDialog("合并", "确定合并当前资源包的所有组和收集器?", "确定", "取消"))

@@ -23,7 +23,15 @@ namespace AIO.UEditor
         private void UpdateDataBuildMode()
         {
             // 获取当前文件磁盘剩余空间
-            Disk = new DriveInfo(EHelper.Path.Project);
+            try
+            {
+                Disk = new DriveInfo(EHelper.Path.Project);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
             LookModeDisplayPackages = Data.Packages.Select(x => x.Name).ToArray();
             BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
             Tags = Data.GetTags();
@@ -50,15 +58,19 @@ namespace AIO.UEditor
         /// </summary>
         partial void OnDrawHeaderBuildMode()
         {
-            EditorGUILayout.LabelField($"     磁盘剩余空间:{Disk.AvailableFreeSpace.ToConverseStringFileSize()}",
-                GEStyle.HeaderLabel);
+            if (Disk != null)
+            {
+                EditorGUILayout.LabelField($"     磁盘剩余空间:{Disk.AvailableFreeSpace.ToConverseStringFileSize()}",
+                    GEStyle.HeaderLabel, GP_Width_160);
+            }
 
+            EditorGUILayout.LabelField($"资源包数量:{Data.Packages.Length}", GEStyle.HeaderLabel, GP_Width_150);
             EditorGUILayout.Separator();
 #if SUPPORT_YOOASSET
             if (GUILayout.Button(GC_REPORT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
-                // 打开菜单栏 YooAsset/Report
-                EditorApplication.ExecuteMenuItem("YooAsset/Report Window");
+                GUI.FocusControl(null);
+                EditorApplication.ExecuteMenuItem("YooAsset/AssetBundle Reporter");
             }
 #endif
 
@@ -72,13 +84,9 @@ namespace AIO.UEditor
             {
                 GUI.FocusControl(null);
                 BuildConfig.Save();
+                AssetDatabase.SaveAssets();
                 if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
                 {
-#if UNITY_2020_1_OR_NEWER
-                    AssetDatabase.SaveAssetIfDirty(BuildConfig);
-#else
-                    AssetDatabase.SaveAssets();
-#endif
                     AssetDatabase.Refresh();
                 }
             }
@@ -103,8 +111,6 @@ namespace AIO.UEditor
                 "Google Cloud",
                 FoldoutUploadGCloud,
                 () => { BuildConfig.AddOrNewGCloud(); }, 0, null, new GUIContent("✚"));
-
-            // FoldoutNoticeDingDing = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildNoticeDingDing, "钉钉通知", FoldoutNoticeDingDing);
         }
 
         /// <summary>
@@ -131,14 +137,19 @@ namespace AIO.UEditor
                     BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
                     BuildConfig.MergeToLatest =
                         GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest, GP_Width_100);
+
                     EditorGUILayout.Separator();
 
                     if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_75))
-                        BuildConfig.BuildOutputPath =
-                            EditorUtility.OpenFolderPanel("请选择导出路径", BuildConfig.BuildOutputPath, "");
+                    {
+                        GUI.FocusControl(null);
+                        BuildConfig.BuildOutputPath = EditorUtility.OpenFolderPanel(
+                            "请选择导出路径", BuildConfig.BuildOutputPath, "");
+                    }
 
                     if (GUILayout.Button("打开目录", GEStyle.toolbarbutton, GP_Width_75))
                     {
+                        GUI.FocusControl(null);
                         if (!Directory.Exists(BuildConfig.BuildOutputPath))
                             Directory.CreateDirectory(BuildConfig.BuildOutputPath);
                         PrPlatform.Open.Path(BuildConfig.BuildOutputPath).Async();
@@ -146,9 +157,14 @@ namespace AIO.UEditor
 
                     if (GUILayout.Button("清空缓存", GEStyle.toolbarbutton, GP_Width_75))
                     {
-                        var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
+                        var sandbox = Path.Combine(BuildConfig.BuildOutputPath);
                         if (Directory.Exists(sandbox))
-                            AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
+                        {
+                            if (EditorUtility.DisplayDialog("清空缓存", $"确定清空缓存?\n-----------------------\n清空缓存代表着\n之后每个资源包\n第一次构建必定是强制构建模式", "确定", "取消"))
+                            {
+                                AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
+                            }
+                        }
                     }
 
                     if (GUILayout.Button("生成配置", GEStyle.toolbarbutton, GP_Width_75))
@@ -159,15 +175,18 @@ namespace AIO.UEditor
                     if (Application.isPlaying) GUI.enabled = false;
                     if (GUILayout.Button("构建资源", GEStyle.toolbarbutton, GP_Width_75))
                     {
-                        try
+                        if (EditorUtility.DisplayDialog("构建资源", "确定构建资源?", "确定", "取消"))
                         {
-                            AssetProxyEditor.ConvertConfig(Data, false);
-                            AssetProxyEditor.BuildArt(BuildConfig, true);
-                            BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                        }
-                        catch (Exception)
-                        {
-                            BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                            try
+                            {
+                                AssetProxyEditor.ConvertConfig(Data, false);
+                                AssetProxyEditor.BuildArt(BuildConfig, true);
+                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                            }
+                            catch (Exception)
+                            {
+                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                            }
                         }
                     }
 
@@ -234,27 +253,39 @@ namespace AIO.UEditor
                     BuildConfig.BuildMode = GELayout.Popup(BuildConfig.BuildMode, GEStyle.PreDropDown);
                 }
 
-                if (Tags != null && Tags.Length > 0)
+                if (!(Tags is null) && Tags.Length > 0)
                 {
-                    using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
+                    if (Tags.Length > 31)
                     {
-                        EditorGUILayout.LabelField("首包标签", GP_Width_100);
-                        CurrentTagIndex = EditorGUILayout.MaskField(CurrentTagIndex, Tags, GEStyle.PreDropDown);
-                    }
-
-                    if (GUI.changed)
-                    {
-                        BuildConfig.FirstPackTag = string.Empty;
-                        for (var i = 0; i < Tags.Length; i++)
+                        // 位运算最大支持31位 2^31 显示警告
+                        using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
                         {
-                            if ((CurrentTagIndex & (1 << i)) != 0)
-                            {
-                                BuildConfig.FirstPackTag += string.Concat(Tags[i], ";");
-                            }
+                            EditorGUILayout.LabelField("首包标签", GP_Width_100);
+                            EditorGUILayout.HelpBox("首包标签数量超过31个, 请减少标签数量", MessageType.Warning);
                         }
                     }
+                    else
+                    {
+                        using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
+                        {
+                            EditorGUILayout.LabelField("首包标签", GP_Width_100);
+                            CurrentTagIndex = EditorGUILayout.MaskField(CurrentTagIndex, Tags, GEStyle.PreDropDown);
+                        }
 
-                    if (CurrentTagIndex != 0) GELayout.HelpBox(BuildConfig.FirstPackTag);
+                        if (GUI.changed)
+                        {
+                            BuildConfig.FirstPackTag = string.Empty;
+                            for (var i = 0; i < Tags.Length; i++)
+                            {
+                                if ((CurrentTagIndex & (1 << i)) != 0)
+                                {
+                                    BuildConfig.FirstPackTag += string.Concat(Tags[i], ";");
+                                }
+                            }
+                        }
+
+                        if (CurrentTagIndex != 0) GELayout.HelpBox(BuildConfig.FirstPackTag);
+                    }
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
@@ -264,12 +295,5 @@ namespace AIO.UEditor
                 }
             }
         }
-
-        // private void OnDrawBuildNoticeDingDing()
-        // {
-        //     // 钉钉 WebHook
-        //     // 钉钉 Secret(请选择加签方式 内容过滤可能导致消息丢失)
-        //     // 钉钉 通知事件类型列表
-        // }
     }
 }
