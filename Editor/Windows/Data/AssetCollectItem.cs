@@ -416,13 +416,16 @@ namespace AIO.UEditor
             cb?.Invoke(AssetDataInfos);
         }
 
-        private void UpdateData()
+        public void UpdateData()
         {
-            if (_Path is null) Folded = false;
+            if (_Path is null)
+            {
+                Debug.LogWarningFormat("收集器路径为空 !!! -> {0}", CollectPath);
+                Folded = false;
+            }
             else
             {
                 var temp = AssetDatabase.GetAssetPath(_Path);
-                if (string.IsNullOrEmpty(temp)) return;
                 if (!AHelper.IO.Exists(temp)) return;
                 CollectPath = temp;
                 GUID = AssetDatabase.AssetPathToGUID(CollectPath);

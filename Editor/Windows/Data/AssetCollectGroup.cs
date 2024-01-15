@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 
 namespace AIO.UEditor
 {
@@ -32,6 +33,16 @@ namespace AIO.UEditor
         /// 资源收集配置
         /// </summary>
         public AssetCollectItem[] Collectors;
+
+        public void Refresh()
+        {
+            if (Collectors is null || Collectors.Length == 0) return;
+            foreach (var collect in Collectors)
+            {
+                if (!AHelper.IO.Exists(collect.CollectPath)) continue;
+                collect.Path = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(collect.CollectPath);
+            }
+        }
 
         public AssetCollectItem this[int index]
         {
@@ -62,9 +73,15 @@ namespace AIO.UEditor
             return dictionary.Keys.ToArray();
         }
 
+        public void Save()
+        {
+            if (Collectors is null || Collectors.Length == 0) return;
+            foreach (var collect in Collectors) collect.UpdateData();
+        }
+
         public void Dispose()
         {
-            if (Collectors is null) return;
+            if (Collectors is null || Collectors.Length == 0) return;
             foreach (var collect in Collectors) collect.Dispose();
         }
 
@@ -93,9 +110,11 @@ namespace AIO.UEditor
             {
                 var hashCode = obj.Name.GetHashCode();
                 hashCode = (hashCode * 397) ^ (!string.IsNullOrEmpty(obj.Tags) ? obj.Tags.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^
+                           (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
                 if (obj.Collectors != null)
-                    hashCode = obj.Collectors.Aggregate(hashCode, (current, item) => (current * 397) ^ item.GetHashCode());
+                    hashCode = obj.Collectors.Aggregate(hashCode,
+                        (current, item) => (current * 397) ^ item.GetHashCode());
                 return hashCode;
             }
         }

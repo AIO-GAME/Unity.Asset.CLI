@@ -17,8 +17,8 @@ namespace AIO.UEditor
         IconResource = "Editor/Icon/Asset",
         Group = "Tools",
         Menu = "AIO/Window/Asset",
-        MinSizeHeight = 450,
-        MinSizeWidth = 800
+        MinSizeHeight = 750,
+        MinSizeWidth = 1200
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
@@ -99,35 +99,22 @@ namespace AIO.UEditor
             }
         }
 
+        protected override void OnAwake()
+        {
+            Data = AssetCollectRoot.GetOrCreate();
+            Selection.activeObject = Data;
+        }
+
         protected override void OnActivation()
         {
             AssetCollectSetting.Initialize();
 
-            if (Data is null)
-            {
-                Data = AssetCollectRoot.GetOrCreate();
-                Selection.activeObject = Data;
-                foreach (var package in Data.Packages)
-                {
-                    if (package?.Groups is null) continue;
+            Data = AssetCollectRoot.GetOrCreate();
+            Data.Refresh();
+            Selection.activeObject = Data;
 
-                    foreach (var group in package.Groups)
-                    {
-                        if (group?.Collectors is null ||
-                            group.Collectors.Length == 0)
-                            continue;
-
-                        foreach (var collect in group.Collectors)
-                        {
-                            if (string.IsNullOrEmpty(collect.CollectPath)) continue;
-                            collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
-                        }
-                    }
-                }
-
-                Config = ASConfig.GetOrCreate();
-                BuildConfig = ASBuildConfig.GetOrCreate();
-            }
+            Config = ASConfig.GetOrCreate();
+            BuildConfig = ASBuildConfig.GetOrCreate();
 
 
             GCInit();

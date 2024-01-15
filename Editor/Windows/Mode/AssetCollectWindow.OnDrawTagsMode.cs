@@ -159,7 +159,7 @@ namespace AIO.UEditor
                     foreach (var collector in group.Collectors)
                     {
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
-                        collector.CollectAssetTask(package.Name, group.Name, dic =>
+                        _ = collector.CollectAssetTask(package.Name, group.Name, dic =>
                         {
                             foreach (var pair in dic)
                             {

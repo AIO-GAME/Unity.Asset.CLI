@@ -51,6 +51,11 @@ namespace AIO.UEditor
                 {
                     item.Address = GELayout.Popup(item.Address, AssetCollectSetting.MapAddress.Displays,
                         GEStyle.PreDropDown);
+
+                    item.RulePackIndex = GELayout.Popup(item.RulePackIndex, AssetCollectSetting.MapPacks.Displays,
+                        GEStyle.PreDropDown);
+
+                    item.LoadType = GELayout.Popup(item.LoadType, GEStyle.PreDropDown, GP_Width_75);
                 }
                 else
                 {

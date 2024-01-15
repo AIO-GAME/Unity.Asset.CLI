@@ -54,6 +54,14 @@ namespace AIO.UEditor
                 GEStyle.HeaderLabel);
 
             EditorGUILayout.Separator();
+#if SUPPORT_YOOASSET
+            if (GUILayout.Button(GC_REPORT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                // 打开菜单栏 YooAsset/Report
+                EditorApplication.ExecuteMenuItem("YooAsset/Report Window");
+            }
+#endif
+
             if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);

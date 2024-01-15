@@ -60,6 +60,12 @@ namespace AIO.UEditor
             return dictionary.Keys.ToArray();
         }
 
+        public void Save()
+        {
+            if (Groups is null || Groups.Length == 0) return;
+            foreach (var group in Groups) group.Save();
+        }
+
         public void Dispose()
         {
             if (Groups is null) return;

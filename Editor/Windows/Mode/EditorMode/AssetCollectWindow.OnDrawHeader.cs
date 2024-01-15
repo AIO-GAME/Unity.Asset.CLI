@@ -73,9 +73,28 @@ namespace AIO.UEditor
                 }
             }
 
+            if (GUILayout.Button(GC_MERGE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                if (EditorUtility.DisplayDialog("合并", "确定合并当前资源包的所有组和收集器?", "确定", "取消"))
+                {
+                    Data.MergeCollector(Data.CurrentPackage.Name);
+                }
+            }
+
+            if (GUILayout.Button(GC_FOLDOUT_ON, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                Data.FoldoutOn();
+            }
+
+
             if (GUILayout.Button(GC_FOLDOUT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 Data.FoldoutOff();
+            }
+
+            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                Data.Refresh();
             }
 
             if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
@@ -92,11 +111,8 @@ namespace AIO.UEditor
                     Data.Save();
                     if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
                     {
-#if UNITY_2020_1_OR_NEWER
-                        AssetDatabase.SaveAssetIfDirty(Data);
-#else
-                    AssetDatabase.SaveAssets();
-#endif
+                        EditorUtility.SetDirty(Data);
+                        AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
                     }
                 }

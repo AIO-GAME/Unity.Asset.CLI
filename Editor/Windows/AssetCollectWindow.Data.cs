@@ -427,6 +427,11 @@ namespace AIO.UEditor
         private GUIContent GC_FOLDOUT_ON;
 
         /// <summary>
+        /// 界面内容 - 合并
+        /// </summary>
+        private GUIContent GC_MERGE;
+
+        /// <summary>
         /// 界面内容 - 删除
         /// </summary>
         private GUIContent GC_DEL;
@@ -482,9 +487,14 @@ namespace AIO.UEditor
         private GUIContent GC_SAVE;
 
         /// <summary>
-        /// 界面内容 - 
+        /// 界面内容 - 转化
         /// </summary>
         private GUIContent GC_ToConvert;
+        
+        /// <summary>
+        /// 界面内容 - 报告
+        /// </summary>
+        private GUIContent GC_REPORT;
 
         private GUIContent GC_Select_ASConfig;
 
@@ -558,8 +568,9 @@ namespace AIO.UEditor
             ViewRectUpdate();
             GPInit();
 
-            GC_ToConvert = GEContent.NewSettingCustom("Editor/Icon/Yooasset", "转换为第三方配置文件");
-
+            GC_MERGE = new GUIContent("合","合并收集器");
+            GC_ToConvert = new GUIContent("转","转换为第三方配置文件");
+            GC_REPORT =  new GUIContent("报","生成报告");
             GC_SAVE = GEContent.NewBuiltin("d_SaveAs", "保存");
             GC_LookMode_Object_Select = GEContent.NewBuiltin("d_scenepicking_pickable_hover", "选择指向指定资源");
 

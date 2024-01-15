@@ -63,6 +63,68 @@ namespace AIO.UEditor
         }
 
         /// <summary>
+        /// 刷新资源收集配置
+        /// </summary>
+        public void Refresh()
+        {
+            foreach (var package in Packages)
+            {
+                foreach (var group in package.Groups)
+                {
+                    if (group.Collectors is null ||
+                        group.Collectors.Length == 0)
+                        continue;
+
+                    foreach (var collect in group.Collectors)
+                    {
+                        if (!AHelper.IO.Exists(collect.CollectPath)) continue;
+                        collect.Path = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(collect.CollectPath);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 合并所有收集器至主收集器
+        /// </summary>
+        public void MergeCollector(string packageName)
+        {
+            var collectors = new List<AssetCollectItem>();
+            var tags = new List<string>();
+            foreach (var package in Packages)
+            {
+                if (packageName != package.Name) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group.Collectors is null ||
+                        group.Collectors.Length == 0)
+                        continue;
+
+                    tags.AddRange(group.Tags.Split(';'));
+                    collectors.AddRange(group.Collectors);
+                }
+
+                break;
+            }
+
+            Packages = Packages.Add(new AssetCollectPackage
+            {
+                Name = $"Merge_Package_{packageName}",
+                Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                Groups = new AssetCollectGroup[]
+                {
+                    new AssetCollectGroup()
+                    {
+                        Name = "Merge Group",
+                        Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                        Collectors = collectors.ToArray(),
+                        Tags = string.Join(";", tags.Distinct().ToArray())
+                    }
+                }
+            });
+        }
+
+        /// <summary>
         /// 获取资源收集配置
         /// </summary>
         public static AssetCollectRoot GetOrCreate(bool isSort = true)
@@ -127,11 +189,13 @@ namespace AIO.UEditor
 
         public void Save()
         {
-            if (Equals(null)) return;
-            for (var index = Packages.Length - 1; index >= 0; index--)
+            if (Equals(null))
             {
-                Packages[index].Dispose();
+                Debug.LogWarning("AssetCollectRoot is null");
+                return;
             }
+
+            for (var index = Packages.Length - 1; index >= 0; index--) Packages[index].Save();
 #if UNITY_2021_1_OR_NEWER
             AssetDatabase.SaveAssetIfDirty(this);
 #else
@@ -358,18 +422,39 @@ namespace AIO.UEditor
         public void FoldoutOff()
         {
             if (Packages is null) return;
-            foreach (var package in Packages
-                         .Where(package => !(package is null))
-                         .Where(package => !(package.Groups is null)))
+            for (var i = 0; i < Packages.Length; i++)
             {
-                foreach (var group in package.Groups
-                             .Where(group => !(group is null))
-                             .Where(group => !(group.Collectors is null)))
+                if (Packages[i] is null) continue;
+                if (Packages[i].Groups is null) continue;
+                for (var j = 0; j < Packages[i].Groups.Length; j++)
                 {
-                    foreach (var item in group.Collectors
-                                 .Where(item => !(item is null))
-                                 .Where(item => !item.Folded)
-                            ) item.Folded = false;
+                    if (Packages[i].Groups[j] is null) continue;
+                    if (Packages[i].Groups[j].Collectors is null) continue;
+                    for (var k = 0; k < Packages[i].Groups[j].Collectors.Length; k++)
+                    {
+                        if (Packages[i].Groups[j].Collectors[k] is null) continue;
+                        Packages[i].Groups[j].Collectors[k].Folded = false;
+                    }
+                }
+            }
+        }
+
+        public void FoldoutOn()
+        {
+            if (Packages is null) return;
+            for (var i = 0; i < Packages.Length; i++)
+            {
+                if (Packages[i] is null) continue;
+                if (Packages[i].Groups is null) continue;
+                for (var j = 0; j < Packages[i].Groups.Length; j++)
+                {
+                    if (Packages[i].Groups[j] is null) continue;
+                    if (Packages[i].Groups[j].Collectors is null) continue;
+                    for (var k = 0; k < Packages[i].Groups[j].Collectors.Length; k++)
+                    {
+                        if (Packages[i].Groups[j].Collectors[k] is null) continue;
+                        Packages[i].Groups[j].Collectors[k].Folded = true;
+                    }
                 }
             }
         }
