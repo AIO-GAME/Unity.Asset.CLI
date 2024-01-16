@@ -194,7 +194,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 上传首包 Google Cloud
         /// </summary>
-        private static async void UpdateUploadFirstPack(GCloudConfig config)
+        private static async void UpdateUploadFirstPack(ASBuildConfig.GCloudConfig config)
         {
             await config.UploadFirstPack(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
         }
