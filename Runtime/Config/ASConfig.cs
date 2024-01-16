@@ -105,11 +105,24 @@ namespace AIO.UEngine
             if (ASMode != EASMode.Remote) yield break;
             if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
             var remote = Path.Combine(
-                URL, "Version",
-                string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks));
+                URL, "Version", string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks));
 
             yield return AssetSystem.NetLoadStringCO(remote,
                 data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
+            foreach (var item in Packages)
+            {
+                item.IsLatest = item.Version == "Latest";
+                if (item.IsLatest)
+                {
+                    remote = Path.Combine(
+                        URL,
+                        AssetSystem.PlatformNameStr,
+                        item.Name,
+                        item.Version,
+                        $"PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}");
+                    yield return AssetSystem.NetLoadStringCO(remote, data => item.Version = data);
+                }
+            }
         }
 
         /// <summary>
@@ -268,40 +281,30 @@ namespace AIO.UEngine
             bool autoSequenceRecord = true,
             bool outputLog = false)
         {
-            if (instance != null) return instance;
-            instance = GetResource();
-            if (instance is null)
-            {
-                instance = CreateInstance<ASConfig>();
-                instance.AppendTimeTicks = appendTimeTicks;
-                instance.AutoSaveVersion = autoSaveVersion;
-                instance.ASMode = EASMode.Remote;
-                instance.LoadPathToLower = loadPathToLower;
-                instance.OutputLog = outputLog;
-                instance.EnableSequenceRecord = autoSequenceRecord;
-            }
-
-            instance.URL = url;
-            return instance;
+            var config = CreateInstance<ASConfig>();
+            config.AppendTimeTicks = appendTimeTicks;
+            config.AutoSaveVersion = autoSaveVersion;
+            config.LoadPathToLower = loadPathToLower;
+            config.OutputLog = outputLog;
+            config.EnableSequenceRecord = autoSequenceRecord;
+            config.ASMode = EASMode.Remote;
+            config.URL = url;
+            return config;
         }
 
         /// <summary>
         /// 获取本地资源包配置
         /// </summary>
+        /// <param name="list">包列表</param>
         /// <param name="loadPathToLower">路径小写</param>
         /// <returns>资源配置</returns>
-        public static ASConfig GetLocal(bool loadPathToLower = false)
+        public static ASConfig GetLocal(AssetsPackageConfig[] list, bool loadPathToLower = false)
         {
-            if (instance != null) return instance;
-            instance = GetResource();
-            if (instance is null)
-            {
-                instance = CreateInstance<ASConfig>();
-                instance.ASMode = EASMode.Local;
-                instance.LoadPathToLower = loadPathToLower;
-            }
-
-            return instance;
+            var config = CreateInstance<ASConfig>();
+            config.LoadPathToLower = loadPathToLower;
+            config.ASMode = EASMode.Local;
+            config.Packages = list;
+            return config;
         }
 
 #if UNITY_EDITOR
@@ -313,17 +316,11 @@ namespace AIO.UEngine
         /// <returns>资源配置</returns>
         public static ASConfig GetEditor(bool loadPathToLower = false)
         {
-            if (instance != null) return instance;
-            instance = GetResource();
-            if (instance is null)
-            {
-                instance = CreateInstance<ASConfig>();
-                instance.ASMode = EASMode.Editor;
-                instance.LoadPathToLower = loadPathToLower;
-            }
-
-            EditorUtility.SetDirty(instance);
-            return instance;
+            var config = CreateInstance<ASConfig>();
+            config.ASMode = EASMode.Editor;
+            config.LoadPathToLower = loadPathToLower;
+            config.UpdatePackage();
+            return config;
         }
 
         public void Save()

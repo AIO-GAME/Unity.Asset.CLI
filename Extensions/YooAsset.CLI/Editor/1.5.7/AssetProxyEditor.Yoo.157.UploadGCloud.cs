@@ -68,7 +68,7 @@ namespace AIO.UEditor.CLI
                         var target = string.Concat(config.RemoteRelative, '/', pair.Key);
                         if (EHelper.IsCMD()) Console.WriteLine($"新增任务 新增远端文件 : {target}");
                         else EditorUtility.DisplayProgressBar("新增任务", $"新增远端文件 : {target}", 0.4f);
-                        await PrGCloud.UploadFileAsync(target, source, config.MetaData);
+                        await PrGCloud.UploadFileAsync(target, source, config.MetaDataKey, config.MetaDataValue);
                     }
                     else
                     {
@@ -102,7 +102,7 @@ namespace AIO.UEditor.CLI
                         var target = string.Concat(config.RemoteRelative, '/', pair.Key);
                         if (EHelper.IsCMD()) Console.WriteLine($"新增任务 修改文件 : {target}");
                         else EditorUtility.DisplayProgressBar("新增任务", $"修改远端文件 : {target}", 0.8f);
-                        await PrGCloud.UploadFileAsync(target, source, config.MetaData);
+                        await PrGCloud.UploadFileAsync(target, source, config.MetaDataKey, config.MetaDataValue);
                     }
                     else
                     {
@@ -129,11 +129,10 @@ namespace AIO.UEditor.CLI
             {
                 if (EHelper.IsCMD())
                     Console.WriteLine($"[GCloud] 远端版本清单不存在 : 准备开始上传资源 : {localFull} -> {config.RemoteRelative}");
-                else EditorUtility.DisplayProgressBar("上传进度", $"准备开始上传资源 {config.RemoteRelative}", 0.2f);
-                Action<string> progress;
-                if (EHelper.IsCMD()) progress = Console.WriteLine;
-                else progress = current => { EditorUtility.DisplayProgressBar("上传进度", current.ToString(), 0.4f); };
-                succeed = await PrGCloud.UploadDirAsync(config.RemoteRelative, localFull, config.MetaData, progress);
+                else
+                    EditorUtility.DisplayProgressBar("上传进度", $"准备开始上传资源 {config.RemoteRelative}", 0.2f);
+                succeed = await PrGCloud.UploadDirAsync(config.RemoteRelative, localFull,
+                    config.MetaDataKey, config.MetaDataValue, Console.WriteLine);
             }
 
             string VersionContent;
@@ -173,7 +172,7 @@ namespace AIO.UEditor.CLI
 
             var VersionTemp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             await AHelper.IO.WriteUTF8Async(VersionTemp, VersionContent);
-            await PrGCloud.UploadFileAsync(Version_Path, VersionTemp, config.MetaData);
+            await PrGCloud.UploadFileAsync(Version_Path, VersionTemp, config.MetaDataKey, config.MetaDataValue);
             AHelper.IO.DeleteFile(VersionTemp);
 
             if (EHelper.IsCMD()) Debug.Log(succeed ? "资源上传完成" : "资源上传失败");

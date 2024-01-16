@@ -24,6 +24,23 @@ namespace AIO.UEngine
         public string Version;
 
         /// <summary>
+        /// 当前版本
+        /// </summary>
+        public string CurrentVersion
+        {
+            get
+            {
+                if (IsLatest) return "Latest";
+                return Version;
+            }
+        }
+
+        /// <summary>
+        /// 是否为最新版本
+        /// </summary>
+        public bool IsLatest { get; set; }
+
+        /// <summary>
         /// 是否为默认包
         /// </summary>
         public bool IsDefault;

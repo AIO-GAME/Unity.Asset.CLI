@@ -125,21 +125,28 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
-                EditorGUILayout.LabelField("Env : gcloud local", GP_Width_100);
+                EditorGUILayout.LabelField("环境 : gcloud local", GP_Width_100);
                 config.GCLOUD_PATH = GELayout.FieldDelayed(config.GCLOUD_PATH);
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
-                EditorGUILayout.LabelField("Env : gsutil local", GP_Width_100);
+                EditorGUILayout.LabelField("环境 : gsutil local", GP_Width_100);
                 config.GSUTIL_PATH = GELayout.FieldDelayed(config.GSUTIL_PATH);
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
-                EditorGUILayout.LabelField("储存桶:元数据", GP_Width_100);
+                EditorGUILayout.LabelField("储存桶", GP_Width_100);
                 config.BUCKET_NAME = GELayout.FieldDelayed(config.BUCKET_NAME);
-                config.MetaData = GELayout.FieldDelayed(config.MetaData);
+             
+            }
+
+            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
+            {
+                EditorGUILayout.LabelField("元数据:[键:值]", GP_Width_100);
+                config.MetaDataKey = GELayout.FieldDelayed(config.MetaDataKey);
+                config.MetaDataValue = GELayout.FieldDelayed(config.MetaDataValue);
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))

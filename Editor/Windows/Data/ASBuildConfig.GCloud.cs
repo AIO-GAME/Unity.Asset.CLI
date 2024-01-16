@@ -59,7 +59,7 @@ namespace AIO.UEditor
         public string RemotePath;
 
         /// <summary>
-        /// 元数据
+        /// 元数据 键
         /// </summary>
         /// <remarks>
         /// --content-type=image/png
@@ -68,7 +68,12 @@ namespace AIO.UEditor
         /// --content-encoding=unset
         /// --content-disposition=disposition
         /// </remarks>
-        public string MetaData;
+        public string MetaDataKey;
+
+        /// <summary>
+        /// 元数据 值
+        /// </summary>
+        public string MetaDataValue;
 
         /// <summary>
         /// 远端相对目录
@@ -173,9 +178,14 @@ namespace AIO.UEditor
             public string BUCKET_NAME;
 
             /// <summary>
-            /// 元数据
+            /// 元数据Key
             /// </summary>
-            public string MetaData;
+            public string MetaDataKey;
+
+            /// <summary>
+            /// 元数据Value
+            /// </summary>
+            public string MetaDataValue;
 
             /// <summary>
             /// 上传状态 : true 正在上传
@@ -201,8 +211,7 @@ namespace AIO.UEditor
                 PrGCloud.Gsutil = GSUTIL_PATH;
                 var result = await PrGCloud.UploadFileAsync(
                     AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(BUCKET_NAME),
-                    location,
-                    MetaData);
+                    location, MetaDataKey, MetaDataValue);
                 EditorUtility.DisplayDialog("提示", result
                     ? "上传成功 "
                     : "上传失败", "确定");
@@ -254,7 +263,8 @@ namespace AIO.UEditor
                 config.PackageName = two;
                 config.Version = three;
                 config.BuildTarget = (BuildTarget)Enum.Parse(typeof(BuildTarget), one, false);
-                config.MetaData = MetaData;
+                config.MetaDataKey = MetaDataKey;
+                config.MetaDataValue = MetaDataValue;
                 config.LocalFullPath = DirTreeFiled.DirPath.Replace("\\", "/");
                 await AssetProxyEditor.UploadGCloud(config);
                 isUploading = false;
