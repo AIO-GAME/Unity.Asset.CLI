@@ -83,7 +83,7 @@ namespace AIO.UEngine
             }
 
             private bool AllowReachableCarrier;
-
+            
             public bool Flow => Packages?.Count > 0;
 
             protected override void OnDispose()

@@ -107,8 +107,14 @@ namespace AIO.UEditor
         /// </summary>
         private GUIContent GC_Edit_Tags;
         
+        /// <summary>
+        /// 界面内容 - 定位信息
+        /// </summary>
+        private GUIContent GC_Edit_Address;
+        
         partial void GUIContentInit()
         {
+            GC_Edit_Address = new GUIContent("定位", "资源可寻址设置");
             GC_Edit_Tags = new GUIContent("标签", "建议:以 ; 分割\n警告:一个组内的标签不能超过 31 个");
             GC_SORT = new GUIContent("序", "数据排序");
             GC_MERGE = new GUIContent("合", "合并收集器");

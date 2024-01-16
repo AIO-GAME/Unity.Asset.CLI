@@ -278,7 +278,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 当前选择包类型索引
         /// </summary>
-        private int LookModeDisplayTypeIndex = -1;
+        private int LookModeDisplayTypeIndex;
 
         /// <summary>
         /// 当前选择收集器索引
@@ -288,7 +288,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 当前标签列表索引
         /// </summary>
-        private int LookModeDisplayTagsIndex = -1;
+        private int LookModeDisplayTagsIndex;
 
         /// <summary>
         /// 收集器全部资源大小

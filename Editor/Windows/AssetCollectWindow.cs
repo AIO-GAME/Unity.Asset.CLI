@@ -17,7 +17,7 @@ namespace AIO.UEditor
         IconResource = "Editor/Icon/Asset",
         Group = "Tools",
         Menu = "AIO/Window/Asset",
-        MinSizeHeight = 750,
+        MinSizeHeight = 650,
         MinSizeWidth = 1200
     )]
     public partial class AssetCollectWindow : GraphicWindow
@@ -74,7 +74,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 更新数据
         /// </summary>
-        protected void UpdateData()
+        private void UpdateData()
         {
             switch (WindowMode)
             {
@@ -309,9 +309,9 @@ namespace AIO.UEditor
                                 if (CurrentCurrentCollectorsIndex >= Data.CurrentGroup.Length)
                                 {
                                     CurrentCurrentCollectorsIndex = 0;
-                                    OnDrawItemListScroll.y = 20 * Data.CurrentGroup.Length;
+                                    OnDrawItemListScroll.y = 27 * Data.CurrentGroup.Length;
                                 }
-                                else OnDrawItemListScroll.y -= 20;
+                                else OnDrawItemListScroll.y -= 27;
 
                                 GUI.FocusControl(null);
                                 eventData.Use();
@@ -329,7 +329,7 @@ namespace AIO.UEditor
                                     CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
                                     OnDrawItemListScroll.y = 0;
                                 }
-                                else OnDrawItemListScroll.y += 20;
+                                else OnDrawItemListScroll.y += 27;
 
                                 GUI.FocusControl(null);
                                 eventData.Use();

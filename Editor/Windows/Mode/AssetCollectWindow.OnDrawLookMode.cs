@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -568,12 +567,12 @@ namespace AIO.UEditor
 
             var rect1Content = new GUIContent(
                 $"    Asset[{LookModeCollectorsPageSize.ToConverseStringFileSize()}\\{LookModeCollectorsALLSize.ToConverseStringFileSize()}]");
+            var rect2Content = new GUIContent("    AssetPath");
             var rect3Content = new GUIContent("    Size");
             var rect4Content = new GUIContent("    Ago");
-            var rect2Content = new GUIContent("    AssetPath");
             if (LookModeSortEnableAssetName) rect1Content.image = GC_LookMode_Data_Sort.image;
-            else if (LookModeSortEnableSize) rect2Content.image = GC_LookMode_Data_Sort.image;
-            else if (LookModeSortEnableLastWrite) rect3Content.image = GC_LookMode_Data_Sort.image;
+            else if (LookModeSortEnableSize) rect3Content.image = GC_LookMode_Data_Sort.image;
+            else if (LookModeSortEnableLastWrite) rect4Content.image = GC_LookMode_Data_Sort.image;
 
             if (GUI.Button(rect1, rect1Content, GEStyle.HeaderLabel))
             {
@@ -621,7 +620,7 @@ namespace AIO.UEditor
             }
             else
             {
-                rect2.width = (rect.width - rect3.width - rect4.width) / 2 - 100 +10;
+                rect2.width = (rect.width - rect3.width - rect4.width) / 2 - 100 + 10;
                 rect2.x = rect3.x - rect2.width;
             }
 
@@ -760,38 +759,31 @@ namespace AIO.UEditor
         {
             var i = packageIndex;
             var j = groupIndex;
-            if (Data.Packages is null || i < 0) return;
-            if (Data.Packages.Length <= i) return;
+            var key = (i, j);
+            if (Data.Length <= i) return;
             if (Data.Packages[i] is null || Data.Packages[i].Groups is null || j < 0) return;
-            if (Data.Packages[i].Groups.Length <= j) return;
-
-            LookModeDisplayGroups[LookModeDisplayPackages[i]] = Array.Empty<string>();
-            LookModeDisplayCollectors[(i, j)] = Array.Empty<string>();
-            LookModeDisplayTags[(i, j)] = Array.Empty<string>();
+            if (Data.Packages[i].Length <= j) return;
+            LookModeDisplayTags[key] = Data.Packages[i].Groups[j].GetTags();
+            LookModeDisplayGroups[LookModeDisplayPackages[i]] = GetGroupDisPlayNames(Data.Packages[i].Groups);
+            LookModeDisplayCollectors[key] = GetCollectorDisPlayNames(Data.Packages[i].Groups[j].Collectors);
+            LookModeDisplayCollectors[key] = GetCollectorDisPlayNames(LookModeDisplayCollectors[key]);
+            LookModeData[key] = new List<AssetDataInfo>();
             LookModeDisplayTypes[(i, j)] = Array.Empty<string>();
-            Task.Factory.StartNew(() =>
-            {
-                LookModeDisplayTags[(i, j)] = Data.Packages[i].Groups[j].GetTags();
-                LookModeDisplayGroups[LookModeDisplayPackages[i]] = GetGroupDisPlayNames(Data.Packages[i].Groups);
-                LookModeDisplayCollectors[(i, j)] = GetCollectorDisPlayNames(Data.Packages[i].Groups[j].Collectors);
-                LookModeDisplayCollectors[(i, j)] = GetCollectorDisPlayNames(LookModeDisplayCollectors[(i, j)]);
-            });
-
-            LookModeData[(i, j)] = new List<AssetDataInfo>();
             var listTypes = new List<string>();
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
             {
                 _ = Data.Packages[i].Groups[j].Collectors[k].CollectAssetTask(
-                    Data.Packages[i].Name,
-                    Data.Packages[i].Groups[j].Name,
-                    dic =>
+                    Data.Packages[i].Name, Data.Packages[i].Groups[j].Name, dic =>
                     {
                         foreach (var pair in dic)
                         {
                             listTypes.Add(pair.Value.Type);
                             LookModeData[(i, j)].Add(pair.Value);
-                            CurrentPageValues.Add(pair.Value);
-                            LookModeCollectorsALLSize += pair.Value.Size;
+                            if (!LookModeDataFilter(pair.Value))
+                            {
+                                CurrentPageValues.Add(pair.Value);
+                                LookModeCollectorsALLSize += pair.Value.Size;
+                            }
                         }
 
                         LookModeDisplayTypes[(i, j)] = listTypes.Distinct().ToArray();
@@ -807,24 +799,13 @@ namespace AIO.UEditor
             if (!Data.IsCollectValid()) return;
 
             LookModeDisplayPackages = new string[Data.Packages.Length];
+            for (var i = 0; i < Data.Packages.Length; i++) LookModeDisplayPackages[i] = Data.Packages[i].Name;
 
             if (LookModeDisplayCollectors is null) LookModeDisplayCollectors = new Dictionary<(int, int), string[]>();
-            else LookModeDisplayCollectors.Clear();
-
             if (LookModeDisplayTags is null) LookModeDisplayTags = new Dictionary<(int, int), string[]>();
-            else LookModeDisplayTags.Clear();
-
-            if (LookModeDisplayTypes is null)
-                LookModeDisplayTypes = new Dictionary<(int, int), string[]>();
-            else LookModeDisplayTypes.Clear();
-
+            if (LookModeDisplayTypes is null) LookModeDisplayTypes = new Dictionary<(int, int), string[]>();
             if (LookModeDisplayGroups is null) LookModeDisplayGroups = new Dictionary<string, string[]>();
-            else LookModeDisplayGroups.Clear();
-
             if (LookModeData is null) LookModeData = new Dictionary<(int, int), List<AssetDataInfo>>();
-            else LookModeData.Clear();
-
-            for (var i = 0; i < Data.Packages.Length; i++) LookModeDisplayPackages[i] = Data.Packages[i].Name;
 
             LookModeCollectorsALLSize = 0;
             LookModeCollectorsPageSize = 0;
