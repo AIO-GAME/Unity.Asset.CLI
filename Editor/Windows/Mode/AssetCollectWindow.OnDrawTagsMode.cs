@@ -94,7 +94,7 @@ namespace AIO.UEditor
 
             if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
-                LookModeCurrentSelectAsset = null;
+                LookCurrentSelectAsset = null;
                 SearchText = string.Empty;
                 LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
                 UpdateDataTagsMode();
@@ -133,7 +133,7 @@ namespace AIO.UEditor
         private void UpdateDataTagsMode()
         {
             GUI.FocusControl(null);
-            LookModeCurrentSelectAsset = null;
+            LookCurrentSelectAsset = null;
 
             CurrentPageValues.Clear();
             CurrentPageValues.PageIndex = 0;
@@ -145,8 +145,9 @@ namespace AIO.UEditor
             TagsModeDisplayCollectors = new string[] { "ALL" };
             TagsModeDisplayTypes = Array.Empty<string>();
             TagsModeDisplayTags = Data.GetTags();
-            var collectors = new List<string>();
+
             var listTypes = new List<string>();
+            var listItems = new List<AssetCollectItem>();
             foreach (var package in Data.Packages)
             {
                 if (package.Groups is null) continue;
@@ -154,11 +155,10 @@ namespace AIO.UEditor
                 {
                     if (group.Collectors is null) continue;
                     var flag = !string.IsNullOrEmpty(group.Tags);
-                    collectors.AddRange(GetCollectorDisPlayNames(group.Collectors,
-                        collector => flag || !string.IsNullOrEmpty(collector.Tags)));
                     foreach (var collector in group.Collectors)
                     {
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
+                        listItems.Add(collector);
                         _ = collector.CollectAssetTask(package.Name, group.Name, dic =>
                         {
                             foreach (var pair in dic)
@@ -180,7 +180,8 @@ namespace AIO.UEditor
                 }
             }
 
-            TagsModeDisplayCollectors = GetCollectorDisPlayNames(collectors);
+            TagsModeDisplayCollectors =
+                GetCollectorDisPlayNames(GetCollectorDisPlayNames(listItems).Distinct().ToArray());
             if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
         }
 

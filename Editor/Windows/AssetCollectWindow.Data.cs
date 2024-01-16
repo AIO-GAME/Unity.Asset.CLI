@@ -303,8 +303,8 @@ namespace AIO.UEditor
         /// <summary>
         /// 是否显示资源详情
         /// </summary>
-        private bool LookModeShowAssetDetail => !string.IsNullOrEmpty(LookModeCurrentSelectAssetDataInfo.GUID) &&
-                                                LookModeCurrentSelectAsset != null;
+        private bool LookModeShowAssetDetail => !string.IsNullOrEmpty(LookCurrentSelectAssetDataInfo.GUID) &&
+                                                LookCurrentSelectAsset != null;
 
         /// <summary>
         /// 资源展示模式 当前页数量选项
@@ -314,12 +314,12 @@ namespace AIO.UEditor
         /// <summary>
         /// 用户当前选择的资源实体
         /// </summary>
-        private Object LookModeCurrentSelectAsset;
+        private Object LookCurrentSelectAsset;
 
         /// <summary>
         /// 选择的资源实体配置
         /// </summary>
-        private AssetDataInfo LookModeCurrentSelectAssetDataInfo;
+        private AssetDataInfo LookCurrentSelectAssetDataInfo;
 
         /// <summary>
         /// 依赖资源

@@ -41,6 +41,16 @@ namespace AIO
         public string CollectPath;
 
         /// <summary>
+        /// 组名
+        /// </summary>
+        public string Group;
+        
+        /// <summary>
+        /// 包名
+        /// </summary>
+        public string Package;
+        
+        /// <summary>
         /// Asset Size
         /// </summary>
         public long Size

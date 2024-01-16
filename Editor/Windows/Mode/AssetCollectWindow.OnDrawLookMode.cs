@@ -183,7 +183,7 @@ namespace AIO.UEditor
 
             if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
-                LookModeCurrentSelectAsset = null;
+                LookCurrentSelectAsset = null;
                 SearchText = string.Empty;
                 LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
                 UpdateDataLookMode();
@@ -374,62 +374,74 @@ namespace AIO.UEditor
             {
                 using (new EditorGUILayout.HorizontalScope(GP_Height_30))
                 {
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Address, GEStyle.AMMixerHeader,
+                    EditorGUILayout.LabelField(LookCurrentSelectAssetDataInfo.Address, GEStyle.AMMixerHeader,
                         GP_Height_30);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
+                    EditorGUILayout.LabelField("Package", GP_Width_100);
+                    EditorGUILayout.LabelField(LookCurrentSelectAssetDataInfo.Package);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                {
+                    EditorGUILayout.LabelField("Group", GP_Width_100);
+                    EditorGUILayout.LabelField(LookCurrentSelectAssetDataInfo.Group);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_IsSubAsset, GP_Width_100);
-                    EditorGUILayout.LabelField($"{AssetDatabase.IsSubAsset(LookModeCurrentSelectAsset)}");
+                    EditorGUILayout.LabelField($"{AssetDatabase.IsSubAsset(LookCurrentSelectAsset)}");
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_Size, GP_Width_100);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.SizeStr);
+                    EditorGUILayout.LabelField(LookCurrentSelectAssetDataInfo.SizeStr);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_Asset, GP_Width_100);
-                    EditorGUILayout.ObjectField(LookModeCurrentSelectAsset, LookModeCurrentSelectAsset.GetType(),
+                    EditorGUILayout.ObjectField(LookCurrentSelectAsset, LookCurrentSelectAsset.GetType(),
                         false);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_GUID, GP_Width_100);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.GUID);
+                    EditorGUILayout.LabelField(LookCurrentSelectAssetDataInfo.GUID);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_Type, GP_Width_100);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Type);
+                    EditorGUILayout.LabelField(LookCurrentSelectAssetDataInfo.Type);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_Path, GP_Width_100);
-                    EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.AssetPath);
+                    EditorGUILayout.LabelField(LookCurrentSelectAssetDataInfo.AssetPath);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                 {
                     EditorGUILayout.LabelField(GC_LookMode_Detail_LastWriteTime, GP_Width_100);
                     var timer =
-                        LookModeCurrentSelectAssetDataInfo.LastWriteTime.ToString("yyyy-MM-dd hh:mm:ss");
+                        LookCurrentSelectAssetDataInfo.LastWriteTime.ToString("yyyy-MM-dd hh:mm:ss");
                     EditorGUILayout.LabelField(timer);
                 }
 
-                if (!string.IsNullOrEmpty(LookModeCurrentSelectAssetDataInfo.Tags))
+                if (!string.IsNullOrEmpty(LookCurrentSelectAssetDataInfo.Tags))
                 {
                     using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                     {
                         EditorGUILayout.LabelField(GC_LookMode_Detail_Tags, GP_Width_100);
-                        EditorGUILayout.LabelField(LookModeCurrentSelectAssetDataInfo.Tags);
-                        GELayout.ButtonCopy(GC_COPY, LookModeCurrentSelectAssetDataInfo.Tags, 16, GEStyle.IconButton);
+                        EditorGUILayout.LabelField(LookCurrentSelectAssetDataInfo.Tags);
+                        GELayout.ButtonCopy(GC_COPY, LookCurrentSelectAssetDataInfo.Tags, 16, GEStyle.IconButton);
                     }
                 }
 
@@ -644,7 +656,8 @@ namespace AIO.UEditor
             EditorGUI.LabelField(rect3, data.SizeStr, EditorStyles.label);
             EditorGUI.LabelField(rect4, data.GetLatestTime(), EditorStyles.label);
 
-            if (Event.current.isMouse && rect.Contains(Event.current.mousePosition))
+            var currentEvent = Event.current;
+            if (currentEvent.isMouse && rect.Contains(currentEvent.mousePosition))
             {
                 if (Event.current.button == 1)
                 {
@@ -674,41 +687,38 @@ namespace AIO.UEditor
                             () => { GUIUtility.systemCopyBuffer = data.Tags; });
                     }
 
-                    if (Config.EnableSequenceRecord)
+                    if (Config.EnableSequenceRecord && WindowMode != Mode.LookFirstPackage)
                     {
                         onDrawLookDataItemMenu.AddItem(new GUIContent("添加 首包列表"), false, () =>
                         {
-                            if (SequenceRecords is null)
-                                SequenceRecords = new AssetSystem.SequenceRecordQueue(true);
-                            if (SequenceRecords.ExistsLocal()) SequenceRecords.UpdateLocal();
-                            SequenceRecords.Add(new AssetSystem.SequenceRecord
+                            var queue = new AssetSystem.SequenceRecordQueue(true);
+                            queue.UpdateLocal();
+                            queue.Add(new AssetSystem.SequenceRecord
                             {
                                 AssetPath = data.AssetPath,
                                 Location = data.Address,
-                                PackageName = Data.CurrentPackage.Name,
+                                PackageName = data.Package,
                                 Bytes = data.Size,
                                 Count = 1,
                                 Time = DateTime.MinValue
                             });
-                            SequenceRecords.Save();
+                            queue.Save();
+                            SequenceRecords = queue;
                         });
                     }
 
                     onDrawLookDataItemMenu.ShowAsContext();
                 }
-                else
-                {
-                    UpdateCurrentSelectAsset(index);
-                }
+                else UpdateCurrentSelectAsset(index);
 
-                Event.current.Use();
+                currentEvent.Use();
             }
         }
 
         private void CancelCurrentSelectAsset()
         {
             GUI.FocusControl(null);
-            LookModeCurrentSelectAsset = null;
+            LookCurrentSelectAsset = null;
             Dependencies.Clear();
             DependenciesSize = 0;
             DependenciesSearchText = string.Empty;
@@ -719,23 +729,21 @@ namespace AIO.UEditor
             GUI.FocusControl(null);
             if (index < 0 || CurrentPageValues.CurrentPageValues.Length == 0)
             {
-                LookModeCurrentSelectAsset = null;
+                LookCurrentSelectAsset = null;
                 Dependencies.Clear();
                 DependenciesSize = 0;
                 return;
             }
 
             CurrentSelectAssetIndex = index;
-            var data = CurrentPageValues.CurrentPageValues[index];
-            LookModeCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(data.AssetPath);
-            LookModeCurrentSelectAssetDataInfo = data;
+            LookCurrentSelectAssetDataInfo = CurrentPageValues.CurrentPageValues[index];
+            LookCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(LookCurrentSelectAssetDataInfo.AssetPath);
             Dependencies.Clear();
             DependenciesSize = 0;
-            foreach (var dependency in
-                     AssetDatabase.GetDependencies(LookModeCurrentSelectAssetDataInfo.AssetPath))
+            foreach (var dependency in AssetDatabase.GetDependencies(LookCurrentSelectAssetDataInfo.AssetPath))
             {
                 var temp = AssetDatabase.LoadAssetAtPath<Object>(dependency);
-                if (LookModeCurrentSelectAsset == temp) continue;
+                if (LookCurrentSelectAsset == temp) continue;
                 Dependencies[dependency] = new DependenciesInfo
                 {
                     Object = temp,

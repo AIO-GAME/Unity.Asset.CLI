@@ -101,7 +101,7 @@ namespace AIO
                         Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory, "Version");
 #endif
                     if (!Directory.Exists(root)) Directory.CreateDirectory(root);
-                    return Path.Combine(root, FILE_NAME);
+                    return Path.Combine(root, FILE_NAME).Replace("\\", "/");
                 }
             }
 

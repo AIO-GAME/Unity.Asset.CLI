@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ using UnityEditor;
 
 namespace AIO.UEngine
 {
+    [Description("资源系统配置")]
     [Serializable]
     [HelpURL(
         "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
@@ -94,6 +96,10 @@ namespace AIO.UEngine
             return Path.Combine(URL, AssetSystem.PlatformNameStr, package, version, fileName);
         }
 
+        /// <summary>
+        /// 从远端资源包列表
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Url路径为空</exception>
         public IEnumerator UpdatePackageRemote()
         {
             if (ASMode != EASMode.Remote) yield break;
@@ -106,6 +112,10 @@ namespace AIO.UEngine
                 data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
         }
 
+        /// <summary>
+        /// 检查配置
+        /// </summary>
+        /// <exception cref="Exception">配置异常</exception>
         public void Check()
         {
             switch (instance.ASMode)
@@ -126,8 +136,6 @@ namespace AIO.UEngine
                     if (string.IsNullOrEmpty(RuntimeRootDirectory))
                         throw new Exception("Please set the runtime root directory");
                     break;
-                default:
-                    break;
             }
         }
 
@@ -136,6 +144,13 @@ namespace AIO.UEngine
             if (ASMode == EASMode.Remote) return;
             switch (ASMode)
             {
+                case EASMode.Local:
+                    Packages = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(
+                        Path.Combine(Application.streamingAssetsPath, $"Version/{AssetSystem.PlatformNameStr}.json"));
+                    if (Packages is null)
+                        throw new Exception("Not found Version.json or AssetsPackageConfig list is null !");
+                    break;
+#if UNITY_EDITOR
                 default:
                     var assembly = Assembly.Load("AIO.Asset.Editor");
                     var type = assembly.GetType("AIO.UEditor.AssetCollectRoot", true);
@@ -169,6 +184,7 @@ namespace AIO.UEngine
                     }
 
                     break;
+#endif
             }
         }
 
@@ -176,13 +192,7 @@ namespace AIO.UEngine
 
         private static ASConfig GetResource()
         {
-            return Resources.LoadAll<ASConfig>("ASConfig").FirstOrDefault(item =>
-#if UNITY_2021_1_OR_NEWER
-                    item is not null
-#else
-                    !(item is null)
-#endif
-            );
+            return Resources.LoadAll<ASConfig>(nameof(ASConfig)).FirstOrDefault(item => !(item is null));
         }
 
         /// <summary>
@@ -190,8 +200,6 @@ namespace AIO.UEngine
         /// </summary>
         public static ASConfig GetOrCreate()
         {
-            if (instance != null) return instance;
-            instance = GetResource();
 #if UNITY_EDITOR
             if (instance is null)
             {
@@ -213,6 +221,7 @@ namespace AIO.UEngine
                     if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
                         Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
                     AssetDatabase.CreateAsset(instance, "Assets/Resources/ASConfig.asset");
+                    AssetDatabase.SaveAssets();
                 }
             }
 
@@ -231,8 +240,8 @@ namespace AIO.UEngine
                     break;
                 }
             }
-
-            EditorUtility.SetDirty(instance);
+#else
+            instance = GetResource();
 #endif
 
             if (instance is null) throw new Exception("Not found ASConfig.asset ! Please create it !");

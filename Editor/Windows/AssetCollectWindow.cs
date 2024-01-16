@@ -85,15 +85,22 @@ namespace AIO.UEditor
                     UpdateDataEditorMode();
                     break;
                 case Mode.Look:
+                    LookModeDisplayTypeIndex = 0;
+                    LookModeDisplayTagsIndex = 0;
+                    LookModeDisplayCollectorsIndex = 0;
                     UpdateDataLookMode();
                     break;
                 case Mode.Build:
                     UpdateDataBuildMode();
                     break;
                 case Mode.LookTags:
+                    LookModeDisplayTypeIndex = 0;
+                    LookModeDisplayTagsIndex = 0;
                     UpdateDataTagsMode();
                     break;
                 case Mode.LookFirstPackage:
+                    LookModeDisplayTypeIndex = 0;
+                    LookModeDisplayTagsIndex = 0;
                     UpdateDataFirstPackageMode();
                     break;
             }

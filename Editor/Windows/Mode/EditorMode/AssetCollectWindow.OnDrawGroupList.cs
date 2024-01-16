@@ -45,9 +45,7 @@ namespace AIO.UEditor
             using (var sp = new EditorGUILayout.ScrollViewScope(OnDrawItemListScroll))
             {
                 OnDrawItemListScroll = sp.scrollPosition;
-                for (var i = Data.CurrentGroup.Collectors.Length - 1;
-                     i >= 0;
-                     i--)
+                for (var i = Data.CurrentGroup.Collectors.Length - 1; i >= 0; i--)
                 {
                     if (CurrentCurrentCollectorsIndex == i)
                     {
@@ -58,7 +56,6 @@ namespace AIO.UEditor
                     }
                     else OnDrawItem(Data.CurrentGroup.Collectors[i], i);
 
-                    // 获取高度
                     EditorGUILayout.Space();
                 }
             }
