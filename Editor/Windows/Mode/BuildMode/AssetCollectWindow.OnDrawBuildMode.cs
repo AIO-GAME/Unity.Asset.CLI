@@ -82,12 +82,23 @@ namespace AIO.UEditor
 
             if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
-                GUI.FocusControl(null);
-                BuildConfig.Save();
-                AssetDatabase.SaveAssets();
-                if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
+                try
                 {
-                    AssetDatabase.Refresh();
+                    GUI.FocusControl(null);
+                    BuildConfig.Save();
+#if UNITY_2021_1_OR_NEWER
+                    AssetDatabase.SaveAssetIfDirty(BuildConfig);
+#else
+                    AssetDatabase.SaveAssets();
+#endif
+                    if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
+                    {
+                        AssetDatabase.Refresh();
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignored
                 }
             }
         }
@@ -160,7 +171,8 @@ namespace AIO.UEditor
                         var sandbox = Path.Combine(BuildConfig.BuildOutputPath);
                         if (Directory.Exists(sandbox))
                         {
-                            if (EditorUtility.DisplayDialog("清空缓存", $"确定清空缓存?\n-----------------------\n清空缓存代表着\n之后每个资源包\n第一次构建必定是强制构建模式", "确定", "取消"))
+                            if (EditorUtility.DisplayDialog("清空缓存",
+                                    $"确定清空缓存?\n-----------------------\n清空缓存代表着\n之后每个资源包\n第一次构建必定是强制构建模式", "确定", "取消"))
                             {
                                 AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
                             }

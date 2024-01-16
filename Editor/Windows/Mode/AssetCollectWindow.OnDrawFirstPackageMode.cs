@@ -119,24 +119,27 @@ namespace AIO.UEditor
             LookModeCollectorsALLSize = 0;
             LookModeCollectorsPageSize = 0;
             TagsModeDisplayTypes = Array.Empty<string>();
-            var types = new Dictionary<string, byte>();
+            var types = new List<string>();
             var asset = new Dictionary<string, AssetDataInfo>();
             foreach (var item in SequenceRecords)
             {
                 if (asset.ContainsKey(item.AssetPath)) continue;
                 var info = new AssetDataInfo
                 {
+                    // AssetPath 移除后缀
                     AssetPath = item.AssetPath,
                     Address = item.Location,
+                    Package = item.PackageName,
+                    Group = "N/A",
                     Tags = "FirstPackage",
                     Extension = Path.GetExtension(item.AssetPath)
                 };
                 asset[info.AssetPath] = info;
                 CurrentTagValues.Add(info);
-                types[info.Type] = 0;
+                types.Add(info.Type);
             }
 
-            TagsModeDisplayTypes = types.Keys.ToArray();
+            TagsModeDisplayTypes = types.Distinct().ToArray();
             CurrentPageValues.Clear();
             CurrentPageValues.Add(CurrentTagValues.Where(data => !FirstPackageModeDataFilter(data)));
             LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
@@ -146,9 +149,6 @@ namespace AIO.UEditor
 
         private void OnDrawFirstPackageMode()
         {
-            GUI.FocusControl(null);
-            LookModeCurrentSelectAsset = null;
-
             if (!Config.EnableSequenceRecord)
             {
                 var content = new GUIContent("请启用序列记录功能");
@@ -168,7 +168,7 @@ namespace AIO.UEditor
                 var index = 0;
                 foreach (var record in AssetSystem.SequenceRecords)
                 {
-                    using (GELayout.Vertical())
+                    using (new EditorGUILayout.VerticalScope())
                     {
                         GELayout.Label(
                             $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
@@ -184,6 +184,7 @@ namespace AIO.UEditor
                 ViewDetailList.height = CurrentHeight - DrawHeaderHeight;
                 ViewDetailList.IsAllowHorizontal = LookModeShowAssetDetail;
                 ViewDetailList.Draw(OnDrawLookModeAssetList, GEStyle.Badge);
+
                 if (LookModeShowAssetDetail)
                 {
                     ViewDetails.IsShow = true;

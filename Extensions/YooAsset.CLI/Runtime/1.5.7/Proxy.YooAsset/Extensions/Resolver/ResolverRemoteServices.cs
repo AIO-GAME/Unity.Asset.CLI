@@ -24,12 +24,12 @@ namespace AIO.UEngine.YooAsset
 
         public string GetRemoteMainURL(string fileName)
         {
-            return AssetSystem.Parameter.GetRemoteURL(fileName, Config.Name, Config.Version);
+            return AssetSystem.Parameter.GetRemoteURL(fileName, Config.Name, Config.CurrentVersion);
         }
 
         public string GetRemoteFallbackURL(string fileName)
         {
-            return AssetSystem.Parameter.GetRemoteURL(fileName, Config.Name, Config.Version);
+            return AssetSystem.Parameter.GetRemoteURL(fileName, Config.Name, Config.CurrentVersion);
         }
     }
 }

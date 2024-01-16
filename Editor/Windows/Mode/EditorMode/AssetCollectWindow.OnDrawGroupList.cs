@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -44,9 +45,7 @@ namespace AIO.UEditor
             using (var sp = new EditorGUILayout.ScrollViewScope(OnDrawItemListScroll))
             {
                 OnDrawItemListScroll = sp.scrollPosition;
-                for (var i = Data.CurrentGroup.Collectors.Length - 1;
-                     i >= 0;
-                     i--)
+                for (var i = Data.CurrentGroup.Collectors.Length - 1; i >= 0; i--)
                 {
                     if (CurrentCurrentCollectorsIndex == i)
                     {

@@ -217,11 +217,7 @@ namespace AIO.UEditor
             }
 
             for (var index = Packages.Length - 1; index >= 0; index--) Packages[index].Save();
-#if UNITY_2021_1_OR_NEWER
-            AssetDatabase.SaveAssetIfDirty(this);
-#else
             EditorUtility.SetDirty(this);
-#endif
         }
 
         private void OnDisable()
@@ -480,7 +476,7 @@ namespace AIO.UEditor
             }
         }
 
-        [MenuItem("Assets/Asset System Find Address", true, 1000)]
+        [MenuItem("Assets/获取资源可寻址路径", true, 1000)]
         private static bool IsSelectAsset()
         {
             return Selection.activeObject != null &&
@@ -491,7 +487,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 根据GUID查找资源可寻址路径
         /// </summary>
-        [MenuItem("Assets/Asset System Find Address", false, 1000)]
+        [MenuItem("Assets/获取资源可寻址路径", false, 1000)]
         public static void FindAssetLocal()
         {
             var obj = Selection.activeObject;

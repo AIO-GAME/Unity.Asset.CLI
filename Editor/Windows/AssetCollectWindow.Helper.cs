@@ -1,15 +1,13 @@
 /*|============|*|
-|*|Author:     |*| star fire                
-|*|Date:       |*| 2024-01-03               
-|*|E-Mail:     |*| 1398581458@qq.com     
+|*|Author:     |*| star fire
+|*|Date:       |*| 2024-01-03
+|*|E-Mail:     |*| 1398581458@qq.com
 |*|============|*/
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.SceneManagement;
-using UnityEngine.SceneManagement;
 
 namespace AIO.UEditor
 {
@@ -141,9 +139,13 @@ namespace AIO.UEditor
         {
             if (collectors.Count >= 31)
             {
-                collectors.Insert(0, "All");
+                var temp = new string[collectors.Count + 1];
+                temp[0] = "All";
+                for (var index = 0; index < collectors.Count; index++) temp[index + 1] = collectors[index];
+                return temp;
             }
-            else if (collectors.Count > 15)
+
+            if (collectors.Count > 15)
             {
                 for (var index = 0; index < collectors.Count; index++)
                 {
@@ -223,7 +225,5 @@ namespace AIO.UEditor
             var handle = await config.Validate();
             EditorUtility.DisplayDialog("提示", handle ? "连接成功" : "连接失败", "确定");
         }
-
- 
     }
 }

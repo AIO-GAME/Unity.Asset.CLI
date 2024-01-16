@@ -393,6 +393,8 @@ namespace AIO.UEditor
             var info = new AssetDataInfo
             {
                 CollectPath = data.CollectPath,
+                Package = PackageName,
+                Group = GroupName,
                 Tags = tags.Length == 0 ? string.Empty : string.Join(";", tags),
             };
 

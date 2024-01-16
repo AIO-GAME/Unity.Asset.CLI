@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
@@ -79,31 +80,44 @@ namespace AIO.UEditor
                     GUI.FocusControl(null);
                     if (item.Type == EAssetCollectItemType.MainAssetCollector)
                     {
-                        var status = 1;
-                        foreach (var collector in Data.CurrentGroup.Collectors)
+                        var list = GetCollectorDisPlayNames(Data.CurrentGroup.Collectors);
+                        if (list.Length > 31)
                         {
-                            if (collector.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                            if (string.IsNullOrEmpty(item.CollectPath)) continue;
-                            if (collector.CollectPath != item.CollectPath)
+                            LookModeDisplayCollectorsIndex = 0;
+                            for (var i = 0; i < list.Length; i++)
                             {
-                                status *= 2;
-                                continue;
+                                if (list[i] == item.CollectPath)
+                                {
+                                    LookModeDisplayCollectorsIndex = i + 1;
+                                    break;
+                                }
                             }
+                        }
+                        else
+                        {
+                            var status = 1;
+                            foreach (var collector in list)
+                            {
+                                if (collector != item.CollectPath)
+                                {
+                                    status *= 2;
+                                    continue;
+                                }
 
-                            LookModeDisplayCollectorsIndex = status;
-                            break;
+                                LookModeDisplayCollectorsIndex = status;
+                                break;
+                            }
                         }
 
-                        GUI.FocusControl(null);
-                        WindowMode = Mode.Look;
                         UpdateDataLookMode();
+                        WindowMode = Mode.Look;
+                        TempTable[nameof(WindowMode)] = WindowMode;
+                        Repaint();
                         return;
                     }
-                    else
-                    {
-                        EditorUtility.DisplayDialog("打开", "只有动态资源才能查询", "确定");
-                        return;
-                    }
+
+                    EditorUtility.DisplayDialog("打开", "只有动态资源才能查询", "确定");
+                    return;
                 }
 
                 if (item.Path is null) GUI.enabled = true;
@@ -122,13 +136,13 @@ namespace AIO.UEditor
                             else
                             {
                                 CurrentCurrentCollectorsIndex = index;
-                                OnDrawItemListScroll.y = index * 20;
+                                OnDrawItemListScroll.y = index * 27;
                             }
                         }
                         else if (CurrentCurrentCollectorsIndex > index)
                         {
                             CurrentCurrentCollectorsIndex--;
-                            OnDrawItemListScroll.y += 20;
+                            OnDrawItemListScroll.y += 27;
                         }
 
                         Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Remove(item);
@@ -144,7 +158,7 @@ namespace AIO.UEditor
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUILayout.LabelField("定位", GP_Width_25);
+                    EditorGUILayout.LabelField(GC_Edit_Address, GP_Width_25);
                     if (Config.LoadPathToLower)
                     {
                         GUI.enabled = false;
@@ -163,47 +177,40 @@ namespace AIO.UEditor
                         GEStyle.PreDropDown);
 
                     item.LoadType = GELayout.Popup(item.LoadType, GEStyle.PreDropDown, GP_Width_75);
-                    item.HasExtension =
-                        GELayout.ToggleLeft("后缀", item.HasExtension, GTOption.Width(42));
+                    item.HasExtension = GELayout.ToggleLeft("后缀", item.HasExtension, GTOption.Width(42));
                 }
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUILayout.LabelField("收集", GP_Width_25);
-                    if (item.RuleUseCollectCustom)
-                    {
-                        item.RuleCollect = GELayout.Field(item.RuleCollect);
-                    }
+                    if (item.RuleUseCollectCustom) item.RuleCollect = GELayout.Field(item.RuleCollect);
                     else
                     {
-                        item.RuleCollectIndex = GELayout.Mask(item.RuleCollectIndex,
-                            AssetCollectSetting.MapCollect.Displays, GEStyle.PreDropDown,
-                            GTOption.Width(80));
+                        item.RuleCollectIndex = GELayout.Mask(
+                            item.RuleCollectIndex, AssetCollectSetting.MapCollect.Displays,
+                            GEStyle.PreDropDown, GTOption.Width(80));
                         GELayout.HelpBox(GetInfo(AssetCollectSetting.MapCollect.Displays, item.RuleCollectIndex));
                     }
 
                     item.RuleUseCollectCustom = GELayout.ToggleLeft(
-                        new GUIContent("自定", "自定义收集规则 \n传入文件后缀 \n冒号(;)隔开 \n无需填写点(.)"),
+                        new GUIContent("自定", "自定义收集规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开 \n可无需填写点(.)"),
                         item.RuleUseCollectCustom, GTOption.Width(42));
                 }
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUILayout.LabelField("过滤", GP_Width_25);
-                    if (item.RuleUseFilterCustom)
-                    {
-                        item.RuleFilter = GELayout.Field(item.RuleFilter);
-                    }
+                    if (item.RuleUseFilterCustom) item.RuleFilter = GELayout.Field(item.RuleFilter);
                     else
                     {
-                        item.RuleFilterIndex =
-                            GELayout.Mask(item.RuleFilterIndex, AssetCollectSetting.MapFilter.Displays,
-                                GEStyle.PreDropDown, GTOption.Width(80));
+                        item.RuleFilterIndex = GELayout.Mask(
+                            item.RuleFilterIndex, AssetCollectSetting.MapFilter.Displays,
+                            GEStyle.PreDropDown, GTOption.Width(80));
                         GELayout.HelpBox(GetInfo(AssetCollectSetting.MapFilter.Displays, item.RuleFilterIndex));
                     }
 
                     item.RuleUseFilterCustom = GELayout.ToggleLeft(
-                        new GUIContent("自定", "自定义过滤规则 \n传入文件后缀 \n冒号(;)隔开 \n无需填写点(.)"),
+                        new GUIContent("自定", "自定义过滤规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开\n可无需填写点(.)"),
                         item.RuleUseFilterCustom, GTOption.Width(42));
                 }
 

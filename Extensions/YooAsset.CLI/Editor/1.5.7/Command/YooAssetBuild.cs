@@ -202,14 +202,16 @@ namespace AIO.UEditor.CLI
             var buildResult = builder.Run(buildParameters);
             if (buildResult.Success)
             {
+                var output = Path.Combine(
+                    buildParameters.BuildOutputRoot,
+                    buildParameters.BuildTarget.ToString(),
+                    buildParameters.PackageName);
+
                 if (command.MergeToLatest)
                 {
-                    MergeToLatest(Path.Combine(
-                            buildParameters.BuildOutputRoot,
-                            buildParameters.BuildTarget.ToString(),
-                            buildParameters.PackageName),
-                        buildParameters.PackageVersion);
+                    MergeToLatest(output, buildParameters.PackageVersion);
                 }
+                else ManifestGenerate(Path.Combine(output, buildParameters.PackageVersion));
 
                 if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
                 else EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
