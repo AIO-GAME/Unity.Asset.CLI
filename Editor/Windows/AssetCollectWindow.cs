@@ -17,8 +17,8 @@ namespace AIO.UEditor
         IconResource = "Editor/Icon/Asset",
         Group = "Tools",
         Menu = "AIO/Window/Asset",
-        MinSizeHeight = 450,
-        MinSizeWidth = 800
+        MinSizeHeight = 750,
+        MinSizeWidth = 1200
     )]
     public partial class AssetCollectWindow : GraphicWindow
     {
@@ -82,7 +82,7 @@ namespace AIO.UEditor
                     UpdateDataConfigMode();
                     break;
                 case Mode.Editor:
-
+                    UpdateDataEditorMode();
                     break;
                 case Mode.Look:
                     UpdateDataLookMode();
@@ -99,35 +99,22 @@ namespace AIO.UEditor
             }
         }
 
+        protected override void OnAwake()
+        {
+            Data = AssetCollectRoot.GetOrCreate();
+            Selection.activeObject = Data;
+        }
+
         protected override void OnActivation()
         {
             AssetCollectSetting.Initialize();
 
-            if (Data is null)
-            {
-                Data = AssetCollectRoot.GetOrCreate();
-                Selection.activeObject = Data;
-                foreach (var package in Data.Packages)
-                {
-                    if (package?.Groups is null) continue;
+            Data = AssetCollectRoot.GetOrCreate();
+            Data.Refresh();
+            Selection.activeObject = Data;
 
-                    foreach (var group in package.Groups)
-                    {
-                        if (group?.Collectors is null ||
-                            group.Collectors.Length == 0)
-                            continue;
-
-                        foreach (var collect in group.Collectors)
-                        {
-                            if (string.IsNullOrEmpty(collect.CollectPath)) continue;
-                            collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
-                        }
-                    }
-                }
-
-                Config = ASConfig.GetOrCreate();
-                BuildConfig = ASBuildConfig.GetOrCreate();
-            }
+            Config = ASConfig.GetOrCreate();
+            BuildConfig = ASBuildConfig.GetOrCreate();
 
 
             GCInit();
@@ -171,9 +158,10 @@ namespace AIO.UEditor
 
         protected override void OnDisable()
         {
-            Data.Save();
-            Config.Save();
-            BuildConfig.Save();
+            if (Data != null) Data.Save();
+            if (Config != null) Config.Save();
+            if (BuildConfig != null) BuildConfig.Save();
+            AssetDatabase.SaveAssets();
         }
 
         public override void EventMouseDown(in Event eventData)
@@ -234,6 +222,13 @@ namespace AIO.UEditor
                 {
                     switch (keyCode)
                     {
+                        // 判断ESC
+                        case KeyCode.Escape:
+                            GUI.FocusControl(null);
+                            CancelCurrentSelectAsset();
+                            eventData.Use();
+                            break;
+
                         case KeyCode.LeftArrow: // 数字键盘 右键
                             if (CurrentPageValues.PageIndex > 0)
                             {
@@ -304,6 +299,57 @@ namespace AIO.UEditor
 
                     break;
                 case Mode.Editor:
+                    switch (keyCode)
+                    {
+                        case KeyCode.UpArrow: // 数字键盘 上键
+                            if (Data.CurrentGroup.Length <= 0) break;
+                            if (CurrentCurrentCollectorsIndex < Data.CurrentGroup.Length)
+                            {
+                                CurrentCurrentCollectorsIndex += 1;
+                                if (CurrentCurrentCollectorsIndex >= Data.CurrentGroup.Length)
+                                {
+                                    CurrentCurrentCollectorsIndex = 0;
+                                    OnDrawItemListScroll.y = 20 * Data.CurrentGroup.Length;
+                                }
+                                else OnDrawItemListScroll.y -= 20;
+
+                                GUI.FocusControl(null);
+                                eventData.Use();
+                            }
+
+                            break;
+
+                        case KeyCode.DownArrow: // 数字键盘 下键
+                            if (Data.CurrentGroup.Length <= 0) break;
+                            if (CurrentCurrentCollectorsIndex >= 0)
+                            {
+                                CurrentCurrentCollectorsIndex -= 1;
+                                if (CurrentCurrentCollectorsIndex < 0)
+                                {
+                                    CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
+                                    OnDrawItemListScroll.y = 0;
+                                }
+                                else OnDrawItemListScroll.y += 20;
+
+                                GUI.FocusControl(null);
+                                eventData.Use();
+                            }
+
+                            break;
+                        // 判断回车
+                        case KeyCode.Return:
+                        case KeyCode.KeypadEnter:
+                            if (CurrentCurrentCollectorsIndex >= 0)
+                            {
+                                GUI.FocusControl(null);
+                                Data.CurrentGroup.Collectors[CurrentCurrentCollectorsIndex].Folded =
+                                    !Data.CurrentGroup.Collectors[CurrentCurrentCollectorsIndex].Folded;
+                                eventData.Use();
+                            }
+
+                            break;
+                    }
+
                     if (eventData.control && keyCode == KeyCode.S)
                     {
                         GUI.FocusControl(null);
@@ -396,7 +442,6 @@ namespace AIO.UEditor
         partial void OnDrawPackage();
         partial void OnDrawGroup();
         partial void OnDrawGroupList();
-        partial void OnDrawItem(AssetCollectItem item);
         partial void OnDrawASConfig();
 
         /// <summary>

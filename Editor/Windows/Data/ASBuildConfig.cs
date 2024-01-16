@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using AIO.UEngine;
 using UnityEditor;
@@ -12,6 +13,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
+    [Description("资源打包配置")]
     [Serializable]
     [HelpURL(
         "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7-")]
@@ -84,29 +86,31 @@ namespace AIO.UEditor
         /// </summary>
         public static ASBuildConfig GetOrCreate()
         {
-            if (_instance != null) return _instance;
-            var objects = EHelper.IO.GetScriptableObjects<ASBuildConfig>();
-            if (objects != null && objects.Length > 0)
-            {
-                foreach (var asset in objects)
-                {
-                    if (asset is null) continue;
-                    if (string.IsNullOrEmpty(asset.BuildOutputPath))
-                    {
-                        asset.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
-                    }
-
-                    _instance = asset;
-                    break;
-                }
-            }
-
             if (_instance is null)
             {
-                _instance = CreateInstance<ASBuildConfig>();
-                _instance.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
-                AssetDatabase.CreateAsset(_instance, "Assets/Editor/ASBuildConfig.asset");
-                AssetDatabase.SaveAssets();
+                var objects = EHelper.IO.GetScriptableObjects<ASBuildConfig>();
+                if (objects != null && objects.Length > 0)
+                {
+                    foreach (var asset in objects)
+                    {
+                        if (asset is null) continue;
+                        if (string.IsNullOrEmpty(asset.BuildOutputPath))
+                        {
+                            asset.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
+                        }
+
+                        _instance = asset;
+                        break;
+                    }
+                }
+
+                if (_instance is null)
+                {
+                    _instance = CreateInstance<ASBuildConfig>();
+                    _instance.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
+                    AssetDatabase.CreateAsset(_instance, "Assets/Editor/ASBuildConfig.asset");
+                    AssetDatabase.SaveAssets();
+                }
             }
 
             return _instance;
@@ -114,7 +118,11 @@ namespace AIO.UEditor
 
         public void Save()
         {
-            if (Equals(null)) return;
+            if (Equals(null))
+            {
+                Debug.LogWarning("ASBuildConfig is null so not save");
+                return;
+            }
 #if UNITY_2021_1_OR_NEWER
             AssetDatabase.SaveAssetIfDirty(this);
 #else

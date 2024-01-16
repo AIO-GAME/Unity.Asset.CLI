@@ -37,5 +37,15 @@ namespace AIO.UEditor
             ViewCollectorsList.Draw(DoEditorDrawRect,
                 () => { OnDrawGroupListScroll = GELayout.VScrollView(OnDrawGroupList, OnDrawGroupListScroll); });
         }
+
+
+        protected void UpdateDataEditorMode()
+        {
+            if (Data.CurrentGroup.Length > 0)
+            {
+                CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
+                OnDrawItemListScroll.y = 0;
+            }
+        }
     }
 }

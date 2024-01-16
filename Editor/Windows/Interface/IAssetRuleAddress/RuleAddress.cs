@@ -7,7 +7,6 @@
 using System;
 using System.IO;
 using UnityEditor;
-using UnityEngine;
 using IAddressRule = AIO.UEditor.IAssetRuleAddress;
 using Object = UnityEngine.Object;
 
@@ -19,14 +18,11 @@ namespace AIO.UEditor
         {
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "Location = Group + Relative File Path";
+            public string DisplayAddressName => "寻址路径 = 组名 + 资源文件相对收集器路径";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return data.AssetPath.Replace(
-                    string.Concat(data.CollectPath, '/'),
-                    string.Concat(Path.GetFileName(data.GroupName) + '/')
-                );
+                return data.AssetPath.Replace(data.CollectPath, data.GroupName).Replace('\\', '/');
             }
         }
 
@@ -34,11 +30,12 @@ namespace AIO.UEditor
         {
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "Location = Group + FileName";
+            public string DisplayAddressName => "寻址路径 = 组名 + 资源文件名";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return string.Concat(Path.GetFileName(data.GroupName), '/', Path.GetFileName(data.AssetPath));
+                return Path.Combine(Path.GetFileName(data.GroupName), Path.GetFileName(data.AssetPath))
+                    .Replace('\\', '/');
             }
         }
 
@@ -46,11 +43,11 @@ namespace AIO.UEditor
         {
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "Location = FileName";
+            public string DisplayAddressName => "寻址路径 = 资源文件名";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return Path.GetFileName(data.AssetPath);
+                return Path.GetFileName(data.AssetPath).Replace('\\', '/');
             }
         }
 
@@ -58,7 +55,7 @@ namespace AIO.UEditor
         {
             public bool AllowThread => false;
 
-            public string DisplayAddressName => "Location = InstanceID";
+            public string DisplayAddressName => "寻址路径 = 资源 实例ID";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
@@ -71,11 +68,12 @@ namespace AIO.UEditor
         {
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "Location = Collect + Relative File Path";
+            public string DisplayAddressName => "寻址路径 = 收集器文件名 + 资源文件相对收集器路径";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return data.AssetPath.Substring(data.CollectPath.LastIndexOf('/') + 1);
+                return data.AssetPath.Substring(data.CollectPath.Replace('\\', '/').LastIndexOf('/') + 1)
+                    .Replace('\\', '/');
             }
         }
 
@@ -83,11 +81,13 @@ namespace AIO.UEditor
         {
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "Location = Collect + FileName";
+            public string DisplayAddressName => "寻址路径 = 收集器文件名 + 资源文件名";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return string.Concat(Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath));
+                return string.Concat(
+                        Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath))
+                    .Replace('\\', '/');
             }
         }
 
@@ -95,11 +95,11 @@ namespace AIO.UEditor
         {
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "Location = Root Relative";
+            public string DisplayAddressName => "寻址路径 = 资源文件相对Asset路径";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return data.AssetPath;
+                return data.AssetPath.Replace('\\', '/');
             }
         }
 
@@ -107,14 +107,14 @@ namespace AIO.UEditor
         {
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "Location = UserData + Relative File Path";
+            public string DisplayAddressName => "寻址路径 = 自定义根路径 + 资源文件相对收集器路径";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return data.AssetPath.Replace(
-                    string.Concat(data.CollectPath, '/'),
-                    string.Concat(data.UserData, '/')
-                );
+                var temp = data.AssetPath.Replace(data.CollectPath, "");
+                temp = temp.Trim('/', '\\');
+                if (string.IsNullOrEmpty(data.UserData)) return temp.Replace('\\', '/');
+                return Path.Combine(data.UserData, temp).Replace('\\', '/');
             }
         }
 
@@ -122,11 +122,12 @@ namespace AIO.UEditor
         {
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "Location = UserData + FileName";
+            public string DisplayAddressName => "寻址路径 = 自定义根路径 + 资源文件名";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return string.Concat(data.UserData, '/', Path.GetFileName(data.AssetPath));
+                if (string.IsNullOrEmpty(data.UserData)) return Path.GetFileName(data.AssetPath);
+                return Path.Combine(data.UserData, Path.GetFileName(data.AssetPath)).Replace('\\', '/');
             }
         }
     }

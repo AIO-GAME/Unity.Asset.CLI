@@ -40,12 +40,14 @@ namespace AIO.UEditor
     /// </summary>
     /// <remarks>
     /// 注意：每个文件独自打资源包
-    /// 例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop_image_backgroud.bundle"
+    /// 例如："Assets/UIPanel/Shop/Image/background.png" --> "assets_uipanel_shop_image_background.bundle"
     /// 例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view_main.bundle"
     /// </remarks>
     public class PackSeparately : IAssetRulePack
     {
-        public string DisplayPackName => "PackRule = 文件路径";
+        public int Priority => 0;
+
+        public string DisplayPackName => "资源打包规则 = 文件路径";
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -65,7 +67,9 @@ namespace AIO.UEditor
     /// </summary>
     public class PackDirectory : IAssetRulePack
     {
-        public string DisplayPackName => "PackRule = 父类文件夹路径";
+        public string DisplayPackName => "资源打包规则 = 父类文件夹路径";
+
+        public int Priority => 1;
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -86,7 +90,9 @@ namespace AIO.UEditor
     /// </summary>
     public class PackTopDirectory : IAssetRulePack
     {
-        public string DisplayPackName => "PackRule = 收集器下顶级文件夹路径";
+        public string DisplayPackName => "资源打包规则 = 收集器下顶级文件夹路径";
+
+        public int Priority => 2;
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -116,7 +122,9 @@ namespace AIO.UEditor
     /// </summary>
     public class PackCollector : IAssetRulePack
     {
-        public string DisplayPackName => "PackRule = 收集器路径";
+        public string DisplayPackName => "资源打包规则 = 收集器路径";
+
+        public int Priority => 3;
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -137,7 +145,9 @@ namespace AIO.UEditor
     /// </summary>
     public class PackGroup : IAssetRulePack
     {
-        public string DisplayPackName => "PackRule = 分组名称";
+        public string DisplayPackName => "资源打包规则 = 分组名称";
+
+        public int Priority => 4;
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -154,7 +164,9 @@ namespace AIO.UEditor
     /// </summary>
     public class PackRawFile : IAssetRulePack
     {
-        public string DisplayPackName => "PackRule = 打包原生文件";
+        public string DisplayPackName => "资源打包规则 = 打包原生文件";
+
+        public int Priority => 5;
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -171,7 +183,9 @@ namespace AIO.UEditor
     /// </summary>
     public class PackShaderVariants : IAssetRulePack
     {
-        public string DisplayPackName => "PackRule = 打包着色器变种集合文件";
+        public string DisplayPackName => "资源打包规则 = 打包着色器变种集合文件";
+
+        public int Priority => 6;
 
         public PackRuleResult GetPackRuleResult(PackRuleData data)
         {

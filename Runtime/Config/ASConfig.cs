@@ -140,7 +140,7 @@ namespace AIO.UEngine
                     var assembly = Assembly.Load("AIO.Asset.Editor");
                     var type = assembly.GetType("AIO.UEditor.AssetCollectRoot", true);
                     var getOrCreate = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public);
-                    var CollectRoot = getOrCreate?.Invoke(null, new object[] { true });
+                    var CollectRoot = getOrCreate?.Invoke(null, new object[] { });
                     if (CollectRoot is null) break;
                     var packages = type.GetField("Packages", BindingFlags.Instance | BindingFlags.Public)
                         ?.GetValue(CollectRoot);

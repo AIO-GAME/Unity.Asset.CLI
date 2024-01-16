@@ -16,7 +16,7 @@ using Object = UnityEngine.Object;
 namespace AIO.UEditor
 {
     /// <summary>
-    ///     
+    /// 收集器列表
     /// </summary>
     [Serializable]
     public class AssetCollectItem : IEqualityComparer<AssetCollectItem>, IDisposable
@@ -59,7 +59,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 收集器全路径
         /// </summary>
-        public string FullPath => System.IO.Path.Combine(EHelper.Path.Project, CollectPath).Replace("\\", "/");
+        public string FullPath => System.IO.Path.Combine(EHelper.Path.Project, CollectPath);
 
         /// <summary>
         /// 自定义数据
@@ -81,6 +81,24 @@ namespace AIO.UEditor
         /// </summary>
         public bool HasExtension;
 
+        /// <summary>
+        /// 打包规则
+        /// </summary>
+        public int RulePackIndex = 1;
+
+        /// <summary>
+        /// 收集器路径
+        /// </summary>
+        public Object Path
+        {
+            get => _Path;
+            set
+            {
+                _Path = value;
+                UpdateData();
+            }
+        }
+
         #region Collect
 
         /// <summary>
@@ -89,7 +107,7 @@ namespace AIO.UEditor
         public int RuleCollectIndex;
 
         /// <summary>
-        /// 收集规则
+        /// 开启自定义收集规则
         /// </summary>
         public bool RuleUseCollectCustom;
 
@@ -108,34 +126,16 @@ namespace AIO.UEditor
         public int RuleFilterIndex;
 
         /// <summary>
-        /// 过滤规则
+        /// 开启自定义过滤规则
         /// </summary>
         public bool RuleUseFilterCustom;
 
         /// <summary>
-        /// 过滤规则
+        /// 过滤规则 自定义
         /// </summary>
         public string RuleFilter;
 
         #endregion
-
-        /// <summary>
-        /// 打包规则
-        /// </summary>
-        public int RulePackIndex;
-
-        /// <summary>
-        /// 收集器路径
-        /// </summary>
-        public Object Path
-        {
-            get => _Path;
-            set
-            {
-                _Path = value;
-                UpdateData();
-            }
-        }
 
         /// <summary>
         /// 收集器路径
@@ -158,11 +158,27 @@ namespace AIO.UEditor
         /// </summary>
         private string[] RuleCustomCollect { get; set; }
 
+        /// <summary>
+        /// 资源包名称
+        /// </summary>
+        public string PackageName { get; private set; }
+
+        /// <summary>
+        /// 资源组名称
+        /// </summary>
+        public string GroupName { get; private set; }
+
+        /// <summary>
+        /// 获取收集规则
+        /// </summary>
         public AssetRulePackResult GetPackRule(AssetRuleData data)
         {
             return AssetCollectSetting.MapPacks.GetValue(RulePackIndex).GetPackRuleResult(data);
         }
 
+        /// <summary>
+        /// 设置可寻址规则
+        /// </summary>
         public void SetAddress<T>() where T : IAssetRuleAddress
         {
             Address = AssetCollectSetting.MapAddress.Values.FindIndex(address => address is T);
@@ -183,29 +199,52 @@ namespace AIO.UEditor
                 return false;
             }
 
-            // 判断收集规则是否符合条件 如果不符合则跳过
-            if (RuleCollects.Count != 0 &&
-                !RuleCollects.Exists(filter => filter.IsCollectAsset(data))
-               ) return false;
+            if (RuleUseCollectCustom) // 判断是否使用自定义收集规则
+            {
+                if (RuleCustomCollect?.Length > 0 && // 判断自定义收集规则等
+                    !UEditor.RuleCollect.IsCollectAssetCustom(RuleCustomCollect, data.Extension)
+                   ) return false;
+            }
+            else
+            {
+                if (RuleCollects.Count != 0 && // 判断收集规则是否符合条件 如果不符合则跳过
+                    !RuleCollects.Exists(filter => filter.IsCollectAsset(data))
+                   ) return false;
+            }
 
-            // 判断自定义收集规则等
-            if (RuleUseCollectCustom && RuleCustomCollect?.Length > 0 &&
-                !UEditor.RuleCollect.IsCollectAssetCustom(RuleCustomCollect, data.Extension)
-               ) return false;
-
-            // 判断过滤规则是否符合条件 如果符合则跳过
-            if (RuleFilters.Count != 0 &&
-                RuleFilters.Exists(filter => filter.IsCollectAsset(data))
-               ) return false;
-
-            // 判断自定义过滤规则等
-            if (RuleUseFilterCustom && RuleCustomFilter?.Length > 0 &&
-                UEditor.RuleCollect.IsCollectAssetCustom(RuleCustomFilter, data.Extension)
-               ) return false;
+            if (RuleUseFilterCustom) // 判断是否使用自定义过滤规则
+            {
+                if (RuleCustomFilter?.Length > 0 && // 判断自定义过滤规则等
+                    UEditor.RuleCollect.IsCollectAssetCustom(RuleCustomFilter, data.Extension)
+                   ) return false;
+            }
+            else
+            {
+                if (RuleFilters.Count != 0 && // 判断过滤规则是否符合条件 如果符合则跳过
+                    RuleFilters.Exists(filter => filter.IsCollectAsset(data))
+                   ) return false;
+            }
 
             return true;
         }
 
+        /// <summary>
+        /// 获取所有标签
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetTags()
+        {
+            if (Type != EAssetCollectItemType.MainAssetCollector) return Array.Empty<string>();
+            if (string.IsNullOrEmpty(Tags)) return Array.Empty<string>();
+            if (!AHelper.IO.Exists(CollectPath)) return Array.Empty<string>();
+            return Tags.Split(';', ' ', ',');
+        }
+
+        /// <summary>
+        /// 获取资源可寻地址
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
         public string GetAddress(string assetPath)
         {
             UpdateCollect();
@@ -225,6 +264,7 @@ namespace AIO.UEditor
             }
 
             data.AssetPath = assetPath.Substring(0, assetPath.Length - data.Extension.Length - 1);
+            data.AssetPath = data.AssetPath;
             return IsCollectAsset(data) ? GetAssetAddress(data, ASConfig.GetOrCreate().LoadPathToLower) : string.Empty;
         }
 
@@ -274,18 +314,19 @@ namespace AIO.UEditor
 
         public void UpdateFilter()
         {
-            RuleFilters.Clear();
             if (RuleUseFilterCustom)
             {
                 if (!string.IsNullOrEmpty(RuleFilter))
-                    RuleCustomFilter = RuleFilter.Split(';');
+                    RuleCustomFilter = RuleFilter.Split(';', ' ', ',');
             }
             else if (RuleFilterIndex < 0)
             {
+                RuleFilters.Clear();
                 RuleFilters.AddRange(AssetCollectSetting.MapFilter.Values);
             }
             else if (RuleFilterIndex > 0)
             {
+                RuleFilters.Clear();
                 var status = 1;
                 foreach (var item in AssetCollectSetting.MapFilter.Values)
                 {
@@ -295,20 +336,24 @@ namespace AIO.UEditor
             }
         }
 
+        /// <summary>
+        /// 更新收集规则
+        /// </summary>
         public void UpdateCollect()
         {
-            RuleCollects.Clear();
             if (RuleUseCollectCustom)
             {
                 if (!string.IsNullOrEmpty(RuleCollect))
-                    RuleCustomCollect = RuleCollect.Split(';');
+                    RuleCustomCollect = RuleCollect.Split(';', ' ', ',');
             }
-            else if (RuleCollectIndex < 0)
+            else if (RuleCollectIndex < 0) // 判断是否为全部收集
             {
+                RuleCollects.Clear();
                 RuleCollects.AddRange(AssetCollectSetting.MapCollect.Values);
             }
-            else if (RuleCollectIndex > 0)
+            else if (RuleCollectIndex > 0) // 判断是否为选择收集
             {
+                RuleCollects.Clear();
                 var status = 1;
                 foreach (var item in AssetCollectSetting.MapCollect.Values)
                 {
@@ -318,20 +363,19 @@ namespace AIO.UEditor
             }
         }
 
-        public string PackageName { get; private set; }
-
-        public string GroupName { get; private set; }
-
+        /// <summary>
+        /// 是否允许多线程收集
+        /// </summary>
         private bool IsAllowThread()
         {
-            if (!AssetCollectSetting.MapAddress.GetValue(Address).AllowThread)
-            {
-                return false;
-            }
-
-            return true;
+            return AssetCollectSetting.MapAddress.GetValue(Address).AllowThread;
         }
 
+        /// <summary>
+        /// 收集资源
+        /// </summary>
+        /// <param name="tags">标签列表</param>
+        /// <param name="pathToLower">路径是否小写</param>
         private void CollectAsset(string[] tags, bool pathToLower)
         {
             UpdateCollect();
@@ -356,20 +400,19 @@ namespace AIO.UEditor
             {
                 foreach (var file in EHelper.IO.GetFilesRelativeAssetNoMeta(CollectPath, SearchOption.AllDirectories))
                 {
-                    var fixedPath = file.Replace("\\", "/");
-                    var temp = System.IO.Path.GetFileName(fixedPath);
+                    var temp = System.IO.Path.GetFileName(file);
                     var index = temp.LastIndexOf('.');
                     if (index >= 0)
                     {
                         data.Extension = temp.Substring(index).Replace(".", "").ToLower();
                     }
 
-                    data.AssetPath = fixedPath.Substring(0, fixedPath.Length - data.Extension.Length - 1);
+                    data.AssetPath = file.Substring(0, file.Length - data.Extension.Length - 1);
                     if (!IsCollectAsset(data)) continue;
                     info.Address = GetAssetAddress(data, pathToLower);
-                    info.AssetPath = fixedPath;
+                    info.AssetPath = file;
                     info.Extension = data.Extension;
-                    AssetDataInfos[fixedPath] = info;
+                    AssetDataInfos[file] = info;
                 }
             }
             else
@@ -378,7 +421,7 @@ namespace AIO.UEditor
                 data.AssetPath = data.CollectPath.Substring(0, data.CollectPath.Length - data.Extension.Length - 1);
                 if (!IsCollectAsset(data)) return;
                 info.Address = GetAssetAddress(data, pathToLower);
-                info.AssetPath = data.CollectPath.Replace("\\", "/");
+                info.AssetPath = data.CollectPath;
                 info.Extension = data.Extension;
                 AssetDataInfos[data.CollectPath] = info;
             }
@@ -393,15 +436,14 @@ namespace AIO.UEditor
             PackageName = package;
             GroupName = group;
             if (!AHelper.IO.Exists(FullPath)) return;
+            if (Type != EAssetCollectItemType.MainAssetCollector) return;
             if (CollectPath.Contains("/Resources/") || CollectPath.EndsWith("Resources"))
             {
                 Debug.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
                 return;
             }
 
-
-            if (Type != EAssetCollectItemType.MainAssetCollector) return;
-            var tags = AssetCollectRoot.GetOrCreate(false).GetTags(PackageName, GroupName, CollectPath);
+            var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
             var pathToLower = ASConfig.GetOrCreate().LoadPathToLower;
 
             if (IsAllowThread())
@@ -416,13 +458,15 @@ namespace AIO.UEditor
             cb?.Invoke(AssetDataInfos);
         }
 
-        private void UpdateData()
+        public void UpdateData()
         {
-            if (_Path is null) Folded = false;
+            if (_Path is null)
+            {
+                Folded = false;
+            }
             else
             {
-                var temp = AssetDatabase.GetAssetPath(_Path);
-                if (string.IsNullOrEmpty(temp)) return;
+                var temp = AssetDatabase.GetAssetPath(_Path).Replace("\\", "/");
                 if (!AHelper.IO.Exists(temp)) return;
                 CollectPath = temp;
                 GUID = AssetDatabase.AssetPathToGUID(CollectPath);
@@ -436,6 +480,10 @@ namespace AIO.UEditor
             RuleFilters?.Clear();
             RuleCollects?.Clear();
             UpdateData();
+            if (_Path is null)
+            {
+                Debug.LogWarningFormat("收集器路径为空 !!! -> {0}", CollectPath);
+            }
         }
 
         public bool Equals(AssetCollectItem x, AssetCollectItem y)
