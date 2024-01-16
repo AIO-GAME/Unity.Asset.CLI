@@ -122,11 +122,6 @@ namespace AIO.UEditor
 
     public partial class ASBuildConfig
     {
-        /// <summary>
-        /// FTP上传配置
-        /// </summary>
-        public FTPConfig[] FTPConfigs;
-
         public void AddOrNewFTP()
         {
             var temp = new FTPConfig

@@ -273,7 +273,6 @@ namespace AIO.UEngine
             if (instance is null)
             {
                 instance = CreateInstance<ASConfig>();
-                instance.URL = url;
                 instance.AppendTimeTicks = appendTimeTicks;
                 instance.AutoSaveVersion = autoSaveVersion;
                 instance.ASMode = EASMode.Remote;
@@ -282,6 +281,7 @@ namespace AIO.UEngine
                 instance.EnableSequenceRecord = autoSequenceRecord;
             }
 
+            instance.URL = url;
             return instance;
         }
 
@@ -329,11 +329,7 @@ namespace AIO.UEngine
         public void Save()
         {
             if (Equals(null)) return;
-#if UNITY_2021_1_OR_NEWER
-            AssetDatabase.SaveAssetIfDirty(this);
-#else
             EditorUtility.SetDirty(this);
-#endif
         }
 #endif
     }

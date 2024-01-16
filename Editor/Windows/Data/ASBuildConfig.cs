@@ -79,6 +79,17 @@ namespace AIO.UEditor
         /// </summary>
         [InspectorName("将资源包合并对比至Latest")] public bool MergeToLatest;
 
+        /// <summary>
+        /// FTP上传配置
+        /// </summary>
+        [InspectorName("FTP上传配置")] public FTPConfig[] FTPConfigs;
+
+        /// <summary>
+        /// GC上传配置
+        /// </summary>
+        [SerializeField] [InspectorName("GC上传配置")]
+        public GCloudConfig[] GCloudConfigs;
+
         private static ASBuildConfig _instance;
 
         /// <summary>
@@ -123,11 +134,8 @@ namespace AIO.UEditor
                 Debug.LogWarning("ASBuildConfig is null so not save");
                 return;
             }
-#if UNITY_2021_1_OR_NEWER
-            AssetDatabase.SaveAssetIfDirty(this);
-#else
+
             EditorUtility.SetDirty(this);
-#endif
         }
     }
 }

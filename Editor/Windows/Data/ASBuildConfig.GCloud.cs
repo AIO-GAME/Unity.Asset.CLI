@@ -84,9 +84,10 @@ namespace AIO.UEditor
                 if (string.IsNullOrEmpty(version))
                     throw new ArgumentNullException($"{version} is null or empty");
 
-                return string.IsNullOrEmpty(RemotePath)
-                    ? Path.Combine(BuildTarget.ToString(), PackageName, version)
-                    : Path.Combine(RemotePath, BuildTarget.ToString(), PackageName, version);
+                return (string.IsNullOrEmpty(RemotePath)
+                        ? Path.Combine(BuildTarget.ToString(), PackageName, version)
+                        : Path.Combine(RemotePath, BuildTarget.ToString(), PackageName, version)
+                    ).Replace("\\", "/");
             }
         }
 
@@ -112,7 +113,7 @@ namespace AIO.UEditor
 
                 var path = Path.Combine(LocalFullPath, BuildTarget.ToString(), PackageName, version);
                 if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} is not found");
-                return path;
+                return path.Replace("\\", "/");
             }
         }
     }
@@ -123,11 +124,6 @@ namespace AIO.UEditor
     /// </summary>
     public partial class ASBuildConfig
     {
-        /// <summary>
-        /// FTP上传配置
-        /// </summary>
-        public GCloudConfig[] GCloudConfigs;
-
         public void AddOrNewGCloud()
         {
             var temp = new GCloudConfig
@@ -142,127 +138,127 @@ namespace AIO.UEditor
                 ? new[] { temp }
                 : GCloudConfigs.Add(temp);
         }
+    }
 
-        [Serializable]
-        public class GCloudConfig
+    [Serializable]
+    public class GCloudConfig
+    {
+        /// <summary>
+        /// Gcloud 路径
+        /// </summary>
+        public string GCLOUD_PATH = "gcloud";
+
+        /// <summary>
+        /// Gsutil 路径
+        /// </summary>
+        public string GSUTIL_PATH = "gsutil";
+
+        /// <summary>
+        /// 是否显示
+        /// </summary>
+        public bool Folded;
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name;
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Description;
+
+        /// <summary>
+        /// 桶名称
+        /// </summary>
+        public string BUCKET_NAME;
+
+        /// <summary>
+        /// 元数据
+        /// </summary>
+        public string MetaData;
+
+        /// <summary>
+        /// 上传状态 : true 正在上传
+        /// </summary>
+        [NonSerialized] public bool isUploading;
+
+        /// <summary>
+        /// 目录
+        /// </summary>
+        public DirTreeFiled DirTreeFiled = new DirTreeFiled
         {
-            /// <summary>
-            /// Gcloud 路径
-            /// </summary>
-            public string GCLOUD_PATH = "gcloud";
+            OptionShowDepth = false,
+            OptionDirDepth = 3,
+            OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$",
+        };
 
-            /// <summary>
-            /// Gsutil 路径
-            /// </summary>
-            public string GSUTIL_PATH = "gsutil";
+        /// <summary>
+        /// 上传首包配置
+        /// </summary>
+        public async Task UploadFirstPack(string location)
+        {
+            PrGCloud.Gcloud = GCLOUD_PATH;
+            PrGCloud.Gsutil = GSUTIL_PATH;
+            var result = await PrGCloud.UploadFileAsync(
+                AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(BUCKET_NAME),
+                location,
+                MetaData);
+            EditorUtility.DisplayDialog("提示", result
+                ? "上传成功 "
+                : "上传失败", "确定");
+        }
 
-            /// <summary>
-            /// 是否显示
-            /// </summary>
-            public bool Folded;
+        public override string ToString()
+        {
+            return string.IsNullOrEmpty(Name) ? BUCKET_NAME : Name;
+        }
 
-            /// <summary>
-            /// 名称
-            /// </summary>
-            public string Name;
-
-            /// <summary>
-            /// 描述
-            /// </summary>
-            public string Description;
-
-            /// <summary>
-            /// 桶名称
-            /// </summary>
-            public string BUCKET_NAME;
-
-            /// <summary>
-            /// 元数据
-            /// </summary>
-            public string MetaData;
-
-            /// <summary>
-            /// 上传状态 : true 正在上传
-            /// </summary>
-            [NonSerialized] public bool isUploading;
-
-            /// <summary>
-            /// 目录
-            /// </summary>
-            public DirTreeFiled DirTreeFiled = new DirTreeFiled
+        public async Task Upload()
+        {
+            if (string.IsNullOrEmpty(BUCKET_NAME))
             {
-                OptionShowDepth = false,
-                OptionDirDepth = 3,
-                OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$",
-            };
-
-            /// <summary>
-            /// 上传首包配置
-            /// </summary>
-            public async Task UploadFirstPack(string location)
-            {
-                PrGCloud.Gcloud = GCLOUD_PATH;
-                PrGCloud.Gsutil = GSUTIL_PATH;
-                var result = await PrGCloud.UploadFileAsync(
-                    AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(BUCKET_NAME),
-                    location,
-                    MetaData);
-                EditorUtility.DisplayDialog("提示", result
-                    ? "上传成功 "
-                    : "上传失败", "确定");
+                EditorUtility.DisplayDialog("Upload Google Cloud", "FTP 服务器地址不能为空", "OK");
+                return;
             }
 
-            public override string ToString()
+            var one = DirTreeFiled[0];
+            if (string.IsNullOrEmpty(one))
             {
-                return string.IsNullOrEmpty(Name) ? BUCKET_NAME : Name;
+                EditorUtility.DisplayDialog("提示", "上传目录 平台 不能为空", "确定");
+                return;
             }
 
-            public async Task Upload()
+            var two = DirTreeFiled[1];
+            if (string.IsNullOrEmpty(two))
             {
-                if (string.IsNullOrEmpty(BUCKET_NAME))
-                {
-                    EditorUtility.DisplayDialog("Upload Google Cloud", "FTP 服务器地址不能为空", "OK");
-                    return;
-                }
-
-                var one = DirTreeFiled[0];
-                if (string.IsNullOrEmpty(one))
-                {
-                    EditorUtility.DisplayDialog("提示", "上传目录 平台 不能为空", "确定");
-                    return;
-                }
-
-                var two = DirTreeFiled[1];
-                if (string.IsNullOrEmpty(two))
-                {
-                    EditorUtility.DisplayDialog("提示", "上传目录 包名 不能为空", "确定");
-                    return;
-                }
-
-                var three = DirTreeFiled[2];
-                if (string.IsNullOrEmpty(three))
-                {
-                    EditorUtility.DisplayDialog("提示", "上传目录 版本 不能为空", "确定");
-                    return;
-                }
-
-                if (!DirTreeFiled.IsValidity())
-                {
-                    EditorUtility.DisplayDialog("Upload Google Cloud", "FTP 上传目标路径无效", "OK");
-                    return;
-                }
-
-                isUploading = true;
-                var config = new ASUploadGCloudConfig();
-                config.RemotePath = BUCKET_NAME;
-                config.PackageName = two;
-                config.Version = three;
-                config.BuildTarget = (BuildTarget)Enum.Parse(typeof(BuildTarget), one, false);
-                config.MetaData = MetaData;
-                config.LocalFullPath = DirTreeFiled.DirPath;
-                await AssetProxyEditor.UploadGCloud(config);
-                isUploading = false;
+                EditorUtility.DisplayDialog("提示", "上传目录 包名 不能为空", "确定");
+                return;
             }
+
+            var three = DirTreeFiled[2];
+            if (string.IsNullOrEmpty(three))
+            {
+                EditorUtility.DisplayDialog("提示", "上传目录 版本 不能为空", "确定");
+                return;
+            }
+
+            if (!DirTreeFiled.IsValidity())
+            {
+                EditorUtility.DisplayDialog("Upload Google Cloud", "FTP 上传目标路径无效", "OK");
+                return;
+            }
+
+            isUploading = true;
+            var config = new ASUploadGCloudConfig();
+            config.RemotePath = BUCKET_NAME;
+            config.PackageName = two;
+            config.Version = three;
+            config.BuildTarget = (BuildTarget)Enum.Parse(typeof(BuildTarget), one, false);
+            config.MetaData = MetaData;
+            config.LocalFullPath = DirTreeFiled.DirPath.Replace("\\", "/");
+            await AssetProxyEditor.UploadGCloud(config);
+            isUploading = false;
         }
     }
 }

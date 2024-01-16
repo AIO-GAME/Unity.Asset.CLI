@@ -30,6 +30,11 @@ namespace AIO.UEditor
             {
                 GUI.FocusControl(null);
                 Config.Save();
+#if UNITY_2021_1_OR_NEWER
+                AssetDatabase.SaveAssetIfDirty(Config);
+#else
+                AssetDatabase.SaveAssets();
+#endif
                 if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
                 {
                     AssetDatabase.Refresh();

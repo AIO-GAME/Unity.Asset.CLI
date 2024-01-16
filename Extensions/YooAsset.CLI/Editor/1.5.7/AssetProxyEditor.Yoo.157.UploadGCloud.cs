@@ -26,7 +26,7 @@ namespace AIO.UEditor.CLI
             else EditorUtility.DisplayProgressBar("上传进度", $"开始上传资源 {config.RemoteRelative}", 0.1f);
 
             var localFull = config.RootPath;
-            var remoteManifest = Path.Combine(config.RemoteRelative, "Manifest.json");
+            var remoteManifest = string.Concat(config.RemoteRelative, '/', "Manifest.json");
             var succeed = true;
 
             // 在判断目标文件夹是否有清单文件 如果有则对比清单文件的MD5值 如果一致则不上传
@@ -36,7 +36,7 @@ namespace AIO.UEditor.CLI
                 else EditorUtility.DisplayProgressBar("上传进度", $"开始进行清单对比 : {remoteManifest}", 0.2f);
 
                 var remoteMD5 = await PrGCloud.GetMD5Async(remoteManifest);
-                var manifestPath = Path.Combine(localFull, "Manifest.json");
+                var manifestPath = string.Concat(localFull, '/', "Manifest.json");
                 var localMD5 = await AHelper.IO.GetFileMD5Async(manifestPath);
 
                 // 如果不一致 则拉取清单文件中的文件进行对比 记录需要上传的文件
@@ -62,11 +62,10 @@ namespace AIO.UEditor.CLI
                 foreach (var pair in tuple.Item1) // 添加
                 {
                     remote[pair.Key] = pair.Value;
-                    var source = Path.Combine(localFull, pair.Key);
+                    var source = string.Concat(localFull, '/', pair.Key);
                     if (File.Exists(source))
                     {
-                        var target = Path.Combine(config.RemoteRelative, pair.Key);
-
+                        var target = string.Concat(config.RemoteRelative, '/', pair.Key);
                         if (EHelper.IsCMD()) Console.WriteLine($"新增任务 新增远端文件 : {target}");
                         else EditorUtility.DisplayProgressBar("新增任务", $"新增远端文件 : {target}", 0.4f);
                         await PrGCloud.UploadFileAsync(target, source, config.MetaData);
@@ -87,7 +86,7 @@ namespace AIO.UEditor.CLI
                 foreach (var pair in tuple.Item2) // 删除
                 {
                     remote.Remove(pair.Key);
-                    var target = Path.Combine(config.RemoteRelative, pair.Key);
+                    var target = string.Concat(config.RemoteRelative, '/', pair.Key);
                     if (!await PrGCloud.ExistsAsync(target)) continue;
                     if (EHelper.IsCMD()) Console.WriteLine($"新增任务 删除文件 : {target}");
                     else EditorUtility.DisplayProgressBar("新增任务", $"删除远端文件 : {target}", 0.6f);
@@ -97,10 +96,10 @@ namespace AIO.UEditor.CLI
                 foreach (var pair in tuple.Item3) // 修改
                 {
                     remote[pair.Key] = pair.Value;
-                    var source = Path.Combine(localFull, pair.Key);
+                    var source = string.Concat(localFull, '/', pair.Key);
                     if (File.Exists(source))
                     {
-                        var target = Path.Combine(config.RemoteRelative, pair.Key);
+                        var target = string.Concat(config.RemoteRelative, '/', pair.Key);
                         if (EHelper.IsCMD()) Console.WriteLine($"新增任务 修改文件 : {target}");
                         else EditorUtility.DisplayProgressBar("新增任务", $"修改远端文件 : {target}", 0.8f);
                         await PrGCloud.UploadFileAsync(target, source, config.MetaData);
@@ -138,8 +137,7 @@ namespace AIO.UEditor.CLI
             }
 
             string VersionContent;
-            var Version_Path =
-                string.Concat(config.RemotePath, '/', "Version/", config.BuildTarget.ToString(), ".json");
+            var Version_Path = string.Concat(config.RemotePath, "/Version/", config.BuildTarget.ToString(), ".json");
 
             if (EHelper.IsCMD()) Console.WriteLine($"[GCloud] 更新远端平台版本 : : {Version_Path}");
             else EditorUtility.DisplayProgressBar("上传进度", $"[GCloud] 更新远端平台版本 : : {Version_Path}", 0.95f);

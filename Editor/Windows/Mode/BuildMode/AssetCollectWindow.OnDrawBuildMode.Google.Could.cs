@@ -12,7 +12,7 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        private string GetGCItemDes(ASBuildConfig.GCloudConfig config, int i)
+        private string GetGCItemDes(GCloudConfig config, int i)
         {
             _builder.Clear();
             if (!config.Folded && config.isUploading) _builder.Append($"[上传中 ... ]");
@@ -111,7 +111,7 @@ namespace AIO.UEditor
             }
         }
 
-        private void OnDrawBuildGC(ASBuildConfig.GCloudConfig config)
+        private void OnDrawBuildGC(GCloudConfig config)
         {
             if (!config.Folded) return;
             if (config.isUploading) GUI.enabled = false;

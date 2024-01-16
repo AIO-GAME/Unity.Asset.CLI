@@ -217,11 +217,7 @@ namespace AIO.UEditor
             }
 
             for (var index = Packages.Length - 1; index >= 0; index--) Packages[index].Save();
-#if UNITY_2021_1_OR_NEWER
-            AssetDatabase.SaveAssetIfDirty(this);
-#else
             EditorUtility.SetDirty(this);
-#endif
         }
 
         private void OnDisable()
