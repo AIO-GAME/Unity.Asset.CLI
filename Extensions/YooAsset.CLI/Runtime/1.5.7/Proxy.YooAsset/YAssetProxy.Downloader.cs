@@ -34,38 +34,44 @@ namespace AIO.UEngine
             /// </summary>
             private long TempDownloadBytes;
 
-            private string TempDownloadName;
-
             #region Event
 
-            /// <summary>
-            /// 网络不可用
-            /// </summary>
-            private Action<IProgressReport> OnNetReachableNot { get; }
+            Action IProgressEvent.OnBegin
+            {
+                get => Event.OnBegin;
+                set => Event.OnBegin = value;
+            }
 
-            /// <summary>
-            /// 移动网络 是否允许在移动网络条件下下载
-            /// </summary>
-            private Action<IProgressReport, Action> OnNetReachableCarrier { get; }
+            Action IProgressEvent.OnResume
+            {
+                get => Event.OnResume;
+                set => Event.OnResume = value;
+            }
 
-            /// <summary>
-            /// 磁盘空间不足
-            /// </summary>
-            private Action<IProgressReport> OnDiskSpaceNotEnough { get; }
+            Action IProgressEvent.OnPause
+            {
+                get => Event.OnPause;
+                set => Event.OnPause = value;
+            }
 
-            /// <summary>
-            /// 无写入权限
-            /// </summary>
-            private Action<IProgressReport> OnWritePermissionNot { get; }
+            Action IProgressEvent.OnCancel
+            {
+                get => Event.OnCancel;
+                set => Event.OnCancel = value;
+            }
 
-            /// <summary>
-            /// 无读取权限
-            /// </summary>
-            private Action<IProgressReport> OnReadPermissionNot { get; }
+            public Action<IProgressInfo> OnProgress { get; set; }
+            public Action<IProgressReport> OnComplete { get; set; }
+            public Action<Exception> OnError { get; set; }
+            public Action<IProgressReport> OnNetReachableNot { get; set; }
+            public Action<IProgressReport, Action> OnNetReachableCarrier { get; set; }
+            public Action<IProgressReport> OnDiskSpaceNotEnough { get; set; }
+            public Action<IProgressReport> OnWritePermissionNot { get; set; }
+            public Action<IProgressReport> OnReadPermissionNot { get; set; }
 
             #endregion
 
-            public YASDownloader(IDictionary<string, YAssetPackage> packages, DownlandAssetEvent iEvent)
+            public YASDownloader(IDictionary<string, YAssetPackage> packages, IDownlandAssetEvent iEvent)
             {
                 Packages = packages;
 
@@ -75,6 +81,9 @@ namespace AIO.UEngine
                 ResourceDownloaderOperations = new Dictionary<string, ResourceDownloaderOperation>();
 
                 Event = iEvent;
+                OnProgress = iEvent.OnProgress;
+                OnComplete = iEvent.OnComplete;
+                OnError = iEvent.OnError;
                 OnNetReachableNot = iEvent.OnNetReachableNot;
                 OnNetReachableCarrier = iEvent.OnNetReachableCarrier;
                 OnDiskSpaceNotEnough = iEvent.OnDiskSpaceNotEnough;
@@ -83,7 +92,7 @@ namespace AIO.UEngine
             }
 
             private bool AllowReachableCarrier;
-            
+
             public bool Flow => Packages?.Count > 0;
 
             protected override void OnDispose()
@@ -279,7 +288,6 @@ namespace AIO.UEngine
             {
                 foreach (var pair in ResourceDownloaderOperations)
                 {
-                    TempDownloadName = pair.Key;
                     CurrentInfo = $"Resource Download -> [{pair.Key}]";
                     TempDownloadBytes = CurrentValue;
 
@@ -361,7 +369,7 @@ namespace AIO.UEngine
                         Pause();
                         return;
                     case NetworkReachability.ReachableViaCarrierDataNetwork:
-                        if (AllowReachableCarrier) return;
+                        if (AllowReachableCarrier) break;
                         Pause();
                         OnNetReachableCarrier?.Invoke(Report, () =>
                         {
@@ -396,8 +404,7 @@ namespace AIO.UEngine
 
                 foreach (var pair in ResourceDownloaderOperations)
                 {
-                    TempDownloadName = pair.Key;
-                    CurrentInfo = string.Format("Resource Download -> [{0}]", pair.Key);
+                    CurrentInfo = $"Resource Download -> [{pair.Key}]";
                     TempDownloadBytes = CurrentValue;
 
                     while (State != EProgressState.Running)

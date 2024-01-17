@@ -21,10 +21,14 @@ namespace AIO.UEngine.YooAsset
             /// </summary>
             public IProgressInfo Progress => _Progress;
 
+            public IDownlandAssetEvent Event { get; set; }
+            
+            public EProgressState State { get; private set; }
+
             /// <summary>
             /// 当前下载进度
             /// </summary>
-            private AProgress _Progress;
+            private AProgress _Progress { get; }
 
             /// <summary>
             /// 总下载大小
@@ -78,7 +82,7 @@ namespace AIO.UEngine.YooAsset
                 _Progress = new AProgress();
             }
 
-            private void Finish()
+            public void Finish()
             {
                 TotalDownloadCountList.Clear();
                 CurrentDownloaadeCountList.Clear();
@@ -93,6 +97,7 @@ namespace AIO.UEngine.YooAsset
             public void Pause()
             {
                 foreach (var operation in operations.Values) operation.PauseDownload();
+                State = EProgressState.Pause;
             }
 
             /// <summary>
@@ -101,16 +106,39 @@ namespace AIO.UEngine.YooAsset
             public void Resume()
             {
                 foreach (var operation in operations.Values) operation.ResumeDownload();
+                State = EProgressState.Running;
             }
 
             internal void RegisterEvent(AssetInfo info, DownloaderOperation operation)
             {
-                if (!AssetSystem.HasEvent_OnDownloading()) return; // 没有注册事件
                 var local = info.AssetPath;
                 if (operations.ContainsKey(local))
                 {
                     AssetSystem.LogError("当前资源正在下载中: {0}", local);
                     return;
+                }
+
+                CurrentDownloaadeCountList[local] = operation.CurrentDownloadCount; // 当前下载数量
+                TotalDownloadCountList[local] = operation.TotalDownloadCount; // 总下载数量
+                CurrentDownloadedBytesList[local] = operation.CurrentDownloadBytes; // 当前下载大小
+                TotalDownloadedBytesList[local] = operation.TotalDownloadBytes; // 总下载大小
+                Update();
+
+                operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
+                operation.OnDownloadOverCallback += OnDownloadOver;
+                operations.Add(local, operation);
+                State = EProgressState.Running;
+                return;
+
+                void OnDownloadOver(bool isSucceed)
+                {
+                    CurrentDownloaadeCountList.Remove(local);
+                    TotalDownloadCountList.Remove(local);
+                    CurrentDownloadedBytesList.Remove(local);
+                    TotalDownloadedBytesList.Remove(local);
+                    operations.Remove(local);
+                    Update();
+                    State = operations.Count > 0 ? EProgressState.Running : EProgressState.Finish;
                 }
 
                 void OnDownloadProgressCallback(
@@ -126,46 +154,22 @@ namespace AIO.UEngine.YooAsset
 
                     _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
                     _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
-                    AssetSystem.InvokeDownloading(_Progress);
+                    AssetSystem.MainDownloadHandle.Event.OnProgress?.Invoke(_Progress);
                 }
-
-                void OnDownloadOver(bool isSucceed)
-                {
-                    CurrentDownloaadeCountList.Remove(local);
-                    TotalDownloadCountList.Remove(local);
-                    CurrentDownloadedBytesList.Remove(local);
-                    TotalDownloadedBytesList.Remove(local);
-                    operations.Remove(local);
-                    Update();
-                }
-
-                CurrentDownloaadeCountList[local] = operation.CurrentDownloadCount; // 当前下载数量
-                TotalDownloadCountList[local] = operation.TotalDownloadCount; // 总下载数量
-                CurrentDownloadedBytesList[local] = operation.CurrentDownloadBytes; // 当前下载大小
-                TotalDownloadedBytesList[local] = operation.TotalDownloadBytes; // 总下载大小
-                Update();
-
-                operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
-                operation.OnDownloadOverCallback += OnDownloadOver;
-                operations.Add(local, operation);
             }
 
             private void Update()
             {
                 _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
                 _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
-                AssetSystem.InvokeDownloading(_Progress);
+                AssetSystem.MainDownloadHandle.Event.OnProgress?.Invoke(_Progress);
             }
         }
-
-        /// <summary>
-        /// 资源加载器 - 加载资源
-        /// </summary>
-        private static readonly LoadingInfo LoadHandle = new LoadingInfo();
 
         internal static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
         {
             var operation = package.CreateBundleDownloader(location);
+#if UNITY_EDITOR
             if (AssetSystem.Parameter.EnableSequenceRecord)
             {
                 AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
@@ -178,8 +182,9 @@ namespace AIO.UEngine.YooAsset
                     AssetPath = location.AssetPath,
                 });
             }
+#endif
 
-            LoadHandle.RegisterEvent(location, operation);
+            if (AssetSystem.MainDownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, operation);
             return operation;
         }
 

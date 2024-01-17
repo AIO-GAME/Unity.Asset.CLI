@@ -14,8 +14,6 @@ namespace AIO
 {
     public partial class AssetSystem
     {
-        private static IASDownloader Downloader;
-
         /// <summary>
         /// 获取下载器
         /// </summary>

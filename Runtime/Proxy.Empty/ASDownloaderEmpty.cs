@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System;
 using System.Collections;
 using System.Linq;
 
@@ -43,5 +44,18 @@ namespace AIO
             Event.OnComplete?.Invoke(Report);
             yield break;
         }
+
+        public Action<IProgressInfo> OnProgress { get; set; }
+        public Action<IProgressReport> OnComplete { get; set; }
+        public Action OnBegin { get; set; }
+        public Action<Exception> OnError { get; set; }
+        public Action OnResume { get; set; }
+        public Action OnPause { get; set; }
+        public Action OnCancel { get; set; }
+        public Action<IProgressReport> OnNetReachableNot { get; set; }
+        public Action<IProgressReport, Action> OnNetReachableCarrier { get; set; }
+        public Action<IProgressReport> OnDiskSpaceNotEnough { get; set; }
+        public Action<IProgressReport> OnWritePermissionNot { get; set; }
+        public Action<IProgressReport> OnReadPermissionNot { get; set; }
     }
 }

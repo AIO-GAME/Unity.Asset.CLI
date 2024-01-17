@@ -122,6 +122,8 @@ namespace AIO
             SequenceRecords = new SequenceRecordQueue(Parameter.EnableSequenceRecord);
             yield return SequenceRecords.LoadCo();
             IsInitialized = true;
+            
+            MainDownloadHandle = Proxy.GetLoadingHandle();
         }
 
         /// <summary>

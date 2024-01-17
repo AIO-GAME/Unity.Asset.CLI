@@ -163,13 +163,14 @@ namespace AIO.UEditor
             OnOpenEvent();
         }
 
-        protected override void OnDisable()
-        {
-            if (Data != null) Data.Save();
-            if (Config != null) Config.Save();
-            if (BuildConfig != null) BuildConfig.Save();
-            AssetDatabase.SaveAssets();
-        }
+        // 关闭自动更新
+        // protected override void OnDisable()
+        // {
+        //     if (Data != null) Data.Save();
+        //     if (Config != null) Config.Save();
+        //     if (BuildConfig != null) BuildConfig.Save();
+        //     AssetDatabase.SaveAssets();
+        // }
 
         public override void EventMouseDown(in Event eventData)
         {
