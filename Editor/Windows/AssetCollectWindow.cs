@@ -123,7 +123,6 @@ namespace AIO.UEditor
             Config = ASConfig.GetOrCreate();
             BuildConfig = ASBuildConfig.GetOrCreate();
 
-
             GCInit();
 
             UpdateData();

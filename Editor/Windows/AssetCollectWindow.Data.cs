@@ -454,8 +454,6 @@ namespace AIO.UEditor
         /// </summary>
         private ViewRect ViewCollectorsList;
 
-        private AssetSystem.SequenceRecordQueue SequenceRecords;
-
         private int LookModeCollectorsPageIndex;
 
         /// <summary>

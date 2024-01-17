@@ -119,8 +119,6 @@ namespace AIO
             else Parameter.UpdatePackage();
 
             yield return Proxy.Initialize();
-            SequenceRecords = new SequenceRecordQueue(Parameter.EnableSequenceRecord);
-            yield return SequenceRecords.LoadCo();
             IsInitialized = true;
             
             MainDownloadHandle = Proxy.GetLoadingHandle();
@@ -156,7 +154,6 @@ namespace AIO
         public static void Destroy()
         {
             Proxy.Dispose();
-            SequenceRecords.Dispose();
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace AIO.UEditor
             if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 GUI.FocusControl(null);
-                Selection.activeObject = ASConfig.GetOrCreate();
+                Selection.activeObject = Config;
             }
 
             if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))

@@ -60,9 +60,24 @@ namespace AIO.UEngine
                 set => Event.OnCancel = value;
             }
 
-            public Action<IProgressInfo> OnProgress { get; set; }
-            public Action<IProgressReport> OnComplete { get; set; }
-            public Action<Exception> OnError { get; set; }
+            public Action<IProgressInfo> OnProgress
+            {
+                get => Event.OnProgress;
+                set => Event.OnProgress = value;
+            }
+
+            public Action<IProgressReport> OnComplete
+            {
+                get => Event.OnComplete;
+                set => Event.OnComplete = value;
+            }
+
+            public Action<Exception> OnError
+            {
+                get => Event.OnError;
+                set => Event.OnError = value;
+            }
+
             public Action<IProgressReport> OnNetReachableNot { get; set; }
             public Action<IProgressReport, Action> OnNetReachableCarrier { get; set; }
             public Action<IProgressReport> OnDiskSpaceNotEnough { get; set; }
@@ -81,9 +96,6 @@ namespace AIO.UEngine
                 ResourceDownloaderOperations = new Dictionary<string, ResourceDownloaderOperation>();
 
                 Event = iEvent;
-                OnProgress = iEvent.OnProgress;
-                OnComplete = iEvent.OnComplete;
-                OnError = iEvent.OnError;
                 OnNetReachableNot = iEvent.OnNetReachableNot;
                 OnNetReachableCarrier = iEvent.OnNetReachableCarrier;
                 OnDiskSpaceNotEnough = iEvent.OnDiskSpaceNotEnough;
@@ -91,6 +103,9 @@ namespace AIO.UEngine
                 OnReadPermissionNot = iEvent.OnReadPermissionNot;
             }
 
+            /// <summary>
+            /// 是否允许使用流量下载
+            /// </summary>
             private bool AllowReachableCarrier;
 
             public bool Flow => Packages?.Count > 0;
@@ -128,12 +143,14 @@ namespace AIO.UEngine
 
             protected override void OnBegin()
             {
-                OpenRecord = false;
                 Tags.Clear();
                 PreDownloadContentOperations.Clear();
                 ResourceDownloaderOperations.Clear();
             }
 
+            /// <summary>
+            /// 更新资源包头信息
+            /// </summary>
             public IEnumerator UpdateHeader()
             {
                 if (!Flow) yield break;
@@ -221,41 +238,7 @@ namespace AIO.UEngine
 
             #region Download
 
-            private static Dictionary<string, List<AssetInfo>> ToYoo(AssetSystem.SequenceRecordQueue Records)
-            {
-                var list = new Dictionary<string, List<AssetInfo>>();
-                if (Records is null) return list;
-                foreach (var record in Records)
-                {
-                    var info = YooAssets.GetPackage(record.PackageName).GetAssetInfo(record.Location);
-                    if (info is null) continue;
-                    if (!YooAssets.GetPackage(record.PackageName).IsNeedDownloadFromRemote(info)) continue;
-                    if (!list.ContainsKey(record.PackageName)) list.Add(record.PackageName, new List<AssetInfo>());
-                    if (list[record.PackageName].Contains(info)) continue;
-                    list[record.PackageName].Add(info);
-                }
-
-                return list;
-            }
-
-            public void CollectNeedRecord()
-            {
-                if (AssetSystem.SequenceRecords is null || AssetSystem.SequenceRecords.Count == 0) return;
-                OpenRecord = true;
-                foreach (var pair in ToYoo(AssetSystem.SequenceRecords))
-                {
-                    var operation = YAssetSystem.CreateBundleDownloader(pair.Key, pair.Value.ToArray());
-                    if (operation is null) continue;
-                    if (operation.TotalDownloadCount <= 0) continue;
-
-                    TotalValue += operation.TotalDownloadBytes - operation.CurrentDownloadBytes;
-                    StartValue += operation.CurrentDownloadBytes;
-                    ResourceDownloaderOperations[string.Concat("Record-", pair.Key)] = operation;
-                }
-            }
-
             private Dictionary<string, byte> Tags = new Dictionary<string, byte>();
-            private bool OpenRecord;
             private bool OpenDownloadAll;
 
             /// <summary>
@@ -331,9 +314,6 @@ namespace AIO.UEngine
                 {
                     if (Tags.Count > 0)
                         AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
-
-                    if (OpenRecord)
-                        AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(record => record.Location));
                 }
             }
 
@@ -447,9 +427,6 @@ namespace AIO.UEngine
                 {
                     if (Tags.Count > 0)
                         AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
-
-                    if (OpenRecord)
-                        AssetSystem.AddWhite(AssetSystem.SequenceRecords.Select(record => record.Location));
                 }
 
                 if (ErrorDict.Count > 0)

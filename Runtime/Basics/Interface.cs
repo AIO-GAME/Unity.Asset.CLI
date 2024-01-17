@@ -149,10 +149,5 @@ namespace AIO
         /// 收集需要下载的标签
         /// </summary>
         void CollectNeedTag(params string[] tags);
-
-        /// <summary>
-        /// 收集需要下载的序列
-        /// </summary>
-        void CollectNeedRecord();
     }
 }

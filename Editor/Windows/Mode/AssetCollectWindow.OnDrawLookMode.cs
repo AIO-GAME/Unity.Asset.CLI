@@ -445,6 +445,17 @@ namespace AIO.UEditor
                     }
                 }
 
+                if (Config.EnableSequenceRecord)
+                {
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
+                    {
+                        EditorGUILayout.LabelField("首包资源", GP_Width_100);
+                        EditorGUILayout.LabelField(Config.SequenceRecord.ContainsGUID(LookCurrentSelectAssetDataInfo.GUID)
+                            ? "是"
+                            : "否");
+                    }
+                }
+
                 if (Dependencies.Count > 0)
                 {
                     using (new EditorGUILayout.VerticalScope(GEStyle.ProjectBrowserHeaderBgMiddle))
@@ -458,8 +469,7 @@ namespace AIO.UEditor
                     {
                         using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                         {
-                            DependenciesSearchText =
-                                EditorGUILayout.TextField(DependenciesSearchText, GEStyle.SearchTextField);
+                            DependenciesSearchText = EditorGUILayout.TextField(DependenciesSearchText, GEStyle.SearchTextField);
                             if (!string.IsNullOrEmpty(DependenciesSearchText))
                             {
                                 if (GUILayout.Button("✘", GEStyle.toolbarbuttonLeft, GTOption.Width(21)))
@@ -687,24 +697,38 @@ namespace AIO.UEditor
                             () => { GUIUtility.systemCopyBuffer = data.Tags; });
                     }
 
-                    if (Config.EnableSequenceRecord && WindowMode != Mode.LookFirstPackage)
+                    if (Config.EnableSequenceRecord)
                     {
-                        onDrawLookDataItemMenu.AddItem(new GUIContent("添加 首包列表"), false, () =>
+                        if (WindowMode != Mode.LookFirstPackage)
                         {
-                            var queue = new AssetSystem.SequenceRecordQueue(true);
-                            queue.UpdateLocal();
-                            queue.Add(new AssetSystem.SequenceRecord
+                            if (!Config.SequenceRecord.ContainsGUID(data.GUID))
                             {
-                                AssetPath = data.AssetPath,
-                                Location = data.Address,
-                                PackageName = data.Package,
-                                Bytes = data.Size,
-                                Count = 1,
-                                Time = DateTime.MinValue
+                                onDrawLookDataItemMenu.AddItem(new GUIContent("添加 首包列表"), false, () =>
+                                {
+                                    Config.SequenceRecord.Add(new AssetSystem.SequenceRecord
+                                    {
+                                        GUID = data.GUID,
+                                        AssetPath = data.AssetPath,
+                                        Location = data.Address,
+                                        PackageName = data.Package,
+                                        Bytes = data.Size,
+                                        Count = 1,
+                                        Time = DateTime.MinValue
+                                    });
+                                    Config.SequenceRecord.Save();
+                                });
+                            }
+                        }
+                        else
+                        {
+                            onDrawLookDataItemMenu.AddItem(new GUIContent("移除 首包列表"), false, () =>
+                            {
+                                Config.SequenceRecord.UpdateLocal();
+                                Config.SequenceRecord.RemoveAssetPath(data.AssetPath);
+                                Config.SequenceRecord.Save();
+                                UpdatePageValuesFirstPackageMode();
                             });
-                            queue.Save();
-                            SequenceRecords = queue;
-                        });
+                        }
                     }
 
                     onDrawLookDataItemMenu.ShowAsContext();

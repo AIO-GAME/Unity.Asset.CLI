@@ -5,7 +5,6 @@
 |||✩ - - - - - |*/
 
 #if SUPPORT_YOOASSET
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AIO.UEngine.YooAsset;

@@ -49,7 +49,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden, Conditional("UNITY_EDITOR")]
         public static void AddSequenceRecord(SequenceRecord record)
         {
-            SequenceRecords.Add(record);
+            Parameter.SequenceRecord.Add(record);
             WhiteListLocal.Add(record.Location);
         }
 

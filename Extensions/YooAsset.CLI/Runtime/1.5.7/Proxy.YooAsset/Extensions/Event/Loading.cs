@@ -8,6 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -174,6 +178,7 @@ namespace AIO.UEngine.YooAsset
             {
                 AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
                 {
+                    GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
                     PackageName = package.PackageName,
                     Location = location.Address,
                     Time = DateTime.Now,

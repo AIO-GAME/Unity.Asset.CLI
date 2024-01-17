@@ -76,14 +76,14 @@ namespace AIO
                 {
                     yield return handle.UpdateHeader();
                     handle.Begin();
+                    handle.CollectNeedTag("SequenceRecord");
                     handle.CollectNeedTag(enumerable);
-                    handle.CollectNeedRecord();
                     yield return handle.WaitCo();
                 }
             }
             else
             {
-                WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
+                WhiteListLocal.AddRange(GetAssetInfos("SequenceRecord"));
                 WhiteListLocal.AddRange(GetAssetInfos(enumerable));
             }
         }
@@ -100,11 +100,11 @@ namespace AIO
                 {
                     yield return handle.UpdateHeader();
                     handle.Begin();
-                    handle.CollectNeedRecord();
+                    handle.CollectNeedTag("SequenceRecord");
                     yield return handle.WaitCo();
                 }
             }
-            else WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
+            else WhiteListLocal.AddRange(GetAssetInfos("SequenceRecord"));
         }
 
         /// <summary>

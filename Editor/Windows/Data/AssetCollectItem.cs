@@ -198,7 +198,7 @@ namespace AIO.UEditor
                 Debug.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", data.AssetPath);
                 return false;
             }
-
+            
             if (RuleUseCollectCustom) // 判断是否使用自定义收集规则
             {
                 if (RuleCustomCollect?.Length > 0 && // 判断自定义收集规则等

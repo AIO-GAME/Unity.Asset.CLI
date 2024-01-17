@@ -14,12 +14,53 @@ namespace AIO.UEditor.CLI
 {
     internal static partial class ConvertYooAsset
     {
+        [DisplayName("AIO Asset Filter Record Rule")]
+        private class AIOFilterRecordRule : IFilterRule
+        {
+            private static ASConfig Config
+            {
+                get
+                {
+                    if (_Config is null) _Config = ASConfig.GetOrCreate();
+                    return _Config;
+                }
+            }
+
+            private static ASConfig _Config;
+
+            public bool IsCollectAsset(FilterRuleData data)
+            {
+                return Config.SequenceRecord.ContainsAssetPath(data.AssetPath);
+            }
+        }
+
+
         [DisplayName("AIO Asset Filter Rule")]
         private class AIOFilterRule : IFilterRule
         {
+            private static ASConfig Config
+            {
+                get
+                {
+                    if (_Config is null) _Config = ASConfig.GetOrCreate();
+                    return _Config;
+                }
+            }
+
+            private static ASConfig _Config;
+
             public bool IsCollectAsset(FilterRuleData data)
             {
                 if (Instance is null || !data.GroupName.Contains('_')) return false;
+
+                if (Config.EnableSequenceRecord)
+                {
+                    if (Config.SequenceRecord.ContainsAssetPath(data.AssetPath))
+                    {
+                        return false;
+                    }
+                }
+
                 var info = data.GroupName.SplitOnce('_');
                 var collector = Instance.GetPackage(info.Item1)
                     ?.GetGroup(info.Item2)

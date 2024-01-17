@@ -484,11 +484,92 @@ namespace AIO.UEditor
                    !AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(Selection.activeObject)); // 不能是文件夹
         }
 
+        public static Tuple<string, string, string> AssetAndGUIDToAddress(string assetPath, string guid)
+        {
+            if (string.IsNullOrEmpty(assetPath)) return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            if (string.IsNullOrEmpty(guid)) return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            var root = GetOrCreate();
+            foreach (var package in root.Packages)
+            {
+                if (package is null) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group is null) continue;
+                    foreach (var item in group.Collectors)
+                    {
+                        if (item is null) continue;
+                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (!assetPath.StartsWith(item.CollectPath)) continue;
+                        // 是否是否被过滤
+                        var address = item.GetAddress(assetPath);
+                        if (string.IsNullOrEmpty(address)) continue;
+                        return new Tuple<string, string, string>(package.Name, group.Name, address);
+                    }
+                }
+            }
+
+            return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+        }
+
+        public static string AssetToAddress(string assetPath)
+        {
+            var guid = AssetDatabase.AssetPathToGUID(assetPath);
+            if (string.IsNullOrEmpty(guid)) return string.Empty;
+            var root = GetOrCreate();
+            foreach (var package in root.Packages)
+            {
+                if (package is null) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group is null) continue;
+                    foreach (var item in group.Collectors)
+                    {
+                        if (item is null) continue;
+                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (!assetPath.StartsWith(item.CollectPath)) continue;
+                        // 是否是否被过滤
+                        var address = item.GetAddress(assetPath);
+                        if (string.IsNullOrEmpty(address)) continue;
+                        return address;
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
+
+        public static string GUIDToAddress(string guid)
+        {
+            if (string.IsNullOrEmpty(guid)) return string.Empty;
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var root = GetOrCreate();
+            foreach (var package in root.Packages)
+            {
+                if (package is null) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group is null) continue;
+                    foreach (var item in group.Collectors)
+                    {
+                        if (item is null) continue;
+                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (!assetPath.StartsWith(item.CollectPath)) continue;
+                        // 是否是否被过滤
+                        var address = item.GetAddress(assetPath);
+                        if (string.IsNullOrEmpty(address)) continue;
+                        return address;
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
+
         /// <summary>
         /// 根据GUID查找资源可寻址路径
         /// </summary>
         [MenuItem("Assets/获取资源可寻址路径", false, 1000)]
-        public static void FindAssetLocal()
+        private static void FindAssetLocal()
         {
             var obj = Selection.activeObject;
             var path = AssetDatabase.GetAssetPath(obj);
@@ -515,12 +596,12 @@ namespace AIO.UEditor
                 }
             }
 
-            if (list.Count == 0) Debug.Log($"未找到资源{path}的可寻址路径");
+            if (list.Count == 0) Debug.Log($"未找到资源 [{path}] 的可寻址路径");
             else
             {
                 var str = string.Join("\n", list.Select(tuple =>
                     $"\nPackage : {tuple.Item1}\nGroup   : {tuple.Item2}\nAddress : {tuple.Item3}\n"));
-                Debug.Log($"资源{path}的可寻址路径:\n{str}");
+                Debug.Log($"查找资源 [{path}] 的可寻址路径:\n{str}");
             }
         }
     }

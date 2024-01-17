@@ -93,12 +93,12 @@ namespace AIO.UEditor
                         FoldoutAutoRecord = GELayout.VFoldout($"序列记录 Size {RecordQueueSizeStr}", FoldoutAutoRecord);
                         if (FoldoutAutoRecord)
                         {
-                            if (AssetSystem.SequenceRecords != null)
+                            if (Target.SequenceRecord != null)
                             {
                                 using (GELayout.Vertical())
                                 {
                                     var index = 0;
-                                    foreach (var record in AssetSystem.SequenceRecords)
+                                    foreach (var record in Target.SequenceRecord)
                                     {
                                         GELayout.Label(
                                             $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
@@ -142,8 +142,8 @@ namespace AIO.UEditor
         private void UpdateRecordQueue()
         {
             if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH)) // 如果在编辑器下存在本地记录则加载
-                AssetSystem.SequenceRecords.UpdateLocal();
-            RecordQueueSizeStr = AssetSystem.SequenceRecords.Size.ToConverseStringFileSize();
+                Target.SequenceRecord.UpdateLocal();
+            RecordQueueSizeStr = Target.SequenceRecord.Size.ToConverseStringFileSize();
         }
 
         private void Update()
