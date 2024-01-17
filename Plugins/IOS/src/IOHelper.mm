@@ -1,3 +1,4 @@
+#include <sys/mount.h>
 
 extern "C" {
   
