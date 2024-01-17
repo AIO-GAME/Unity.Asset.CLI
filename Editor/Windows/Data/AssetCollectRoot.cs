@@ -518,11 +518,8 @@ namespace AIO.UEditor
             if (list.Count == 0) Debug.Log($"未找到资源{path}的可寻址路径");
             else
             {
-                var str = string.Join("\n", list.Select(tuple => @$"
-Package : {tuple.Item1}
-Group   : {tuple.Item2}
-Address : {tuple.Item3}
-"));
+                var str = string.Join("\n", list.Select(tuple =>
+                    $"\nPackage : {tuple.Item1}\nGroup   : {tuple.Item2}\nAddress : {tuple.Item3}\n"));
                 Debug.Log($"资源{path}的可寻址路径:\n{str}");
             }
         }

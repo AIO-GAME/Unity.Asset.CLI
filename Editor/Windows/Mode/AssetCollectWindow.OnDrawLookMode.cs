@@ -747,12 +747,10 @@ namespace AIO.UEditor
                 Dependencies[dependency] = new DependenciesInfo
                 {
                     Object = temp,
-                    Type = AssetDatabase.GetMainAssetTypeAtPath(dependency)?.FullName,
                     AssetPath = dependency,
                     Name = temp.name,
                     Size = new FileInfo(dependency).Length
                 };
-                if (string.IsNullOrEmpty(Dependencies[dependency].Type)) Dependencies[dependency].Type = "Unknown";
                 DependenciesSize += Dependencies[dependency].Size;
             }
 
