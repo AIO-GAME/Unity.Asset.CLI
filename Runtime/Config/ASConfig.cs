@@ -236,26 +236,27 @@ namespace AIO.UEngine
                     AssetDatabase.CreateAsset(instance, "Assets/Resources/ASConfig.asset");
                     AssetDatabase.SaveAssets();
                 }
-            }
 
-            if (Application.isPlaying)
-            {
-                if (instance.ASMode == EASMode.Editor)
+                if (Application.isPlaying)
                 {
-                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    if (instance.ASMode == EASMode.Editor)
                     {
-                        if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
-                        var temp = assembly.GetType("AIO.UEditor.AssetCollectRoot", true)
-                            ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
-                            ?.Invoke(null, new object[] { });
-                        if (temp == null) break;
-                        assembly.GetType("AIO.UEditor.AssetProxyEditor", true)
-                            ?.GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
-                            ?.Invoke(null, new object[] { temp, false });
-                        break;
+                        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                        {
+                            if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
+                            var temp = assembly.GetType("AIO.UEditor.AssetCollectRoot", true)
+                                ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
+                                ?.Invoke(null, new object[] { });
+                            if (temp == null) break;
+                            assembly.GetType("AIO.UEditor.AssetProxyEditor", true)
+                                ?.GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
+                                ?.Invoke(null, new object[] { temp, false });
+                            break;
+                        }
                     }
                 }
             }
+
 #else
             instance = GetResource();
 #endif
