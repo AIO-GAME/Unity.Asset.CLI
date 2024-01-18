@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -46,7 +48,8 @@ namespace AIO.UEditor
                 item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GP_Width_80);
 
                 if (item.Path is null) GUI.enabled = true;
-                item.Path = GELayout.Field(item.Path, GTOption.WidthMin(120), GTOption.WidthMax(240));
+                item.Path = EditorGUILayout.ObjectField(item.Path, typeof(UnityEngine.Object),
+                    false, GTOption.WidthMin(120), GTOption.WidthMax(240));
                 if (item.Path is null) GUI.enabled = false;
 
                 if (!item.Folded)
@@ -145,7 +148,13 @@ namespace AIO.UEditor
                             OnDrawItemListScroll.y += 27;
                         }
 
+                        if (ItemCollectorsSearching) ItemCollectorsSearchResult.Remove(item);
                         Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Remove(item);
+                        if (Data.CurrentGroup.Collectors.Length == 0)
+                        {
+                            ItemCollectorsSearch = null;
+                            ItemCollectorsSearchResult.Clear();
+                        }
                     }
 
                     return;

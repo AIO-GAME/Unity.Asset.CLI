@@ -485,10 +485,79 @@ namespace AIO.UEditor
         }
 
         /// <summary>
+        /// 根据资源路径查找资源可寻址路径
+        /// </summary>
+        /// <param name="assetPath">资源路径</param>
+        /// <param name="limitPackage">限制包名 只查找指定包资源 空则忽略</param>
+        /// <returns>
+        /// Item1 包名
+        /// Item2 组名
+        /// Item3 可寻址路径
+        /// </returns>
+        public static Tuple<string, string, string> AssetToAddress(string assetPath, string limitPackage = "")
+        {
+            if (string.IsNullOrEmpty(assetPath))
+                return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            var root = GetOrCreate();
+            foreach (var package in root.Packages)
+            {
+                if (package is null) continue;
+                if (!string.IsNullOrEmpty(limitPackage))
+                {
+                    if (limitPackage != package.Name) continue;
+                }
+
+                foreach (var group in package.Groups)
+                {
+                    if (group is null) continue;
+                    foreach (var item in group.Collectors)
+                    {
+                        if (item is null) continue;
+                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (!assetPath.StartsWith(item.CollectPath)) continue;
+                        var address = item.GetAddress(assetPath);
+                        if (string.IsNullOrEmpty(address)) continue;
+                        return new Tuple<string, string, string>(package.Name, group.Name, address);
+                    }
+                }
+            }
+
+            return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+        }
+
+        public static Tuple<string, string, string> GUIDToAddress(string guid)
+        {
+            if (string.IsNullOrEmpty(guid))
+                return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var root = GetOrCreate();
+            foreach (var package in root.Packages)
+            {
+                if (package is null) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group is null) continue;
+                    foreach (var item in group.Collectors)
+                    {
+                        if (item is null) continue;
+                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (!assetPath.StartsWith(item.CollectPath)) continue;
+                        // 是否是否被过滤
+                        var address = item.GetAddress(assetPath);
+                        if (string.IsNullOrEmpty(address)) continue;
+                        return new Tuple<string, string, string>(package.Name, group.Name, address);
+                    }
+                }
+            }
+
+            return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+        }
+
+        /// <summary>
         /// 根据GUID查找资源可寻址路径
         /// </summary>
         [MenuItem("Assets/获取资源可寻址路径", false, 1000)]
-        public static void FindAssetLocal()
+        private static void FindAssetLocal()
         {
             var obj = Selection.activeObject;
             var path = AssetDatabase.GetAssetPath(obj);
@@ -515,15 +584,12 @@ namespace AIO.UEditor
                 }
             }
 
-            if (list.Count == 0) Debug.Log($"未找到资源{path}的可寻址路径");
+            if (list.Count == 0) Debug.Log($"未找到资源 [{path}] 的可寻址路径");
             else
             {
-                var str = string.Join("\n", list.Select(tuple => @$"
-Package : {tuple.Item1}
-Group   : {tuple.Item2}
-Address : {tuple.Item3}
-"));
-                Debug.Log($"资源{path}的可寻址路径:\n{str}");
+                var str = string.Join("\n", list.Select(tuple =>
+                    $"\nPackage : {tuple.Item1}\nGroup   : {tuple.Item2}\nAddress : {tuple.Item3}\n"));
+                Debug.Log($"查找资源 [{path}] 的可寻址路径:\n{str}");
             }
         }
     }

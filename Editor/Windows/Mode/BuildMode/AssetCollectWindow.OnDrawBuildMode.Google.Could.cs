@@ -139,7 +139,6 @@ namespace AIO.UEditor
             {
                 EditorGUILayout.LabelField("储存桶", GP_Width_100);
                 config.BUCKET_NAME = GELayout.FieldDelayed(config.BUCKET_NAME);
-             
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))

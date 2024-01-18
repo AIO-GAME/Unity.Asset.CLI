@@ -123,7 +123,6 @@ namespace AIO.UEditor
             Config = ASConfig.GetOrCreate();
             BuildConfig = ASBuildConfig.GetOrCreate();
 
-
             GCInit();
 
             UpdateData();
@@ -163,13 +162,14 @@ namespace AIO.UEditor
             OnOpenEvent();
         }
 
-        protected override void OnDisable()
-        {
-            if (Data != null) Data.Save();
-            if (Config != null) Config.Save();
-            if (BuildConfig != null) BuildConfig.Save();
-            AssetDatabase.SaveAssets();
-        }
+        // 关闭自动更新
+        // protected override void OnDisable()
+        // {
+        //     if (Data != null) Data.Save();
+        //     if (Config != null) Config.Save();
+        //     if (BuildConfig != null) BuildConfig.Save();
+        //     AssetDatabase.SaveAssets();
+        // }
 
         public override void EventMouseDown(in Event eventData)
         {
@@ -309,49 +309,102 @@ namespace AIO.UEditor
                     switch (keyCode)
                     {
                         case KeyCode.UpArrow: // 数字键盘 上键
-                            if (Data.CurrentGroup.Length <= 0) break;
-                            if (CurrentCurrentCollectorsIndex < Data.CurrentGroup.Length)
+                            if (ItemCollectorsSearching)
                             {
-                                CurrentCurrentCollectorsIndex += 1;
-                                if (CurrentCurrentCollectorsIndex >= Data.CurrentGroup.Length)
+                                if (ItemCollectorsSearchResult.Count <= 0) break;
+                                if (CurrentCurrentCollectorsIndex >= 0)
                                 {
-                                    CurrentCurrentCollectorsIndex = 0;
-                                    OnDrawItemListScroll.y = 27 * Data.CurrentGroup.Length;
-                                }
-                                else OnDrawItemListScroll.y -= 27;
+                                    CurrentCurrentCollectorsIndex += 1;
+                                    if (CurrentCurrentCollectorsIndex < 0)
+                                    {
+                                        CurrentCurrentCollectorsIndex = ItemCollectorsSearchResult.Count - 1;
+                                        OnDrawItemListScroll.y = 0;
+                                    }
+                                    else OnDrawItemListScroll.y -= 27;
 
-                                GUI.FocusControl(null);
-                                eventData.Use();
+                                    GUI.FocusControl(null);
+                                    eventData.Use();
+                                }
+                            }
+                            else
+                            {
+                                if (Data.CurrentGroup.Length <= 0) break;
+                                if (CurrentCurrentCollectorsIndex < Data.CurrentGroup.Length)
+                                {
+                                    CurrentCurrentCollectorsIndex += 1;
+                                    if (CurrentCurrentCollectorsIndex >= Data.CurrentGroup.Length)
+                                    {
+                                        CurrentCurrentCollectorsIndex = 0;
+                                        OnDrawItemListScroll.y = 27 * Data.CurrentGroup.Length - 1;
+                                    }
+                                    else OnDrawItemListScroll.y -= 27;
+
+                                    GUI.FocusControl(null);
+                                    eventData.Use();
+                                }
                             }
 
                             break;
 
                         case KeyCode.DownArrow: // 数字键盘 下键
-                            if (Data.CurrentGroup.Length <= 0) break;
-                            if (CurrentCurrentCollectorsIndex >= 0)
+                            if (ItemCollectorsSearching)
                             {
-                                CurrentCurrentCollectorsIndex -= 1;
-                                if (CurrentCurrentCollectorsIndex < 0)
+                                if (ItemCollectorsSearchResult.Count <= 0) break;
+                                if (CurrentCurrentCollectorsIndex >= 0)
                                 {
-                                    CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
-                                    OnDrawItemListScroll.y = 0;
-                                }
-                                else OnDrawItemListScroll.y += 27;
+                                    CurrentCurrentCollectorsIndex -= 1;
+                                    if (CurrentCurrentCollectorsIndex < 0)
+                                    {
+                                        CurrentCurrentCollectorsIndex = ItemCollectorsSearchResult.Count - 1;
+                                        OnDrawItemListScroll.y = 0;
+                                    }
+                                    else OnDrawItemListScroll.y += 27;
 
-                                GUI.FocusControl(null);
-                                eventData.Use();
+                                    GUI.FocusControl(null);
+                                    eventData.Use();
+                                }
+                            }
+                            else
+                            {
+                                if (Data.CurrentGroup.Length <= 0) break;
+                                if (CurrentCurrentCollectorsIndex >= 0)
+                                {
+                                    CurrentCurrentCollectorsIndex -= 1;
+                                    if (CurrentCurrentCollectorsIndex < 0)
+                                    {
+                                        CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
+                                        OnDrawItemListScroll.y = 0;
+                                    }
+                                    else OnDrawItemListScroll.y += 27;
+
+                                    GUI.FocusControl(null);
+                                    eventData.Use();
+                                }
                             }
 
                             break;
                         // 判断回车
                         case KeyCode.Return:
                         case KeyCode.KeypadEnter:
-                            if (CurrentCurrentCollectorsIndex >= 0)
+                            if (ItemCollectorsSearching)
                             {
-                                GUI.FocusControl(null);
-                                Data.CurrentGroup.Collectors[CurrentCurrentCollectorsIndex].Folded =
-                                    !Data.CurrentGroup.Collectors[CurrentCurrentCollectorsIndex].Folded;
-                                eventData.Use();
+                                if (CurrentCurrentCollectorsIndex >= 0)
+                                {
+                                    GUI.FocusControl(null);
+                                    ItemCollectorsSearchResult[CurrentCurrentCollectorsIndex].Folded =
+                                        !ItemCollectorsSearchResult[CurrentCurrentCollectorsIndex].Folded;
+                                    eventData.Use();
+                                }
+                            }
+                            else
+                            {
+                                if (CurrentCurrentCollectorsIndex >= 0)
+                                {
+                                    GUI.FocusControl(null);
+                                    Data.CurrentGroup.Collectors[CurrentCurrentCollectorsIndex].Folded =
+                                        !Data.CurrentGroup.Collectors[CurrentCurrentCollectorsIndex].Folded;
+                                    eventData.Use();
+                                }
                             }
 
                             break;

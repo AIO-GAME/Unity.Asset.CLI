@@ -96,6 +96,11 @@ namespace AIO.UEngine
             YAssetSystem.Destroy();
         }
 
+        public override IASNetLoading GetLoadingHandle()
+        {
+            return new YAssetSystem.LoadingInfo();
+        }
+
         public override void CleanCache(Action<bool> cb)
         {
             YAssetSystem.ClearCacheResource(cb);

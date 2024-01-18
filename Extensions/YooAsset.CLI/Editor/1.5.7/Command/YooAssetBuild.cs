@@ -180,6 +180,9 @@ namespace AIO.UEditor.CLI
                     break;
             }
 
+            buildParameters.CopyBuildinFileTags = ASConfig.GetOrCreate().EnableSequenceRecord
+                ? string.Concat(buildParameters.CopyBuildinFileTags, ";SequenceRecord").Trim(';')
+                : buildParameters.CopyBuildinFileTags;
 
             buildParameters.CopyBuildinFileOption = !string.IsNullOrEmpty(buildParameters.CopyBuildinFileTags)
                 ? YooAsset.Editor.ECopyBuildinFileOption.ClearAndCopyByTags

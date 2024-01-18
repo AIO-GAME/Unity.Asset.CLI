@@ -8,6 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -21,30 +25,14 @@ namespace AIO.UEngine.YooAsset
             /// </summary>
             public IProgressInfo Progress => _Progress;
 
+            public IDownlandAssetEvent Event { get; set; }
+            
+            public EProgressState State { get; private set; }
+
             /// <summary>
             /// 当前下载进度
             /// </summary>
-            private AProgress _Progress;
-
-            /// <summary>
-            /// 总下载大小
-            /// </summary>
-            public long TotalDownloadBytes => TotalDownloadedBytesList.Values.Sum();
-
-            /// <summary>
-            /// 当前下载大小
-            /// </summary>
-            public long CurrentDownloadBytes => CurrentDownloadedBytesList.Values.Sum();
-
-            /// <summary>
-            /// 总下载数量
-            /// </summary>
-            public int TotalDownloadCount => TotalDownloadCountList.Values.Sum();
-
-            /// <summary>
-            /// 当前下载数量
-            /// </summary>
-            public int CurrentDownloadCount => CurrentDownloaadeCountList.Values.Sum();
+            private AProgress _Progress { get; }
 
             /// <summary>
             /// 总下载大小
@@ -56,32 +44,19 @@ namespace AIO.UEngine.YooAsset
             /// </summary>
             private Dictionary<string, long> CurrentDownloadedBytesList;
 
-            /// <summary>
-            /// 当前下载数量
-            /// </summary>
-            private Dictionary<string, int> CurrentDownloaadeCountList;
-
-            /// <summary>
-            /// 总下载数量
-            /// </summary>
-            private Dictionary<string, int> TotalDownloadCountList;
-
             private Dictionary<string, DownloaderOperation> operations;
 
             internal LoadingInfo()
             {
                 operations = new Dictionary<string, DownloaderOperation>();
-                TotalDownloadCountList = new Dictionary<string, int>();
-                CurrentDownloaadeCountList = new Dictionary<string, int>();
                 CurrentDownloadedBytesList = new Dictionary<string, long>();
                 TotalDownloadedBytesList = new Dictionary<string, long>();
+                Event = new DownlandAssetEvent();
                 _Progress = new AProgress();
             }
 
-            private void Finish()
+            public void Finish()
             {
-                TotalDownloadCountList.Clear();
-                CurrentDownloaadeCountList.Clear();
                 CurrentDownloadedBytesList.Clear();
                 TotalDownloadedBytesList.Clear();
                 operations.Clear();
@@ -93,6 +68,7 @@ namespace AIO.UEngine.YooAsset
             public void Pause()
             {
                 foreach (var operation in operations.Values) operation.PauseDownload();
+                State = EProgressState.Pause;
             }
 
             /// <summary>
@@ -101,16 +77,38 @@ namespace AIO.UEngine.YooAsset
             public void Resume()
             {
                 foreach (var operation in operations.Values) operation.ResumeDownload();
+                State = EProgressState.Running;
             }
 
             internal void RegisterEvent(AssetInfo info, DownloaderOperation operation)
             {
-                if (!AssetSystem.HasEvent_OnDownloading()) return; // 没有注册事件
                 var local = info.AssetPath;
                 if (operations.ContainsKey(local))
                 {
-                    AssetSystem.LogError("当前资源正在下载中: {0}", local);
+                    AssetSystem.LogError("当前资源 正在下载中 : {0}", local);
                     return;
+                }
+
+                CurrentDownloadedBytesList[local] = operation.CurrentDownloadBytes; // 当前下载大小
+                TotalDownloadedBytesList[local] = operation.TotalDownloadBytes; // 总下载大小
+                Update();
+                operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
+                operation.OnDownloadOverCallback += OnDownloadOver;
+                operation.OnDownloadErrorCallback += (f,r) =>
+                {
+                    AssetSystem.MainDownloadHandle.Event.OnError?.Invoke(new Exception($"{f}:{r}"));
+                };
+                operations.Add(local, operation);
+                State = EProgressState.Running;
+                return;
+
+                void OnDownloadOver(bool isSucceed)
+                {
+                    CurrentDownloadedBytesList.Remove(local);
+                    TotalDownloadedBytesList.Remove(local);
+                    operations.Remove(local);
+                    Update();
+                    State = operations.Count > 0 ? EProgressState.Running : EProgressState.Finish;
                 }
 
                 void OnDownloadProgressCallback(
@@ -119,57 +117,32 @@ namespace AIO.UEngine.YooAsset
                     long totalDownloadBytes,
                     long currentDownloadBytes)
                 {
-                    CurrentDownloaadeCountList[local] = currentDownloadCount;
-                    TotalDownloadCountList[local] = totalDownloadCount;
                     TotalDownloadedBytesList[local] = totalDownloadBytes;
                     CurrentDownloadedBytesList[local] = currentDownloadBytes;
 
                     _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
                     _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
-                    AssetSystem.InvokeDownloading(_Progress);
+                    AssetSystem.MainDownloadHandle.Event.OnProgress?.Invoke(_Progress);
                 }
-
-                void OnDownloadOver(bool isSucceed)
-                {
-                    CurrentDownloaadeCountList.Remove(local);
-                    TotalDownloadCountList.Remove(local);
-                    CurrentDownloadedBytesList.Remove(local);
-                    TotalDownloadedBytesList.Remove(local);
-                    operations.Remove(local);
-                    Update();
-                }
-
-                CurrentDownloaadeCountList[local] = operation.CurrentDownloadCount; // 当前下载数量
-                TotalDownloadCountList[local] = operation.TotalDownloadCount; // 总下载数量
-                CurrentDownloadedBytesList[local] = operation.CurrentDownloadBytes; // 当前下载大小
-                TotalDownloadedBytesList[local] = operation.TotalDownloadBytes; // 总下载大小
-                Update();
-
-                operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
-                operation.OnDownloadOverCallback += OnDownloadOver;
-                operations.Add(local, operation);
             }
 
             private void Update()
             {
                 _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
                 _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
-                AssetSystem.InvokeDownloading(_Progress);
+                AssetSystem.MainDownloadHandle.Event.OnProgress?.Invoke(_Progress);
             }
         }
-
-        /// <summary>
-        /// 资源加载器 - 加载资源
-        /// </summary>
-        private static readonly LoadingInfo LoadHandle = new LoadingInfo();
 
         internal static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
         {
             var operation = package.CreateBundleDownloader(location);
+#if UNITY_EDITOR
             if (AssetSystem.Parameter.EnableSequenceRecord)
             {
                 AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
                 {
+                    GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
                     PackageName = package.PackageName,
                     Location = location.Address,
                     Time = DateTime.Now,
@@ -178,8 +151,9 @@ namespace AIO.UEngine.YooAsset
                     AssetPath = location.AssetPath,
                 });
             }
+#endif
 
-            LoadHandle.RegisterEvent(location, operation);
+            if (AssetSystem.MainDownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, operation);
             return operation;
         }
 

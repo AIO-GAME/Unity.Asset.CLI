@@ -45,6 +45,11 @@ namespace AIO.UEngine
         public abstract bool IsAlreadyLoad(string location);
 
         /// <summary>
+        /// 获取下载器
+        /// </summary>
+        public abstract IASNetLoading GetLoadingHandle();
+        
+        /// <summary>
         /// 清空资源缓存
         /// </summary>
         public abstract void CleanCache(Action<bool> cb);

@@ -44,12 +44,12 @@ namespace AIO
         /// 组名
         /// </summary>
         public string Group;
-        
+
         /// <summary>
         /// 包名
         /// </summary>
         public string Package;
-        
+
         /// <summary>
         /// Asset Size
         /// </summary>
@@ -109,9 +109,9 @@ namespace AIO
                 if (_lastWriteTime == default)
                 {
                     if (File.Exists(AssetPath))
-                        _lastWriteTime = AHelper.IO.GetFileLastWriteTimeUtc(AssetPath);
+                        _lastWriteTime = File.GetLastWriteTime(AssetPath);
                     else if (Directory.Exists(AssetPath))
-                        _lastWriteTime = AHelper.IO.GetDirLastWriteTimeUtc(AssetPath);
+                        _lastWriteTime = Directory.GetLastWriteTime(AssetPath);
                     else _lastWriteTime = DateTime.MinValue;
                 }
 

@@ -7,7 +7,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -85,6 +84,24 @@ namespace AIO.UEngine
         /// </summary>
         public string RuntimeRootDirectory = "BuiltinFiles";
 
+#if UNITY_EDITOR
+        public AssetSystem.SequenceRecordQueue SequenceRecord
+        {
+            get
+            {
+                if (_SequenceRecord == null)
+                {
+                    _SequenceRecord = new AssetSystem.SequenceRecordQueue(true);
+                    _SequenceRecord.UpdateLocal();
+                }
+
+                return _SequenceRecord;
+            }
+        }
+
+        private AssetSystem.SequenceRecordQueue _SequenceRecord;
+#endif
+
         /// <summary>
         /// 获取远程资源包地址
         /// </summary>
@@ -105,7 +122,10 @@ namespace AIO.UEngine
             if (ASMode != EASMode.Remote) yield break;
             if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
             var remote = Path.Combine(
-                URL, "Version", string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks));
+                URL,
+                "Version",
+                string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks)
+            );
 
             yield return AssetSystem.NetLoadStringCO(remote,
                 data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
@@ -114,6 +134,7 @@ namespace AIO.UEngine
                 item.IsLatest = item.Version == "Latest";
                 if (item.IsLatest)
                 {
+#if SUPPORT_YOOASSET // YooAsset 暂时处理办法
                     remote = Path.Combine(
                         URL,
                         AssetSystem.PlatformNameStr,
@@ -121,6 +142,7 @@ namespace AIO.UEngine
                         item.Version,
                         $"PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}");
                     yield return AssetSystem.NetLoadStringCO(remote, data => item.Version = data);
+#endif
                 }
             }
         }
@@ -152,6 +174,10 @@ namespace AIO.UEngine
             }
         }
 
+        /// <summary>
+        /// 更新资源包
+        /// </summary>
+        /// <exception cref="Exception">配置文件夹不存在</exception>
         public void UpdatePackage()
         {
             if (ASMode == EASMode.Remote) return;
@@ -200,6 +226,8 @@ namespace AIO.UEngine
 #endif
             }
         }
+
+        #region static
 
         private static ASConfig instance;
 
@@ -326,9 +354,12 @@ namespace AIO.UEngine
 
         public void Save()
         {
+            if (instance.SequenceRecord != null) instance.SequenceRecord.Save();
             if (Equals(null)) return;
             EditorUtility.SetDirty(this);
         }
 #endif
+
+        #endregion
     }
 }

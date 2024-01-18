@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AIO.UEngine;
 using YooAsset.Editor;
 
 namespace AIO.UEditor.CLI
@@ -105,17 +106,20 @@ namespace AIO.UEditor.CLI
 
         private static void PackageRemoveRepeat(AssetCollectRoot asset)
         {
-            if (asset.Packages is null) return;
-            var YPackages = AssetBundleCollectorSettingData.Setting.Packages;
-            foreach (var APackage in asset.Packages)
-            {
-                for (var YPIndex = YPackages.Count - 1; YPIndex >= 0; YPIndex--)
-                {
-                    if (YPackages[YPIndex].PackageName != APackage.Name) continue;
-                    YPackages.RemoveAt(YPIndex);
-                    break;
-                }
-            }
+            // 暂时直接全部清空 重新添加
+            AssetBundleCollectorSettingData.Setting.Packages.Clear();
+
+            // 可能会有重复的包名，所以需要去重
+            // var YPackages = AssetBundleCollectorSettingData.Setting.Packages;
+            // foreach (var APackage in asset.Packages)
+            // {
+            //     for (var YPIndex = YPackages.Count - 1; YPIndex >= 0; YPIndex--)
+            //     {
+            //         if (YPackages[YPIndex].PackageName != APackage.Name) continue;
+            //         YPackages.RemoveAt(YPIndex);
+            //         break;
+            //     }
+            // }
         }
 
         private static void PackageUpdateSetting(AssetCollectRoot asset)
@@ -185,6 +189,48 @@ namespace AIO.UEditor.CLI
             PackageUpdateSetting(asset);
             PackageConvert(asset);
             PackageRemoveEmpty();
+
+            // 如果启用了序列记录，则需要给每个包新增一个序列记录组
+            if (ASConfig.GetOrCreate().EnableSequenceRecord)
+            {
+                foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
+                {
+                    if (package.Groups is null) continue;
+
+                    var list = (from @group in package.Groups
+                        from collector in @group.Collectors
+                        where collector.CollectorType == ECollectorType.MainAssetCollector
+                        select collector).ToArray();
+
+                    if (list.Length == 0) continue;
+                    var recordGroup = new AssetBundleCollectorGroup
+                    {
+                        GroupName = AssetSystem.TagsRecord,
+                        GroupDesc = "序列记录组[首包专用](请勿删除)",
+                        AssetTags = AssetSystem.TagsRecord,
+                        Collectors = new List<AssetBundleCollector>()
+                    };
+                    foreach (var collector in list)
+                    {
+                        // 如果GUID已经存在，则不添加
+                        if (recordGroup.Collectors.Exists(collector1 =>
+                                collector1.CollectorGUID == collector.CollectorGUID)) continue;
+                        recordGroup.Collectors.Add(new AssetBundleCollector
+                        {
+                            CollectorGUID = collector.CollectorGUID,
+                            CollectPath = collector.CollectPath,
+                            CollectorType = ECollectorType.MainAssetCollector,
+                            AssetTags = collector.AssetTags,
+                            AddressRuleName = nameof(AIOAddressRecordRule),
+                            FilterRuleName = nameof(AIOFilterRecordRule),
+                            PackRuleName = nameof(PackGroup),
+                            UserData = package.PackageName,
+                        });
+                    }
+
+                    package.Groups.Add(recordGroup);
+                }
+            }
         }
     }
 }

@@ -42,6 +42,15 @@ namespace AIO.UEditor.CLI
                 return collector.GetAssetAddress(infoData, ASConfig.GetOrCreate().LoadPathToLower);
             }
         }
+
+        [DisplayName("AIO Asset Address Record Rule")]
+        private class AIOAddressRecordRule : IAddressRule
+        {
+            string IAddressRule.GetAssetAddress(AddressRuleData data)
+            {
+                return AssetCollectRoot.AssetToAddress(data.AssetPath,data.UserData).Item3;
+            }
+        }
     }
 }
 #endif

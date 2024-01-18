@@ -1,7 +1,7 @@
 /*|============|*|
-|*|Author:     |*| xinan                
-|*|Date:       |*| 2024-01-03               
-|*|E-Mail:     |*| 1398581458@qq.com     
+|*|Author:     |*| xi nan
+|*|Date:       |*| 2024-01-03
+|*|E-Mail:     |*| 1398581458@qq.com
 |*|============|*/
 
 using System.IO;
@@ -78,47 +78,6 @@ namespace AIO.UEditor
                                 {
                                     GUI.FocusControl(null);
                                     ValidateFTP(BuildConfig.FTPConfigs[i]);
-                                }
-
-                                if (!string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].DirTreeFiled.DirPath))
-                                {
-                                    if (GUILayout.Button("复制", GEStyle.toolbarbutton, GP_Width_50))
-                                    {
-                                        GUI.FocusControl(null);
-                                        var source = BuildConfig.BuildOutputPath.Trim('/', '\\');
-                                        var target = Path.Combine(
-                                            BuildConfig.FTPConfigs[i].DirTreeFiled.DirPath
-                                                .Trim('/', '\\'), Path.GetFileName(source));
-                                        if (EditorUtility.DisplayDialog("提示", $"{source}\n复制\n{target}", "确定",
-                                                "取消"))
-                                        {
-                                            if (AHelper.IO.ExistsDir(target))
-                                                AHelper.IO.DeleteDir(target, SearchOption.AllDirectories, true);
-                                            PrPlatform.Folder.Copy(target, source).Async();
-                                            return;
-                                        }
-                                    }
-
-                                    if (GUILayout.Button("链接", GEStyle.toolbarbutton, GP_Width_50))
-                                    {
-                                        GUI.FocusControl(null);
-                                        var source = BuildConfig.BuildOutputPath.Trim('/', '\\');
-                                        var target = Path.Combine(
-                                            BuildConfig.FTPConfigs[i].DirTreeFiled.DirPath.Trim('/', '\\'),
-                                            Path.GetFileName(source));
-                                        if (EditorUtility.DisplayDialog("提示", $"{source}\n链接\n{target}", "确定",
-                                                "取消"))
-                                        {
-                                            IExecutor executor = null;
-                                            if (AHelper.IO.ExistsDir(target))
-                                                executor = PrPlatform.Folder.Del(target);
-                                            var symbolic = executor is null
-                                                ? PrPlatform.Folder.Symbolic(target, source)
-                                                : executor.Link(PrPlatform.Folder.Symbolic(target, source));
-                                            symbolic.Async();
-                                            return;
-                                        }
-                                    }
                                 }
 
                                 if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))

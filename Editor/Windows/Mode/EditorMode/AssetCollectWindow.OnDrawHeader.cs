@@ -86,17 +86,6 @@ namespace AIO.UEditor
                 }
             }
 
-            if (GUILayout.Button(GC_FOLDOUT_ON, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
-            {
-                Data.FoldoutOn();
-            }
-
-
-            if (GUILayout.Button(GC_FOLDOUT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
-            {
-                Data.FoldoutOff();
-            }
-
             if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
                 Data.Refresh();

@@ -13,21 +13,16 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public partial class AssetCollectWindow
     {
+        /// <summary>
+        /// 更新 资源查询模式 数据
+        /// </summary>
         private void UpdateDataFirstPackageMode()
         {
-            if (Config.EnableSequenceRecord)
-            {
-                if (SequenceRecords is null)
-                    SequenceRecords = new AssetSystem.SequenceRecordQueue();
-                if (SequenceRecords.ExistsLocal()) SequenceRecords.UpdateLocal();
-                UpdatePageValuesFirstPackageMode();
-            }
-            else SequenceRecords?.Clear();
+            if (!Config.EnableSequenceRecord) return;
+            if (Config.SequenceRecord.ExistsLocal()) Config.SequenceRecord.UpdateLocal();
+            UpdatePageValuesFirstPackageMode();
         }
 
         /// <summary>
@@ -35,19 +30,33 @@ namespace AIO.UEditor
         /// </summary>
         private void OnDrawHeaderFirstPackageMode()
         {
+            if (!Config.EnableSequenceRecord)
+            {
+                EditorGUILayout.Separator();
+                if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+                {
+                    GUI.FocusControl(null);
+                    Selection.activeObject = Config;
+                }
+
+                return;
+            }
+
             if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
             {
                 if (GELayout.Button(GC_OPEN_FOLDER, GEStyle.TEtoolbarbutton, GP_Width_25))
                 {
-                    Application.OpenURL(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
+                    GUI.FocusControl(null);
+                    EditorUtility.RevealInFinder(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                 }
 
                 if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_25))
                 {
+                    GUI.FocusControl(null);
                     AHelper.IO.DeleteFile(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                     SearchText = string.Empty;
                     LookModeDisplayTypeIndex = 0;
-                    SequenceRecords.UpdateLocal();
+                    Config.SequenceRecord.UpdateLocal();
                     UpdatePageValuesFirstPackageMode();
                     return;
                 }
@@ -56,9 +65,16 @@ namespace AIO.UEditor
             if (!string.IsNullOrEmpty(Config.URL))
             {
                 if (GELayout.Button(GC_NET, GEStyle.TEtoolbarbutton, GP_Width_25))
+                {
+                    GUI.FocusControl(null);
                     Application.OpenURL(AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Config));
+                }
 
-                GELayout.Button(GC_DOWNLOAD, SyncSequenceRecords, GEStyle.TEtoolbarbutton, GP_Width_25);
+                if (GELayout.Button(GC_DOWNLOAD, GEStyle.TEtoolbarbutton, GP_Width_25))
+                {
+                    GUI.FocusControl(null);
+                    SyncSequenceRecords();
+                }
             }
 
             SearchText = EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
@@ -78,8 +94,7 @@ namespace AIO.UEditor
             {
                 if (TempTable.GetOrDefault<int>(nameof(LookModeDisplayTypeIndex)) !=
                     LookModeDisplayTypeIndex ||
-                    TempTable.GetOrDefault<string>(nameof(SearchText)) != SearchText
-                   )
+                    TempTable.GetOrDefault<string>(nameof(SearchText)) != SearchText)
                 {
                     CurrentPageValues.Clear();
                     CurrentPageValues.Add(CurrentTagValues.Where(data => !FirstPackageModeDataFilter(data)));
@@ -91,16 +106,27 @@ namespace AIO.UEditor
             }
 
             OnDrawHeaderLookPageSetting();
-            if (Config.EnableSequenceRecord)
+
+            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
-                GELayout.Button(GC_SAVE, () => { SequenceRecords.Save(); }, GEStyle.TEtoolbarbutton, GP_Width_25);
-                GELayout.Button(GC_REFRESH, () =>
-                {
-                    SearchText = string.Empty;
-                    LookModeDisplayTypeIndex = 0;
-                    SequenceRecords.UpdateLocal();
-                    UpdatePageValuesFirstPackageMode();
-                }, GEStyle.TEtoolbarbutton, GP_Width_25);
+                GUI.FocusControl(null);
+                SearchText = string.Empty;
+                LookModeDisplayTypeIndex = 0;
+                Config.SequenceRecord.UpdateLocal();
+                UpdatePageValuesFirstPackageMode();
+            }
+
+            if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            {
+                GUI.FocusControl(null);
+                Selection.activeObject = Config;
+            }
+
+            if (GELayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_25))
+            {
+                GUI.FocusControl(null);
+                Config.SequenceRecord.Save();
+                EditorUtility.DisplayDialog("保存", "保存成功", "确定");
             }
         }
 
@@ -108,8 +134,8 @@ namespace AIO.UEditor
         {
             SearchText = string.Empty;
             LookModeDisplayTypeIndex = 0;
-            await SequenceRecords.DownloadTask(Config.URL);
-            SequenceRecords.UpdateLocal();
+            await Config.SequenceRecord.DownloadTask(Config.URL);
+            Config.SequenceRecord.UpdateLocal();
             UpdatePageValuesFirstPackageMode();
         }
 
@@ -121,18 +147,19 @@ namespace AIO.UEditor
             TagsModeDisplayTypes = Array.Empty<string>();
             var types = new List<string>();
             var asset = new Dictionary<string, AssetDataInfo>();
-            foreach (var item in SequenceRecords)
+            for (var i = 0; i < Config.SequenceRecord.Count; i++)
             {
-                if (asset.ContainsKey(item.AssetPath)) continue;
+                if (asset.ContainsKey(Config.SequenceRecord[i].AssetPath)) continue;
+                var temp = AssetCollectRoot.AssetToAddress(
+                    Config.SequenceRecord[i].AssetPath);
+                Config.SequenceRecord[i].PackageName = temp.Item1;
                 var info = new AssetDataInfo
                 {
-                    // AssetPath 移除后缀
-                    AssetPath = item.AssetPath,
-                    Address = item.Location,
-                    Package = item.PackageName,
+                    AssetPath = Config.SequenceRecord[i].AssetPath,
+                    Address = temp.Item3,
+                    Package = temp.Item1,
                     Group = "N/A",
-                    Tags = "FirstPackage",
-                    Extension = Path.GetExtension(item.AssetPath)
+                    Extension = Path.GetExtension(Config.SequenceRecord[i].AssetPath)
                 };
                 asset[info.AssetPath] = info;
                 CurrentTagValues.Add(info);
@@ -142,8 +169,8 @@ namespace AIO.UEditor
             TagsModeDisplayTypes = types.Distinct().ToArray();
             CurrentPageValues.Clear();
             CurrentPageValues.Add(CurrentTagValues.Where(data => !FirstPackageModeDataFilter(data)));
-            LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
             CurrentPageValues.PageIndex = 0;
+            LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
             LookModeDataPageValueSort(ESort.AssetName, true);
         }
 
@@ -166,7 +193,7 @@ namespace AIO.UEditor
             if (EditorApplication.isPlaying)
             {
                 var index = 0;
-                foreach (var record in AssetSystem.SequenceRecords)
+                foreach (var record in Config.SequenceRecord)
                 {
                     using (new EditorGUILayout.VerticalScope())
                     {

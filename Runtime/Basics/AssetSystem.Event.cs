@@ -4,37 +4,44 @@
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
-using System;
+using UnityEngine;
 
 namespace AIO
 {
     public partial class AssetSystem
     {
         /// <summary>
-        /// 事件通知
+        /// 主下载器
         /// </summary>
-        public static event Action<EASEventType, string> OnEventNotify;
+        public static IASNetLoading MainDownloadHandle { get; private set; }
 
         /// <summary>
-        /// 资源正在下载
+        /// 当前主下载器事件
         /// </summary>
-        public static event Action<IProgressInfo> OnEventDownloading;
+        public static IDownlandAssetEvent DownloadEvent => MainDownloadHandle?.Event;
 
-        public static event Action OnNoNetwork;
-        
-        internal static void InvokeNotify(EASEventType eventType, string message)
-        {
-            OnEventNotify?.Invoke(eventType, message);
-        }
+        /// <summary>
+        /// 下载器状态
+        /// </summary>
+        public static EProgressState DownloadHandleState => MainDownloadHandle?.State ?? EProgressState.Finish;
 
-        internal static bool HasEvent_OnDownloading()
-        {
-            return OnEventDownloading != null;
-        }
+        /// <summary>
+        /// 判断当前网络环境是否为流量
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsWifi =>
+            Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork;
 
-        internal static void InvokeDownloading<T>(T loading) where T : IProgressInfo
-        {
-            OnEventDownloading?.Invoke(loading);
-        }
+        /// <summary>
+        /// 判断当前网络环境是否为无网络
+        /// </summary>
+        public static bool IsNoNet =>
+            Application.internetReachability == NetworkReachability.NotReachable;
+
+        /// <summary>
+        /// 判断当前网络环境是否为流量
+        /// </summary>
+        public static bool IsNetReachable =>
+            Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork;
     }
 }

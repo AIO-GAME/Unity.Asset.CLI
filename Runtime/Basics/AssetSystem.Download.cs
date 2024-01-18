@@ -14,7 +14,10 @@ namespace AIO
 {
     public partial class AssetSystem
     {
-        private static IASDownloader Downloader;
+        /// <summary>
+        /// 记录序列资源标签
+        /// </summary>
+        public const string TagsRecord = "SequenceRecord";
 
         /// <summary>
         /// 获取下载器
@@ -78,14 +81,14 @@ namespace AIO
                 {
                     yield return handle.UpdateHeader();
                     handle.Begin();
+                    handle.CollectNeedTag(TagsRecord);
                     handle.CollectNeedTag(enumerable);
-                    handle.CollectNeedRecord();
                     yield return handle.WaitCo();
                 }
             }
             else
             {
-                WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
+                WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
                 WhiteListLocal.AddRange(GetAssetInfos(enumerable));
             }
         }
@@ -102,11 +105,11 @@ namespace AIO
                 {
                     yield return handle.UpdateHeader();
                     handle.Begin();
-                    handle.CollectNeedRecord();
+                    handle.CollectNeedTag(TagsRecord);
                     yield return handle.WaitCo();
                 }
             }
-            else WhiteListLocal.AddRange(SequenceRecords.Select(x => x.Location));
+            else WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
         }
 
         /// <summary>

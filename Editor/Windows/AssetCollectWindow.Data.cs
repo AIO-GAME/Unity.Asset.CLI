@@ -344,7 +344,17 @@ namespace AIO.UEditor
 
             public string Name;
 
-            public string Type;
+            public string Type
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(_Type)) return _Type;
+                    _Type = Object is null ? "Unknown" : Object.GetType().FullName;
+                    return _Type;
+                }
+            }
+
+            private string _Type;
 
             public long Size;
         }
@@ -443,8 +453,6 @@ namespace AIO.UEditor
         /// 界面 - 收集器列表
         /// </summary>
         private ViewRect ViewCollectorsList;
-
-        private AssetSystem.SequenceRecordQueue SequenceRecords;
 
         private int LookModeCollectorsPageIndex;
 
