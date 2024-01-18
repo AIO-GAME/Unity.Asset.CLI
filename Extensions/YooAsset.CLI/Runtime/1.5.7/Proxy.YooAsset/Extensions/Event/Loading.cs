@@ -37,26 +37,6 @@ namespace AIO.UEngine.YooAsset
             /// <summary>
             /// 总下载大小
             /// </summary>
-            public long TotalDownloadBytes => TotalDownloadedBytesList.Values.Sum();
-
-            /// <summary>
-            /// 当前下载大小
-            /// </summary>
-            public long CurrentDownloadBytes => CurrentDownloadedBytesList.Values.Sum();
-
-            /// <summary>
-            /// 总下载数量
-            /// </summary>
-            public int TotalDownloadCount => TotalDownloadCountList.Values.Sum();
-
-            /// <summary>
-            /// 当前下载数量
-            /// </summary>
-            public int CurrentDownloadCount => CurrentDownloaadeCountList.Values.Sum();
-
-            /// <summary>
-            /// 总下载大小
-            /// </summary>
             private Dictionary<string, long> TotalDownloadedBytesList;
 
             /// <summary>
@@ -64,32 +44,19 @@ namespace AIO.UEngine.YooAsset
             /// </summary>
             private Dictionary<string, long> CurrentDownloadedBytesList;
 
-            /// <summary>
-            /// 当前下载数量
-            /// </summary>
-            private Dictionary<string, int> CurrentDownloaadeCountList;
-
-            /// <summary>
-            /// 总下载数量
-            /// </summary>
-            private Dictionary<string, int> TotalDownloadCountList;
-
             private Dictionary<string, DownloaderOperation> operations;
 
             internal LoadingInfo()
             {
                 operations = new Dictionary<string, DownloaderOperation>();
-                TotalDownloadCountList = new Dictionary<string, int>();
-                CurrentDownloaadeCountList = new Dictionary<string, int>();
                 CurrentDownloadedBytesList = new Dictionary<string, long>();
                 TotalDownloadedBytesList = new Dictionary<string, long>();
+                Event = new DownlandAssetEvent();
                 _Progress = new AProgress();
             }
 
             public void Finish()
             {
-                TotalDownloadCountList.Clear();
-                CurrentDownloaadeCountList.Clear();
                 CurrentDownloadedBytesList.Clear();
                 TotalDownloadedBytesList.Clear();
                 operations.Clear();
@@ -118,26 +85,25 @@ namespace AIO.UEngine.YooAsset
                 var local = info.AssetPath;
                 if (operations.ContainsKey(local))
                 {
-                    AssetSystem.LogError("当前资源正在下载中: {0}", local);
+                    AssetSystem.LogError("当前资源 正在下载中 : {0}", local);
                     return;
                 }
 
-                CurrentDownloaadeCountList[local] = operation.CurrentDownloadCount; // 当前下载数量
-                TotalDownloadCountList[local] = operation.TotalDownloadCount; // 总下载数量
                 CurrentDownloadedBytesList[local] = operation.CurrentDownloadBytes; // 当前下载大小
                 TotalDownloadedBytesList[local] = operation.TotalDownloadBytes; // 总下载大小
                 Update();
-
                 operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
                 operation.OnDownloadOverCallback += OnDownloadOver;
+                operation.OnDownloadErrorCallback += (f,r) =>
+                {
+                    AssetSystem.MainDownloadHandle.Event.OnError?.Invoke(new Exception($"{f}:{r}"));
+                };
                 operations.Add(local, operation);
                 State = EProgressState.Running;
                 return;
 
                 void OnDownloadOver(bool isSucceed)
                 {
-                    CurrentDownloaadeCountList.Remove(local);
-                    TotalDownloadCountList.Remove(local);
                     CurrentDownloadedBytesList.Remove(local);
                     TotalDownloadedBytesList.Remove(local);
                     operations.Remove(local);
@@ -151,8 +117,6 @@ namespace AIO.UEngine.YooAsset
                     long totalDownloadBytes,
                     long currentDownloadBytes)
                 {
-                    CurrentDownloaadeCountList[local] = currentDownloadCount;
-                    TotalDownloadCountList[local] = totalDownloadCount;
                     TotalDownloadedBytesList[local] = totalDownloadBytes;
                     CurrentDownloadedBytesList[local] = currentDownloadBytes;
 

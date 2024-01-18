@@ -119,9 +119,8 @@ namespace AIO
             else Parameter.UpdatePackage();
 
             yield return Proxy.Initialize();
-            IsInitialized = true;
-            
             MainDownloadHandle = Proxy.GetLoadingHandle();
+            IsInitialized = true;
         }
 
         /// <summary>

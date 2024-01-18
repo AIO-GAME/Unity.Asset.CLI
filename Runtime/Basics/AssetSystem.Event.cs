@@ -4,7 +4,6 @@
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
-using System;
 using UnityEngine;
 
 namespace AIO

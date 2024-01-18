@@ -72,6 +72,18 @@ namespace AIO.UEditor
 
                             if (!string.IsNullOrEmpty(BuildConfig.GCloudConfigs[i].BUCKET_NAME))
                             {
+                                if (!string.IsNullOrEmpty(BuildConfig.GCloudConfigs[i].DirTreeFiled.DirPath))
+                                {
+                                    if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
+                                    {
+                                        if (GUILayout.Button("更新首包配置", GEStyle.toolbarbutton, GP_Width_100))
+                                        {
+                                            GUI.FocusControl(null);
+                                            UpdateUploadFirstPack(BuildConfig.GCloudConfigs[i]);
+                                        }
+                                    }
+                                }
+
                                 if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20))
                                 {
                                     GUI.FocusControl(null);

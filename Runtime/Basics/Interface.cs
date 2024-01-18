@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections;
+using UnityEngine;
 
 namespace AIO
 {
@@ -22,7 +23,7 @@ namespace AIO
         /// <summary>
         /// 当前下载事件
         /// </summary>
-        IDownlandAssetEvent Event { get; set; }
+        IDownlandAssetEvent Event { get; }
 
         /// <summary>
         /// 当前下载状态
@@ -62,6 +63,7 @@ namespace AIO
 
     public struct DownlandAssetEvent : IDownlandAssetEvent
     {
+
         /// <summary>
         /// 网络不可用
         /// </summary>
@@ -144,7 +146,7 @@ namespace AIO
         /// 收集需要下载的所有资源
         /// </summary>
         void CollectNeedAll();
-        
+
         /// <summary>
         /// 收集需要下载的标签
         /// </summary>
