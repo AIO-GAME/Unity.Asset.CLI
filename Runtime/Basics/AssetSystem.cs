@@ -152,6 +152,9 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static void Destroy()
         {
+#if UNITY_EDITOR
+            Parameter.SequenceRecord.Save();
+#endif
             Proxy.Dispose();
         }
 
