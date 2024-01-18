@@ -83,9 +83,23 @@ namespace AIO.UEngine
         /// 运行时内置文件根目录
         /// </summary>
         public string RuntimeRootDirectory = "BuiltinFiles";
-        
+
 #if UNITY_EDITOR
-        public AssetSystem.SequenceRecordQueue SequenceRecord { get; private set; }
+        public AssetSystem.SequenceRecordQueue SequenceRecord
+        {
+            get
+            {
+                if (_SequenceRecord == null)
+                {
+                    _SequenceRecord = new AssetSystem.SequenceRecordQueue(true);
+                    _SequenceRecord.UpdateLocal();
+                }
+
+                return _SequenceRecord;
+            }
+        }
+
+        private AssetSystem.SequenceRecordQueue _SequenceRecord;
 #endif
 
         /// <summary>
@@ -113,7 +127,8 @@ namespace AIO.UEngine
                 string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks)
             );
 
-            yield return AssetSystem.NetLoadStringCO(remote, data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
+            yield return AssetSystem.NetLoadStringCO(remote,
+                data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
             foreach (var item in Packages)
             {
                 item.IsLatest = item.Version == "Latest";
@@ -268,11 +283,6 @@ namespace AIO.UEngine
                         }
                     }
                 }
-                else
-                {
-                    instance.SequenceRecord = new AssetSystem.SequenceRecordQueue(true);
-                    instance.SequenceRecord.UpdateLocal();
-                }
             }
 
 #else
@@ -344,7 +354,7 @@ namespace AIO.UEngine
 
         public void Save()
         {
-            instance.SequenceRecord.Save();
+            if (instance.SequenceRecord != null) instance.SequenceRecord.Save();
             if (Equals(null)) return;
             EditorUtility.SetDirty(this);
         }

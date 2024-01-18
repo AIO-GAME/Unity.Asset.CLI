@@ -20,11 +20,9 @@ namespace AIO.UEditor
         /// </summary>
         private void UpdateDataFirstPackageMode()
         {
-            if (Config.EnableSequenceRecord)
-            {
-                if (Config.SequenceRecord.ExistsLocal()) Config.SequenceRecord.UpdateLocal();
-                UpdatePageValuesFirstPackageMode();
-            }
+            if (!Config.EnableSequenceRecord) return;
+            if (Config.SequenceRecord.ExistsLocal()) Config.SequenceRecord.UpdateLocal();
+            UpdatePageValuesFirstPackageMode();
         }
 
         /// <summary>
@@ -152,9 +150,8 @@ namespace AIO.UEditor
             for (var i = 0; i < Config.SequenceRecord.Count; i++)
             {
                 if (asset.ContainsKey(Config.SequenceRecord[i].AssetPath)) continue;
-                var temp = AssetCollectRoot.AssetAndGUIDToAddress(
-                    Config.SequenceRecord[i].AssetPath,
-                    Config.SequenceRecord[i].GUID);
+                var temp = AssetCollectRoot.AssetToAddress(
+                    Config.SequenceRecord[i].AssetPath);
                 Config.SequenceRecord[i].PackageName = temp.Item1;
                 var info = new AssetDataInfo
                 {

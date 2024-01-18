@@ -144,7 +144,7 @@ namespace AIO
         /// 收集需要下载的所有资源
         /// </summary>
         void CollectNeedAll();
-
+        
         /// <summary>
         /// 收集需要下载的标签
         /// </summary>

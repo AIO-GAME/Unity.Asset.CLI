@@ -141,8 +141,10 @@ namespace AIO.UEditor
 
         private void UpdateRecordQueue()
         {
-            if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH)) // 如果在编辑器下存在本地记录则加载
-                Target.SequenceRecord.UpdateLocal();
+            if (Target is null) return;
+            if (Target.SequenceRecord is null) return;
+            // 如果在编辑器下存在本地记录则加载
+            if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH)) Target.SequenceRecord.UpdateLocal();
             RecordQueueSizeStr = Target.SequenceRecord.Size.ToConverseStringFileSize();
         }
 

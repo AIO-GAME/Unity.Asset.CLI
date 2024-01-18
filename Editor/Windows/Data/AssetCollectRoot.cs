@@ -484,10 +484,52 @@ namespace AIO.UEditor
                    !AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(Selection.activeObject)); // 不能是文件夹
         }
 
-        public static Tuple<string, string, string> AssetAndGUIDToAddress(string assetPath, string guid)
+        /// <summary>
+        /// 根据资源路径查找资源可寻址路径
+        /// </summary>
+        /// <param name="assetPath">资源路径</param>
+        /// <param name="limitPackage">限制包名 只查找指定包资源 空则忽略</param>
+        /// <returns>
+        /// Item1 包名
+        /// Item2 组名
+        /// Item3 可寻址路径
+        /// </returns>
+        public static Tuple<string, string, string> AssetToAddress(string assetPath, string limitPackage = "")
         {
-            if (string.IsNullOrEmpty(assetPath)) return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
-            if (string.IsNullOrEmpty(guid)) return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            if (string.IsNullOrEmpty(assetPath))
+                return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            var root = GetOrCreate();
+            foreach (var package in root.Packages)
+            {
+                if (package is null) continue;
+                if (!string.IsNullOrEmpty(limitPackage))
+                {
+                    if (limitPackage != package.Name) continue;
+                }
+
+                foreach (var group in package.Groups)
+                {
+                    if (group is null) continue;
+                    foreach (var item in group.Collectors)
+                    {
+                        if (item is null) continue;
+                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
+                        if (!assetPath.StartsWith(item.CollectPath)) continue;
+                        var address = item.GetAddress(assetPath);
+                        if (string.IsNullOrEmpty(address)) continue;
+                        return new Tuple<string, string, string>(package.Name, group.Name, address);
+                    }
+                }
+            }
+
+            return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+        }
+
+        public static Tuple<string, string, string> GUIDToAddress(string guid)
+        {
+            if (string.IsNullOrEmpty(guid))
+                return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
             var root = GetOrCreate();
             foreach (var package in root.Packages)
             {
@@ -509,60 +551,6 @@ namespace AIO.UEditor
             }
 
             return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
-        }
-
-        public static string AssetToAddress(string assetPath)
-        {
-            var guid = AssetDatabase.AssetPathToGUID(assetPath);
-            if (string.IsNullOrEmpty(guid)) return string.Empty;
-            var root = GetOrCreate();
-            foreach (var package in root.Packages)
-            {
-                if (package is null) continue;
-                foreach (var group in package.Groups)
-                {
-                    if (group is null) continue;
-                    foreach (var item in group.Collectors)
-                    {
-                        if (item is null) continue;
-                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                        if (!assetPath.StartsWith(item.CollectPath)) continue;
-                        // 是否是否被过滤
-                        var address = item.GetAddress(assetPath);
-                        if (string.IsNullOrEmpty(address)) continue;
-                        return address;
-                    }
-                }
-            }
-
-            return string.Empty;
-        }
-
-        public static string GUIDToAddress(string guid)
-        {
-            if (string.IsNullOrEmpty(guid)) return string.Empty;
-            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var root = GetOrCreate();
-            foreach (var package in root.Packages)
-            {
-                if (package is null) continue;
-                foreach (var group in package.Groups)
-                {
-                    if (group is null) continue;
-                    foreach (var item in group.Collectors)
-                    {
-                        if (item is null) continue;
-                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                        if (!assetPath.StartsWith(item.CollectPath)) continue;
-                        // 是否是否被过滤
-                        var address = item.GetAddress(assetPath);
-                        if (string.IsNullOrEmpty(address)) continue;
-                        return address;
-                    }
-                }
-            }
-
-            return string.Empty;
         }
 
         /// <summary>

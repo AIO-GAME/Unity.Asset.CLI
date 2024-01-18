@@ -48,7 +48,7 @@ namespace AIO.UEditor.CLI
         {
             string IAddressRule.GetAssetAddress(AddressRuleData data)
             {
-                return AssetCollectRoot.AssetToAddress(data.AssetPath);
+                return AssetCollectRoot.AssetToAddress(data.AssetPath,data.UserData).Item3;
             }
         }
     }

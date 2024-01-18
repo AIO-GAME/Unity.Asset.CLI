@@ -251,7 +251,7 @@ namespace AIO.UEngine
                 {
                     if (!Packages.TryGetValue(name, out var asset)) continue;
                     Tags[name] = 1;
-                    var operation = asset.CreateBundleDownloader(asset.GetAssetInfos(tags));
+                    var operation = asset.CreateBundleDownloader(asset.GetAssetInfos(tags)); // 此处暂默认 YooAsset 处理了重复资源的问题
                     if (operation is null) continue;
                     if (operation.TotalDownloadCount <= 0) continue;
                     TotalValue += operation.TotalDownloadBytes - operation.CurrentDownloadBytes;
@@ -306,15 +306,8 @@ namespace AIO.UEngine
 
                 State = EProgressState.Finish;
 
-                if (OpenDownloadAll)
-                {
-                    AssetSystem.WhiteAll = true;
-                }
-                else
-                {
-                    if (Tags.Count > 0)
-                        AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
-                }
+                if (OpenDownloadAll) AssetSystem.WhiteAll = true;
+                else if (Tags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
             }
 
             protected override void OnPause()

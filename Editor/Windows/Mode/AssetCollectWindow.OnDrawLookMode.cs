@@ -450,9 +450,10 @@ namespace AIO.UEditor
                     using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbuttonLeft))
                     {
                         EditorGUILayout.LabelField("首包资源", GP_Width_100);
-                        EditorGUILayout.LabelField(Config.SequenceRecord.ContainsGUID(LookCurrentSelectAssetDataInfo.GUID)
-                            ? "是"
-                            : "否");
+                        EditorGUILayout.LabelField(
+                            Config.SequenceRecord.ContainsGUID(LookCurrentSelectAssetDataInfo.GUID)
+                                ? "是"
+                                : "否");
                     }
                 }
 
@@ -469,7 +470,8 @@ namespace AIO.UEditor
                     {
                         using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                         {
-                            DependenciesSearchText = EditorGUILayout.TextField(DependenciesSearchText, GEStyle.SearchTextField);
+                            DependenciesSearchText =
+                                EditorGUILayout.TextField(DependenciesSearchText, GEStyle.SearchTextField);
                             if (!string.IsNullOrEmpty(DependenciesSearchText))
                             {
                                 if (GUILayout.Button("✘", GEStyle.toolbarbuttonLeft, GTOption.Width(21)))
@@ -723,6 +725,11 @@ namespace AIO.UEditor
                         {
                             onDrawLookDataItemMenu.AddItem(new GUIContent("移除 首包列表"), false, () =>
                             {
+                                if (LookCurrentSelectAssetDataInfo.GUID == data.GUID)
+                                {
+                                    LookCurrentSelectAsset = null;
+                                }
+
                                 Config.SequenceRecord.UpdateLocal();
                                 Config.SequenceRecord.RemoveAssetPath(data.AssetPath);
                                 Config.SequenceRecord.Save();

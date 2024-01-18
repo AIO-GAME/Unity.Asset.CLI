@@ -15,6 +15,11 @@ namespace AIO
     public partial class AssetSystem
     {
         /// <summary>
+        /// 记录序列资源标签
+        /// </summary>
+        public const string TagsRecord = "SequenceRecord";
+
+        /// <summary>
         /// 获取下载器
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
@@ -76,14 +81,14 @@ namespace AIO
                 {
                     yield return handle.UpdateHeader();
                     handle.Begin();
-                    handle.CollectNeedTag("SequenceRecord");
+                    handle.CollectNeedTag(TagsRecord);
                     handle.CollectNeedTag(enumerable);
                     yield return handle.WaitCo();
                 }
             }
             else
             {
-                WhiteListLocal.AddRange(GetAssetInfos("SequenceRecord"));
+                WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
                 WhiteListLocal.AddRange(GetAssetInfos(enumerable));
             }
         }
@@ -100,11 +105,11 @@ namespace AIO
                 {
                     yield return handle.UpdateHeader();
                     handle.Begin();
-                    handle.CollectNeedTag("SequenceRecord");
+                    handle.CollectNeedTag(TagsRecord);
                     yield return handle.WaitCo();
                 }
             }
-            else WhiteListLocal.AddRange(GetAssetInfos("SequenceRecord"));
+            else WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
         }
 
         /// <summary>

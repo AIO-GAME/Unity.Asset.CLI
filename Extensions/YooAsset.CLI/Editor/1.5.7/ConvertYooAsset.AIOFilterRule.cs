@@ -30,7 +30,7 @@ namespace AIO.UEditor.CLI
 
             public bool IsCollectAsset(FilterRuleData data)
             {
-                return Config.SequenceRecord.ContainsAssetPath(data.AssetPath);
+                return Config.SequenceRecord.ContainsAssetPath(data.AssetPath, data.UserData);
             }
         }
 
@@ -52,16 +52,12 @@ namespace AIO.UEditor.CLI
             public bool IsCollectAsset(FilterRuleData data)
             {
                 if (Instance is null || !data.GroupName.Contains('_')) return false;
-
+                var info = data.GroupName.SplitOnce('_');
                 if (Config.EnableSequenceRecord)
                 {
-                    if (Config.SequenceRecord.ContainsAssetPath(data.AssetPath))
-                    {
-                        return false;
-                    }
+                    if (Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1)) return false;
                 }
 
-                var info = data.GroupName.SplitOnce('_');
                 var collector = Instance.GetPackage(info.Item1)
                     ?.GetGroup(info.Item2)
                     ?.GetCollector(data.CollectPath);

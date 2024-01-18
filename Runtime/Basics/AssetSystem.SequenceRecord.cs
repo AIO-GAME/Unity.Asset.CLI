@@ -159,6 +159,11 @@ namespace AIO
                 return Records.Exists(record => record.AssetPath == assetPath);
             }
 
+            public bool ContainsAssetPath(string assetPath, string packageName)
+            {
+                return Records.Exists(record => record.AssetPath == assetPath && record.PackageName == packageName);
+            }
+
             public void CopyTo(SequenceRecord[] array, int arrayIndex)
             {
                 Records.CopyTo(array, arrayIndex);

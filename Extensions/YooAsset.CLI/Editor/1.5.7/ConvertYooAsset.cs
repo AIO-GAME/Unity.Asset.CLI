@@ -205,15 +205,16 @@ namespace AIO.UEditor.CLI
                     if (list.Length == 0) continue;
                     var recordGroup = new AssetBundleCollectorGroup
                     {
-                        GroupName = $"SequenceRecord",
-                        GroupDesc = $"序列记录组[首包专用](请勿删除)",
-                        AssetTags = "SequenceRecord",
+                        GroupName = AssetSystem.TagsRecord,
+                        GroupDesc = "序列记录组[首包专用](请勿删除)",
+                        AssetTags = AssetSystem.TagsRecord,
                         Collectors = new List<AssetBundleCollector>()
                     };
                     foreach (var collector in list)
                     {
                         // 如果GUID已经存在，则不添加
-                        if (recordGroup.Collectors.Exists(collector1 => collector1.CollectorGUID == collector.CollectorGUID)) continue;
+                        if (recordGroup.Collectors.Exists(collector1 =>
+                                collector1.CollectorGUID == collector.CollectorGUID)) continue;
                         recordGroup.Collectors.Add(new AssetBundleCollector
                         {
                             CollectorGUID = collector.CollectorGUID,
@@ -223,7 +224,7 @@ namespace AIO.UEditor.CLI
                             AddressRuleName = nameof(AIOAddressRecordRule),
                             FilterRuleName = nameof(AIOFilterRecordRule),
                             PackRuleName = nameof(PackGroup),
-                            UserData = string.Empty,
+                            UserData = package.PackageName,
                         });
                     }
 
