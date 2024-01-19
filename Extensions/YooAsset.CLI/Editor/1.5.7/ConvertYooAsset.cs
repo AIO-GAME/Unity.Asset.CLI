@@ -31,7 +31,6 @@ namespace AIO.UEditor.CLI
 
         static ConvertYooAsset()
         {
-            AssetCollectSetting.Initialize();
             Collectors = new Dictionary<AssetCollectItem, bool>();
         }
 
@@ -197,12 +196,6 @@ namespace AIO.UEditor.CLI
                 {
                     if (package.Groups is null) continue;
 
-                    var list = (from @group in package.Groups
-                        from collector in @group.Collectors
-                        where collector.CollectorType == ECollectorType.MainAssetCollector
-                        select collector).ToArray();
-
-                    if (list.Length == 0) continue;
                     var recordGroup = new AssetBundleCollectorGroup
                     {
                         GroupName = AssetSystem.TagsRecord,
@@ -210,25 +203,30 @@ namespace AIO.UEditor.CLI
                         AssetTags = AssetSystem.TagsRecord,
                         Collectors = new List<AssetBundleCollector>()
                     };
-                    foreach (var collector in list)
+                    foreach (var group in package.Groups)
                     {
-                        // 如果GUID已经存在，则不添加
-                        if (recordGroup.Collectors.Exists(collector1 =>
-                                collector1.CollectorGUID == collector.CollectorGUID)) continue;
-                        recordGroup.Collectors.Add(new AssetBundleCollector
+                        if (group.Collectors is null) continue;
+                        foreach (var collector in group.Collectors)
                         {
-                            CollectorGUID = collector.CollectorGUID,
-                            CollectPath = collector.CollectPath,
-                            CollectorType = ECollectorType.MainAssetCollector,
-                            AssetTags = collector.AssetTags,
-                            AddressRuleName = nameof(AIOAddressRecordRule),
-                            FilterRuleName = nameof(AIOFilterRecordRule),
-                            PackRuleName = nameof(PackGroup),
-                            UserData = package.PackageName,
-                        });
+                            if (collector.CollectorType != ECollectorType.MainAssetCollector) continue;
+                            // 如果GUID已经存在，则不添加
+                            if (recordGroup.Collectors.Exists(collector1 =>
+                                    collector1.CollectorGUID == collector.CollectorGUID)) continue;
+                            recordGroup.Collectors.Add(new AssetBundleCollector
+                            {
+                                CollectorGUID = collector.CollectorGUID,
+                                CollectPath = collector.CollectPath,
+                                CollectorType = ECollectorType.MainAssetCollector,
+                                AssetTags = collector.AssetTags,
+                                AddressRuleName = nameof(AIOAddressRecordRule),
+                                FilterRuleName = nameof(AIOFilterRecordRule),
+                                PackRuleName = nameof(PackGroup),
+                                UserData = group.GroupName,
+                            });
+                        }
                     }
 
-                    package.Groups.Add(recordGroup);
+                    package.Groups.Insert(0, recordGroup);
                 }
             }
         }

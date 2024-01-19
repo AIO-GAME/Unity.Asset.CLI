@@ -198,7 +198,7 @@ namespace AIO.UEditor
                 Debug.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", data.AssetPath);
                 return false;
             }
-            
+
             if (RuleUseCollectCustom) // 判断是否使用自定义收集规则
             {
                 if (RuleCustomCollect?.Length > 0 && // 判断自定义收集规则等
@@ -414,7 +414,9 @@ namespace AIO.UEditor
                     info.Address = GetAssetAddress(data, pathToLower);
                     info.AssetPath = file;
                     info.Extension = data.Extension;
-                    AssetDataInfos[file] = info;
+                    if (AssetDataInfos.ContainsKey(file))
+                        Debug.LogWarningFormat("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", file);
+                    else AssetDataInfos[file] = info;
                 }
             }
             else
@@ -425,7 +427,9 @@ namespace AIO.UEditor
                 info.Address = GetAssetAddress(data, pathToLower);
                 info.AssetPath = data.CollectPath;
                 info.Extension = data.Extension;
-                AssetDataInfos[data.CollectPath] = info;
+                if (AssetDataInfos.ContainsKey(data.CollectPath))
+                    Debug.LogWarningFormat("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", data.CollectPath);
+                else AssetDataInfos[data.CollectPath] = info;
             }
         }
 

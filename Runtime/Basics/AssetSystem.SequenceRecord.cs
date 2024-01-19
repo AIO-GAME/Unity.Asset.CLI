@@ -17,6 +17,8 @@ namespace AIO
 {
     public partial class AssetSystem
     {
+#if UNITY_EDITOR
+
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
             private const string FILE_NAME = "ASSETRECORD";
@@ -48,9 +50,16 @@ namespace AIO
             /// </summary>
             public void UpdateLocal()
             {
-                Records = File.Exists(LOCAL_PATH)
-                    ? AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH)
-                    : new List<SequenceRecord>();
+                if (File.Exists(LOCAL_PATH))
+                {
+                    var temp = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
+                    Records = new List<SequenceRecord>();
+                    if (temp == null) return;
+                    var dic = new Dictionary<string, SequenceRecord>();
+                    foreach (var item in temp) dic[item.GUID] = item;
+                    Records.AddRange(dic.Values);
+                }
+                else Records = new List<SequenceRecord>();
             }
 
             /// <summary>
@@ -111,7 +120,10 @@ namespace AIO
             public void Save()
             {
                 if (Records is null) return;
-                Records = Records.Distinct().ToList();
+                var temp = new Dictionary<string, SequenceRecord>();
+                foreach (var item in Records.Where(item => !temp.ContainsKey(item.GUID))) temp[item.GUID] = item;
+                Records.Clear();
+                Records.AddRange(temp.Values);
                 Records.Sort((a, b) => b.Time.CompareTo(a.Time));
                 AHelper.IO.WriteJsonUTF8(LOCAL_PATH, Records);
             }
@@ -281,5 +293,7 @@ namespace AIO
                     $"[{Time}] {PackageName} - {Location} - {AssetPath} - {Bytes.ToConverseStringFileSize()} - {Count}";
             }
         }
+
+#endif
     }
 }

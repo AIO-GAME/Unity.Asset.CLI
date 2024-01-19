@@ -69,7 +69,6 @@ namespace AIO.UEditor
             if (filterCollect is null) return false;
             foreach (var collect in filterCollect)
             {
-                if (collect[1] == '.' && collect.Substring(2) == extension) return true;
                 switch (collect[0])
                 {
                     case '.':
