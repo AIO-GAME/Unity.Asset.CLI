@@ -116,7 +116,7 @@ namespace AIO.UEditor.CLI
                     data.Add(new AssetsPackageConfig
                     {
                         Name = config.PackageName,
-                        Version = config.Version
+                        Version = config.IsUploadLatest ? "Latest" : config.Version
                     });
                 }
                 else data2.Version = config.Version;
@@ -130,7 +130,7 @@ namespace AIO.UEditor.CLI
                     new AssetsPackageConfig
                     {
                         Name = config.PackageName,
-                        Version = config.Version
+                        Version = config.IsUploadLatest ? "Latest" : config.Version
                     }
                 });
             }
