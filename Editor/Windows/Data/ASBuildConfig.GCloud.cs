@@ -19,12 +19,12 @@ namespace AIO.UEditor
         /// <summary>
         /// Gcloud 路径
         /// </summary>
-        public string GCLOUD_PATH = "gcloud";
+        public string GCLOUD_PATH;
 
         /// <summary>
         /// Gsutil 路径
         /// </summary>
-        public string GSUTIL_PATH = "gsutil";
+        public string GSUTIL_PATH;
 
         /// <summary>
         /// 是否上传Latest
