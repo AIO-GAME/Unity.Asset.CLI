@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
+using UnityEditor;
 using UnityEngine;
 
 namespace AIO
@@ -56,8 +57,22 @@ namespace AIO
                     Records = new List<SequenceRecord>();
                     if (temp == null) return;
                     var dic = new Dictionary<string, SequenceRecord>();
-                    foreach (var item in temp) dic[item.GUID] = item;
-                    Records.AddRange(dic.Values);
+                    if (temp.Count > 0)
+                    {
+                        foreach (var item in temp)
+                        {
+                            if (string.IsNullOrEmpty(item.GUID))
+                            {
+                                if (string.IsNullOrEmpty(item.AssetPath)) continue;
+                                item.GUID = AssetDatabase.AssetPathToGUID(item.AssetPath);
+                            }
+
+                            if (string.IsNullOrEmpty(item.GUID)) continue;
+                            dic[item.GUID] = item;
+                        }
+
+                        Records.AddRange(dic.Values);
+                    }
                 }
                 else Records = new List<SequenceRecord>();
             }
