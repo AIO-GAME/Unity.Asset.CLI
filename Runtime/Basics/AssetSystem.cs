@@ -25,8 +25,11 @@ namespace AIO
         /// </summary>
         public static event Action<AssetSystemException> OnException;
 
+        private static AssetSystemException _Exception;
+
         internal static void ExceptionEvent(AssetSystemException ex)
         {
+            _Exception = ex;
             if (OnException is null) throw new SystemException($"Asset System Exception : {ex}");
             OnException.Invoke(ex);
         }
@@ -101,7 +104,9 @@ namespace AIO
         public static IEnumerator Initialize<T>(T proxy, ASConfig config, IProgressEvent iEvent = default)
             where T : AssetProxy
         {
-            if (!IsInitialized) IsInitialized = false;
+            IsInitialized = false;
+            _Exception = AssetSystemException.None;
+
             if (proxy is null)
             {
                 ExceptionEvent(AssetSystemException.AssetProxyIsNull);
@@ -126,6 +131,7 @@ namespace AIO
             Parameter = config;
             Proxy = proxy;
             yield return Proxy.UpdatePackages(Parameter);
+            if (_Exception != AssetSystemException.None) yield break;
             try
             {
                 Parameter.Check();
@@ -137,6 +143,7 @@ namespace AIO
             }
 
             yield return Proxy.Initialize();
+            if (_Exception != AssetSystemException.None) yield break;
             DownloadHandle = Proxy.GetLoadingHandle();
             IsInitialized = true;
         }

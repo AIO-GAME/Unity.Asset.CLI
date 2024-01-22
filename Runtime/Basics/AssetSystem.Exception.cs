@@ -13,10 +13,15 @@ namespace AIO
     /// </summary>
     public enum AssetSystemException
     {
+        /// <summary>
+        /// 无异常
+        /// </summary>
+        None = 0,
+
         [Description(@"
 [EN:Unknown Exception]
 [CN:未知异常]")]
-        Unknown = 0,
+        Unknown,
 
         [Description(@"
 [EN:AssetProxy is null! Verify implementation or enter an instance!]
@@ -69,12 +74,12 @@ ASConfig 为空！请检查实现或输入实例！
 [EN:Description Failed to parse the Json file of the remote path version]
 [CN:资源配置远端路径版本配置解析Json失败]")]
         ASConfigRemoteUrlRemoteVersionParsingJsonFailure,
-        
+
         [Description(@"
 [EN:Abnormal configuration check parameters]
 [CN:配置检查参数异常]")]
         ASConfigCheckError,
-        
+
         [Description(@"
 [EN:Configuration initialization failed]
 [CN:配置初始化失败]")]
