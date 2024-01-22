@@ -40,7 +40,7 @@ namespace AIO.UEngine.YooAsset
             AssetSystem.Log("Load {0} : [{1} : {2}] -> {3}", type.ToString(), packageName, location,
                 GetAssetInfo(location)?.AssetPath);
 #else
-            AssetSystem.Log("{0} : [{1} : {2}]", type.ToString(),packagename, location);
+            AssetSystem.Log("{0} : [{1} : {2}]", type.ToString(), packageName, location);
 #endif
         }
 
@@ -244,7 +244,7 @@ namespace AIO.UEngine.YooAsset
                 return package;
             }
 
-            AssetSystem.LogException($@"资源查找失败 [auto : {location}]");
+            AssetSystem.LogException($"资源查找失败 [auto : {location}]");
             return null;
         }
 

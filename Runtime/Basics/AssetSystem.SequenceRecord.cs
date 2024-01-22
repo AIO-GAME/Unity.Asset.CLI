@@ -138,11 +138,10 @@ namespace AIO
 
             public void Add(SequenceRecord record)
             {
-                if (Enable)
-                {
-                    if (ContainsGUID(record.GUID)) return;
-                    Records.Add(record);
-                }
+                if (!Enable) return;
+                if (record is null) return;
+                if (ContainsGUID(record.GUID)) return;
+                Records.Add(record);
             }
 
             public void Clear()

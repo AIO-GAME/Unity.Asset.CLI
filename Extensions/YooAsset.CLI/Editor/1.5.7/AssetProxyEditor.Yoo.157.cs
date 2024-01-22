@@ -27,9 +27,9 @@ namespace AIO.UEditor.CLI
         public string Scopes => Ghost.YooAsset.Scopes;
         public string Name => Ghost.YooAsset.Name;
 
-        public void CreateConfig(string bundlesDir)
+        public void CreateConfig(string bundlesDir, bool mergeToLatest)
         {
-            CreateConfig157(bundlesDir);
+            CreateConfig157(bundlesDir, mergeToLatest);
         }
 
         public void ConvertConfig(AssetCollectRoot config)
@@ -125,14 +125,15 @@ namespace AIO.UEditor.CLI
         [MenuItem("YooAsset/Create Config")]
         public static void CreateConfig()
         {
-            CreateConfig157(Path.Combine(EHelper.Path.Project, "Bundles"));
+            CreateConfig157(Path.Combine(EHelper.Path.Project, "Bundles"), ASBuildConfig.GetOrCreate().MergeToLatest);
         }
 
         /// <summary>
         /// 创建配置
         /// </summary>
-        /// <param name="BundlesDir"></param>
-        private static void CreateConfig157(string BundlesDir)
+        /// <param name="BundlesDir">构建目录</param>
+        /// <param name="MergeToLatest">开启合并Latest</param>
+        private static void CreateConfig157(string BundlesDir, bool MergeToLatest)
         {
             if (!Directory.Exists(BundlesDir))
             {
@@ -181,7 +182,7 @@ namespace AIO.UEditor.CLI
                             TableDic[enums].Add(PackageInfo.Name, new AssetsPackageConfig());
 
                         var last = AHelper.IO.GetLastWriteTimeUtc(Versions);
-                        TableDic[enums][PackageInfo.Name].Version = last.Name;
+                        TableDic[enums][PackageInfo.Name].Version = MergeToLatest ? "Latest" : last.Name;
                         TableDic[enums][PackageInfo.Name].Name = PackageInfo.Name;
                         var table = AHelper.IO.ReadJson<Hashtable>(Path.Combine(last.FullName,
                             $"BuildReport_{PackageInfo.Name}_{last.Name}.json"));

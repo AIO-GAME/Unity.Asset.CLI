@@ -218,7 +218,7 @@ namespace AIO.UEditor.CLI
 
                 if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
                 else EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
-                AssetProxyEditor.CreateConfig(buildParameters.BuildOutputRoot);
+                AssetProxyEditor.CreateConfig(buildParameters.BuildOutputRoot, command.MergeToLatest);
             }
             else
             {

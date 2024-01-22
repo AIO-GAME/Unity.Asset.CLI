@@ -437,8 +437,7 @@ namespace AIO.UEngine
                         var str = new StringBuilder("Failed to download resource pack file :\n");
                         foreach (var pair in ErrorDict)
                         {
-                            AssetSystem.LogError(
-                                $"Failed to download resource pack file -> [{pair.Key} -> {pair.Value}]");
+                            AssetSystem.LogError($"下载资源失败 -> [{pair.Key} -> {pair.Value}]");
                             str.AppendLine(pair.Key);
                         }
 

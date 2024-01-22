@@ -256,13 +256,13 @@ namespace AIO.UEngine.YooAsset
             YAssetPackage package = null;
             yield return GetAutoPackageCO(packageName, location, ya => package = ya);
             if (package is null)
-                throw new Exception($"The scenario configuration is incorrect : {packageName} {location} {sceneMode}");
+                throw new Exception($"场景配置 异常错误 : {packageName} {location} {sceneMode}");
 
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
             var check = false;
             yield return LoadCheckOPCO(operation, error => check = error);
             if (!check)
-                throw new Exception($"Loading scenario resources is abnormal : {packageName} {location} {sceneMode}");
+                throw new Exception($"加载场景 资源异常 : {packageName} {location} {sceneMode}");
             AddHandle(location, operation);
 
             cb?.Invoke(operation.SceneObject);

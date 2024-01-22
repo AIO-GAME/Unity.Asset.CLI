@@ -35,7 +35,8 @@ namespace AIO.UEditor
         /// 创建配置
         /// </summary>
         /// <param name="bundlesDir">导出目标文件夹</param>
-        void CreateConfig(string bundlesDir);
+        /// <param name="mergeToLatest">合并Latest</param>
+        void CreateConfig(string bundlesDir, bool mergeToLatest);
 
         /// <summary>
         /// 构建资源
