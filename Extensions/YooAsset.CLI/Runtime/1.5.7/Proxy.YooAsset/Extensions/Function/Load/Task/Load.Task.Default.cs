@@ -30,7 +30,6 @@ using ATaskByteArray = System.Threading.Tasks.Task<System.Byte[]>;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using YooAsset;
 using Object = UnityEngine.Object;
 
 namespace AIO.UEngine.YooAsset

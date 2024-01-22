@@ -9,7 +9,6 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using YooAsset;
 using Object = UnityEngine.Object;
 
 namespace AIO.UEngine.YooAsset

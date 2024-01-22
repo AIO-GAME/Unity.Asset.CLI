@@ -18,14 +18,14 @@ namespace AIO.UEngine.YooAsset
     {
         #region 实例化GameObject
 
-        public static IEnumerator InstGameObjectCO(string packagename, string location, Transform parent,
+        public static IEnumerator InstGameObjectCO(string packageName, string location, Transform parent,
             Action<GameObject> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packageName, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -47,13 +47,13 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(operation.InstantiateSync(parent));
         }
 
-        public static IEnumerator InstGameObjectCO(string packagename, string location, Action<GameObject> cb)
+        public static IEnumerator InstGameObjectCO(string packageName, string location, Action<GameObject> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packageName, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -82,18 +82,18 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static IEnumerator LoadSubAssetsCO<TObject>(string packagename, string location, Action<TObject[]> cb)
+        public static IEnumerator LoadSubAssetsCO<TObject>(string packageName, string location, Action<TObject[]> cb)
             where TObject : Object
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packageName, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -118,17 +118,17 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         /// <param name="cb">回调</param>
-        public static IEnumerator LoadSubAssetsCO(string packagename, string location, Type type, Action<Object[]> cb)
+        public static IEnumerator LoadSubAssetsCO(string packageName, string location, Type type, Action<Object[]> cb)
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packageName, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -157,18 +157,18 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static IEnumerator LoadAssetCO<TObject>(string packagename, string location, Action<TObject> cb)
+        public static IEnumerator LoadAssetCO<TObject>(string packageName, string location, Action<TObject> cb)
             where TObject : Object
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packageName, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -193,17 +193,17 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
         /// <param name="cb">回调</param>
-        public static IEnumerator LoadAssetCO(string packagename, string location, Type type, Action<Object> cb)
+        public static IEnumerator LoadAssetCO(string packageName, string location, Type type, Action<Object> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packageName, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -232,7 +232,7 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载场景
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">场景的定位地址</param>
         /// <param name="cb">回调</param>
         /// <param name="sceneMode">场景加载模式</param>
@@ -240,7 +240,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="priority">优先级</param>
         public static IEnumerator LoadSceneCO(
             Action<Scene> cb,
-            string packagename,
+            string packageName,
             string location,
             LoadSceneMode sceneMode = LoadSceneMode.Single,
             bool suspendLoad = false,
@@ -254,15 +254,15 @@ namespace AIO.UEngine.YooAsset
             }
 
             YAssetPackage package = null;
-            yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+            yield return GetAutoPackageCO(packageName, location, ya => package = ya);
             if (package is null)
-                throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", packagename, location, sceneMode));
+                throw new Exception($"The scenario configuration is incorrect : {packageName} {location} {sceneMode}");
 
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
             var check = false;
             yield return LoadCheckOPCO(operation, error => check = error);
             if (!check)
-                throw new Exception(string.Format("加载场景 资源异常:{0} {1} {2}", packagename, location, sceneMode));
+                throw new Exception($"Loading scenario resources is abnormal : {packageName} {location} {sceneMode}");
             AddHandle(location, operation);
 
             cb?.Invoke(operation.SceneObject);
@@ -275,16 +275,16 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static IEnumerator LoadRawFileDataCO(string packagename, string location, Action<byte[]> cb)
+        public static IEnumerator LoadRawFileDataCO(string packageName, string location, Action<byte[]> cb)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packageName, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -309,16 +309,16 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static IEnumerator LoadRawFileTextCO(string packagename, string location, Action<string> cb)
+        public static IEnumerator LoadRawFileTextCO(string packageName, string location, Action<string> cb)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
                 YAssetPackage package = null;
-                yield return GetAutoPackageCO(packagename, location, ya => package = ya);
+                yield return GetAutoPackageCO(packageName, location, ya => package = ya);
                 if (package is null)
                 {
                     cb?.Invoke(null);

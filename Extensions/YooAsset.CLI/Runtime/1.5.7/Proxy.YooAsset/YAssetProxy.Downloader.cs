@@ -427,10 +427,10 @@ namespace AIO.UEngine
                     State = EProgressState.Fail;
                     if (Event.OnError != null)
                     {
-                        var str = new StringBuilder("下载资源包文件失败\n");
+                        var str = new StringBuilder("Failed to download resource pack file :\n");
                         foreach (var pair in ErrorDict)
                         {
-                            AssetSystem.LogError($"下载资源包文件失败 -> [{pair.Key} -> {pair.Value}]");
+                            AssetSystem.LogError($"Failed to download resource pack file -> [{pair.Key} -> {pair.Value}]");
                             str.AppendLine(pair.Key);
                         }
 
@@ -441,7 +441,7 @@ namespace AIO.UEngine
                     {
                         foreach (var pair in ErrorDict)
                         {
-                            AssetSystem.LogError($"下载资源包文件失败 -> [{pair.Key} -> {pair.Value}]");
+                            AssetSystem.LogError($"Failed to download resource pack file -> [{pair.Key} -> {pair.Value}]");
                         }
                     }
 #endif

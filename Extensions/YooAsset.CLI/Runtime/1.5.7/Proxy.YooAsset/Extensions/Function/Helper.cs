@@ -34,10 +34,10 @@ namespace AIO.UEngine.YooAsset
 #endif
         }
 
-        private static void PackageDebug(LoadType type, string packagename, string location)
+        private static void PackageDebug(LoadType type, string packageName, string location)
         {
 #if UNITY_EDITOR
-            AssetSystem.Log("Load {0} : [{1} : {2}] -> {3}", type.ToString(), packagename, location,
+            AssetSystem.Log("Load {0} : [{1} : {2}] -> {3}", type.ToString(), packageName, location,
                 GetAssetInfo(location)?.AssetPath);
 #else
             AssetSystem.Log("{0} : [{1} : {2}]", type.ToString(),packagename, location);
@@ -95,12 +95,12 @@ namespace AIO.UEngine.YooAsset
             AssetSystem.LogException("资源查找失败 [auto : {0}]", location);
         }
 
-        private static IEnumerator GetAutoPackageCO(string packagename, AssetInfo location, Action<YAssetPackage> cb)
+        private static IEnumerator GetAutoPackageCO(string packageName, AssetInfo location, Action<YAssetPackage> cb)
         {
-            yield return GetAutoPackageCO(packagename, location.Address, cb);
+            yield return GetAutoPackageCO(packageName, location.Address, cb);
         }
 
-        private static IEnumerator GetAutoPackageCO(string packagename, string location, Action<YAssetPackage> cb)
+        private static IEnumerator GetAutoPackageCO(string packageName, string location, Action<YAssetPackage> cb)
         {
             if (location.EndsWith("/") || location.EndsWith("\\"))
             {
@@ -109,10 +109,10 @@ namespace AIO.UEngine.YooAsset
                 yield break;
             }
 
-            PackageDebug(LoadType.Coroutine, packagename, location);
-            if (!Dic.TryGetValue(packagename, out var package))
+            PackageDebug(LoadType.Coroutine, packageName, location);
+            if (!Dic.TryGetValue(packageName, out var package))
             {
-                AssetSystem.LogException("目标资源包不存在 [{0} : {1}]", packagename, location);
+                AssetSystem.LogException("目标资源包不存在 [{0} : {1}]", packageName, location);
                 yield break;
             }
 
@@ -125,7 +125,7 @@ namespace AIO.UEngine.YooAsset
             if (package.IsNeedDownloadFromRemote(location))
             {
                 var info = package.GetAssetInfo(location);
-                if (info is null) AssetSystem.LogException("无法获取资源信息 [{0} : {1}]", packagename, location);
+                if (info is null) AssetSystem.LogException("无法获取资源信息 [{0} : {1}]", packageName, location);
                 else
                 {
                     var operation = CreateDownloaderOperation(package, info);
@@ -177,12 +177,12 @@ namespace AIO.UEngine.YooAsset
             return null;
         }
 
-        private static YAssetPackage GetAutoPackageSync(string packagename, AssetInfo location)
+        private static YAssetPackage GetAutoPackageSync(string packageName, AssetInfo location)
         {
-            return GetAutoPackageSync(packagename, location.Address);
+            return GetAutoPackageSync(packageName, location.Address);
         }
 
-        private static YAssetPackage GetAutoPackageSync(string packagename, string location)
+        private static YAssetPackage GetAutoPackageSync(string packageName, string location)
         {
             if (location.EndsWith("/") || location.EndsWith("\\"))
             {
@@ -190,11 +190,11 @@ namespace AIO.UEngine.YooAsset
                 return null;
             }
 
-            PackageDebug(LoadType.Sync, packagename, location);
+            PackageDebug(LoadType.Sync, packageName, location);
 
-            if (!Dic.TryGetValue(packagename, out var package))
+            if (!Dic.TryGetValue(packageName, out var package))
             {
-                AssetSystem.LogException(string.Format("目标资源包不存在 [{0} : {1}]", packagename, location));
+                AssetSystem.LogException(string.Format("目标资源包不存在 [{0} : {1}]", packageName, location));
                 return null;
             }
 
@@ -248,12 +248,12 @@ namespace AIO.UEngine.YooAsset
             return null;
         }
 
-        private static Task<YAssetPackage> GetAutoPackageTask(string packagename, AssetInfo location)
+        private static Task<YAssetPackage> GetAutoPackageTask(string packageName, AssetInfo location)
         {
-            return GetAutoPackageTask(packagename, location.Address);
+            return GetAutoPackageTask(packageName, location.Address);
         }
 
-        private static async Task<YAssetPackage> GetAutoPackageTask(string packagename, string location)
+        private static async Task<YAssetPackage> GetAutoPackageTask(string packageName, string location)
         {
             if (location.EndsWith("/") || location.EndsWith("\\"))
             {
@@ -261,10 +261,10 @@ namespace AIO.UEngine.YooAsset
                 return null;
             }
 
-            PackageDebug(LoadType.Async, packagename, location);
-            if (!Dic.TryGetValue(packagename, out var package))
+            PackageDebug(LoadType.Async, packageName, location);
+            if (!Dic.TryGetValue(packageName, out var package))
             {
-                AssetSystem.LogException($"目标资源包不存在 [{packagename} : {location}]");
+                AssetSystem.LogException($"目标资源包不存在 [{packageName} : {location}]");
                 return null;
             }
 
@@ -274,7 +274,7 @@ namespace AIO.UEngine.YooAsset
             if (package.IsNeedDownloadFromRemote(location))
             {
                 var info = package.GetAssetInfo(location);
-                if (info is null) AssetSystem.LogException($"无法获取资源信息 [{packagename} : {location}]");
+                if (info is null) AssetSystem.LogException($"无法获取资源信息 [{packageName} : {location}]");
                 else
                 {
                     var operation = CreateDownloaderOperation(package, info);

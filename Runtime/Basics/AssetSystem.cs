@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using AIO.UEngine;
+using UnityEditor;
 using UnityEngine;
 
 namespace AIO
@@ -19,6 +20,17 @@ namespace AIO
     /// </summary>
     public static partial class AssetSystem
     {
+        /// <summary>
+        /// 系统初始化异常
+        /// </summary>
+        public static event Action<AssetSystemException> OnException;
+
+        internal static void ExceptionEvent(AssetSystemException ex)
+        {
+            if (OnException is null) throw new SystemException($"资源系统异常类型 : {ex}");
+            OnException.Invoke(ex);
+        }
+
         /// <summary>
         /// 系统初始化
         /// </summary>
@@ -34,23 +46,15 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize()
         {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    if (type.IsAbstract) continue;
-                    if (typeof(AssetProxy).IsAssignableFrom(type))
-                    {
-                        Proxy = (AssetProxy)Activator.CreateInstance(type);
-                        break;
-                    }
-                }
-            }
+            yield return Initialize(ASConfig.GetOrCreate());
+        }
 
-            if (Proxy is null)
-                throw new Exception("Not Found Other Asset Proxy! Please Input Asset Proxy!");
-
-            yield return Initialize(Proxy, ASConfig.GetOrCreate());
+        /// <summary>
+        /// 收集类型过滤
+        /// </summary>
+        private static bool TypeFilter(Type type)
+        {
+            return !type.IsAbstract && typeof(AssetProxy).IsAssignableFrom(type);
         }
 
         /// <summary>
@@ -63,17 +67,11 @@ namespace AIO
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (type.IsAbstract) continue;
-                    if (typeof(AssetProxy).IsAssignableFrom(type))
-                    {
-                        Proxy = (AssetProxy)Activator.CreateInstance(type);
-                        break;
-                    }
+                    if (!TypeFilter(type)) continue;
+                    Proxy = (AssetProxy)Activator.CreateInstance(type);
+                    break;
                 }
             }
-
-            if (Proxy is null)
-                throw new Exception("Not Found Other Asset Proxy! Please Input Asset Proxy!");
 
             yield return Initialize(Proxy, config);
         }
@@ -102,24 +100,42 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : AssetProxy
         {
-            IsInitialized = false;
-            Parameter = config;
-            BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, Parameter.RuntimeRootDirectory);
+            if (!IsInitialized) IsInitialized = false;
+            if (proxy is null)
+            {
+                ExceptionEvent(AssetSystemException.AssetProxyIsNull);
+                yield break;
+            }
+
+            if (config is null)
+            {
+                ExceptionEvent(AssetSystemException.ASConfigIsNull);
+                yield break;
+            }
+
+            BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, config.RuntimeRootDirectory);
             SandboxRootDirectory =
 #if UNITY_EDITOR
                 string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
-                    Path.DirectorySeparatorChar, "Sandbox", Path.DirectorySeparatorChar,
-                    UnityEditor.EditorUserBuildSettings.activeBuildTarget.ToString());
+                    "/Sandbox/", EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
                 Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory);
 #endif
+            Parameter = config;
             Proxy = proxy;
-            if (Parameter.ASMode == EASMode.Remote)
-                yield return Parameter.UpdatePackageRemote();
-            else Parameter.UpdatePackage();
+            yield return Proxy.UpdatePackages(Parameter);
+            try
+            {
+                Parameter.Check();
+            }
+            catch (Exception)
+            {
+                ExceptionEvent(AssetSystemException.ASConfigCheckError);
+                yield break;
+            }
 
             yield return Proxy.Initialize();
-            MainDownloadHandle = Proxy.GetLoadingHandle();
+            DownloadHandle = Proxy.GetLoadingHandle();
             IsInitialized = true;
         }
 

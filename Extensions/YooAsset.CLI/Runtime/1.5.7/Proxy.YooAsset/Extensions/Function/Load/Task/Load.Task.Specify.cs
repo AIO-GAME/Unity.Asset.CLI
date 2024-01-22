@@ -39,12 +39,12 @@ namespace AIO.UEngine.YooAsset
 {
     internal partial class YAssetSystem
     {
-        public static async ATaskGameObject InstGameObjectTask(string packagename, string location, Transform parent)
+        public static async ATaskGameObject InstGameObjectTask(string packageName, string location, Transform parent)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadAssetAsync<GameObject>(location);
                 if (!await LoadCheckOPTask(operation)) return null;
@@ -54,12 +54,12 @@ namespace AIO.UEngine.YooAsset
             return operation.InstantiateSync(parent);
         }
 
-        public static async ATaskGameObject InstGameObjectTask(string packagename, string location)
+        public static async ATaskGameObject InstGameObjectTask(string packageName, string location)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadAssetAsync<GameObject>(location);
                 if (!await LoadCheckOPTask(operation)) return null;
@@ -74,20 +74,20 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
 #if UNITASK
-        public static async UniTask<TObject[]> LoadSubAssetsTask<TObject>(string packagename, string location) where TObject : Object
+        public static async UniTask<TObject[]> LoadSubAssetsTask<TObject>(string packageName, string location) where TObject : Object
 #else
-        public static async Task<TObject[]> LoadSubAssetsTask<TObject>(string packagename, string location)
+        public static async Task<TObject[]> LoadSubAssetsTask<TObject>(string packageName, string location)
             where TObject : Object
 #endif
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadSubAssetsAsync<TObject>(location);
                 if (!await LoadCheckOPTask(operation)) return null;
@@ -100,15 +100,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
-        public static async ATaskObjectArray LoadSubAssetsTask(string packagename, string location, Type type)
+        public static async ATaskObjectArray LoadSubAssetsTask(string packageName, string location, Type type)
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadSubAssetsAsync(location, type);
                 if (!await LoadCheckOPTask(operation)) return null;
@@ -125,20 +125,20 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
 #if UNITASK
-        public static async UniTask<TObject> LoadAssetTask<TObject>(string packagename, string location) where TObject : Object
+        public static async UniTask<TObject> LoadAssetTask<TObject>(string packageName, string location) where TObject : Object
 #else
-        public static async Task<TObject> LoadAssetTask<TObject>(string packagename, string location)
+        public static async Task<TObject> LoadAssetTask<TObject>(string packageName, string location)
             where TObject : Object
 #endif
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadAssetAsync<TObject>(location);
                 if (!await LoadCheckOPTask(operation)) return null;
@@ -151,15 +151,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
-        public static async ATaskObject LoadAssetTask(string packagename, string location, Type type)
+        public static async ATaskObject LoadAssetTask(string packageName, string location, Type type)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadAssetAsync(location, type);
                 if (!await LoadCheckOPTask(operation)) return null;
@@ -176,13 +176,13 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载场景
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">场景的定位地址</param>
         /// <param name="sceneMode">场景加载模式</param>
         /// <param name="suspendLoad">场景加载到90%自动挂起</param>
         /// <param name="priority">优先级</param>
         public static async ATaskScene LoadSceneTask(
-            string packagename,
+            string packageName,
             string location,
             LoadSceneMode sceneMode = LoadSceneMode.Single,
             bool suspendLoad = false,
@@ -196,14 +196,14 @@ namespace AIO.UEngine.YooAsset
                 FreeHandle(location);
             }
 
-            var package = await GetAutoPackageTask(packagename, location);
+            var package = await GetAutoPackageTask(packageName, location);
             if (package is null)
-                throw new Exception(string.Format("场景配置 异常错误:{0} {1} {2}", packagename, location, sceneMode));
+                throw new Exception($"The scenario configuration is incorrect : {packageName} {location} {sceneMode}");
 
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
             if (!await LoadCheckOPTask(operation))
                 throw new Exception(
-                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                    $"Loading scenario resources is abnormal : {package.PackageName} {location} {sceneMode}");
             AddHandle(location, operation);
 
             return operation.SceneObject;
@@ -216,14 +216,14 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
-        public static async ATaskByteArray LoadRawFileDataTask(string packagename, string location)
+        public static async ATaskByteArray LoadRawFileDataTask(string packageName, string location)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadRawFileAsync(location);
                 if (!await LoadCheckOPTask(operation)) return null;
@@ -236,14 +236,14 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
-        public static async ATaskString LoadRawFileTextTask(string packagename, string location)
+        public static async ATaskString LoadRawFileTextTask(string packageName, string location)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadRawFileAsync(location);
                 if (!await LoadCheckOPTask(operation)) return null;

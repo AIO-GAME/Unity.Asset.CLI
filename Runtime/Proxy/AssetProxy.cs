@@ -30,6 +30,12 @@ namespace AIO.UEngine
         public abstract IEnumerator Initialize();
 
         /// <summary>
+        /// 更新资源包
+        /// </summary>
+        /// <returns></returns>
+        public abstract IEnumerator UpdatePackages(ASConfig config);
+        
+        /// <summary>
         /// 释放资源句柄
         /// </summary>
         public abstract void Dispose();

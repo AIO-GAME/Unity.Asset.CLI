@@ -96,7 +96,7 @@ namespace AIO.UEngine.YooAsset
                 operation.OnDownloadOverCallback += OnDownloadOver;
                 operation.OnDownloadErrorCallback += (f,r) =>
                 {
-                    AssetSystem.MainDownloadHandle.Event.OnError?.Invoke(new Exception($"{f}:{r}"));
+                    AssetSystem.DownloadHandle.Event.OnError?.Invoke(new Exception($"{f}:{r}"));
                 };
                 operations.Add(local, operation);
                 State = EProgressState.Running;
@@ -122,7 +122,7 @@ namespace AIO.UEngine.YooAsset
 
                     _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
                     _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
-                    AssetSystem.MainDownloadHandle.Event.OnProgress?.Invoke(_Progress);
+                    AssetSystem.DownloadHandle.Event.OnProgress?.Invoke(_Progress);
                 }
             }
 
@@ -130,7 +130,7 @@ namespace AIO.UEngine.YooAsset
             {
                 _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
                 _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
-                AssetSystem.MainDownloadHandle.Event.OnProgress?.Invoke(_Progress);
+                AssetSystem.DownloadHandle.Event.OnProgress?.Invoke(_Progress);
             }
         }
 
@@ -153,7 +153,7 @@ namespace AIO.UEngine.YooAsset
             }
 #endif
 
-            if (AssetSystem.MainDownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, operation);
+            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, operation);
             return operation;
         }
 

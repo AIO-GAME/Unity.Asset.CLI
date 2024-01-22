@@ -1,6 +1,4 @@
 ﻿#if SUPPORT_YOOASSET
-using System;
-using UnityEngine;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset

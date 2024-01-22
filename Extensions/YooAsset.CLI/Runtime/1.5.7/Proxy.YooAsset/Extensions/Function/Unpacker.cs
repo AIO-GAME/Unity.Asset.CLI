@@ -11,9 +11,10 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tag">资源标签</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public static ResourceUnpackerOperation UnpackerPatchDefault(string tag, int unpackingMaxNumber, int failedTryAgain)
+        public static ResourceUnpackerOperation UnPackerPatchDefault(string tag, int unpackingMaxNumber,
+            int failedTryAgain)
         {
-            return DefaultPackage.CreateResourceUnpacker(tag, unpackingMaxNumber, failedTryAgain);
+            return DefaultPackage.CreateResourceUnPacker(tag, unpackingMaxNumber, failedTryAgain);
         }
 
         /// <summary>
@@ -22,9 +23,10 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public static ResourceUnpackerOperation UnpackerPatchDefault(string[] tags, int unpackingMaxNumber, int failedTryAgain)
+        public static ResourceUnpackerOperation UnPackerPatchDefault(string[] tags, int unpackingMaxNumber,
+            int failedTryAgain)
         {
-            return DefaultPackage.CreateResourceUnpacker(tags, unpackingMaxNumber, failedTryAgain);
+            return DefaultPackage.CreateResourceUnPacker(tags, unpackingMaxNumber, failedTryAgain);
         }
 
         /// <summary>
@@ -32,9 +34,10 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public static ResourceUnpackerOperation CreateResourceUnpackerDefault(int unpackingMaxNumber, int failedTryAgain)
+        public static ResourceUnpackerOperation CreateResourceUnPackerDefault(int unpackingMaxNumber,
+            int failedTryAgain)
         {
-            return DefaultPackage.CreateResourceUnpacker(unpackingMaxNumber, failedTryAgain);
+            return DefaultPackage.CreateResourceUnPacker(unpackingMaxNumber, failedTryAgain);
         }
 
         /// <summary>
@@ -44,10 +47,11 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tag">资源标签</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public static ResourceUnpackerOperation UnpackerPatch(string package, string tag, int unpackingMaxNumber, int failedTryAgain)
+        public static ResourceUnpackerOperation UnPackerPatch(string package, string tag, int unpackingMaxNumber,
+            int failedTryAgain)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
-            return asset.CreateResourceUnpacker(tag, unpackingMaxNumber, failedTryAgain);
+            return asset.CreateResourceUnPacker(tag, unpackingMaxNumber, failedTryAgain);
         }
 
         /// <summary>
@@ -57,10 +61,11 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public static ResourceUnpackerOperation UnpackerPatch(string package, string[] tags, int unpackingMaxNumber, int failedTryAgain)
+        public static ResourceUnpackerOperation UnPackerPatch(string package, string[] tags, int unpackingMaxNumber,
+            int failedTryAgain)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
-            return asset.CreateResourceUnpacker(tags, unpackingMaxNumber, failedTryAgain);
+            return asset.CreateResourceUnPacker(tags, unpackingMaxNumber, failedTryAgain);
         }
 
         /// <summary>
@@ -69,10 +74,11 @@ namespace AIO.UEngine.YooAsset
         /// <param name="package">包名</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public static ResourceUnpackerOperation UnpackerPatch(string package, int unpackingMaxNumber, int failedTryAgain)
+        public static ResourceUnpackerOperation UnPackerPatch(string package, int unpackingMaxNumber,
+            int failedTryAgain)
         {
             if (!Dic.TryGetValue(package, out var asset)) return null;
-            return asset.CreateResourceUnpacker(unpackingMaxNumber, failedTryAgain);
+            return asset.CreateResourceUnPacker(unpackingMaxNumber, failedTryAgain);
         }
     }
 }

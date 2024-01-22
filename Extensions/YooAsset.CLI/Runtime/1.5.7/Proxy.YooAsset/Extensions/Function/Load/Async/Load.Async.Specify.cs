@@ -20,13 +20,13 @@ namespace AIO.UEngine.YooAsset
     {
         #region 实例化GameObject
 
-        public static async void InstGameObject(string packagename, string location, Transform parent,
+        public static async void InstGameObject(string packageName, string location, Transform parent,
             Action<GameObject> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -46,12 +46,12 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(operation.InstantiateSync(parent));
         }
 
-        public static async void InstGameObject(string packagename, string location, Action<GameObject> cb)
+        public static async void InstGameObject(string packageName, string location, Action<GameObject> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -78,17 +78,17 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static async void LoadSubAssets<TObject>(string packagename, string location, Action<TObject[]> cb)
+        public static async void LoadSubAssets<TObject>(string packageName, string location, Action<TObject[]> cb)
             where TObject : Object
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -111,15 +111,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源信息</param>
         /// <param name="cb">回调</param>
-        public static async void LoadSubAssets(string packagename, AssetInfo location, Action<Object[]> cb)
+        public static async void LoadSubAssets(string packageName, AssetInfo location, Action<Object[]> cb)
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -142,16 +142,16 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         /// <param name="cb">回调</param>
-        public static async void LoadSubAssets(string packagename, string location, Type type, Action<Object[]> cb)
+        public static async void LoadSubAssets(string packageName, string location, Type type, Action<Object[]> cb)
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -178,17 +178,17 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static async void LoadAsset<TObject>(string packagename, string location, Action<TObject> cb)
+        public static async void LoadAsset<TObject>(string packageName, string location, Action<TObject> cb)
             where TObject : Object
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -211,16 +211,16 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
         /// <param name="cb">回调</param>
-        public static async void LoadAsset(string packagename, string location, Type type, Action<Object> cb)
+        public static async void LoadAsset(string packageName, string location, Type type, Action<Object> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -243,15 +243,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源信息</param>
         /// <param name="cb">回调</param>
-        public static async void LoadAsset(string packagename, AssetInfo location, Action<Object> cb)
+        public static async void LoadAsset(string packageName, AssetInfo location, Action<Object> cb)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -278,7 +278,7 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载场景
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">场景的定位地址</param>
         /// <param name="cb">回调</param>
         /// <param name="sceneMode">场景加载模式</param>
@@ -286,7 +286,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="priority">优先级</param>
         public static async void LoadScene(
             Action<Scene> cb,
-            string packagename,
+            string packageName,
             string location,
             LoadSceneMode sceneMode = LoadSceneMode.Single,
             bool suspendLoad = false,
@@ -302,15 +302,15 @@ namespace AIO.UEngine.YooAsset
 
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                     throw new Exception(
-                        string.Format("场景配置 异常错误:{0} {1} {2}", packagename, location, sceneMode));
+                        $"The scenario configuration is incorrect : {packageName} {location} {sceneMode}");
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
                 if (!await LoadCheckOPTask(operation))
                     throw new Exception(
-                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                        $"Loading scenario resources is abnormal :{package.PackageName} {location} {sceneMode}");
                 AddHandle(location, operation);
             }
 
@@ -321,14 +321,14 @@ namespace AIO.UEngine.YooAsset
         /// 协程加载场景
         /// </summary>
         /// <param name="cb">回调</param>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">场景的定位地址</param>
         /// <param name="sceneMode">场景加载模式</param>
         /// <param name="suspendLoad">场景加载到90%自动挂起</param>
         /// <param name="priority">优先级</param>
         public static async void LoadScene(
             Action<Scene> cb,
-            string packagename,
+            string packageName,
             AssetInfo location,
             LoadSceneMode sceneMode = LoadSceneMode.Single,
             bool suspendLoad = false,
@@ -344,15 +344,15 @@ namespace AIO.UEngine.YooAsset
 
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                     throw new Exception(
-                        string.Format("场景配置 异常错误:{0} {1} {2}", packagename, location, sceneMode));
+                        $"The scenario configuration is incorrect : {packageName} {location} {sceneMode}");
 
                 operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
                 if (!await LoadCheckOPTask(operation))
                     throw new Exception(
-                        string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                        $"Loading scenario resources is abnormal : {package.PackageName} {location} {sceneMode}");
                 AddHandle(location, operation);
             }
 
@@ -367,15 +367,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源信息</param>
         /// <param name="cb">回调</param>
-        public static async void LoadRawFileData(string packagename, AssetInfo location, Action<byte[]> cb)
+        public static async void LoadRawFileData(string packageName, AssetInfo location, Action<byte[]> cb)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -398,15 +398,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static async void LoadRawFileData(string packagename, string location, Action<byte[]> cb)
+        public static async void LoadRawFileData(string packageName, string location, Action<byte[]> cb)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -429,15 +429,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源信息</param>
         /// <param name="cb">回调</param>
-        public static async void LoadRawFileText(string packagename, AssetInfo location, Action<string> cb)
+        public static async void LoadRawFileText(string packageName, AssetInfo location, Action<string> cb)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);
@@ -460,15 +460,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 异步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public static async void LoadRawFileText(string packagename, string location, Action<string> cb)
+        public static async void LoadRawFileText(string packageName, string location, Action<string> cb)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = await GetAutoPackageTask(packagename, location);
+                var package = await GetAutoPackageTask(packageName, location);
                 if (package is null)
                 {
                     cb?.Invoke(null);

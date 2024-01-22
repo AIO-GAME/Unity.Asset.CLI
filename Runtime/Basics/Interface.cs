@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections;
-using UnityEngine;
 
 namespace AIO
 {
@@ -63,7 +62,6 @@ namespace AIO
 
     public struct DownlandAssetEvent : IDownlandAssetEvent
     {
-
         /// <summary>
         /// 网络不可用
         /// </summary>

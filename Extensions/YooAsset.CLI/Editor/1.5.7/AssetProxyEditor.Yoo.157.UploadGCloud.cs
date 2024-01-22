@@ -5,13 +5,10 @@
 |*|============|*/
 
 #if SUPPORT_YOOASSET
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using AIO.UEngine;
-using UnityEditor;
-using UnityEngine;
 
 namespace AIO.UEditor.CLI
 {

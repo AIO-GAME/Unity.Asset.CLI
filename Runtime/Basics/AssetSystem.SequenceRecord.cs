@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,8 +19,6 @@ namespace AIO
 {
     public partial class AssetSystem
     {
-#if UNITY_EDITOR
-
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
             private const string FILE_NAME = "ASSETRECORD";
@@ -107,26 +106,6 @@ namespace AIO
                         : AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(data);
                     AHelper.IO.WriteJsonUTF8(LOCAL_PATH, Records);
                 });
-            }
-
-            /// <summary>
-            /// 加载序列记录
-            /// </summary>
-            public IEnumerator LoadCo()
-            {
-                if (!Enable) yield break;
-                if (Parameter.ASMode == EASMode.Remote) yield return DownloadCo(Parameter.URL);
-                UpdateLocal();
-            }
-
-            /// <summary>
-            /// 加载序列记录
-            /// </summary>
-            public async Task LoadAsync()
-            {
-                if (!Enable) return;
-                if (Parameter.ASMode == EASMode.Remote) await DownloadTask(Parameter.URL);
-                UpdateLocal();
             }
 
             /// <summary>
@@ -236,7 +215,7 @@ namespace AIO
             {
                 return string.IsNullOrEmpty(URL)
                     ? string.Empty
-                    : Path.Combine(URL, "Version", FILE_NAME).Replace("\\", "/");
+                    : Path.Combine(URL, "Version", FILE_NAME).Replace('\\', '/');
             }
 
             /// <summary>
@@ -248,14 +227,13 @@ namespace AIO
                 {
                     var root =
 #if UNITY_EDITOR
-                        Path.Combine(Application.dataPath.Substring(
-                                0, Application.dataPath.LastIndexOf('/')),
+                        Path.Combine(Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')),
                             "Bundles", "Version");
 #else
                         Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory, "Version");
 #endif
                     if (!Directory.Exists(root)) Directory.CreateDirectory(root);
-                    return Path.Combine(root, FILE_NAME).Replace("\\", "/");
+                    return Path.Combine(root, FILE_NAME).Replace('\\', '/');
                 }
             }
 
@@ -308,7 +286,6 @@ namespace AIO
                     $"[{Time}] {PackageName} - {Location} - {AssetPath} - {Bytes.ToConverseStringFileSize()} - {Count}";
             }
         }
-
-#endif
     }
 }
+#endif

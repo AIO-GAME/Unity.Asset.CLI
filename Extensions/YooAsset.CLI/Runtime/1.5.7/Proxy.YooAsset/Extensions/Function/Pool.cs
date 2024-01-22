@@ -14,7 +14,7 @@ namespace AIO.UEngine.YooAsset
     {
         private static T GetHandle<T>(string location) where T : OperationHandleBase
         {
-            if (ReferenceOPHandle.ContainsKey(location)) return (T)ReferenceOPHandle[location];
+            if (ReferenceOPHandle.TryGetValue(location, out var value)) return (T)value;
             return null;
         }
 

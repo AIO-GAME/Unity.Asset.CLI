@@ -4,7 +4,7 @@ namespace AIO.UEngine
 {
     public class ResolverBundleStream : FileStream
     {
-        public const byte KEY = 64;
+        private const byte KEY = 64;
 
         public ResolverBundleStream(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize,
             bool useAsync) : base(path, mode, access, share, bufferSize, useAsync)
@@ -22,6 +22,7 @@ namespace AIO.UEngine
             {
                 array[i] ^= KEY;
             }
+
             return index;
         }
     }

@@ -1,5 +1,4 @@
 ﻿#if SUPPORT_YOOASSET
-using System;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
