@@ -118,7 +118,7 @@ namespace AIO
             BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, config.RuntimeRootDirectory);
             SandboxRootDirectory =
 #if UNITY_EDITOR
-                string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
+                Path.Combine(Directory.GetParent(Application.dataPath).FullName,
                     config.RuntimeRootDirectory, EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
                 Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory);

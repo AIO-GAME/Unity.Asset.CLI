@@ -14,10 +14,6 @@ namespace AIO.UEngine
     /// </summary>
     public abstract partial class AssetProxy : IDisposable
     {
-        public AssetProxy()
-        {
-        }
-
         /// <summary>
         /// 资源回收（卸载引用计数为零的资源）
         /// </summary>
@@ -34,7 +30,7 @@ namespace AIO.UEngine
         /// </summary>
         /// <returns></returns>
         public abstract IEnumerator UpdatePackages(ASConfig config);
-        
+
         /// <summary>
         /// 释放资源句柄
         /// </summary>
@@ -54,7 +50,7 @@ namespace AIO.UEngine
         /// 获取下载器
         /// </summary>
         public abstract IASNetLoading GetLoadingHandle();
-        
+
         /// <summary>
         /// 清空资源缓存
         /// </summary>
