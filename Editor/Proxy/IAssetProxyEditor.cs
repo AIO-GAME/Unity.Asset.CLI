@@ -48,7 +48,7 @@ namespace AIO.UEditor
         /// </summary>
         /// <param name="config">构建配置</param>
         void BuildArt(ASBuildConfig config);
-        
+
         /// <summary>
         /// 上传到GCloud
         /// 生成一份清单文件 记录当前文件夹下的所有文件的MD5值
@@ -59,7 +59,7 @@ namespace AIO.UEditor
         /// 需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
         Task UploadGCloud(ASUploadGCloudConfig config);
-        
+
         /// <summary>
         /// 上传到Ftp
         /// </summary>

@@ -48,7 +48,28 @@ namespace AIO.UEditor.CLI
         {
             string IAddressRule.GetAssetAddress(AddressRuleData data)
             {
-                return AssetCollectRoot.AssetToAddress(data.AssetPath,data.UserData).Item3;
+                if (!data.UserData.Contains('_')) return "Error : Rule mismatch";
+                var info = data.UserData.SplitOnce('_');
+                var collector = Instance.GetPackage(info.Item1)?.GetGroup(info.Item2).GetCollector(data.CollectPath);
+                if (collector is null) return "Error : Not found collector";
+                if (!Collectors.ContainsKey(collector))
+                {
+                    collector.UpdateCollect();
+                    collector.UpdateFilter();
+                    Collectors[collector] = true;
+                }
+
+                var infoData = new AssetRuleData
+                {
+                    Tags = collector.Tags,
+                    UserData = collector.UserData,
+                    PackageName = info.Item1,
+                    GroupName = info.Item2,
+                    CollectPath = collector.CollectPath,
+                    Extension = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
+                };
+                infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
+                return collector.GetAssetAddress(infoData, ASConfig.GetOrCreate().LoadPathToLower);
             }
         }
     }

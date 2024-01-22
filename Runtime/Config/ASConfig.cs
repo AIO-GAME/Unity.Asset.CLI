@@ -89,7 +89,7 @@ namespace AIO.UEngine
         {
             get
             {
-                if (_SequenceRecord == null)
+                if (_SequenceRecord is null)
                 {
                     _SequenceRecord = new AssetSystem.SequenceRecordQueue(true);
                     _SequenceRecord.UpdateLocal();
@@ -129,6 +129,7 @@ namespace AIO.UEngine
 
             yield return AssetSystem.NetLoadStringCO(remote,
                 data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
+            if (Packages is null) throw new Exception("Not found Version.json or AssetsPackageConfig list is null !");
             foreach (var item in Packages)
             {
                 item.IsLatest = item.Version == "Latest";

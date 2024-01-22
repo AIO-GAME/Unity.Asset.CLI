@@ -42,6 +42,7 @@ namespace AIO
             return WhiteAll || WhiteListLocal.Contains(location);
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// 获取序列记录
         /// </summary>
@@ -49,11 +50,10 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden, Conditional("UNITY_EDITOR")]
         public static void AddSequenceRecord(SequenceRecord record)
         {
-#if UNITY_EDITOR
             Parameter.SequenceRecord.Add(record);
             WhiteListLocal.Add(record.Location);
-#endif
         }
+#endif
 
         /// <summary>
         /// 资源包配置

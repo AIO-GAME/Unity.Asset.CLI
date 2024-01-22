@@ -1,5 +1,5 @@
 /*|============|*|
-|*|Author:     |*| xinan
+|*|Author:     |*| xi nan
 |*|Date:       |*| 2024-01-03
 |*|E-Mail:     |*| 1398581458@qq.com
 |*|============|*/
@@ -15,7 +15,7 @@ namespace AIO.UEditor
         private string GetGCItemDes(ASBuildConfig.GCloudConfig config, int i)
         {
             _builder.Clear();
-            if (!config.Folded && config.isUploading) _builder.Append($"[上传中 ... ]");
+            if (!config.Folded && config.isUploading) _builder.Append("[上传中 ... ]");
             if (!string.IsNullOrEmpty(config.Name))
                 _builder.Append(config.Name);
 
@@ -31,14 +31,8 @@ namespace AIO.UEditor
                 }
 
                 _builder.Append(config.BUCKET_NAME);
-                if (string.IsNullOrEmpty(config.Description))
-                {
-                    _builder.Append(']');
-                }
-                else
-                {
-                    _builder.Append('/').Append(config.Description).Append(']');
-                }
+                if (!string.IsNullOrEmpty(config.Description)) _builder.Append('/').Append(config.Description);
+                _builder.Append(']');
             }
 
             if (_builder.Length == 0) _builder.Append($"NO.{i}");

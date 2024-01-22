@@ -30,7 +30,46 @@ namespace AIO.UEditor.CLI
 
             public bool IsCollectAsset(FilterRuleData data)
             {
-                return Config.SequenceRecord.ContainsAssetPath(data.AssetPath, data.UserData);
+                if (Instance is null || !data.UserData.Contains('_')) return false;
+                var info = data.UserData.SplitOnce('_');
+                var collector = Instance.GetPackage(info.Item1)
+                    ?.GetGroup(info.Item2)
+                    ?.GetCollector(data.CollectPath);
+                if (collector is null) return false;
+                if (collector.FullPath.Contains("Roguelike/Sprite"))
+                {
+                    Debug.Log(collector.FullPath);
+                }
+
+                var mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : ASConfig.GetOrCreate().ASMode;
+                if (mode == EASMode.Editor &&
+                    collector.LoadType == EAssetLoadType.Runtime)
+                    return false;
+
+                if (mode != EASMode.Editor &&
+                    collector.LoadType == EAssetLoadType.Editor)
+                    return false;
+
+                if (!Collectors.ContainsKey(collector))
+                {
+                    collector.UpdateCollect();
+                    collector.UpdateFilter();
+                    Collectors[collector] = true;
+                }
+
+                var infoData = new AssetRuleData
+                {
+                    Tags = collector.Tags,
+                    UserData = collector.UserData,
+                    PackageName = info.Item1,
+                    GroupName = info.Item2,
+                    CollectPath = collector.CollectPath,
+                    Extension = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
+                };
+                infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
+                if (collector.IsCollectAsset(infoData))
+                    return Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1);
+                return false;
             }
         }
 
@@ -62,6 +101,10 @@ namespace AIO.UEditor.CLI
                     ?.GetGroup(info.Item2)
                     ?.GetCollector(data.CollectPath);
                 if (collector is null) return false;
+                if (collector.FullPath.Contains("Roguelike/Sprite"))
+                {
+                    Debug.Log(collector.FullPath);
+                }
 
                 var mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : ASConfig.GetOrCreate().ASMode;
                 if (mode == EASMode.Editor &&

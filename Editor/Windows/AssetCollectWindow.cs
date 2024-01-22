@@ -114,8 +114,6 @@ namespace AIO.UEditor
 
         protected override void OnActivation()
         {
-            AssetCollectSetting.Initialize();
-
             Data = AssetCollectRoot.GetOrCreate();
             Data.Refresh();
             Selection.activeObject = Data;

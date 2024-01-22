@@ -26,28 +26,19 @@ namespace AIO.UEditor.CLI
             var handle = AHandle.FTP.Create(config.Server, config.Port, config.User, config.Pass,
                 config.RemoteRelative);
             await handle.InitAsync();
-            Console.WriteLine($"[FTP] 连接成功 : {handle.Absolute}");
+            EHelper.DisplayProgressBar("上传进度", $"开始上传资源 {handle.Absolute}", 0.1f);
             // 在判断目标文件夹是否有清单文件 如果没有则先删除目标文件夹 再上传
             var progress = new AProgressEvent();
-            if (EHelper.IsCMD()) progress.OnProgress = Console.WriteLine;
-            else
+            progress.OnComplete = report => { EHelper.DisplayDialog("结束", report.ToString(), "确定"); };
+            progress.OnError = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); };
+            progress.OnProgress = current =>
             {
-                progress.OnProgress = current =>
-                {
-                    EditorUtility.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f);
-                };
-                progress.OnComplete = (current) => { EditorUtility.ClearProgressBar(); };
-            }
-
-            progress.OnError = (error) =>
-            {
-                if (EHelper.IsCMD()) Debug.LogError($"上传失败 : {error}");
-                else EditorUtility.DisplayDialog("Error", $"上传失败 : {error}", "确定");
+                EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f);
             };
             // 在判断目标文件夹是否有清单文件 如果有则对比清单文件的MD5值 如果一致则不上传
             if (await handle.CheckFileAsync("Manifest.json"))
             {
-                Console.WriteLine($"[FTP] 远端版本清单存在 : {handle.Absolute}/Manifest.json 开始进行清单对比");
+                EHelper.DisplayProgressBar("上传", $"[FTP] 远端版本清单存在 : {handle.Absolute}/Manifest.json 开始进行清单对比", 0.2f);
                 var remoteMD5 = await handle.GetMD5Async("Manifest.json");
                 var manifestPath = Path.Combine(localFull, "Manifest.json");
                 var localMD5 = await AHelper.IO.GetFileMD5Async(manifestPath);
@@ -55,14 +46,13 @@ namespace AIO.UEditor.CLI
                 // 如果不一致 则拉取清单文件中的文件进行对比 记录需要上传的文件
                 if (localMD5 == remoteMD5)
                 {
-                    if (EHelper.IsCMD()) Debug.Log("当前远端版本清单对比一致 无需上传!");
-                    else EditorUtility.DisplayDialog("消息", "当前远端版本清单对比一致 无需上传!", "确定");
+                    EHelper.DisplayDialog("消息", "当前远端版本清单对比一致 无需上传!", "确定");
                     return;
                 }
 
                 var current = await AHelper.IO.ReadJsonUTF8Async<Dictionary<string, string>>(manifestPath);
-                var remote = AHelper.Json.Deserialize<Dictionary<string, string>>(
-                    await handle.GetTextAsync("Manifest.json"));
+                var manifest = await handle.GetTextAsync("Manifest.json");
+                var remote = AHelper.Json.Deserialize<Dictionary<string, string>>(manifest);
                 var tuple = YooAssetBuild.ComparisonManifest(current, remote);
 
                 foreach (var pair in tuple.Item1) // 添加
@@ -71,13 +61,12 @@ namespace AIO.UEditor.CLI
                     var source = Path.Combine(localFull, pair.Key);
                     if (File.Exists(source))
                     {
-                        Console.WriteLine($"新增文件 : {pair.Key}");
+                        EHelper.DisplayProgressBar("新增任务", $"新增远端文件 : {pair.Key}", 0.4f);
                         await handle.UploadFileAsync(source, pair.Key);
                     }
                     else
                     {
-                        if (EHelper.IsCMD()) Debug.LogError($"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源");
-                        else EditorUtility.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
+                        EHelper.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
                         return;
                     }
                 }
@@ -86,7 +75,7 @@ namespace AIO.UEditor.CLI
                 {
                     remote.Remove(pair.Key);
                     if (!await handle.CheckFileAsync(pair.Key)) continue;
-                    Console.WriteLine($"删除文件 : {pair.Key}");
+                    EHelper.DisplayProgressBar("删除任务", $"删除远端文件 : {pair.Key}", 0.6f);
                     await handle.DeleteFileAsync(pair.Key);
                 }
 
@@ -97,13 +86,12 @@ namespace AIO.UEditor.CLI
                     var source = Path.Combine(localFull, pair.Key);
                     if (File.Exists(source))
                     {
-                        Console.WriteLine($"修改文件 : {pair.Key}");
+                        EHelper.DisplayProgressBar("新增任务", $"修改远端文件 : {pair.Key}", 0.8f);
                         await handle.UploadFileAsync(source, pair.Key);
                     }
                     else
                     {
-                        if (EHelper.IsCMD()) Debug.LogError($"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源");
-                        else EditorUtility.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
+                        EHelper.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
                         return;
                     }
                 }
@@ -115,12 +103,12 @@ namespace AIO.UEditor.CLI
             }
             else
             {
-                Console.WriteLine($"[FTP] 远端版本清单不存在 : 准备开始上传资源 : {localFull} -> {handle.Absolute}");
+                EHelper.DisplayProgressBar("上传", $"[FTP] 远端版本清单不存在 : 准备开始上传资源 : {localFull} -> {handle.Absolute}",
+                    0.2f);
                 await handle.UploadDirAsync(localFull, progress);
             }
 
-            if (EHelper.IsCMD()) Debug.Log($"资源上传完成");
-            else EditorUtility.DisplayDialog("Info", $"资源上传完成", "确定");
+            EHelper.DisplayDialog("Info", $"资源上传完成", "确定");
         }
     }
 }

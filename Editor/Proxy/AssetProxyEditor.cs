@@ -58,8 +58,8 @@ namespace AIO.UEditor
                 return;
             }
 
-            PrGCloud.Gcloud = string.IsNullOrEmpty(config.GCLOUD_PATH) ? PrGCloud.Gcloud : config.GCLOUD_PATH;
-            PrGCloud.Gsutil = string.IsNullOrEmpty(config.GSUTIL_PATH) ? PrGCloud.Gsutil : config.GSUTIL_PATH;
+            PrGCloud.Gcloud = string.IsNullOrEmpty(config.GCLOUD_PATH) ? "gcloud" : config.GCLOUD_PATH;
+            PrGCloud.Gsutil = string.IsNullOrEmpty(config.GSUTIL_PATH) ? "gsutil" : config.GSUTIL_PATH;
             await Editor.UploadGCloud(config);
         }
 

@@ -6,13 +6,11 @@
 
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
 namespace AIO
 {
     public partial class AssetSystem
     {
-      
         /// <summary>
         /// 运行时 内置文件目录 
         /// </summary>
@@ -59,7 +57,7 @@ namespace AIO
 #if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
             return new DriveInfo(SandboxRootDirectory).IsReady;
 #else
-            Debug.LogWarning("Platform not support");
+            UnityEngine.Debug.LogWarning("Platform not support");
             return false;
 #endif
 
@@ -69,7 +67,7 @@ namespace AIO
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new DriveInfo(SandboxRootDirectory).IsReady;      
 #else
-            Debug.LogWarning("Platform not support");
+            UnityEngine.Debug.LogWarning("Platform not support");
             return false;
 #endif
 
@@ -86,7 +84,7 @@ namespace AIO
 #if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
             return new DriveInfo(SandboxRootDirectory).IsReady;
 #else
-            Debug.LogWarning("Platform not support");
+            UnityEngine.Debug.LogWarning("Platform not support");
             return false;
 #endif
 
@@ -96,7 +94,7 @@ namespace AIO
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new DriveInfo(SandboxRootDirectory).IsReady;
 #else
-            Debug.LogWarning("Platform not support");
+            UnityEngine.Debug.LogWarning("Platform not support");
             return false;
 #endif
 
@@ -124,7 +122,7 @@ namespace AIO
 #if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
             return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
 #else
-            Debug.LogWarning("Platform not support");
+            UnityEngine.Debug.LogWarning("Platform not support");
             return 0;
 #endif
 
@@ -136,18 +134,18 @@ namespace AIO
 #elif UNITY_ANDROID
             try
             { 
-                var unityPluginLoader = new AndroidJavaClass("IOHelper");
+                var unityPluginLoader = new UnityEngine.AndroidJavaClass("IOHelper");
                 return unityPluginLoader.CallStatic<long>("GetFreeDiskSpace");
             }
             catch (System.Exception e)
             {
-                Debug.LogException(e);
+                UnityEngine.Debug.LogException(e);
                 return 0;
             }
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
 #else
-            Debug.LogWarning("Platform not support");
+            UnityEngine.Debug.LogWarning("Platform not support");
             return 0;
 #endif
 #endif

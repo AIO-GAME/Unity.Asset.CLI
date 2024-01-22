@@ -10,28 +10,65 @@ namespace AIO.UEditor
 {
     public static class AssetCollectSetting
     {
-        public static DisplayList<IAssetRuleAddress> MapAddress { get; private set; }
-        public static DisplayList<IAssetRuleFilter> MapCollect { get; private set; }
-        public static DisplayList<IAssetRuleFilter> MapFilter { get; private set; }
-        public static DisplayList<IAssetRulePack> MapPacks { get; private set; }
+        public static DisplayList<IAssetRuleAddress> MapAddress
+        {
+            get
+            {
+                if (_MapAddress is null) Initialize();
+                return _MapAddress;
+            }
+        }
 
-        public static void Initialize()
+        public static DisplayList<IAssetRuleFilter> MapCollect
+        {
+            get
+            {
+                if (_MapCollect is null) Initialize();
+                return _MapCollect;
+            }
+        }
+
+        public static DisplayList<IAssetRuleFilter> MapFilter
+        {
+            get
+            {
+                if (_MapFilter is null) Initialize();
+                return _MapFilter;
+            }
+        }
+
+
+        public static DisplayList<IAssetRulePack> MapPacks
+        {
+            get
+            {
+                if (_MapPacks is null) Initialize();
+                return _MapPacks;
+            }
+        }
+
+        private static DisplayList<IAssetRuleAddress> _MapAddress;
+        private static DisplayList<IAssetRuleFilter> _MapCollect;
+        private static DisplayList<IAssetRuleFilter> _MapFilter;
+        private static DisplayList<IAssetRulePack> _MapPacks;
+
+        private static void Initialize()
         {
             var assetAddress = typeof(IAssetRuleAddress).FullName;
             var assetFilter = typeof(IAssetRuleFilter).FullName;
             var assetPack = typeof(IAssetRulePack).FullName;
 
-            if (MapAddress is null) MapAddress = new DisplayList<IAssetRuleAddress>();
-            else MapAddress.Clear();
+            if (_MapAddress is null) _MapAddress = new DisplayList<IAssetRuleAddress>();
+            else _MapAddress.Clear();
 
-            if (MapCollect is null) MapCollect = new DisplayList<IAssetRuleFilter>();
-            else MapCollect.Clear();
+            if (_MapCollect is null) _MapCollect = new DisplayList<IAssetRuleFilter>();
+            else _MapCollect.Clear();
 
-            if (MapFilter is null) MapFilter = new DisplayList<IAssetRuleFilter>();
-            else MapFilter.Clear();
+            if (_MapFilter is null) _MapFilter = new DisplayList<IAssetRuleFilter>();
+            else _MapFilter.Clear();
 
-            if (MapPacks is null) MapPacks = new DisplayList<IAssetRulePack>();
-            else MapPacks.Clear();
+            if (_MapPacks is null) _MapPacks = new DisplayList<IAssetRulePack>();
+            else _MapPacks.Clear();
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -47,19 +84,19 @@ namespace AIO.UEditor
                     var key = type.FullName ?? type.Name;
                     if (iAssetAddress != null && instance is IAssetRuleAddress InstanceAddress)
                     {
-                        MapAddress.Add(key, InstanceAddress.DisplayAddressName, InstanceAddress);
+                        _MapAddress.Add(key, InstanceAddress.DisplayAddressName, InstanceAddress);
                     }
 
                     if (iAssetPack != null && instance is IAssetRulePack InstancePack)
                     {
-                        MapPacks.Add(key, InstancePack.DisplayPackName, InstancePack);
+                        _MapPacks.Add(key, InstancePack.DisplayPackName, InstancePack);
                     }
 
                     if (iAssetFilter != null && instance is IAssetRuleFilter InstanceFilter)
                     {
                         var keyFilter = InstanceFilter.DisplayFilterName;
-                        MapCollect.Add(key, keyFilter, InstanceFilter);
-                        MapFilter.Add(key, keyFilter, InstanceFilter);
+                        _MapCollect.Add(key, keyFilter, InstanceFilter);
+                        _MapFilter.Add(key, keyFilter, InstanceFilter);
                     }
                 }
             }
