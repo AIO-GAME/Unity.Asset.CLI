@@ -128,7 +128,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 当前界面模式
         /// </summary>
-        private Mode WindowMode = Mode.Editor;
+        public static Mode WindowMode = Mode.Editor;
 
         /// <summary>
         /// Header中间显示信息

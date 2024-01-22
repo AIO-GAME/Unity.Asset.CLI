@@ -264,7 +264,6 @@ namespace AIO.UEditor
             }
 
             data.AssetPath = assetPath.Substring(0, assetPath.Length - data.Extension.Length - 1);
-            data.AssetPath = data.AssetPath;
             return IsCollectAsset(data) ? GetAssetAddress(data, ASConfig.GetOrCreate().LoadPathToLower) : string.Empty;
         }
 
