@@ -112,7 +112,7 @@ namespace AIO
         /// <summary>
         /// 下载恢复
         /// </summary>
-        public Action OnResume { get; set; }
+        public Action OnResume { get; set; } 
 
         /// <summary>
         /// 下载暂停

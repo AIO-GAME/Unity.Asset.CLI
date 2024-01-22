@@ -123,9 +123,13 @@ namespace AIO.UEngine
             }
 
             var list = (from object item in array
-                where item is not null
+                where !(item is null)
                 select new AssetsPackageConfig
-                    { Name = fieldInfo.GetValue(item) as string, Version = "-.-.-", IsDefault = false }).ToArray();
+                {
+                    Name = fieldInfo.GetValue(item) as string,
+                    Version = "-.-.-",
+                    IsDefault = false
+                }).ToArray();
 
             if (list.Length <= 0)
             {

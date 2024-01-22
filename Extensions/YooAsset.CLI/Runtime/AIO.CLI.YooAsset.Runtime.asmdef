@@ -1,12 +1,11 @@
 {
     "name": "AIO.CLI.YooAsset.Runtime",
+    "rootNamespace": "",
     "references": [
         "YooAsset",
         "UniTask.YooAsset",
         "AIO.Core.Runtime",
-        "AIO.Asset.Runtime",
-        "UnityEditor.UI",
-        "UnityEngine.UI"
+        "AIO.Asset.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

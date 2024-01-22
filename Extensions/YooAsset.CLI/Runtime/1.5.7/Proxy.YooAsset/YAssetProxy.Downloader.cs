@@ -101,6 +101,12 @@ namespace AIO.UEngine
                 OnDiskSpaceNotEnough = iEvent.OnDiskSpaceNotEnough;
                 OnWritePermissionNot = iEvent.OnWritePermissionNot;
                 OnReadPermissionNot = iEvent.OnReadPermissionNot;
+
+                if (Event.OnProgress is null)
+                    Event.OnProgress = info => AssetSystem.Log(info.ToString());
+
+                if (Event.OnComplete is null)
+                    Event.OnComplete = info => AssetSystem.Log(info.ToString());
             }
 
             /// <summary>
@@ -251,7 +257,8 @@ namespace AIO.UEngine
                 {
                     if (!Packages.TryGetValue(name, out var asset)) continue;
                     Tags[name] = 1;
-                    var operation = asset.CreateBundleDownloader(asset.GetAssetInfos(tags)); // 此处暂默认 YooAsset 处理了重复资源的问题
+                    var operation =
+                        asset.CreateBundleDownloader(asset.GetAssetInfos(tags)); // 此处暂默认 YooAsset 处理了重复资源的问题
                     if (operation is null) continue;
                     if (operation.TotalDownloadCount <= 0) continue;
                     TotalValue += operation.TotalDownloadBytes - operation.CurrentDownloadBytes;
@@ -430,7 +437,8 @@ namespace AIO.UEngine
                         var str = new StringBuilder("Failed to download resource pack file :\n");
                         foreach (var pair in ErrorDict)
                         {
-                            AssetSystem.LogError($"Failed to download resource pack file -> [{pair.Key} -> {pair.Value}]");
+                            AssetSystem.LogError(
+                                $"Failed to download resource pack file -> [{pair.Key} -> {pair.Value}]");
                             str.AppendLine(pair.Key);
                         }
 
@@ -441,7 +449,8 @@ namespace AIO.UEngine
                     {
                         foreach (var pair in ErrorDict)
                         {
-                            AssetSystem.LogError($"Failed to download resource pack file -> [{pair.Key} -> {pair.Value}]");
+                            AssetSystem.LogError(
+                                $"Failed to download resource pack file -> [{pair.Key} -> {pair.Value}]");
                         }
                     }
 #endif

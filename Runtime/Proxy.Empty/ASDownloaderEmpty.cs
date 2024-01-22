@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections;
-using System.Linq;
 
 namespace AIO
 {
@@ -40,9 +39,6 @@ namespace AIO
             yield break;
         }
 
-        public Action<IProgressInfo> OnProgress { get; set; }
-        public Action<IProgressReport> OnComplete { get; set; }
-
         /// <summary>开始回调</summary>
         public new Action OnBegin { get; set; }
 
@@ -56,6 +52,8 @@ namespace AIO
         public new Action OnCancel { get; set; }
 
         public Action<Exception> OnError { get; set; }
+        public Action<IProgressInfo> OnProgress { get; set; }
+        public Action<IProgressReport> OnComplete { get; set; }
         public Action<IProgressReport> OnNetReachableNot { get; set; }
         public Action<IProgressReport, Action> OnNetReachableCarrier { get; set; }
         public Action<IProgressReport> OnDiskSpaceNotEnough { get; set; }

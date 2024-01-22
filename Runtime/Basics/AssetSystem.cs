@@ -27,7 +27,7 @@ namespace AIO
 
         internal static void ExceptionEvent(AssetSystemException ex)
         {
-            if (OnException is null) throw new SystemException($"资源系统异常类型 : {ex}");
+            if (OnException is null) throw new SystemException($"Asset System Exception : {ex}");
             OnException.Invoke(ex);
         }
 
@@ -98,7 +98,8 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : AssetProxy
+        public static IEnumerator Initialize<T>(T proxy, ASConfig config, IProgressEvent iEvent = default)
+            where T : AssetProxy
         {
             if (!IsInitialized) IsInitialized = false;
             if (proxy is null)
@@ -113,11 +114,12 @@ namespace AIO
                 yield break;
             }
 
+            if (string.IsNullOrEmpty(config.RuntimeRootDirectory)) config.RuntimeRootDirectory = "BuiltinFiles";
             BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, config.RuntimeRootDirectory);
             SandboxRootDirectory =
 #if UNITY_EDITOR
                 string.Concat(Directory.GetParent(Application.dataPath)?.FullName,
-                    "/Sandbox/", EditorUserBuildSettings.activeBuildTarget.ToString());
+                    config.RuntimeRootDirectory, EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
                 Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory);
 #endif
