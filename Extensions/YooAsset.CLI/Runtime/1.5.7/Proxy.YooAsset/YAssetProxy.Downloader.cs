@@ -376,11 +376,7 @@ namespace AIO.UEngine
             {
                 if (State == EProgressState.Cancel ||
                     State == EProgressState.Fail ||
-                    State == EProgressState.Finish)
-                {
-                    Finish();
-                    yield break;
-                }
+                    State == EProgressState.Finish) yield break;
 
                 foreach (var pair in ResourceDownloaderOperations)
                 {
@@ -454,7 +450,6 @@ namespace AIO.UEngine
                     }
 #endif
                 }
-                else Finish();
             }
         }
     }
