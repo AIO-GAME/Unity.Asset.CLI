@@ -63,7 +63,7 @@ namespace AIO.UEditor.CLI
                     }
                 }
 
-                EHelper.DisplayProgressBar("删除文件", "删除远端文件", 0.6f);
+                EHelper.DisplayProgressBar("删除任务", "等待任务完成", 0.6f);
                 await PrGCloud.DeleteFileAsync(tuple.Item2.Values);
 
                 foreach (var pair in tuple.Item3) // 修改

@@ -31,7 +31,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 上传目录 不包含平台 包名 版本
         /// </summary>
-        public string LocalFullPath = Path.Combine(EHelper.Path.Project, "Bundles");
+        public string LocalFullPath => Path.Combine(EHelper.Path.Project, "Bundles");
 
         /// <summary>
         /// 上传包名

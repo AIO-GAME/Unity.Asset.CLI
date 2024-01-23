@@ -1,7 +1,7 @@
-﻿using System.IO;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using UnityEditor;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
-#if UNITY_EDITOR
 namespace AIO
 {
     internal static class Setting
@@ -16,14 +16,12 @@ namespace AIO
         /// </summary>
         public static string Version { get; private set; }
 
-        [UnityEditor.InitializeOnLoadMethod]
+        [InitializeOnLoadMethod]
         public static void Initialize()
         {
-            var package = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(Setting).Assembly);
-            var packageJson = AHelper.IO.ReadJsonUTF8<JObject>(package.resolvedPath + "/package.json");
+            var package = PackageInfo.FindForAssembly(typeof(Setting).Assembly);
+            var packageJson = AHelper.IO.ReadJsonUTF8<JObject>(string.Concat(package.resolvedPath, "/package.json"));
             Version = packageJson.Value<string>("version");
         }
     }
 }
-
-#endif

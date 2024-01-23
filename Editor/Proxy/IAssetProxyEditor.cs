@@ -45,12 +45,6 @@ namespace AIO.UEditor
         void BuildArt(AssetBuildCommand command);
 
         /// <summary>
-        /// 构建资源
-        /// </summary>
-        /// <param name="config">构建配置</param>
-        void BuildArt(ASBuildConfig config);
-
-        /// <summary>
         /// 上传到GCloud
         /// 生成一份清单文件 记录当前文件夹下的所有文件的MD5值
         /// 在上传的时候会对比清单文件的MD5值 如果一致则不上传

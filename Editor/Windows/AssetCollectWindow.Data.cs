@@ -454,6 +454,9 @@ namespace AIO.UEditor
         /// </summary>
         private ViewRect ViewCollectorsList;
 
+        /// <summary>
+        /// 界面 - 收集器选择下标
+        /// </summary>
         private int LookModeCollectorsPageIndex;
 
         /// <summary>
@@ -461,6 +464,9 @@ namespace AIO.UEditor
         /// </summary>
         private int CurrentSelectAssetIndex;
 
+        /// <summary>
+        /// 界面 - 查询模式 显示ICON
+        /// </summary>
         private GenericMenu onDrawLookDataItemMenu;
 
         /// <summary>

@@ -162,9 +162,5 @@ namespace AIO.UEditor
                 };
             }
         }
-
-        protected override void OnChange()
-        {
-        }
     }
 }

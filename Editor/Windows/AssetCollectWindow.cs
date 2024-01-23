@@ -13,7 +13,7 @@ namespace AIO.UEditor
     /// <summary>
     /// 资源管理窗口
     /// </summary>
-    [GWindow("资源收集管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
+    [GWindow("资源管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
         IconResource = "Editor/Icon/Asset",
         Group = "Tools",
         Menu = "AIO/Window/Asset",
@@ -160,15 +160,6 @@ namespace AIO.UEditor
             OnOpenEvent();
         }
 
-        // 关闭自动更新
-        // protected override void OnDisable()
-        // {
-        //     if (Data != null) Data.Save();
-        //     if (Config != null) Config.Save();
-        //     if (BuildConfig != null) BuildConfig.Save();
-        //     AssetDatabase.SaveAssets();
-        // }
-
         public override void EventMouseDown(in Event eventData)
         {
             switch (WindowMode)
@@ -227,8 +218,7 @@ namespace AIO.UEditor
                 {
                     switch (keyCode)
                     {
-                        // 判断ESC
-                        case KeyCode.Escape:
+                        case KeyCode.Escape: // 判断ESC
                             GUI.FocusControl(null);
                             CancelCurrentSelectAsset();
                             eventData.Use();
