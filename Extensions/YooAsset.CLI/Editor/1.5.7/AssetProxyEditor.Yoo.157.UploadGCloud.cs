@@ -46,6 +46,8 @@ namespace AIO.UEditor.CLI
                 var remote = AHelper.Json.Deserialize<Dictionary<string, string>>(
                     await PrGCloud.ReadTextAsync(remoteManifest));
                 var tuple = YooAssetBuild.ComparisonManifest(current, remote);
+                var total = tuple.Item1.Count;
+                var index = 1;
                 foreach (var pair in tuple.Item1) // 添加
                 {
                     remote[pair.Key] = pair.Value;
@@ -53,7 +55,7 @@ namespace AIO.UEditor.CLI
                     if (File.Exists(source))
                     {
                         var target = string.Concat(config.RemoteRelative, '/', pair.Key);
-                        EHelper.DisplayProgressBar("新增文件", target, 0.4f);
+                        EHelper.DisplayProgressBar($"新增文件 {index++}/{total}", target, 0.4f);
                         await PrGCloud.UploadFileAsync(target, source, config.MetaDataKey, config.MetaDataValue);
                     }
                     else
@@ -65,7 +67,8 @@ namespace AIO.UEditor.CLI
 
                 EHelper.DisplayProgressBar("删除任务", "等待任务完成", 0.6f);
                 await PrGCloud.DeleteFileAsync(tuple.Item2.Values);
-
+                total = tuple.Item3.Count;
+                index = 1;
                 foreach (var pair in tuple.Item3) // 修改
                 {
                     remote[pair.Key] = pair.Value;
@@ -73,7 +76,7 @@ namespace AIO.UEditor.CLI
                     if (File.Exists(source))
                     {
                         var target = string.Concat(config.RemoteRelative, '/', pair.Key);
-                        EHelper.DisplayProgressBar("修改文件", target, 0.8f);
+                        EHelper.DisplayProgressBar($"修改文件 {index++}/{total}", target, 0.8f);
                         await PrGCloud.UploadFileAsync(target, source, config.MetaDataKey, config.MetaDataValue);
                     }
                     else

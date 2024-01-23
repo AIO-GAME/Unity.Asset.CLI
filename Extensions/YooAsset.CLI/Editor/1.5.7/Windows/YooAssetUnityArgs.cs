@@ -33,11 +33,11 @@ namespace AIO.UEditor.CLI
 #elif UNITY_2018
                 VersionIndex = 1;
 #elif UNITY_2019
-            VersionIndex = 2;
+                VersionIndex = 2;
 #elif UNITY_2020
                 VersionIndex = 3;
 #elif UNITY_2021
-            VersionIndex = 4;
+                VersionIndex = 4;
 #elif UNITY_2022
                 VersionIndex = 5;
 #elif UNITY_2023
