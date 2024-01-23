@@ -137,5 +137,26 @@ namespace AIO.UEditor
 
             EditorUtility.SetDirty(this);
         }
+
+        public static implicit operator AssetBuildCommand(ASBuildConfig config)
+        {
+            var command = new AssetBuildCommand
+            {
+                BuildMode = config.BuildMode,
+                BuildPipeline = config.BuildPipeline,
+                ActiveTarget = config.BuildTarget,
+                PackageVersion = config.BuildVersion,
+                CompressOption = config.CompressedMode,
+                BuildPackage = config.PackageName,
+                EncyptionClassName = config.EncyptionClassName,
+                CopyBuildinFileOption = ECopyBuildinFileOption.None,
+                CopyBuildinFileTags = config.FirstPackTag,
+                MergeToLatest = config.MergeToLatest,
+                VerifyBuildingResult = config.ValidateBuild,
+                OutputRoot = config.BuildOutputPath,
+                OutputNameStyle = EOutputNameStyle.BundleName_HashName
+            };
+            return command;
+        }
     }
 }

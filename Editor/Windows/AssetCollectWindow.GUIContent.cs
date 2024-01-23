@@ -99,7 +99,10 @@ namespace AIO.UEditor
         /// 界面内容 - 报告
         /// </summary>
         private GUIContent GC_REPORT;
-
+        
+        /// <summary>
+        /// 选择指定配置
+        /// </summary>
         private GUIContent GC_Select_ASConfig;
 
         /// <summary>

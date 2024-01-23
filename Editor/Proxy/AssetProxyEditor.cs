@@ -27,15 +27,19 @@ namespace AIO.UEditor
                 foreach (var type in assembly.GetTypes())
                 {
                     if (type.IsAbstract) continue;
-                    if (typeof(IAssetProxyEditor).IsAssignableFrom(type))
-                    {
-                        Editor = (IAssetProxyEditor)Activator.CreateInstance(type);
-                        break;
-                    }
+                    if (!typeof(IAssetProxyEditor).IsAssignableFrom(type)) continue;
+                    Editor = (IAssetProxyEditor)Activator.CreateInstance(type);
+                    break;
                 }
             }
         }
 
+        /// <summary>
+        /// 创建配置
+        /// </summary>
+        /// <param name="BundlesDir">资源构建目录</param>
+        /// <param name="MergeToLatest">是否合并为latest版本</param>
+        /// <param name="isTips">提示</param>
         public static void CreateConfig(string BundlesDir, bool MergeToLatest = false, bool isTips = false)
         {
             if (Editor is null)
@@ -78,6 +82,11 @@ namespace AIO.UEditor
             await Editor.UploadFtp(config);
         }
 
+        /// <summary>
+        /// 构建资源
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="isTips"></param>
         public static void BuildArt(ASBuildConfig config, bool isTips = false)
         {
             if (Editor is null)
@@ -88,7 +97,19 @@ namespace AIO.UEditor
 
             SaveScene();
 
-            Editor.BuildArt(config);
+            var command = new AssetBuildCommand
+            {
+                PackageVersion = config.BuildVersion,
+                BuildPackage = config.PackageName,
+                CompressOption = config.CompressedMode,
+                ActiveTarget = config.BuildTarget,
+                BuildPipeline = config.BuildPipeline,
+                OutputRoot = config.BuildOutputPath,
+                BuildMode = config.BuildMode,
+                CopyBuildinFileTags = config.FirstPackTag,
+                MergeToLatest = config.MergeToLatest,
+            };
+            Editor.BuildArt(command);
         }
 
         public static void BuildArt(AssetBuildCommand command, bool isTips = false)
@@ -104,6 +125,12 @@ namespace AIO.UEditor
             Editor.BuildArt(command);
         }
 
+        /// <summary>
+        /// 转换配置
+        /// </summary>
+        /// <param name="config">配饰文件</param>
+        /// <param name="ignoreTips">忽略提示</param>
+        /// <exception cref="Exception">异常</exception>
         public static void ConvertConfig(AssetCollectRoot config, bool ignoreTips = true)
         {
             if (Editor is null)

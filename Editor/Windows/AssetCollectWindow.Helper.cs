@@ -175,11 +175,10 @@ namespace AIO.UEditor
                     where item.Type == EAssetCollectItemType.MainAssetCollector
                     where !string.IsNullOrEmpty(item.CollectPath)
                     where condition(item)
-                    select page
-                        ? string.Concat(char.ToUpper(item.CollectPath[0]), '/',
-                            item.CollectPath.Replace('/', '\\').TrimEnd('\\'))
-                        : item.CollectPath.Replace('/', '\\').TrimEnd('\\'))
-                .ToArray();
+                    select (page
+                        ? string.Concat(char.ToUpper(item.CollectPath[0]), '/', item.CollectPath)
+                        : item.CollectPath).Replace('/', '\\').TrimEnd('\\')
+                ).ToArray();
         }
 
         /// <summary>
@@ -222,8 +221,7 @@ namespace AIO.UEditor
         /// </summary>
         private static async void ValidateFTP(ASBuildConfig.FTPConfig config)
         {
-            var handle = await config.Validate();
-            EditorUtility.DisplayDialog("提示", handle ? "连接成功" : "连接失败", "确定");
+            EditorUtility.DisplayDialog("提示", await config.Validate() ? "连接成功" : "连接失败", "确定");
         }
     }
 }

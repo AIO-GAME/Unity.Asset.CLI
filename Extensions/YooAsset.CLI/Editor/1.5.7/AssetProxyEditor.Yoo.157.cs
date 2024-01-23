@@ -42,23 +42,6 @@ namespace AIO.UEditor.CLI
             YooAssetBuild.ArtBuild(command);
         }
 
-        public void BuildArt(ASBuildConfig config)
-        {
-            var buildCommand = new AssetBuildCommand
-            {
-                PackageVersion = config.BuildVersion,
-                BuildPackage = config.PackageName,
-                CompressOption = config.CompressedMode,
-                ActiveTarget = config.BuildTarget,
-                BuildPipeline = config.BuildPipeline,
-                OutputRoot = config.BuildOutputPath,
-                BuildMode = config.BuildMode,
-                CopyBuildinFileTags = config.FirstPackTag,
-                MergeToLatest = config.MergeToLatest,
-            };
-            YooAssetBuild.ArtBuild(buildCommand);
-        }
-
         /// <summary>
         /// 上传到GCloud
         /// 生成一份清单文件 记录当前文件夹下的所有文件的MD5值
