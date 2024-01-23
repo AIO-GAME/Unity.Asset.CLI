@@ -26,14 +26,7 @@ namespace AIO.UEngine
         /// <summary>
         /// 当前版本
         /// </summary>
-        public string CurrentVersion
-        {
-            get
-            {
-                if (IsLatest) return "Latest";
-                return Version;
-            }
-        }
+        public string CurrentVersion => IsLatest ? "Latest" : Version;
 
         /// <summary>
         /// 是否为最新版本
@@ -52,13 +45,7 @@ namespace AIO.UEngine
 
         public override string ToString()
         {
-            return string.Format(
-                "Name : {0} , Version : {1} , IsDefault : {2} , CompressMode : {3}",
-                Name,
-                Version,
-                IsDefault,
-                CompressMode
-            );
+            return $"Name : {Name} , Version : {Version} , IsDefault : {IsDefault} , CompressMode : {CompressMode}";
         }
     }
 }

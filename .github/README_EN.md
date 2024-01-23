@@ -79,41 +79,49 @@ openupm add com.aio.cli.asset
 
 </details>
 
-## 📢 Thanks
-
-Thank you for choosing our package. If this package helps you, please consider showing your support by adding a ⭐ to the
-repo.
-
 ## ⭐ About
 
-This is a command line interface (CLI) package for Unity. It provides a set of commands and tools to enhance the
-efficiency of Unity development.
-
-## 🖥️ Requirements
-
-- Unity 2019.1 or later
-- .NET 4.0 or later
-
-## 🧰 Getting Started
-
-Please refer to the wiki for a step-by-step guide on how to get started with this package.
+- **This is a Unity resource loading interface (CLI) package. It provides a set of commands and tools to enhance efficiency and development experience.**
+> [!IMPORTANT]
+> - ✅ **Supports Unity 2019.4 and above**
+> - ✅ **Supports resource synchronous loading/asynchronous loading/coroutine loading interfaces**
+> - ✅ **Supports resource local mode/remote mode/compiler mode interfaces**
+> - ✅ **Supports empty package/first package/whole package/custom subpackages**
+> - ✅ **Supports Android/iOS/Windows/Mac/WebGL**
+> - ✅ **Supports CI/CD pipeline resource packaging**
+> - ✅ **Supports .NET 4.x**
+> - ✅ **Supports il2cpp**
+> - ✅ **Supports Unity incremental build**
+> - ✅ **Supports [UniTask](https://github.com/Cysharp/UniTask)**
+> - ✅ **Supports [YooAsset](https://github.com/tuyoogame/YooAsset)**
+> - ❌ **Does not support [XAsset](https://github.com/xasset/xasset)**
+> - ❌ **Does not support [Addressable](https://github.com/Unity-Technologies/Addressables-Sample)**
+> - ❌ **Does not support custom proxy third-party plugins**
 
 ## 📖 Documentation
 
-For more info please see | [Documentation](./API_USAGE/AssetSystem.md)
-or [Wiki](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)
+- [_**Documentation Directory**_](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)
+- [_**API**_](./API_USAGE/AssetSystem.md)
+- [_**Configuration Explanation**_](./API_USAGE/Config.md)
+- [_**Tool Usage**_](./API_USAGE/ToolWindow.md)
 
-## 🤖 Demos
+## 🔗 Third-Party References and Tools
 
-Please refer to the wiki for demo links.
+**Please refer to the wiki for a list of references and tools used in this package.**
+| **Doc** | **Description**                                                                      |
+| :----: | :-----: |
+| **[Common](https://github.com/AIO-GAME/Common)**| _**C# Unity common utility library to help development teams quickly build frameworks.**_ |
+| **[UniTask](https://github.com/Cysharp/UniTask#readme)** | _**Provides an efficient allocation-free async/await integration for Unity.**_                         |
+| **[YooAsset](https://www.yooasset.com)**| _**YooAsset is a resource management system for Unity3D designed to help development teams deploy and deliver games quickly.**_ |
 
-## 🔗 Third-Party References & Tools
+## ✨ Contributors
 
-Please refer to the wiki for a list of references and tools used in this package.
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
 
-| Doc                                                                | Description                                    |
-|:-------------------------------------------------------------------|:-----------------------------------------------|
-| [UniTask](https://github.com/Cysharp/UniTask#readme)               | 为 Unity 提供了一个有效的分配自由的 async / await 集成。          |
-| [YooAsset](https://www.yooasset.com)                               | YooAsset 是一套用于 Unity3D 的资源管理系统，用于帮助研发团队快速部署和交付游戏。 |
-| [Hybrid CLR](https://focus-creative-games.github.io/hybridclr-doc) | 特性完整、零成本、高性能、低内存的 Unity 全平台原生 c#热更方案              |
+## 📢 Acknowledgments
+
+- **Thank you for choosing our extension package.**
+- **If this package is helpful to you.**
+- **Please consider showing support by adding a ⭐.**
 

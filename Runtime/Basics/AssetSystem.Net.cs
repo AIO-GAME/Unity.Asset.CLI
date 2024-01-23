@@ -26,34 +26,34 @@ namespace AIO
             switch (operation.result)
             {
                 case UnityWebRequest.Result.InProgress:
-                    LogError($"{ERROR_NET}请求正在进行中 -> {operation.url} {operation.error}");
+                    LogException($"{ERROR_NET}请求正在进行中 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.ConnectionError:
-                    LogError($"{ERROR_NET}无法连接到服务器 -> {operation.url} {operation.error}");
+                    LogException($"{ERROR_NET}无法连接到服务器 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.ProtocolError:
-                    LogError($"{ERROR_NET}服务器返回响应错误 -> {operation.url} {operation.error}");
+                    LogException($"{ERROR_NET}服务器返回响应错误 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.DataProcessingError:
-                    LogError($"{ERROR_NET}数据处理异常 -> {operation.url} {operation.error}");
+                    LogException($"{ERROR_NET}数据处理异常 -> {operation.url} {operation.error}");
                     return false;
             }
 
             if (operation.result != UnityWebRequest.Result.Success)
             {
-                LogError($"{ERROR_NET_UNKNOWN}{operation.result} -> {operation.error}");
+                LogException($"{ERROR_NET_UNKNOWN}{operation.result} -> {operation.error}");
                 return false;
             }
 #else
             if (operation.isHttpError || operation.isNetworkError)
             {
-                LogError($"{ERROR_NET_UNKNOWN} {operation.url} -> {operation.error}");
+                LogException($"{ERROR_NET_UNKNOWN} {operation.url} -> {operation.error}");
                 return false;
             }
 #endif
 
             if (operation.isDone) return true;
-            LogError($"{ERROR_NET} 请求未完成 -> {operation.url} -> {operation.error}");
+            LogException($"{ERROR_NET} 请求未完成 -> {operation.url} -> {operation.error}");
             return false;
         }
 

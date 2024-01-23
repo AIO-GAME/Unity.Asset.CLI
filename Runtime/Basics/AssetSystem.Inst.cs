@@ -104,7 +104,6 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="parent">父级节点</param>
-        /// <param name="cb">回调</param>
         /// <returns><see cref="UnityEngine.GameObject"/></returns>
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator InstGameObjectCO(string location, Transform parent)

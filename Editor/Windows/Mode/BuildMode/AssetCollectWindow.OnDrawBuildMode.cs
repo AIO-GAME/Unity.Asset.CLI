@@ -181,7 +181,7 @@ namespace AIO.UEditor
 
                     if (GUILayout.Button("生成配置", GEStyle.toolbarbutton, GP_Width_75))
                     {
-                        AssetProxyEditor.CreateConfig(BuildConfig.BuildOutputPath, true);
+                        AssetProxyEditor.CreateConfig(BuildConfig.BuildOutputPath, BuildConfig.MergeToLatest, true);
                     }
 
                     if (Application.isPlaying) GUI.enabled = false;

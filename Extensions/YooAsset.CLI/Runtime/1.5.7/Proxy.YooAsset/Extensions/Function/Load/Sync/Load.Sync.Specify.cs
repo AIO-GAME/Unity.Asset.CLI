@@ -14,12 +14,12 @@ namespace AIO.UEngine.YooAsset
 {
     internal partial class YAssetSystem
     {
-        public static GameObject InstGameObject(string packagename, string location, Transform parent)
+        public static GameObject InstGameObject(string packageName, string location, Transform parent)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPackageSync(packagename, location);
+                var package = GetAutoPackageSync(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadAssetSync<GameObject>(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -29,12 +29,12 @@ namespace AIO.UEngine.YooAsset
             return operation.InstantiateSync(parent);
         }
 
-        public static GameObject InstGameObject(string packagename, string location)
+        public static GameObject InstGameObject(string packageName, string location)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPackageSync(packagename, location);
+                var package = GetAutoPackageSync(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadAssetSync<GameObject>(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -47,15 +47,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public static TObject[] LoadSubAssets<TObject>(in string packagename, in string location) where TObject : Object
+        public static TObject[] LoadSubAssets<TObject>(in string packageName, in string location) where TObject : Object
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPackageSync(packagename, location);
+                var package = GetAutoPackageSync(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadSubAssetsSync<TObject>(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -68,15 +68,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载子资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
-        public static Object[] LoadSubAssets(in string packagename, in string location, in Type type)
+        public static Object[] LoadSubAssets(in string packageName, in string location, in Type type)
         {
             var operation = GetHandle<SubAssetsOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPackageSync(packagename, location);
+                var package = GetAutoPackageSync(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadSubAssetsSync(location, type);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -89,15 +89,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public static TObject LoadAsset<TObject>(in string packagename, in string location) where TObject : Object
+        public static TObject LoadAsset<TObject>(in string packageName, in string location) where TObject : Object
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPackageSync(packagename, location);
+                var package = GetAutoPackageSync(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadAssetSync<TObject>(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -110,15 +110,15 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载资源对象
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
-        public static Object LoadAsset(in string packagename, in string location, in Type type)
+        public static Object LoadAsset(in string packageName, in string location, in Type type)
         {
             var operation = GetHandle<AssetOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPackageSync(packagename, location);
+                var package = GetAutoPackageSync(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadAssetAsync(location, type);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -131,14 +131,14 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
-        public static string LoadRawFileText(in string packagename, in string location)
+        public static string LoadRawFileText(in string packageName, in string location)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPackageSync(packagename, location);
+                var package = GetAutoPackageSync(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadRawFileSync(location);
                 if (!LoadCheckOPSync(operation)) return null;
@@ -151,14 +151,14 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 同步加载原生文件
         /// </summary>
-        /// <param name="packagename">包名</param>
+        /// <param name="packageName">包名</param>
         /// <param name="location">资源的定位地址</param>
-        public static byte[] LoadRawFileData(in string packagename, in string location)
+        public static byte[] LoadRawFileData(in string packageName, in string location)
         {
             var operation = GetHandle<RawFileOperationHandle>(location);
             if (operation is null)
             {
-                var package = GetAutoPackageSync(packagename, location);
+                var package = GetAutoPackageSync(packageName, location);
                 if (package is null) return null;
                 operation = package.LoadRawFileSync(location);
                 if (!LoadCheckOPSync(operation)) return null;

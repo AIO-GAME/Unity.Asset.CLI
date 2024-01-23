@@ -5,14 +5,14 @@
 |||✩ - - - - - |*/
 
 #if SUPPORT_YOOASSET
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using YooAsset;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
@@ -26,8 +26,8 @@ namespace AIO.UEngine.YooAsset
             public IProgressInfo Progress => _Progress;
 
             public IDownlandAssetEvent Event { get; set; }
-            
-            public EProgressState State { get; private set; }
+
+            EProgressState IASNetLoading.State => _Progress.State;
 
             /// <summary>
             /// 当前下载进度
@@ -68,7 +68,7 @@ namespace AIO.UEngine.YooAsset
             public void Pause()
             {
                 foreach (var operation in operations.Values) operation.PauseDownload();
-                State = EProgressState.Pause;
+                _Progress.State = EProgressState.Pause;
             }
 
             /// <summary>
@@ -77,7 +77,7 @@ namespace AIO.UEngine.YooAsset
             public void Resume()
             {
                 foreach (var operation in operations.Values) operation.ResumeDownload();
-                State = EProgressState.Running;
+                _Progress.State = EProgressState.Running;
             }
 
             internal void RegisterEvent(AssetInfo info, DownloaderOperation operation)
@@ -94,21 +94,25 @@ namespace AIO.UEngine.YooAsset
                 Update();
                 operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
                 operation.OnDownloadOverCallback += OnDownloadOver;
-                operation.OnDownloadErrorCallback += (f,r) =>
+                operation.OnDownloadErrorCallback += (f, r) =>
                 {
-                    AssetSystem.MainDownloadHandle.Event.OnError?.Invoke(new Exception($"{f}:{r}"));
+                    AssetSystem.DownloadHandle.Event.OnError?.Invoke(new Exception($"{f}:{r}"));
                 };
                 operations.Add(local, operation);
-                State = EProgressState.Running;
+                _Progress.State = EProgressState.Running;
                 return;
 
                 void OnDownloadOver(bool isSucceed)
                 {
+                    if (isSucceed)
+                        AssetSystem.DownloadHandle.Event.OnError?.Invoke(new Exception($"Downloading Fail : {local}"));
+                    operations.Remove(local);
                     CurrentDownloadedBytesList.Remove(local);
                     TotalDownloadedBytesList.Remove(local);
-                    operations.Remove(local);
                     Update();
-                    State = operations.Count > 0 ? EProgressState.Running : EProgressState.Finish;
+                    _Progress.State = operations.Count > 0 ? EProgressState.Running : EProgressState.Finish;
+
+                    if (_Progress.State == EProgressState.Finish) Event.OnComplete?.Invoke(_Progress);
                 }
 
                 void OnDownloadProgressCallback(
@@ -119,10 +123,7 @@ namespace AIO.UEngine.YooAsset
                 {
                     TotalDownloadedBytesList[local] = totalDownloadBytes;
                     CurrentDownloadedBytesList[local] = currentDownloadBytes;
-
-                    _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
-                    _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
-                    AssetSystem.MainDownloadHandle.Event.OnProgress?.Invoke(_Progress);
+                    Update();
                 }
             }
 
@@ -130,11 +131,11 @@ namespace AIO.UEngine.YooAsset
             {
                 _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
                 _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
-                AssetSystem.MainDownloadHandle.Event.OnProgress?.Invoke(_Progress);
+                AssetSystem.DownloadHandle.Event.OnProgress?.Invoke(_Progress);
             }
         }
 
-        internal static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
+        private static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
         {
             var operation = package.CreateBundleDownloader(location);
 #if UNITY_EDITOR
@@ -153,7 +154,7 @@ namespace AIO.UEngine.YooAsset
             }
 #endif
 
-            if (AssetSystem.MainDownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, operation);
+            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, operation);
             return operation;
         }
 

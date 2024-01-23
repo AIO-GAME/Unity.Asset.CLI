@@ -13,17 +13,17 @@ namespace AIO
         /// <summary>
         /// 主下载器
         /// </summary>
-        public static IASNetLoading MainDownloadHandle { get; private set; }
+        public static IASNetLoading DownloadHandle { get; private set; }
 
         /// <summary>
         /// 当前主下载器事件
         /// </summary>
-        public static IDownlandAssetEvent DownloadEvent => MainDownloadHandle?.Event;
+        public static IDownlandAssetEvent DownloadEvent => DownloadHandle?.Event;
 
         /// <summary>
         /// 下载器状态
         /// </summary>
-        public static EProgressState DownloadHandleState => MainDownloadHandle?.State ?? EProgressState.Finish;
+        public static EProgressState DownloadState => DownloadHandle?.State ?? EProgressState.Finish;
 
         /// <summary>
         /// 判断当前网络环境是否为流量

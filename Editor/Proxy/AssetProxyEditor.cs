@@ -36,7 +36,7 @@ namespace AIO.UEditor
             }
         }
 
-        public static void CreateConfig(string BundlesDir, bool isTips = false)
+        public static void CreateConfig(string BundlesDir, bool MergeToLatest = false, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -44,7 +44,7 @@ namespace AIO.UEditor
                 return;
             }
 
-            Editor.CreateConfig(BundlesDir);
+            Editor.CreateConfig(BundlesDir, MergeToLatest);
         }
 
         /// <summary>

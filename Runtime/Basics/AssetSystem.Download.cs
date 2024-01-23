@@ -90,6 +90,7 @@ namespace AIO
             {
                 WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
                 WhiteListLocal.AddRange(GetAssetInfos(enumerable));
+                dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
             }
         }
 
@@ -109,7 +110,11 @@ namespace AIO
                     yield return handle.WaitCo();
                 }
             }
-            else WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
+            else
+            {
+                WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
+                dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
+            }
         }
 
         /// <summary>
@@ -121,6 +126,7 @@ namespace AIO
             if (Parameter.ASMode != EASMode.Remote)
             {
                 WhiteAll = true;
+                dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
                 yield break;
             }
 
@@ -139,7 +145,12 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadHeader(DownlandAssetEvent dEvent = default)
         {
-            if (Parameter.ASMode != EASMode.Remote) yield break;
+            if (Parameter.ASMode != EASMode.Remote)
+            {
+                dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
+                yield break;
+            }
+
             using (var handle = Proxy.GetDownloader(dEvent))
             {
                 yield return handle.UpdateHeader();

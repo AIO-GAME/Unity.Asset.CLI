@@ -4,8 +4,6 @@
 |||✩ - - - - - |*/
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -85,6 +83,8 @@ namespace AIO.UEngine
         public string RuntimeRootDirectory = "BuiltinFiles";
 
 #if UNITY_EDITOR
+        private AssetSystem.SequenceRecordQueue _SequenceRecord;
+
         public AssetSystem.SequenceRecordQueue SequenceRecord
         {
             get
@@ -99,7 +99,6 @@ namespace AIO.UEngine
             }
         }
 
-        private AssetSystem.SequenceRecordQueue _SequenceRecord;
 #endif
 
         /// <summary>
@@ -111,41 +110,6 @@ namespace AIO.UEngine
         public string GetRemoteURL(string fileName, string package, string version)
         {
             return Path.Combine(URL, AssetSystem.PlatformNameStr, package, version, fileName);
-        }
-
-        /// <summary>
-        /// 从远端资源包列表
-        /// </summary>
-        /// <exception cref="ArgumentNullException">Url路径为空</exception>
-        public IEnumerator UpdatePackageRemote()
-        {
-            if (ASMode != EASMode.Remote) yield break;
-            if (string.IsNullOrEmpty(URL)) throw new ArgumentNullException(nameof(URL));
-            var remote = Path.Combine(
-                URL,
-                "Version",
-                string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks)
-            );
-
-            yield return AssetSystem.NetLoadStringCO(remote,
-                data => { Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(data); });
-            if (Packages is null) throw new Exception("Not found Version.json or AssetsPackageConfig list is null !");
-            foreach (var item in Packages)
-            {
-                item.IsLatest = item.Version == "Latest";
-                if (item.IsLatest)
-                {
-#if SUPPORT_YOOASSET // YooAsset 暂时处理办法
-                    remote = Path.Combine(
-                        URL,
-                        AssetSystem.PlatformNameStr,
-                        item.Name,
-                        item.Version,
-                        $"PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}");
-                    yield return AssetSystem.NetLoadStringCO(remote, data => item.Version = data);
-#endif
-                }
-            }
         }
 
         /// <summary>
@@ -172,59 +136,6 @@ namespace AIO.UEngine
                     if (string.IsNullOrEmpty(RuntimeRootDirectory))
                         throw new Exception("Please set the runtime root directory");
                     break;
-            }
-        }
-
-        /// <summary>
-        /// 更新资源包
-        /// </summary>
-        /// <exception cref="Exception">配置文件夹不存在</exception>
-        public void UpdatePackage()
-        {
-            if (ASMode == EASMode.Remote) return;
-            switch (ASMode)
-            {
-                case EASMode.Local:
-                    Packages = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(
-                        Path.Combine(Application.streamingAssetsPath, $"Version/{AssetSystem.PlatformNameStr}.json"));
-                    if (Packages is null)
-                        throw new Exception("Not found Version.json or AssetsPackageConfig list is null !");
-                    break;
-#if UNITY_EDITOR
-                default:
-                    var assembly = Assembly.Load("AIO.Asset.Editor");
-                    var type = assembly.GetType("AIO.UEditor.AssetCollectRoot", true);
-                    var getOrCreate = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public);
-                    var CollectRoot = getOrCreate?.Invoke(null, new object[] { });
-                    if (CollectRoot is null) break;
-                    var packages = type.GetField("Packages", BindingFlags.Instance | BindingFlags.Public)
-                        ?.GetValue(CollectRoot);
-                    if (packages is Array array)
-                    {
-                        var list = new List<AssetsPackageConfig>();
-                        var fieldInfo = assembly
-                            .GetType("AIO.UEditor.AssetCollectPackage", true)
-                            .GetField("Name", BindingFlags.Instance | BindingFlags.Public);
-                        foreach (var item in array)
-                        {
-                            if (item is null) continue;
-                            list.Add(new AssetsPackageConfig
-                            {
-                                Name = fieldInfo?.GetValue(item) as string,
-                                Version = "-.-.-",
-                                IsDefault = false
-                            });
-                        }
-
-                        if (list.Count > 0)
-                        {
-                            Packages = list.ToArray();
-                            Packages[0].IsDefault = true;
-                        }
-                    }
-
-                    break;
-#endif
             }
         }
 
@@ -266,23 +177,22 @@ namespace AIO.UEngine
                     AssetDatabase.SaveAssets();
                 }
 
-                if (Application.isPlaying)
+                if (Application.isPlaying && instance.ASMode == EASMode.Editor)
                 {
-                    if (instance.ASMode == EASMode.Editor)
+#if SUPPORT_YOOASSET
+                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                     {
-                        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                        {
-                            if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
-                            var temp = assembly.GetType("AIO.UEditor.AssetCollectRoot", true)
-                                ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
-                                ?.Invoke(null, new object[] { });
-                            if (temp == null) break;
-                            assembly.GetType("AIO.UEditor.AssetProxyEditor", true)
-                                ?.GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
-                                ?.Invoke(null, new object[] { temp, false });
-                            break;
-                        }
+                        if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
+                        var temp = assembly.GetType("AIO.UEditor.AssetCollectRoot", true)
+                            ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
+                            ?.Invoke(null, new object[] { });
+                        if (temp == null) break;
+                        assembly.GetType("AIO.UEditor.AssetProxyEditor", true)
+                            ?.GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
+                            ?.Invoke(null, new object[] { temp, false });
+                        break;
                     }
+#endif
                 }
             }
 
@@ -349,7 +259,6 @@ namespace AIO.UEngine
             var config = CreateInstance<ASConfig>();
             config.ASMode = EASMode.Editor;
             config.LoadPathToLower = loadPathToLower;
-            config.UpdatePackage();
             return config;
         }
 

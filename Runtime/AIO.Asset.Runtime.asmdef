@@ -1,5 +1,6 @@
 {
     "name": "AIO.Asset.Runtime",
+    "rootNamespace": "",
     "references": [
         "UniTask",
         "UniTask.Addressables",
@@ -8,11 +9,7 @@
         "UniTask.YooAsset",
         "UniTask.TextMeshPro",
         "YooAsset",
-        "Unity.TextMeshPro",
-        "DOTween.Modules",
-        "AIO.Core.Runtime",
-        "UnityEditor.UI",
-        "UnityEngine.UI"
+        "AIO.Core.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -31,21 +28,6 @@
             "name": "com.cysharp.unitask",
             "expression": "",
             "define": "SUPPORT_UNITASK"
-        },
-        {
-            "name": "com.demigiant.dotween",
-            "expression": "",
-            "define": "SUPPORT_DOTWEEN"
-        },
-        {
-            "name": "com.unity.textmeshpro",
-            "expression": "",
-            "define": "SUPPORT_TEXTMESHPRO"
-        },
-        {
-            "name": "com.unity.addressables",
-            "expression": "",
-            "define": "SUPPORT_WHOOTHOT"
         }
     ],
     "noEngineReferences": false

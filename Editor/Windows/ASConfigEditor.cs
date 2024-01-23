@@ -150,7 +150,17 @@ namespace AIO.UEditor
 
         private void Update()
         {
-            Target.UpdatePackage();
+            var Data = AssetCollectRoot.GetOrCreate();
+            Target.Packages = new AssetsPackageConfig[Data.Packages.Length];
+            for (var index = 0; index < Data.Packages.Length; index++)
+            {
+                Target.Packages[index] = new AssetsPackageConfig
+                {
+                    Name = Data.Packages[index].Name,
+                    Version = "-.-.-",
+                    IsDefault = index == 0
+                };
+            }
         }
 
         protected override void OnChange()

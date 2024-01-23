@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 using YooAsset;
 using Object = UnityEngine.Object;
@@ -49,8 +48,8 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
             if (parameters.Parameters is null)
             {
-                AssetSystem.LogException($"{parameters.Mode} Parameters is null");
-                throw new Exception();
+                AssetSystem.ExceptionEvent(AssetSystemException.SettingConfigInitializeFailure);
+                return null;
             }
 
             AssetSystem.Log("[{0}:{1}] is {2}", Config.Name, Config.Version, parameters.Mode);
@@ -62,9 +61,9 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
                 case EPlayMode.EditorSimulateMode:
                 {
-                    if (parameters.Parameters is EditorSimulateModeParameters parmaeter)
+                    if (parameters.Parameters is EditorSimulateModeParameters parameter)
                     {
-                        parmaeter.SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(Config.Name);
+                        parameter.SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(Config.Name);
                     }
 
                     break;
@@ -72,22 +71,30 @@ namespace AIO.UEngine.YooAsset
 #endif
                 case EPlayMode.HostPlayMode:
                 {
-                    if (parameters.Parameters is HostPlayModeParameters parmaeter)
+                    if (parameters.Parameters is HostPlayModeParameters parameter)
                     {
-                        if (parmaeter.RemoteServices is null)
-                            throw new Exception($"{Mode} RemoteServices is null");
-                        return Package.InitializeAsync(parmaeter);
+                        if (parameter.RemoteServices is null)
+                        {
+                            AssetSystem.ExceptionEvent(AssetSystemException.SettingConfigInitializeFailure);
+                            return null;
+                        }
+
+                        return Package.InitializeAsync(parameter);
                     }
 
                     break;
                 }
                 case EPlayMode.WebPlayMode:
                 {
-                    if (parameters.Parameters is WebPlayModeParameters parmaeter)
+                    if (parameters.Parameters is WebPlayModeParameters parameter)
                     {
-                        if (parmaeter.RemoteServices is null)
-                            throw new Exception($"{Mode} RemoteServices is null");
-                        return Package.InitializeAsync(parmaeter);
+                        if (parameter.RemoteServices is null)
+                        {
+                            AssetSystem.ExceptionEvent(AssetSystemException.SettingConfigInitializeFailure);
+                            return null;
+                        }
+
+                        return Package.InitializeAsync(parameter);
                     }
 
                     break;
@@ -492,7 +499,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tag">资源标签</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnpacker(string tag, int unpackingMaxNumber, int failedTryAgain)
+        public ResourceUnpackerOperation CreateResourceUnPacker(string tag, int unpackingMaxNumber, int failedTryAgain)
         {
             return Package.CreateResourceUnpacker(new string[] { tag }, unpackingMaxNumber, failedTryAgain);
         }
@@ -503,7 +510,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnpacker(string[] tags, int unpackingMaxNumber,
+        public ResourceUnpackerOperation CreateResourceUnPacker(string[] tags, int unpackingMaxNumber,
             int failedTryAgain)
         {
             return Package.CreateResourceUnpacker(tags, unpackingMaxNumber, failedTryAgain);
@@ -515,7 +522,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnpacker(IEnumerable<string> tags, int unpackingMaxNumber,
+        public ResourceUnpackerOperation CreateResourceUnPacker(IEnumerable<string> tags, int unpackingMaxNumber,
             int failedTryAgain)
         {
             return Package.CreateResourceUnpacker(tags.ToArray(), unpackingMaxNumber, failedTryAgain);
@@ -526,7 +533,7 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnpacker(int unpackingMaxNumber, int failedTryAgain)
+        public ResourceUnpackerOperation CreateResourceUnPacker(int unpackingMaxNumber, int failedTryAgain)
         {
             return Package.CreateResourceUnpacker(unpackingMaxNumber, failedTryAgain);
         }

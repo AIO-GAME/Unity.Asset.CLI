@@ -44,7 +44,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke( operation.InstantiateSync(parent));
+            cb?.Invoke(operation.InstantiateSync(parent));
         }
 
         public static IEnumerator InstGameObjectCO(string location, Action<GameObject> cb)
@@ -72,7 +72,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke( operation.InstantiateSync());
+            cb?.Invoke(operation.InstantiateSync());
         }
 
         #endregion
@@ -110,7 +110,7 @@ namespace AIO.UEngine.YooAsset
                 AddHandle(location, operation);
             }
 
-            cb?.Invoke( operation.GetSubAssetObjects<TObject>());
+            cb?.Invoke(operation.GetSubAssetObjects<TObject>());
         }
 
         /// <summary>
@@ -247,14 +247,15 @@ namespace AIO.UEngine.YooAsset
 
             YAssetPackage package = null;
             yield return GetAutoPackageCO(location, ya => package = ya);
-            if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
+            if (package is null)
+                throw new Exception($"场景配置 异常错误 : {location} {sceneMode}");
 
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
             var check = false;
             yield return LoadCheckOPCO(operation, error => check = error);
             if (!check)
                 throw new Exception(
-                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                    $"场景配置 异常错误 : {package.PackageName} {location} {sceneMode}");
             AddHandle(location, operation);
             operation.ActivateScene();
             cb?.Invoke(operation.SceneObject);
@@ -281,16 +282,18 @@ namespace AIO.UEngine.YooAsset
                 yield return operation.UnloadAsync();
                 FreeHandle(location);
             }
+
             YAssetPackage package = null;
             yield return GetAutoPackageCO(location, ya => package = ya);
-            if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
+            if (package is null)
+                throw new Exception($"场景配置 异常错误 : {location} {sceneMode}");
 
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
             var check = false;
             yield return LoadCheckOPCO(operation, error => check = error);
             if (!check)
                 throw new Exception(
-                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                    $"场景配置 异常错误 : {package.PackageName} {location} {sceneMode}");
             AddHandle(location, operation);
             operation.ActivateScene();
             cb?.Invoke(operation.SceneObject);

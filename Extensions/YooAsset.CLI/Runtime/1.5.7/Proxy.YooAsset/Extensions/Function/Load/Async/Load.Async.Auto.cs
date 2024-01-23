@@ -283,12 +283,13 @@ namespace AIO.UEngine.YooAsset
             }
 
             var package = await GetAutoPackageTask(location);
-            if (package is null) throw new Exception(string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
+            if (package is null) throw new Exception(
+                $"场景配置 异常错误 : {location} {sceneMode}");
 
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
             if (!await LoadCheckOPTask(operation))
                 throw new Exception(
-                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                    $"Loading scenario resources is abnormal : {package.PackageName} {location} {sceneMode}");
             AddHandle(location, operation);
 
             cb?.Invoke(operation.SceneObject);
@@ -320,12 +321,12 @@ namespace AIO.UEngine.YooAsset
             var package = await GetAutoPackageTask(location);
             if (package is null)
                 throw new Exception(
-                    string.Format("场景配置 异常错误:{0} {1}", location, sceneMode));
+                    $"场景配置 异常错误 : {location} {sceneMode}");
 
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
             if (!await LoadCheckOPTask(operation))
                 throw new Exception(
-                    string.Format("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode));
+                    $"Loading scenario resources is abnormal : {package.PackageName} {location} {sceneMode}");
             AddHandle(location, operation);
 
             cb?.Invoke(operation.SceneObject);
