@@ -126,7 +126,7 @@ namespace AIO
                 Path.Combine(Directory.GetParent(Application.dataPath).FullName,
                     config.RuntimeRootDirectory, EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
-                Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory);
+                Path.Combine(Application.persistentDataPath, config.RuntimeRootDirectory);
 #endif
             Parameter = config;
             Proxy = proxy;
