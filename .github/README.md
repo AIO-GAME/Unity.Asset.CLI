@@ -16,7 +16,7 @@
 <a href="https://openupm.com/packages/com.aio.cli.asset/"> <img alt="" src="https://img.shields.io/npm/v/com.aio.cli.asset?label=openupm&amp;registry_uri=https://package.openupm.com" /> </a>
 </p>
 
-## ⚙ Install
+## ⚙ 安装
 
 <details>
 <summary>
@@ -70,7 +70,7 @@
 
 </details>
 
-## ⭐ About
+## ⭐ 关于
 
 - **这是 Unity 的资源加载接口(CLI)包。它提供了一组命令和工具来增强效率和开发体验。**
 > [!IMPORTANT]
@@ -89,14 +89,14 @@
 > - ❌ **支持 [Addressable](https://github.com/Unity-Technologies/Addressables-Sample)**
 > - ❌ **支持 自定义代理第三方插件**
 
-## 📖 Documentation
+## 📖 文档
 
 - [_**文档目录**_](https://github.com/AIO-GAME/Unity.Asset.CLI/wiki)
 - [_**API**_](./API_USAGE/AssetSystem.md)
 - [_**配置讲解**_](./API_USAGE/Config.md)
 - [_**工具使用**_](./API_USAGE/ToolWindow.md)
 
-## 🔗 Third-Party References & Tools
+## 🔗 第三方参考资料和工具
 
 **Please refer to the wiki for a list of references and tools used in this package.**
 | **Doc** | **Description**                                                                      |
@@ -110,7 +110,7 @@
 <!-- readme: collaborators,contributors -start -->
 <!-- readme: collaborators,contributors -end -->
 
-## 📢 Thanks
+## 📢 致谢
 
 - **谢谢您选择我们的扩展包。**
 - **如果此软件包对您有所帮助。**
