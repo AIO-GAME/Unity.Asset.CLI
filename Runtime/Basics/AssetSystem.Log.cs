@@ -19,7 +19,7 @@ namespace AIO
         {
             if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogFormat($"<b><color=#9575CD>[ASSET]</color><color=#FFC107>[Warning]</color></b> {format}",
+                Debug.LogWarningFormat($"<b><color=#9575CD>[ASSET]</color><color=#FFC107>[Warning]</color></b> {format}",
                     args);
 #else
                 Debug.LogWarning(new Exception($"[ASSET][Warning] {string.Format(format, args)}"));
@@ -31,7 +31,7 @@ namespace AIO
         {
             if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogFormat("<b><color=#9575CD>[ASSET]</color><color=#FFC107>[Warning]</color></b> {0}", args);
+                Debug.LogWarningFormat("<b><color=#9575CD>[ASSET]</color><color=#FFC107>[Warning]</color></b> {0}", args);
 #else
                 Debug.LogWarning(new Exception($"[ASSET][Warning] {args}"));
 #endif
@@ -42,7 +42,7 @@ namespace AIO
         {
             if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogFormat("<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {0}", args);
+                Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {0}", args);
 #else
                 Debug.LogException(new Exception($"[ASSET][Exception] {args}"));
 #endif
@@ -53,7 +53,7 @@ namespace AIO
         {
             if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogFormat("<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {0}", args);
+                Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {0}", args);
 #else
                 Debug.LogException(new Exception($"[ASSET][Exception] {args}"));
 #endif
@@ -64,7 +64,7 @@ namespace AIO
         {
             if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogFormat($"<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {format}",
+                Debug.LogErrorFormat($"<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {format}",
                     args);
 #else
                 Debug.LogException(new Exception($"[ASSET][Exception] {string.Format(format, args)}"));
@@ -98,7 +98,7 @@ namespace AIO
         {
             if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogFormat("<b><color=#9575CD>[ASSET]</color><color=#F44336>[Error]</color></b> {0}", args);
+                Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#F44336>[Error]</color></b> {0}", args);
 #else
                 Debug.LogErrorFormat("[ASSET][Error] {0}", args);
 #endif
@@ -109,7 +109,7 @@ namespace AIO
         {
             if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogFormat($"<b><color=#9575CD>[ASSET]</color><color=#F44336>[Error]</color></b> {format}", args);
+                Debug.LogErrorFormat($"<b><color=#9575CD>[ASSET]</color><color=#F44336>[Error]</color></b> {format}", args);
 #else
                 Debug.LogErrorFormat($"[ASSET][Error] {format}", args);
 #endif
