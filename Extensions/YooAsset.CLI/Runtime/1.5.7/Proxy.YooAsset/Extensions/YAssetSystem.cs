@@ -75,7 +75,6 @@ namespace AIO.UEngine.YooAsset
 
         private static bool isInitialize;
 
-
         public static void Initialize()
         {
             if (isInitialize == false)

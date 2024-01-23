@@ -147,7 +147,9 @@ namespace AIO.UEngine
 
         #region static
 
+#if UNITY_EDITOR
         private static ASConfig instance;
+#endif
 
         private static ASConfig GetResource()
         {
@@ -202,12 +204,11 @@ namespace AIO.UEngine
                 }
             }
 
-#else
-            instance = GetResource();
-#endif
-
             if (instance is null) throw new Exception("Not found ASConfig.asset ! Please create it !");
             return instance;
+#else
+            return GetResource();
+#endif
         }
 
         /// <summary>
