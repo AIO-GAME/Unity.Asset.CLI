@@ -1,6 +1,5 @@
 {
     "name": "AIO.Asset.Runtime",
-    "rootNamespace": "",
     "references": [
         "UniTask",
         "UniTask.Addressables",

@@ -1,5 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UnityEngine.Scripting;
+
+[assembly: Preserve]
+#if UNITY_2018_3_OR_NEWER
+[assembly: AlwaysLinkAssembly]
+#endif
 
 [assembly: ComVisible(false)]
 [assembly: InternalsVisibleTo("AIO.Asset.Editor")]

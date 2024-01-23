@@ -5,6 +5,7 @@
 |||✩ - - - - - |*/
 
 #if SUPPORT_YOOASSET
+
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -12,7 +13,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using AIO.UEngine.YooAsset;
+using UnityEngine.Scripting;
 using YooAsset;
+
+[assembly: Preserve]
+#if UNITY_2018_3_OR_NEWER
+[assembly: AlwaysLinkAssembly]
+#endif
 
 namespace AIO.UEngine
 {
