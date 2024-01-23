@@ -32,9 +32,9 @@ namespace AIO.UEditor
         {
             using (GELayout.VHorizontal())
             {
-                if (GELayout.Button("Clean Sandbox"))
+                if (GELayout.Button("Clean Cache"))
                 {
-                    var sandbox = Path.Combine(EHelper.Path.Project, "Sandbox");
+                    var sandbox = Path.Combine(EHelper.Path.Project, Target.RuntimeRootDirectory);
                     if (Directory.Exists(sandbox)) AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
                 }
 

@@ -118,7 +118,7 @@ namespace AIO.UEngine
         /// <exception cref="Exception">配置异常</exception>
         public void Check()
         {
-            switch (instance.ASMode)
+            switch (ASMode)
             {
                 case EASMode.Editor:
                     if (Packages == null || Packages.Length == 0)
@@ -129,6 +129,12 @@ namespace AIO.UEngine
                         throw new Exception("Please set the package version");
                     break;
                 case EASMode.Remote:
+                    if (string.IsNullOrEmpty(URL))
+                        throw new Exception("Please set the remote URL");
+                    if (Packages.Any(value => string.IsNullOrEmpty(value.Name)))
+                        throw new Exception("Please set the package name");
+                    if (Packages.Any(value => string.IsNullOrEmpty(value.Version)))
+                        throw new Exception("Please set the package version");
                     if (string.IsNullOrEmpty(RuntimeRootDirectory))
                         throw new Exception("Please set the runtime root directory");
                     break;
@@ -264,8 +270,8 @@ namespace AIO.UEngine
 
         public void Save()
         {
-            if (instance.SequenceRecord != null) instance.SequenceRecord.Save();
             if (Equals(null)) return;
+            if (SequenceRecord != null) SequenceRecord.Save();
             EditorUtility.SetDirty(this);
         }
 #endif
