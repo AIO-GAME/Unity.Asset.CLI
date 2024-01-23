@@ -46,7 +46,6 @@ namespace AIO.UEditor.CLI
                 var remote = AHelper.Json.Deserialize<Dictionary<string, string>>(
                     await PrGCloud.ReadTextAsync(remoteManifest));
                 var tuple = YooAssetBuild.ComparisonManifest(current, remote);
-                var taskList = new List<Task>();
                 foreach (var pair in tuple.Item1) // 添加
                 {
                     remote[pair.Key] = pair.Value;
@@ -55,10 +54,7 @@ namespace AIO.UEditor.CLI
                     {
                         var target = string.Concat(config.RemoteRelative, '/', pair.Key);
                         EHelper.DisplayProgressBar("新增文件", target, 0.4f);
-                        taskList.Add(Task.Factory.StartNew(() =>
-                        {
-                            PrGCloud.UploadFile(target, source, config.MetaDataKey, config.MetaDataValue);
-                        }));
+                        await PrGCloud.UploadFileAsync(target, source, config.MetaDataKey, config.MetaDataValue);
                     }
                     else
                     {
@@ -67,12 +63,9 @@ namespace AIO.UEditor.CLI
                     }
                 }
 
-                EHelper.DisplayProgressBar("新增任务", $"等待任务完成 -> [任务数:{taskList.Count}]", 0.4f);
-                Task.WaitAll(taskList.ToArray());
                 EHelper.DisplayProgressBar("删除任务", "等待任务完成", 0.6f);
                 await PrGCloud.DeleteFileAsync(tuple.Item2.Values);
 
-                taskList.Clear();
                 foreach (var pair in tuple.Item3) // 修改
                 {
                     remote[pair.Key] = pair.Value;
@@ -81,10 +74,7 @@ namespace AIO.UEditor.CLI
                     {
                         var target = string.Concat(config.RemoteRelative, '/', pair.Key);
                         EHelper.DisplayProgressBar("修改文件", target, 0.8f);
-                        taskList.Add(Task.Factory.StartNew(() =>
-                        {
-                            PrGCloud.UploadFile(target, source, config.MetaDataKey, config.MetaDataValue);
-                        }));
+                        await PrGCloud.UploadFileAsync(target, source, config.MetaDataKey, config.MetaDataValue);
                     }
                     else
                     {
@@ -92,9 +82,6 @@ namespace AIO.UEditor.CLI
                         return;
                     }
                 }
-
-                EHelper.DisplayProgressBar("修改任务", $"等待任务完成 -> [任务数:{taskList.Count}]", 0.8f);
-                Task.WaitAll(taskList.ToArray());
 
                 // 然后再将需要新增 删除 更新的文件上传到Ftp 上传完成后更新清单文件
                 EHelper.DisplayProgressBar("上传进度", "更新远端资源清单配置", 0.9f);
