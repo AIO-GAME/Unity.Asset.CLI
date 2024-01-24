@@ -191,9 +191,9 @@ namespace AIO.UEditor
         /// <returns>Ture:忽略 False:需要过滤</returns>
         public bool IsCollectAsset(AssetRuleData data)
         {
-            // 判断是否为Resources目录下的资源
             var rootPath = data.AssetPath.Substring(0, data.AssetPath.LastIndexOf('/'));
-            if (rootPath.Contains("Resources/") || rootPath.EndsWith("Resources"))
+            if (rootPath.EndsWith("Editor")) return false;
+            if (rootPath.Contains("Resources/") || rootPath.EndsWith("Resources")) // 判断是否为Resources目录下的资源
             {
                 Debug.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", data.AssetPath);
                 return false;

@@ -277,7 +277,7 @@ namespace AIO.UEditor.CLI
 
             foreach (var item in target) // 遍历最新版本清单
             {
-                if (!current.ContainsKey(item.Key)) // 删除
+                if (!current.ContainsKey(item.Key)) // 如果当前清单文件中不存在 则代表需要删除目标版本指定文件
                 {
                     delete.Add(item.Key, item.Value);
                     continue;
