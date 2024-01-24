@@ -378,6 +378,16 @@ namespace AIO.UEngine
                     State == EProgressState.Fail ||
                     State == EProgressState.Finish) yield break;
 
+                var total = ResourceDownloaderOperations.Sum(pair => pair.Value.TotalDownloadBytes);
+                if (AssetSystem.GetAvailableDiskSpace() < total)
+                {
+                    Debug.LogError(
+                        $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {total.ToConverseStringFileSize()}");
+                    State = EProgressState.Fail;
+                    OnDiskSpaceNotEnough?.Invoke(Report);
+                    yield break;
+                }
+
                 foreach (var pair in ResourceDownloaderOperations)
                 {
                     CurrentInfo = $"Resource Download -> [{pair.Key}]";
@@ -399,17 +409,6 @@ namespace AIO.UEngine
                                 break;
                         }
                     }
-                
-#if !UNITY_IOS      // 屏蔽IOS设备检查磁盘空间
-                    // 检查磁盘空间是否足够
-                    if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
-                    {
-                        Debug.Log($"磁盘空间不足 {AssetSystem.GetAvailableDiskSpace()} < {pair.Value.TotalDownloadBytes}");
-                        State = EProgressState.Fail;
-                        OnDiskSpaceNotEnough?.Invoke(Report);
-                        yield break;
-                    }
-#endif
 
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
                     pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;
