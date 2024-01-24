@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 namespace AIO
 {
@@ -120,7 +121,9 @@ namespace AIO
 #if UNITY_EDITOR
 
 #if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
-            return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
+            return string.IsNullOrEmpty(SandboxRootDirectory)
+                ? new DriveInfo(Application.dataPath).AvailableFreeSpace
+                : new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
 #else
             UnityEngine.Debug.LogWarning("Platform not support");
             return 0;
