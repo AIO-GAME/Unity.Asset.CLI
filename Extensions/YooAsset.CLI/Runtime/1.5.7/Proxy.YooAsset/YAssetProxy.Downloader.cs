@@ -391,6 +391,7 @@ namespace AIO.UEngine
                             case EProgressState.Fail:
                                 yield break;
                             case EProgressState.Cancel:
+                                State = EProgressState.Cancel;
                                 Event.OnError?.Invoke(new TaskCanceledException());
                                 Event.OnComplete?.Invoke(Report);
                                 yield break;
@@ -403,6 +404,7 @@ namespace AIO.UEngine
                     // 检查磁盘空间是否足够
                     if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
                     {
+                        State = EProgressState.Fail;
                         OnDiskSpaceNotEnough?.Invoke(Report);
                         yield break;
                     }
@@ -415,41 +417,20 @@ namespace AIO.UEngine
 
                 State = EProgressState.Finish;
 
-                if (OpenDownloadAll)
+                if (OpenDownloadAll) AssetSystem.WhiteAll = true;
+                else if (Tags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
+                if (ErrorDict.Count <= 0) yield break;
+
+                State = EProgressState.Fail;
+                var str = new StringBuilder("Failed to download resource pack file :\n");
+                foreach (var pair in ErrorDict)
                 {
-                    AssetSystem.WhiteAll = true;
-                }
-                else
-                {
-                    if (Tags.Count > 0)
-                        AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
+                    AssetSystem.LogError($"下载资源失败 -> [{pair.Key} -> {pair.Value}]");
+                    str.AppendLine(pair.Key);
                 }
 
-                if (ErrorDict.Count > 0)
-                {
-                    State = EProgressState.Fail;
-                    if (Event.OnError != null)
-                    {
-                        var str = new StringBuilder("Failed to download resource pack file :\n");
-                        foreach (var pair in ErrorDict)
-                        {
-                            AssetSystem.LogError($"下载资源失败 -> [{pair.Key} -> {pair.Value}]");
-                            str.AppendLine(pair.Key);
-                        }
-
-                        Event.OnError.Invoke(new SystemException(str.ToString()));
-                    }
-#if UNITY_EDITOR
-                    else
-                    {
-                        foreach (var pair in ErrorDict)
-                        {
-                            AssetSystem.LogError(
-                                $"Failed to download resource pack file -> [{pair.Key} -> {pair.Value}]");
-                        }
-                    }
-#endif
-                }
+                if (Event.OnError is null) throw new SystemException(str.ToString());
+                Event.OnError.Invoke(new SystemException(str.ToString()));
             }
         }
     }

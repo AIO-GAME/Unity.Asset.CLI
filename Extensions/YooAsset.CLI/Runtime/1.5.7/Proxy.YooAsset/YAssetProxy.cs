@@ -5,6 +5,7 @@
 |||✩ - - - - - |*/
 
 #if SUPPORT_YOOASSET
+
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -12,7 +13,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using AIO.UEngine.YooAsset;
+using UnityEngine.Scripting;
 using YooAsset;
+
+[assembly: Preserve]
+#if UNITY_2018_3_OR_NEWER
+[assembly: AlwaysLinkAssembly]
+#endif
 
 namespace AIO.UEngine
 {
@@ -66,14 +73,14 @@ namespace AIO.UEngine
                     };
 #endif
                     break;
+                case EASMode.Local:
+                    yAssetFlow = new YAParametersLocal(AssetSystem.Parameter);
+                    break;
                 case EASMode.Editor: // 编辑器模式
 #if UNITY_EDITOR
                     yAssetFlow = new YAssetHandleEditor(AssetSystem.Parameter);
                     break;
 #endif
-                case EASMode.Local:
-                    yAssetFlow = new YAParametersLocal(AssetSystem.Parameter);
-                    break;
                 default:
                     AssetSystem.ExceptionEvent(AssetSystemException.NoSupportEASMode);
                     return null;
@@ -213,11 +220,6 @@ namespace AIO.UEngine
         {
             switch (config.ASMode)
             {
-                case EASMode.Editor:
-#if UNITY_EDITOR
-                    UpdatePackagesEditor(config);
-                    break;
-#endif
                 case EASMode.Remote:
                     yield return UpdatePackagesRemote(config);
                     break;
@@ -227,8 +229,14 @@ namespace AIO.UEngine
                     if (config.Packages is null)
                         AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
                     break;
+                case EASMode.Editor:
+#if UNITY_EDITOR
+                    UpdatePackagesEditor(config);
+                    break;
+#endif
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    AssetSystem.ExceptionEvent(AssetSystemException.NoSupportEASMode);
+                    break;
             }
         }
 

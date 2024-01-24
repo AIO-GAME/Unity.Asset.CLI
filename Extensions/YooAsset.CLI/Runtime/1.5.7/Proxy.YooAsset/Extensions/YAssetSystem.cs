@@ -75,7 +75,6 @@ namespace AIO.UEngine.YooAsset
 
         private static bool isInitialize;
 
-
         public static void Initialize()
         {
             if (isInitialize == false)
@@ -93,9 +92,14 @@ namespace AIO.UEngine.YooAsset
             Config.Packages.Clear();
             Dic.Clear();
 
-            var packageConfigs = AssetSystem.PackageConfigs;
-            if (packageConfigs != null)
-                foreach (var package in packageConfigs)
+            if (AssetSystem.PackageConfigs is null)
+            {
+                AssetSystem.LogError("AssetSystem PackageConfigs is null");
+                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                return;
+            }
+
+            foreach (var package in AssetSystem.PackageConfigs)
                     Config.Packages.Add(package);
 
             foreach (var item in Config.Packages)

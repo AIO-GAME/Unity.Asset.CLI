@@ -132,9 +132,9 @@ namespace AIO.UEditor
                     if (Config.ASMode == EASMode.Editor) UpdateDataConfigMode();
                 }
 
-                if (GELayout.Button("Clean Sandbox", GEStyle.toolbarbuttonRight, GP_Width_100))
+                if (GELayout.Button("Clean Cache", GEStyle.toolbarbuttonRight, GP_Width_100))
                 {
-                    var sandbox = Path.Combine(EHelper.Path.Project, "Sandbox");
+                    var sandbox = Path.Combine(EHelper.Path.Project, Config.RuntimeRootDirectory);
                     if (Directory.Exists(sandbox))
                         AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
                 }

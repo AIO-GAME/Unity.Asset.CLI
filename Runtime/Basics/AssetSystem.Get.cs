@@ -4,8 +4,10 @@
 |*|E-Mail:     |*| xinansky99@foxmail.com
 |*|============|*/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 namespace AIO
 {
@@ -117,38 +119,40 @@ namespace AIO
         /// <returns></returns>
         public static long GetAvailableDiskSpace()
         {
+            try
+            {
 #if UNITY_EDITOR
 
-#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
-            return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
+#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_EDITOR_LINUX
+                return string.IsNullOrEmpty(SandboxRootDirectory)
+                    ? new DriveInfo(Application.dataPath).AvailableFreeSpace
+                    : new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
 #else
-            UnityEngine.Debug.LogWarning("Platform not support");
-            return 0;
+                UnityEngine.Debug.LogWarning("Platform not support");
+                return 0;
 #endif
 
 #else
 #if UNITY_WEBGL
-            return 0;
+                return 0;
 #elif UNITY_IOS || UNITY_IPHONE
-            return (long)_IOS_GetFreeDiskSpace();
+                return (long)_IOS_GetFreeDiskSpace();
 #elif UNITY_ANDROID
-            try
-            { 
                 var unityPluginLoader = new UnityEngine.AndroidJavaClass("IOHelper");
                 return unityPluginLoader.CallStatic<long>("GetFreeDiskSpace");
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+                return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
+#else
+                UnityEngine.Debug.LogWarning("Platform not support");
+                return 0;
+#endif
+#endif
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                UnityEngine.Debug.LogException(e);
+                Debug.LogException(e);
                 return 0;
             }
-#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
-            return new DriveInfo(SandboxRootDirectory).AvailableFreeSpace;
-#else
-            UnityEngine.Debug.LogWarning("Platform not support");
-            return 0;
-#endif
-#endif
         }
     }
 }

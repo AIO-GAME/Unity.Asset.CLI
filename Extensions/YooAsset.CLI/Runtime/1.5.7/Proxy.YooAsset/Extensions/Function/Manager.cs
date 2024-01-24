@@ -51,7 +51,10 @@ namespace AIO.UEngine.YooAsset
         {
             if (GetParameter is null)
             {
+                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+#if UNITY_EDITOR
                 AssetSystem.LogError("Parameter is null");
+#endif
                 yield break;
             }
 
@@ -59,11 +62,21 @@ namespace AIO.UEngine.YooAsset
             foreach (var item in Dic.Values)
             {
                 var args = GetParameter.Invoke(item);
-                if (args is null) throw new Exception($"AssetSystem {item.Config.Name} Parameter is null");
+                if (args is null)
+                {
+                    AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+#if UNITY_EDITOR
+                    throw new Exception($"AssetSystem {item.Config.Name} Parameter is null");
+#endif
+                }
 
                 var operation = item.InitializeAsync(args);
                 if (operation.Task != null) tasks.Add(operation);
-                else AssetSystem.Log("{0} -> {1} -> {2}", nameof(LoadTask), item.Config, operation.Error);
+                else
+                {
+                    AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                    AssetSystem.LogException("{0} -> {1} -> {2}", nameof(LoadTask), item.Config, operation.Error);
+                }
             }
 
             foreach (var task in tasks) yield return task;
@@ -76,9 +89,7 @@ namespace AIO.UEngine.YooAsset
         {
             var tasks = Dic.Keys.ToArray()
                 .Select(item => Dic[item].ClearUnusedCacheFilesAsync())
-                .Cast<IEnumerator>()
-                .ToList();
-
+                .Cast<IEnumerator>();
             foreach (var task in tasks) yield return task;
         }
 

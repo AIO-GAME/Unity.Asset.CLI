@@ -1,6 +1,5 @@
 {
     "name": "AIO.CLI.YooAsset.Runtime",
-    "rootNamespace": "",
     "references": [
         "YooAsset",
         "UniTask.YooAsset",

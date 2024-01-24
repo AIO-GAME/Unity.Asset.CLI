@@ -1,5 +1,4 @@
-﻿#if SUPPORT_YOOASSET
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,14 +6,14 @@ namespace YooAsset.Editor
 {
     public class PackageCompareWindow : EditorWindow
     {
-        static PackageCompareWindow _thisInstance;
+        private static PackageCompareWindow _thisInstance;
 
         [MenuItem("YooAsset/补丁包比对工具", false)]
-        static void ShowWindow()
+        private static void ShowWindow()
         {
             if (_thisInstance == null)
             {
-                _thisInstance = GetWindow(typeof(PackageCompareWindow), false, "补丁包比对工具", true) as PackageCompareWindow;
+                _thisInstance = GetWindow<PackageCompareWindow>(false, "补丁包比对工具", true);
                 _thisInstance.minSize = new Vector2(800, 600);
             }
 
@@ -107,12 +106,12 @@ namespace YooAsset.Editor
             newList.Clear();
 
             // 加载补丁清单1
-            byte[] bytesData1 = FileUtility.ReadAllBytes(_manifestPath1);
-            PackageManifest manifest1 = ManifestTools.DeserializeFromBinary(bytesData1);
+            var bytesData1 = FileUtility.ReadAllBytes(_manifestPath1);
+            var manifest1 = ManifestTools.DeserializeFromBinary(bytesData1);
 
             // 加载补丁清单1
-            byte[] bytesData2 = FileUtility.ReadAllBytes(_manifestPath2);
-            PackageManifest manifest2 = ManifestTools.DeserializeFromBinary(bytesData2);
+            var bytesData2 = FileUtility.ReadAllBytes(_manifestPath2);
+            var manifest2 = ManifestTools.DeserializeFromBinary(bytesData2);
 
             // 拷贝文件列表
             foreach (var bundle2 in manifest2.BundleList)
@@ -131,12 +130,10 @@ namespace YooAsset.Editor
             }
 
             // 按字母重新排序
-            changeList.Sort((x, y) => string.Compare(x.BundleName, y.BundleName));
-            newList.Sort((x, y) => string.Compare(x.BundleName, y.BundleName));
+            changeList.Sort((x, y) => string.CompareOrdinal(x.BundleName, y.BundleName));
+            newList.Sort((x, y) => string.CompareOrdinal(x.BundleName, y.BundleName));
 
             Debug.Log("资源包差异比对完成！");
         }
     }
 }
-
-#endif
