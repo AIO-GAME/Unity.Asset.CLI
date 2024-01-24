@@ -393,7 +393,6 @@ namespace AIO.UEngine
                             case EProgressState.Cancel:
                                 State = EProgressState.Cancel;
                                 Event.OnError?.Invoke(new TaskCanceledException());
-                                Event.OnComplete?.Invoke(Report);
                                 yield break;
                             case EProgressState.Pause:
                                 yield return new WaitForSeconds(0.1f);
@@ -404,6 +403,7 @@ namespace AIO.UEngine
                     // 检查磁盘空间是否足够
                     if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
                     {
+                        Debug.Log($"磁盘空间不足 {AssetSystem.GetAvailableDiskSpace()} < {pair.Value.TotalDownloadBytes}");
                         State = EProgressState.Fail;
                         OnDiskSpaceNotEnough?.Invoke(Report);
                         yield break;
