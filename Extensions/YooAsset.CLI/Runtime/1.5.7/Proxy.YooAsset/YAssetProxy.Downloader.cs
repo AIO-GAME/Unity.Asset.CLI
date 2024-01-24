@@ -399,7 +399,8 @@ namespace AIO.UEngine
                                 break;
                         }
                     }
-
+                
+#if !UNITY_IOS      // 屏蔽IOS设备检查磁盘空间
                     // 检查磁盘空间是否足够
                     if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
                     {
@@ -408,6 +409,7 @@ namespace AIO.UEngine
                         OnDiskSpaceNotEnough?.Invoke(Report);
                         yield break;
                     }
+#endif
 
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
                     pair.Value.OnDownloadErrorCallback = OnUpdateDownloadError;

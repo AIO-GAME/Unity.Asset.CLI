@@ -12,107 +12,87 @@ namespace AIO
 {
     public partial class AssetSystem
     {
+#if UNITY_EDITOR
+        private const string BASE_FORMAT = "<b><color=#9575CD>[ASSET]</color></b>";
+        private const string BASE_LOG_FORMAT = BASE_FORMAT + "<b><color=#B3E5FC>[Log]</color></b>";
+        private const string BASE_EXCEPTION_FORMAT = BASE_FORMAT + "<b><color=#E91E63>[Exception]</color></b>";
+        private const string BASE_WARNING_FORMAT = BASE_FORMAT + "<b><color=#FFC107>[Warning]</color></b>";
+        private const string BASE_ERROR_FORMAT = BASE_FORMAT + "<b><color=#F44336>[Error]</color></b>";
+#else
+        private const string BASE_FORMAT = "[ASSET]";
+        private const string BASE_LOG_FORMAT = BASE_FORMAT + "[Log]";           
+        private const string BASE_EXCEPTION_FORMAT = BASE_FORMAT + "[Exception]";
+        private const string BASE_WARNING_FORMAT = BASE_FORMAT + "[Warning]";
+        private const string BASE_ERROR_FORMAT = BASE_LOG_FORMAT + "[Error]";
+#endif
+
         #region LOG
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogWarning(string format, params object[] args)
         {
-            // if (Parameter.OutputLog)
-#if UNITY_EDITOR
-                Debug.LogWarningFormat($"<b><color=#9575CD>[ASSET]</color><color=#FFC107>[Warning]</color></b> {format}",
-                    args);
-#else
-                Debug.LogWarning(new Exception($"[ASSET][Warning] {string.Format(format, args)}"));
-#endif
+            if (Parameter.OutputLog)
+                Debug.LogWarningFormat($"{BASE_WARNING_FORMAT} {format}", args);
         }
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogWarning(string args)
         {
-            // if (Parameter.OutputLog)
-#if UNITY_EDITOR
-                Debug.LogWarningFormat("<b><color=#9575CD>[ASSET]</color><color=#FFC107>[Warning]</color></b> {0}", args);
-#else
-                Debug.LogWarning(new Exception($"[ASSET][Warning] {args}"));
-#endif
+            if (Parameter.OutputLog)
+                Debug.LogWarning($"{BASE_WARNING_FORMAT} {args}");
         }
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogException(Exception args)
         {
-            // if (Parameter.OutputLog)
+            if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {0}", args);
+                Debug.LogError($"{BASE_EXCEPTION_FORMAT} {args}");
 #else
-                Debug.LogException(new Exception($"[ASSET][Exception] {args}"));
+                Debug.LogException(new Exception($"{BASE_EXCEPTION_FORMAT} {args}"));
 #endif
         }
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogException(string args)
         {
-            // if (Parameter.OutputLog)
-#if UNITY_EDITOR
-                Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {0}", args);
-#else
-                Debug.LogException(new Exception($"[ASSET][Exception] {args}"));
-#endif
+            if (Parameter.OutputLog)
+                Debug.LogError($"{BASE_EXCEPTION_FORMAT} {args}");
         }
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogException(string format, params object[] args)
         {
-            // if (Parameter.OutputLog)
-#if UNITY_EDITOR
-                Debug.LogErrorFormat($"<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {format}",
-                    args);
-#else
-                Debug.LogException(new Exception($"[ASSET][Exception] {string.Format(format, args)}"));
-#endif
+            if (Parameter.OutputLog)
+                Debug.LogErrorFormat($"{BASE_EXCEPTION_FORMAT} {format}", args);
         }
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void Log(string args)
         {
-            // if (Parameter.OutputLog)
-#if UNITY_EDITOR
-                Debug.LogFormat("<b><color=#9575CD>[ASSET]</color><color=#B3E5FC>[Log]</color></b> {0}", args);
-#else
-                Debug.LogFormat("[ASSET][Log] {0}", args);
-#endif
+            if (Parameter.OutputLog)
+                Debug.Log($"{BASE_LOG_FORMAT} {args}");
         }
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void Log(string format, params object[] args)
         {
-            // if (Parameter.OutputLog)
-#if UNITY_EDITOR
-                Debug.LogFormat($"<b><color=#9575CD>[ASSET]</color><color=#B3E5FC>[Log]</color></b> {format}", args);
-#else
-                Debug.LogFormat($"[ASSET][Log] {format}", args);
-#endif
+            if (Parameter.OutputLog)
+                Debug.LogFormat($"{BASE_LOG_FORMAT} {format}", args);
         }
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogError(string args)
         {
-            // if (Parameter.OutputLog)
-#if UNITY_EDITOR
-                Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#F44336>[Error]</color></b> {0}", args);
-#else
-                Debug.LogErrorFormat("[ASSET][Error] {0}", args);
-#endif
+            if (Parameter.OutputLog)
+                Debug.LogError($"{BASE_ERROR_FORMAT} {args}");
         }
 
-        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogError(string format, params object[] args)
         {
-            // if (Parameter.OutputLog)
-#if UNITY_EDITOR
-                Debug.LogErrorFormat($"<b><color=#9575CD>[ASSET]</color><color=#F44336>[Error]</color></b> {format}", args);
-#else
-                Debug.LogErrorFormat($"[ASSET][Error] {format}", args);
-#endif
+            if (Parameter.OutputLog)
+                Debug.LogErrorFormat($"{BASE_ERROR_FORMAT} {format}", args);
         }
 
         #endregion
