@@ -91,15 +91,10 @@ namespace AIO.UEditor.CLI
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "删除远端文件", 0.6f);
             foreach (var pair in tuple.Item2.Keys.ToArray())
                 tuple.Item2[pair] = string.Concat(remotePath, '/', pair);
-            var succeed = await PrGCloud.DeleteFileAsync(tuple.Item2.Values); // 删除
-            if (!succeed)
-            {
-                Debug.LogError("删除远端文件失败");
-                return false;
-            }
+            await PrGCloud.DeleteFileAsync(tuple.Item2.Values); // 删除
 
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "上传新增修改文件", 0.7f);
-            succeed = await PrGCloud.UploadDirAsync(remotePath.PathGetLastFloder(), location,
+            var succeed = await PrGCloud.UploadDirAsync(remotePath.PathGetLastFloder(), location,
                 config.MetaDataKey, config.MetaDataValue);
             if (!succeed)
             {
