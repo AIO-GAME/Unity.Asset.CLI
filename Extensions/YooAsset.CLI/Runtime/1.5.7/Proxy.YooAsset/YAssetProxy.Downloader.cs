@@ -378,6 +378,16 @@ namespace AIO.UEngine
                     State == EProgressState.Fail ||
                     State == EProgressState.Finish) yield break;
 
+                var total = ResourceDownloaderOperations.Sum(pair => pair.Value.TotalDownloadBytes);
+                if (AssetSystem.GetAvailableDiskSpace() < total)
+                {
+                    Debug.LogError(
+                        $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {total.ToConverseStringFileSize()}");
+                    State = EProgressState.Fail;
+                    OnDiskSpaceNotEnough?.Invoke(Report);
+                    yield break;
+                }
+
                 foreach (var pair in ResourceDownloaderOperations)
                 {
                     CurrentInfo = $"Resource Download -> [{pair.Key}]";
@@ -393,20 +403,11 @@ namespace AIO.UEngine
                             case EProgressState.Cancel:
                                 State = EProgressState.Cancel;
                                 Event.OnError?.Invoke(new TaskCanceledException());
-                                Event.OnComplete?.Invoke(Report);
                                 yield break;
                             case EProgressState.Pause:
                                 yield return new WaitForSeconds(0.1f);
                                 break;
                         }
-                    }
-
-                    // 检查磁盘空间是否足够
-                    if (AssetSystem.GetAvailableDiskSpace() < pair.Value.TotalDownloadBytes)
-                    {
-                        State = EProgressState.Fail;
-                        OnDiskSpaceNotEnough?.Invoke(Report);
-                        yield break;
                     }
 
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
