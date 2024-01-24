@@ -14,10 +14,10 @@ namespace AIO
     {
         #region LOG
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogWarning(string format, params object[] args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogWarningFormat($"<b><color=#9575CD>[ASSET]</color><color=#FFC107>[Warning]</color></b> {format}",
                     args);
@@ -26,10 +26,10 @@ namespace AIO
 #endif
         }
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogWarning(string args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogWarningFormat("<b><color=#9575CD>[ASSET]</color><color=#FFC107>[Warning]</color></b> {0}", args);
 #else
@@ -37,10 +37,10 @@ namespace AIO
 #endif
         }
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogException(Exception args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {0}", args);
 #else
@@ -48,10 +48,10 @@ namespace AIO
 #endif
         }
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogException(string args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {0}", args);
 #else
@@ -59,10 +59,10 @@ namespace AIO
 #endif
         }
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogException(string format, params object[] args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogErrorFormat($"<b><color=#9575CD>[ASSET]</color><color=#E91E63>[Exception]</color></b> {format}",
                     args);
@@ -71,10 +71,10 @@ namespace AIO
 #endif
         }
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void Log(string args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogFormat("<b><color=#9575CD>[ASSET]</color><color=#B3E5FC>[Log]</color></b> {0}", args);
 #else
@@ -82,10 +82,10 @@ namespace AIO
 #endif
         }
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void Log(string format, params object[] args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogFormat($"<b><color=#9575CD>[ASSET]</color><color=#B3E5FC>[Log]</color></b> {format}", args);
 #else
@@ -93,10 +93,10 @@ namespace AIO
 #endif
         }
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogError(string args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogErrorFormat("<b><color=#9575CD>[ASSET]</color><color=#F44336>[Error]</color></b> {0}", args);
 #else
@@ -104,10 +104,10 @@ namespace AIO
 #endif
         }
 
-        [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        //[DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogError(string format, params object[] args)
         {
-            if (Parameter.OutputLog)
+            // if (Parameter.OutputLog)
 #if UNITY_EDITOR
                 Debug.LogErrorFormat($"<b><color=#9575CD>[ASSET]</color><color=#F44336>[Error]</color></b> {format}", args);
 #else
