@@ -16,6 +16,15 @@ namespace AIO
         public static IASNetLoading DownloadHandle { get; private set; }
 
         /// <summary>
+        /// 重置下载器
+        /// </summary>
+        public static void ResetDownloadHandle()
+        {
+            if (DownloadHandle != null) DownloadHandle.Cancel();
+            DownloadHandle = Proxy.GetLoadingHandle();
+        }
+
+        /// <summary>
         /// 当前主下载器事件
         /// </summary>
         public static IDownlandAssetEvent DownloadEvent => DownloadHandle?.Event;

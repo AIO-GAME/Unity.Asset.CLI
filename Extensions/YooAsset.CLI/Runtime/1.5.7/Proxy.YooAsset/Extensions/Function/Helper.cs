@@ -77,8 +77,7 @@ namespace AIO.UEngine.YooAsset
                     else
                     {
                         var operation = CreateDownloaderOperation(package, info);
-                        operation.BeginDownload();
-                        yield return operation;
+                        yield return WaitCO(operation);
                         if (operation.Status != EOperationStatus.Succeed)
                         {
                             AssetSystem.LogException("获取远端资源失败 [{0} : {1}] {2} -> {3}", package.PackageName,
@@ -129,8 +128,7 @@ namespace AIO.UEngine.YooAsset
                 else
                 {
                     var operation = CreateDownloaderOperation(package, info);
-                    operation.BeginDownload();
-                    yield return operation;
+                    yield return WaitCO(operation);
                     if (operation.Status != EOperationStatus.Succeed)
                     {
                         AssetSystem.LogException("资源获取失败 [{0} : {1}] {2} -> {3}", package.PackageName,
@@ -236,8 +234,7 @@ namespace AIO.UEngine.YooAsset
                 var info = package.GetAssetInfo(location);
                 if (info is null) throw new SystemException(string.Format("无法获取资源信息 {0}", location));
                 var operation = CreateDownloaderOperation(package, info);
-                operation.BeginDownload();
-                await operation.Task;
+                await WaitTask(operation);
                 if (operation.Status == EOperationStatus.Succeed) return package;
                 AssetSystem.LogException("资源获取失败 [{0} : {1}] {2} -> {3}", package.PackageName,
                     package.GetPackageVersion(), location, operation.Error);
@@ -278,8 +275,7 @@ namespace AIO.UEngine.YooAsset
                 else
                 {
                     var operation = CreateDownloaderOperation(package, info);
-                    operation.BeginDownload();
-                    await operation.Task;
+                    await WaitTask(operation);
                     if (operation.Status != EOperationStatus.Succeed)
                         AssetSystem.LogException(
                             $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");

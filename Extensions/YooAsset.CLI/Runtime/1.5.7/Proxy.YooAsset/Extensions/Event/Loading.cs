@@ -7,8 +7,10 @@
 #if SUPPORT_YOOASSET
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using YooAsset;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -48,6 +50,8 @@ namespace AIO.UEngine.YooAsset
                 foreach (var operation in _Data.Values) operation.Operation.CancelDownload();
                 _Data.Clear();
                 _Progress.State = EProgressState.Cancel;
+                temp = false;
+                end = true;
             }
 
             public IDownlandAssetEvent Event { get; }
@@ -62,8 +66,6 @@ namespace AIO.UEngine.YooAsset
             /// </summary>
             private Dictionary<string, Info> _Data;
 
-            private bool AllowReachableCarrier = false;
-
             internal LoadingInfo()
             {
                 Event = new DownlandAssetEvent();
@@ -76,7 +78,6 @@ namespace AIO.UEngine.YooAsset
                 if (_Data.ContainsKey(info.AssetPath)) return;
 
                 var local = info.AssetPath;
-                operation.OnStartDownloadFileCallback += OnStartDownloadFile;
                 operation.OnDownloadProgressCallback += OnDownloadProgress;
                 operation.OnDownloadOverCallback += OnDownloadOver;
                 operation.OnDownloadErrorCallback += OnDownloadError;
@@ -99,40 +100,6 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 return;
-
-                void OnStartDownloadFile(string fileName, long sizeBytes)
-                {
-                    if (_Progress.State != EProgressState.Running)
-                    {
-                        _Progress.State = EProgressState.Pause;
-                        foreach (var item in _Data.Values) item.Operation.PauseDownload();
-                        return;
-                    }
-
-                    switch (Application.internetReachability)
-                    {
-                        default:
-                        case NetworkReachability.NotReachable:
-                            _Progress.State = EProgressState.Pause;
-                            foreach (var item in _Data.Values) item.Operation.PauseDownload();
-                            Event.OnNetReachableNot?.Invoke(_Progress);
-                            return;
-                        case NetworkReachability.ReachableViaLocalAreaNetwork:
-                        case NetworkReachability.ReachableViaCarrierDataNetwork:
-                            if (AllowReachableCarrier) break;
-                            _Progress.State = EProgressState.Pause;
-                            foreach (var item in _Data.Values) item.Operation.PauseDownload();
-                            Event.OnNetReachableCarrier?.Invoke(_Progress, () =>
-                            {
-                                AllowReachableCarrier = true;
-                                _Progress.State = EProgressState.Running;
-                                foreach (var item in _Data.Values) item.Operation.ResumeDownload();
-                            });
-                            break;
-                        // case NetworkReachability.ReachableViaLocalAreaNetwork:
-                        //    break;
-                    }
-                }
 
                 void OnDownloadError(string fileName, string error)
                 {
@@ -161,31 +128,6 @@ namespace AIO.UEngine.YooAsset
                 void OnDownloadProgress(int _, int __, long total, long current)
                 {
                     if (_Progress.State != EProgressState.Running) return;
-                    
-                    switch (Application.internetReachability)
-                    {
-                        default:
-                        case NetworkReachability.NotReachable:
-                            _Progress.State = EProgressState.Pause;
-                            foreach (var item in _Data.Values) item.Operation.PauseDownload();
-                            Event.OnNetReachableNot?.Invoke(_Progress);
-                            return;
-                        case NetworkReachability.ReachableViaLocalAreaNetwork:
-                        case NetworkReachability.ReachableViaCarrierDataNetwork:
-                            if (AllowReachableCarrier) break;
-                            _Progress.State = EProgressState.Pause;
-                            foreach (var item in _Data.Values) item.Operation.PauseDownload();
-                            Event.OnNetReachableCarrier?.Invoke(_Progress, () =>
-                            {
-                                AllowReachableCarrier = true;
-                                _Progress.State = EProgressState.Running;
-                                foreach (var item in _Data.Values) item.Operation.ResumeDownload();
-                            });
-                            return;
-                        // case NetworkReachability.ReachableViaLocalAreaNetwork:
-                        //    break;
-                    }
-                    
                     _Data[local].Total = total;
                     _Data[local].Current = current;
                     Update();
@@ -209,6 +151,98 @@ namespace AIO.UEngine.YooAsset
 
                 _Data.Clear();
             }
+        }
+
+        private static bool AllowReachableCarrier = false;
+
+        private static async Task WaitTask(DownloaderOperation operation)
+        {
+            operation.BeginDownload();
+            switch (Application.internetReachability)
+            {
+                default:
+                case NetworkReachability.NotReachable:
+                {
+                    var progress = new AProgress();
+                    progress.TotalValue = operation.TotalDownloadBytes;
+                    progress.CurrentValue = operation.CurrentDownloadBytes;
+                    AssetSystem.DownloadEvent.OnNetReachableNot?.Invoke(progress);
+                    operation.CancelDownload();
+                    break;
+                }
+                case NetworkReachability.ReachableViaLocalAreaNetwork:
+                case NetworkReachability.ReachableViaCarrierDataNetwork:
+                {
+                    if (AllowReachableCarrier) break;
+                    var progress = new AProgress();
+                    progress.TotalValue = operation.TotalDownloadBytes;
+                    progress.CurrentValue = operation.CurrentDownloadBytes;
+                    operation.PauseDownload();
+                    AssetSystem.DownloadEvent.OnNetReachableCarrier?.Invoke(progress, () =>
+                    {
+                        AllowReachableCarrier = true;
+                        operation.ResumeDownload();
+                    });
+                    break;
+                }
+                // case NetworkReachability.ReachableViaLocalAreaNetwork:
+                //  break;
+            }
+
+            await operation.Task;
+        }
+
+        private static bool temp = false;
+
+        /// <summary>
+        /// 检测下载器是否重置
+        /// </summary>
+        private static bool end = false;
+
+        private static IEnumerator WaitCO(DownloaderOperation operation)
+        {
+            if (temp) yield return new WaitForSeconds(0.1f);
+            switch (Application.internetReachability)
+            {
+                default:
+                case NetworkReachability.NotReachable:
+                {
+                    var progress = new AProgress();
+                    progress.TotalValue = operation.TotalDownloadBytes;
+                    progress.CurrentValue = operation.CurrentDownloadBytes;
+                    AssetSystem.DownloadEvent.OnNetReachableNot?.Invoke(progress);
+                    yield break;
+                }
+                case NetworkReachability.ReachableViaLocalAreaNetwork:
+                case NetworkReachability.ReachableViaCarrierDataNetwork:
+                {
+                    if (AllowReachableCarrier) break;
+                    temp = true;
+
+                    AssetSystem.DownloadEvent.OnNetReachableCarrier?.Invoke(new AProgress
+                    {
+                        TotalValue = operation.TotalDownloadBytes,
+                        CurrentValue = operation.CurrentDownloadBytes,
+                    }, () =>
+                    {
+                        AllowReachableCarrier = true;
+                        temp = false;
+                    });
+                    while (temp) yield return new WaitForSeconds(0.1f);
+                    break;
+                }
+                // case NetworkReachability.ReachableViaLocalAreaNetwork:
+                //  break;
+            }
+
+            if (end == false)
+            {
+                operation.CancelDownload();
+                yield break;
+            }
+
+            operation.BeginDownload();
+            yield return operation;
         }
 
         private static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
