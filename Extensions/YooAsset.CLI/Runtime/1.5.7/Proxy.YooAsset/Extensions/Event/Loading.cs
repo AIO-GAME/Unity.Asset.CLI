@@ -12,6 +12,7 @@ using System.Linq;
 using YooAsset;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEngine;
 #endif
 
 namespace AIO.UEngine.YooAsset
@@ -42,6 +43,13 @@ namespace AIO.UEngine.YooAsset
 
             EProgressState IASNetLoading.State => _Progress.State;
 
+            public void Cancel()
+            {
+                foreach (var operation in _Data.Values) operation.Operation.CancelDownload();
+                _Data.Clear();
+                _Progress.State = EProgressState.Cancel;
+            }
+
             public IDownlandAssetEvent Event { get; }
 
             /// <summary>
@@ -54,11 +62,7 @@ namespace AIO.UEngine.YooAsset
             /// </summary>
             private Dictionary<string, Info> _Data;
 
-            public void Dispose()
-            {
-                foreach (var operation in _Data.Values) operation.Operation.CancelDownload();
-                _Data.Clear();
-            }
+            private bool AllowReachableCarrier = false;
 
             internal LoadingInfo()
             {
@@ -67,49 +71,68 @@ namespace AIO.UEngine.YooAsset
                 _Progress = new AProgress();
             }
 
-            public void Finish()
-            {
-                foreach (var operation in _Data.Values) operation.Operation.CancelDownload();
-                _Data.Clear();
-                _Progress.State = EProgressState.Finish;
-            }
-
-            /// <summary>
-            /// 暂停下载
-            /// </summary>
-            public void Pause()
-            {
-                foreach (var operation in _Data.Values) operation.Operation.PauseDownload();
-                _Progress.State = EProgressState.Pause;
-            }
-
-            /// <summary>
-            /// 恢复下载
-            /// </summary>
-            public void Resume()
-            {
-                _Progress.State = EProgressState.Running;
-                foreach (var operation in _Data.Values) operation.Operation.ResumeDownload();
-            }
-
             internal void RegisterEvent(AssetInfo info, DownloaderOperation operation)
             {
                 if (_Data.ContainsKey(info.AssetPath)) return;
 
                 var local = info.AssetPath;
+                operation.OnStartDownloadFileCallback += OnStartDownloadFile;
+                operation.OnDownloadProgressCallback += OnDownloadProgress;
+                operation.OnDownloadOverCallback += OnDownloadOver;
+                operation.OnDownloadErrorCallback += OnDownloadError;
                 _Data[local] = new Info
                 {
                     Current = operation.CurrentDownloadBytes,
                     Total = operation.TotalDownloadBytes,
                     Operation = operation
                 };
-                Update();
 
-                operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
-                operation.OnDownloadOverCallback += OnDownloadOver;
-                operation.OnDownloadErrorCallback += OnDownloadError;
-                _Progress.State = EProgressState.Running;
+                if (_Progress.State == EProgressState.Pause)
+                {
+                    operation.PauseDownload();
+                    foreach (var item in _Data.Values) item.Operation.PauseDownload();
+                }
+                else
+                {
+                    _Progress.State = EProgressState.Running;
+                    Update();
+                }
+
                 return;
+
+                void OnStartDownloadFile(string fileName, long sizeBytes)
+                {
+                    if (_Progress.State != EProgressState.Running)
+                    {
+                        _Progress.State = EProgressState.Pause;
+                        foreach (var item in _Data.Values) item.Operation.PauseDownload();
+                        return;
+                    }
+
+                    switch (Application.internetReachability)
+                    {
+                        default:
+                        case NetworkReachability.NotReachable:
+                            _Progress.State = EProgressState.Pause;
+                            foreach (var item in _Data.Values) item.Operation.PauseDownload();
+                            Event.OnNetReachableNot?.Invoke(_Progress);
+                            return;
+                        case NetworkReachability.ReachableViaLocalAreaNetwork:
+                        case NetworkReachability.ReachableViaCarrierDataNetwork:
+                            if (AllowReachableCarrier) break;
+                            _Progress.State = EProgressState.Pause;
+                            foreach (var item in _Data.Values) item.Operation.PauseDownload();
+                            Event.OnNetReachableCarrier?.Invoke(_Progress, () =>
+                            {
+                                AllowReachableCarrier = true;
+                                _Progress.State = EProgressState.Running;
+                                foreach (var item in _Data.Values) item.Operation.ResumeDownload();
+                            });
+                            break;
+                        // case NetworkReachability.ReachableViaLocalAreaNetwork:
+                        //    break;
+                    }
+                }
 
                 void OnDownloadError(string fileName, string error)
                 {
@@ -118,6 +141,7 @@ namespace AIO.UEngine.YooAsset
 
                 void OnDownloadOver(bool isSucceed)
                 {
+                    if (_Progress.State != EProgressState.Running) return;
                     if (isSucceed)
                     {
                         _Data.Remove(local);
@@ -125,8 +149,8 @@ namespace AIO.UEngine.YooAsset
                     }
                     else
                     {
-                        _Data.Remove(local);
                         AssetSystem.DownloadHandle.Event.OnError?.Invoke(new Exception($"Downloading Fail : {local}"));
+                        _Data.Remove(local);
                         Update();
                     }
 
@@ -134,8 +158,34 @@ namespace AIO.UEngine.YooAsset
                     if (_Progress.State == EProgressState.Finish) Event.OnComplete?.Invoke(_Progress);
                 }
 
-                void OnDownloadProgressCallback(int _, int __, long total, long current)
+                void OnDownloadProgress(int _, int __, long total, long current)
                 {
+                    if (_Progress.State != EProgressState.Running) return;
+                    
+                    switch (Application.internetReachability)
+                    {
+                        default:
+                        case NetworkReachability.NotReachable:
+                            _Progress.State = EProgressState.Pause;
+                            foreach (var item in _Data.Values) item.Operation.PauseDownload();
+                            Event.OnNetReachableNot?.Invoke(_Progress);
+                            return;
+                        case NetworkReachability.ReachableViaLocalAreaNetwork:
+                        case NetworkReachability.ReachableViaCarrierDataNetwork:
+                            if (AllowReachableCarrier) break;
+                            _Progress.State = EProgressState.Pause;
+                            foreach (var item in _Data.Values) item.Operation.PauseDownload();
+                            Event.OnNetReachableCarrier?.Invoke(_Progress, () =>
+                            {
+                                AllowReachableCarrier = true;
+                                _Progress.State = EProgressState.Running;
+                                foreach (var item in _Data.Values) item.Operation.ResumeDownload();
+                            });
+                            return;
+                        // case NetworkReachability.ReachableViaLocalAreaNetwork:
+                        //    break;
+                    }
+                    
                     _Data[local].Total = total;
                     _Data[local].Current = current;
                     Update();
@@ -144,10 +194,20 @@ namespace AIO.UEngine.YooAsset
 
             private void Update()
             {
-                if (AssetSystem.DownloadHandle.Event.OnProgress is null) return;
                 _Progress.TotalValue = _Data.Values.Sum(v => v.Total);
                 _Progress.CurrentValue = _Data.Values.Sum(v => v.Current);
                 AssetSystem.DownloadHandle.Event.OnProgress?.Invoke(_Progress);
+            }
+
+            public void Dispose()
+            {
+                foreach (var operation in _Data.Values)
+                {
+                    operation.Operation.CancelDownload();
+                    operation.Operation = null;
+                }
+
+                _Data.Clear();
             }
         }
 

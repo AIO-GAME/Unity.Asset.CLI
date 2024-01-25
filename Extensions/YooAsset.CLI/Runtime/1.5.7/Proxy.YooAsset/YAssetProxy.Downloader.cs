@@ -341,6 +341,7 @@ namespace AIO.UEngine
                 long totalDownloadBytes,
                 long currentDownloadBytes)
             {
+                if (State != EProgressState.Running) return;
                 switch (Application.internetReachability)
                 {
                     default:
@@ -348,6 +349,7 @@ namespace AIO.UEngine
                         OnNetReachableNot?.Invoke(Report);
                         Pause();
                         return;
+                    case NetworkReachability.ReachableViaLocalAreaNetwork:
                     case NetworkReachability.ReachableViaCarrierDataNetwork:
                         if (AllowReachableCarrier) break;
                         Pause();
@@ -357,11 +359,10 @@ namespace AIO.UEngine
                             Resume();
                         });
                         break;
-                    case NetworkReachability.ReachableViaLocalAreaNetwork:
-                        break;
+                    // case NetworkReachability.ReachableViaLocalAreaNetwork:
+                    //     break;
                 }
 
-                if (State == EProgressState.Fail) return;
                 CurrentValue = TempDownloadBytes + currentDownloadBytes;
             }
 

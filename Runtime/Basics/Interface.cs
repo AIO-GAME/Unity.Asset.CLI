@@ -28,6 +28,11 @@ namespace AIO
         /// 当前下载状态
         /// </summary>
         EProgressState State { get; }
+        
+        /// <summary>
+        /// 取消当前所有下载
+        /// </summary>
+        void Cancel();
     }
 
     public interface IDownlandAssetEvent : IProgressEvent
