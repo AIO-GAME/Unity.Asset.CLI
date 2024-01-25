@@ -11,6 +11,25 @@ namespace AIO
     public partial class AssetSystem
     {
         /// <summary>
+        /// 是否允许流量下载
+        /// </summary>
+        public static bool AllowReachableCarrier { get; set; }
+
+        /// <summary>
+        /// 队列暂停中
+        /// </summary>
+        /// <remarks>
+        /// Ture: 暂停中
+        /// False: 没有暂停
+        /// </remarks>
+        internal static bool StatusStop { get; set; }
+
+        /// <summary>
+        /// 下载器是否重置
+        /// </summary>
+        internal static bool HandleReset { get; set; }
+
+        /// <summary>
         /// 主下载器
         /// </summary>
         public static IASNetLoading DownloadHandle { get; private set; }
@@ -20,8 +39,23 @@ namespace AIO
         /// </summary>
         public static void ResetDownloadHandle()
         {
+            HandleReset = true;
             if (DownloadHandle != null) DownloadHandle.Cancel();
-            DownloadHandle = Proxy.GetLoadingHandle();
+            var temp = Proxy.GetLoadingHandle();
+            temp.Event.OnNetReachableCarrier = DownloadEvent.OnNetReachableCarrier;
+            temp.Event.OnWritePermissionNot = DownloadEvent.OnWritePermissionNot;
+            temp.Event.OnReadPermissionNot = DownloadEvent.OnReadPermissionNot;
+            temp.Event.OnDiskSpaceNotEnough = DownloadEvent.OnDiskSpaceNotEnough;
+            temp.Event.OnNetReachableNot = DownloadEvent.OnNetReachableNot;
+            temp.Event.OnProgress = DownloadEvent.OnProgress;
+            temp.Event.OnError = DownloadEvent.OnError;
+            temp.Event.OnComplete = DownloadEvent.OnComplete;
+            temp.Event.OnCancel = DownloadEvent.OnCancel;
+            temp.Event.OnBegin = DownloadEvent.OnBegin;
+            temp.Event.OnResume = DownloadEvent.OnResume;
+            temp.Event.OnPause = DownloadEvent.OnPause;
+            DownloadHandle = temp;
+            StatusStop = false;
         }
 
         /// <summary>

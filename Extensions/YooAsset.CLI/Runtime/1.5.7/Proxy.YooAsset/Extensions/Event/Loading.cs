@@ -4,21 +4,24 @@
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
+
 #if SUPPORT_YOOASSET
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using YooAsset;
-#if UNITY_EDITOR
-using UnityEditor;
 using UnityEngine;
-#endif
+using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
+
     internal partial class YAssetSystem
     {
         public class LoadingInfo : IASNetLoading, IDisposable
@@ -50,8 +53,6 @@ namespace AIO.UEngine.YooAsset
                 foreach (var operation in _Data.Values) operation.Operation.CancelDownload();
                 _Data.Clear();
                 _Progress.State = EProgressState.Cancel;
-                temp = false;
-                end = true;
             }
 
             public IDownlandAssetEvent Event { get; }
@@ -71,6 +72,10 @@ namespace AIO.UEngine.YooAsset
                 Event = new DownlandAssetEvent();
                 _Data = new Dictionary<string, Info>();
                 _Progress = new AProgress();
+
+                foreach (var operation in Operations.Values) operation.CancelDownload();
+                Operations.Clear();
+                AssetSystem.HandleReset = false;
             }
 
             internal void RegisterEvent(AssetInfo info, DownloaderOperation operation)
@@ -153,101 +158,140 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
-        private static bool AllowReachableCarrier = false;
-
-        private static async Task WaitTask(DownloaderOperation operation)
+        private static async Task WaitTask(DownloaderOperation operation, AssetInfo location)
         {
-            operation.BeginDownload();
+            if (Operations.ContainsKey(location.AssetPath)) // 如果已经存在下载任务 则直接返回 避免重复下载
+            {
+                await Operations[location.AssetPath].Task;
+                return;
+            }
+
+            Operations[location.AssetPath] = operation;
+            if (AssetSystem.StatusStop) await Task.Delay(100);
             switch (Application.internetReachability)
             {
                 default:
                 case NetworkReachability.NotReachable:
                 {
-                    var progress = new AProgress();
-                    progress.TotalValue = operation.TotalDownloadBytes;
-                    progress.CurrentValue = operation.CurrentDownloadBytes;
-                    AssetSystem.DownloadEvent.OnNetReachableNot?.Invoke(progress);
-                    operation.CancelDownload();
-                    break;
+                    if (AssetSystem.DownloadEvent.OnNetReachableNot is null)
+                        throw new Exception("NetReachableNot is null");
+
+                    AssetSystem.DownloadEvent.OnNetReachableNot.Invoke(new AProgress
+                    {
+                        TotalValue = Operations[location.AssetPath].TotalDownloadBytes,
+                        CurrentValue = Operations[location.AssetPath].CurrentDownloadBytes,
+                        State = EProgressState.Fail,
+                    });
+                    return;
                 }
                 case NetworkReachability.ReachableViaLocalAreaNetwork:
                 case NetworkReachability.ReachableViaCarrierDataNetwork:
                 {
-                    if (AllowReachableCarrier) break;
-                    var progress = new AProgress();
-                    progress.TotalValue = operation.TotalDownloadBytes;
-                    progress.CurrentValue = operation.CurrentDownloadBytes;
-                    operation.PauseDownload();
-                    AssetSystem.DownloadEvent.OnNetReachableCarrier?.Invoke(progress, () =>
+                    if (AssetSystem.AllowReachableCarrier) break;
+                    if (AssetSystem.DownloadEvent.OnNetReachableCarrier is null)
+                        throw new Exception("AssetSystem.DownloadEvent.OnNetReachableCarrier is null");
+
+                    AssetSystem.StatusStop = true;
+                    AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(new AProgress
                     {
-                        AllowReachableCarrier = true;
-                        operation.ResumeDownload();
+                        State = EProgressState.Pause,
+                        TotalValue = Operations[location.AssetPath].TotalDownloadBytes,
+                        CurrentValue = Operations[location.AssetPath].CurrentDownloadBytes,
+                    }, () =>
+                    {
+                        AssetSystem.AllowReachableCarrier = true;
+                        AssetSystem.StatusStop = false;
+                        AssetSystem.HandleReset = false;
                     });
+                    while (AssetSystem.StatusStop) await Task.Delay(100);
                     break;
                 }
                 // case NetworkReachability.ReachableViaLocalAreaNetwork:
                 //  break;
             }
 
-            await operation.Task;
+            if (AssetSystem.HandleReset) return;
+            if (!Operations.ContainsKey(location.AssetPath)) return;
+            if (Operations[location.AssetPath].Status == EOperationStatus.Failed) return;
+            Operations[location.AssetPath].BeginDownload();
+            await Operations[location.AssetPath].Task;
+            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, Operations[location.AssetPath]);
+            Operations.Remove(location.AssetPath);
         }
 
-        private static bool temp = false;
+        private static readonly Dictionary<string, DownloaderOperation> Operations = new Dictionary<string, DownloaderOperation>();
 
-        /// <summary>
-        /// 检测下载器是否重置
-        /// </summary>
-        private static bool end = false;
-
-        private static IEnumerator WaitCO(DownloaderOperation operation)
+        private static IEnumerator WaitCO(DownloaderOperation operation, AssetInfo location)
         {
-            if (temp) yield return new WaitForSeconds(0.1f);
+            if (Operations.ContainsKey(location.AssetPath)) // 如果已经存在下载任务 则直接返回 避免重复下载
+            {
+                yield return Operations[location.AssetPath];
+                yield break;
+            }
+
+            Operations[location.AssetPath] = operation;
+            if (AssetSystem.StatusStop) yield return new WaitForSeconds(0.1f);
             switch (Application.internetReachability)
             {
                 default:
                 case NetworkReachability.NotReachable:
                 {
-                    var progress = new AProgress();
-                    progress.TotalValue = operation.TotalDownloadBytes;
-                    progress.CurrentValue = operation.CurrentDownloadBytes;
-                    AssetSystem.DownloadEvent.OnNetReachableNot?.Invoke(progress);
+                    if (AssetSystem.DownloadEvent.OnNetReachableNot is null)
+                        throw new Exception("NetReachableNot is null");
+
+                    AssetSystem.DownloadEvent.OnNetReachableNot.Invoke(new AProgress
+                    {
+                        TotalValue = Operations[location.AssetPath].TotalDownloadBytes,
+                        CurrentValue = Operations[location.AssetPath].CurrentDownloadBytes,
+                        State = EProgressState.Fail,
+                    });
                     yield break;
                 }
                 case NetworkReachability.ReachableViaLocalAreaNetwork:
                 case NetworkReachability.ReachableViaCarrierDataNetwork:
                 {
-                    if (AllowReachableCarrier) break;
-                    temp = true;
+                    if (AssetSystem.AllowReachableCarrier) break;
+                    if (AssetSystem.DownloadEvent.OnNetReachableCarrier is null)
+                        throw new Exception("AssetSystem.DownloadEvent.OnNetReachableCarrier is null");
 
-                    AssetSystem.DownloadEvent.OnNetReachableCarrier?.Invoke(new AProgress
+                    AssetSystem.StatusStop = true;
+                    AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(new AProgress
                     {
-                        TotalValue = operation.TotalDownloadBytes,
-                        CurrentValue = operation.CurrentDownloadBytes,
+                        State = EProgressState.Pause,
+                        TotalValue = Operations[location.AssetPath].TotalDownloadBytes,
+                        CurrentValue = Operations[location.AssetPath].CurrentDownloadBytes,
                     }, () =>
                     {
-                        AllowReachableCarrier = true;
-                        temp = false;
+                        AssetSystem.AllowReachableCarrier = true;
+                        AssetSystem.StatusStop = false;
+                        AssetSystem.HandleReset = false;
                     });
-                    while (temp) yield return new WaitForSeconds(0.1f);
+                    while (AssetSystem.StatusStop) yield return new WaitForSeconds(0.1f);
                     break;
                 }
                 // case NetworkReachability.ReachableViaLocalAreaNetwork:
                 //  break;
             }
 
-            if (end == false)
-            {
-                operation.CancelDownload();
-                yield break;
-            }
-
-            operation.BeginDownload();
-            yield return operation;
+            if (AssetSystem.HandleReset) yield break;
+            if (!Operations.ContainsKey(location.AssetPath)) yield break;
+            if (Operations[location.AssetPath].Status == EOperationStatus.Failed) yield break;
+            Operations[location.AssetPath].BeginDownload();
+            yield return Operations[location.AssetPath];
+            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, Operations[location.AssetPath]);
+            Operations.Remove(location.AssetPath);
         }
 
         private static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
         {
-            var operation = package.CreateBundleDownloader(location);
+            return Operations.ContainsKey(location.AssetPath)
+                ? Operations[location.AssetPath]
+                : package.CreateBundleDownloader(location);
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private static void AddSequenceRecord(YAssetPackage package, AssetInfo location, DownloaderOperation operation)
+        {
 #if UNITY_EDITOR
             if (AssetSystem.Parameter.EnableSequenceRecord)
             {
@@ -263,8 +307,6 @@ namespace AIO.UEngine.YooAsset
                 });
             }
 #endif
-            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, operation);
-            return operation;
         }
     }
 }
