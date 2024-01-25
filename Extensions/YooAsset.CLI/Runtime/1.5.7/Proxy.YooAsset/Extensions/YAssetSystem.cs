@@ -50,6 +50,11 @@ namespace AIO.UEngine.YooAsset
     [IgnoreConsoleJump]
     internal static partial class YAssetSystem
     {
+        /// <summary>
+        /// 资源加载器 - 参数
+        /// </summary>
+        public static event Func<YAssetPackage, YAssetParameters> GetParameter;
+
         private static Dictionary<string, YAssetPackage> Dic { get; set; }
 
         /// <summary>
@@ -100,7 +105,7 @@ namespace AIO.UEngine.YooAsset
             }
 
             foreach (var package in AssetSystem.PackageConfigs)
-                    Config.Packages.Add(package);
+                Config.Packages.Add(package);
 
             foreach (var item in Config.Packages)
             {
