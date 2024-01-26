@@ -80,7 +80,7 @@ namespace AIO.UEngine.YooAsset
         {
             if (!operation.IsValid)
             {
-                Debug.LogError(operation.LastError);
+                AssetSystem.LogError(operation.LastError);
                 cb?.Invoke(false);
                 yield break;
             }
@@ -88,7 +88,7 @@ namespace AIO.UEngine.YooAsset
             yield return operation;
             if (operation.Status != EOperationStatus.Succeed)
             {
-                Debug.LogError(operation.LastError);
+                AssetSystem.LogError(operation.LastError);
                 cb?.Invoke(false);
                 yield break;
             }

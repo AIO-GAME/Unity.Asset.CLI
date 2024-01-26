@@ -8,8 +8,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using YooAsset;
 
@@ -19,44 +21,86 @@ namespace AIO.UEngine.YooAsset
     {
         private enum LoadType
         {
+            /// <summary>
+            /// 同步加载
+            /// </summary>
             Sync,
+
+            /// <summary>
+            /// 协程加载
+            /// </summary>
             Coroutine,
+
+            /// <summary>
+            /// 异步加载
+            /// </summary>
             Async
         }
 
+        [Conditional("DEBUG")]
         private static void PackageDebug(LoadType type, string location)
         {
 #if UNITY_EDITOR
-            AssetSystem.Log("Load {0} : [auto : {1}] -> {2}", type.ToString(), location,
-                GetAssetInfo(location)?.AssetPath);
+            AssetSystem.Log($"Load {type.ToString()} : [auto : {location}] -> {GetAssetInfo(location)?.AssetPath}");
 #else
             AssetSystem.Log("{0} : [auto : {1}]", type.ToString(), location);
 #endif
         }
 
+        [Conditional("DEBUG")]
         private static void PackageDebug(LoadType type, string packageName, string location)
         {
 #if UNITY_EDITOR
-            AssetSystem.Log("Load {0} : [{1} : {2}] -> {3}", type.ToString(), packageName, location,
-                GetAssetInfo(location)?.AssetPath);
+            AssetSystem.Log($"Load {type.ToString()} : [{packageName} : {location}] -> {GetAssetInfo(location)?.AssetPath}");
 #else
             AssetSystem.Log("{0} : [{1} : {2}]", type.ToString(), packageName, location);
 #endif
         }
 
-        #region CO
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IEnumerator GetAutoPackageCO(AssetInfo location, Action<YAssetPackage> cb)
         {
             yield return GetAutoPackageCO(location.Address, cb);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static IEnumerator GetAutoPackageCO(string packageName, AssetInfo location, Action<YAssetPackage> cb)
+        {
+            yield return GetAutoPackageCO(packageName, location.Address, cb);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static YAssetPackage GetAutoPackageSync(AssetInfo location)
+        {
+            return GetAutoPackageSync(location.Address);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static YAssetPackage GetAutoPackageSync(string packageName, AssetInfo location)
+        {
+            return GetAutoPackageSync(packageName, location.Address);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Task<YAssetPackage> GetAutoPackageTask(AssetInfo location)
+        {
+            return GetAutoPackageTask(location.Address);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Task<YAssetPackage> GetAutoPackageTask(string packageName, AssetInfo location)
+        {
+            return GetAutoPackageTask(packageName, location.Address);
+        }
+
+        #region CO
+
         private static IEnumerator GetAutoPackageCO(string location, Action<YAssetPackage> cb)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
+            if (location.EndsWith('/') || location.EndsWith('\\'))
             {
-                cb?.Invoke(null);
-                AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
+                cb.Invoke(null);
+                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 yield break;
             }
 
@@ -65,7 +109,7 @@ namespace AIO.UEngine.YooAsset
             {
                 if (AssetSystem.IsWhite(location))
                 {
-                    cb?.Invoke(package);
+                    cb.Invoke(package);
                     yield break;
                 }
 
@@ -73,93 +117,94 @@ namespace AIO.UEngine.YooAsset
                 {
                     var info = package.GetAssetInfo(location);
                     if (info is null)
-                        AssetSystem.LogException("无法获取资源信息 [{0} : {1}]", package.PackageName, location);
-                    else
                     {
-                        var operation = CreateDownloaderOperation(package, info);
-                        operation.BeginDownload();
-                        yield return operation;
-                        if (operation.Status != EOperationStatus.Succeed)
-                        {
-                            AssetSystem.LogException("获取远端资源失败 [{0} : {1}] {2} -> {3}", package.PackageName,
-                                package.GetPackageVersion(), location, operation.Error);
-                        }
+                        AssetSystem.LogException($"无法获取资源信息 [{package.PackageName} : {location}]");
+                        cb.Invoke(null);
+                        yield break;
                     }
+
+                    var operation = CreateDownloaderOperation(package, info);
+                    yield return WaitCO(operation, info);
+                    if (operation.Status != EOperationStatus.Succeed)
+                    {
+                        AssetSystem.LogException("获取远端资源失败 [{0} : {1}] {2} -> {3}",
+                            package.PackageName, package.GetPackageVersion(), location, operation.Error);
+                        cb.Invoke(null);
+                        yield break;
+                    }
+
+                    AddSequenceRecord(package, info, operation);
                 }
 
-                cb?.Invoke(package);
+                cb.Invoke(package);
                 yield break;
             }
 
-            cb?.Invoke(null);
-            AssetSystem.LogException("资源查找失败 [auto : {0}]", location);
-        }
-
-        private static IEnumerator GetAutoPackageCO(string packageName, AssetInfo location, Action<YAssetPackage> cb)
-        {
-            yield return GetAutoPackageCO(packageName, location.Address, cb);
+            AssetSystem.LogException($"资源查找失败 [auto : {location}]");
+            cb.Invoke(null);
         }
 
         private static IEnumerator GetAutoPackageCO(string packageName, string location, Action<YAssetPackage> cb)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
+            if (location.EndsWith('/') || location.EndsWith('\\'))
             {
-                cb?.Invoke(null);
-                AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
+                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
+                cb.Invoke(null);
                 yield break;
             }
 
             PackageDebug(LoadType.Coroutine, packageName, location);
             if (!Dic.TryGetValue(packageName, out var package))
             {
-                AssetSystem.LogException("目标资源包不存在 [{0} : {1}]", packageName, location);
+                AssetSystem.LogException($"目标资源包不存在 [{packageName} : {location}]");
+                cb.Invoke(null);
                 yield break;
             }
 
             if (AssetSystem.IsWhite(location))
             {
-                cb?.Invoke(package);
+                cb.Invoke(package);
                 yield break;
             }
 
             if (package.IsNeedDownloadFromRemote(location))
             {
                 var info = package.GetAssetInfo(location);
-                if (info is null) AssetSystem.LogException("无法获取资源信息 [{0} : {1}]", packageName, location);
-                else
+                if (info is null)
                 {
-                    var operation = CreateDownloaderOperation(package, info);
-                    operation.BeginDownload();
-                    yield return operation;
-                    if (operation.Status != EOperationStatus.Succeed)
-                    {
-                        AssetSystem.LogException("资源获取失败 [{0} : {1}] {2} -> {3}", package.PackageName,
-                            package.GetPackageVersion(), location, operation.Error);
-                    }
+                    AssetSystem.LogException($"无法获取资源信息 [{packageName} : {location}]");
+                    cb.Invoke(null);
+                    yield break;
                 }
+
+                var operation = CreateDownloaderOperation(package, info);
+                yield return WaitCO(operation, info);
+                if (operation.Status != EOperationStatus.Succeed)
+                {
+                    AssetSystem.LogException("资源获取失败 [{0} : {1}] {2} -> {3}",
+                        package.PackageName, package.GetPackageVersion(), location, operation.Error);
+                    cb.Invoke(null);
+                    yield break;
+                }
+
+                AddSequenceRecord(package, info, operation);
             }
 
-            if (package.CheckLocationValid(location)) cb?.Invoke(package);
+            if (package.CheckLocationValid(location)) cb.Invoke(package);
             else
             {
-                AssetSystem.LogException("[{0} : {1}] 传入地址验证无效 {2}", package.PackageName, package.GetPackageVersion(),
-                    location);
-                cb?.Invoke(null);
+                AssetSystem.LogException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+                cb.Invoke(null);
             }
         }
 
         #endregion
 
-        private static YAssetPackage GetAutoPackageSync(AssetInfo location)
-        {
-            return GetAutoPackageSync(location.Address);
-        }
-
         private static YAssetPackage GetAutoPackageSync(string location)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
+            if (location.EndsWith('/') || location.EndsWith('\\'))
             {
-                AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
+                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 return null;
             }
 
@@ -169,7 +214,11 @@ namespace AIO.UEngine.YooAsset
                 if (AssetSystem.IsWhite(location)) return package;
 
                 if (package.IsNeedDownloadFromRemote(location))
+                {
                     AssetSystem.LogException($"不支持同步加载远程资源 [{package.PackageName} : {location}]");
+                    return null;
+                }
+
                 return package;
             }
 
@@ -177,53 +226,42 @@ namespace AIO.UEngine.YooAsset
             return null;
         }
 
-        private static YAssetPackage GetAutoPackageSync(string packageName, AssetInfo location)
-        {
-            return GetAutoPackageSync(packageName, location.Address);
-        }
-
         private static YAssetPackage GetAutoPackageSync(string packageName, string location)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
+            if (location.EndsWith('/') || location.EndsWith('\\'))
             {
-                AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
+                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 return null;
             }
 
             PackageDebug(LoadType.Sync, packageName, location);
-
             if (!Dic.TryGetValue(packageName, out var package))
             {
-                AssetSystem.LogException(string.Format("目标资源包不存在 [{0} : {1}]", packageName, location));
+                AssetSystem.LogException($"目标资源包不存在 [{packageName} : {location}]");
                 return null;
             }
 
-            if (AssetSystem.IsWhite(location))
-                return package;
-
+            if (AssetSystem.IsWhite(location)) return package;
             if (package.IsNeedDownloadFromRemote(location))
-                AssetSystem.LogException(string.Format("不支持同步加载远程资源 [{0} : {1}]", package.PackageName, location));
+            {
+                AssetSystem.LogException($"不支持同步加载远程资源 [{package.PackageName} : {location}]");
+                return null;
+            }
 
             if (!package.CheckLocationValid(location))
             {
-                AssetSystem.LogException(string.Format("[{0} : {1}] 传入地址验证无效 {2}", package.PackageName,
-                    package.GetPackageVersion(), location));
+                AssetSystem.LogException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
                 return null;
             }
 
             return package;
         }
 
-        private static Task<YAssetPackage> GetAutoPackageTask(AssetInfo location)
-        {
-            return GetAutoPackageTask(location.Address);
-        }
-
         private static async Task<YAssetPackage> GetAutoPackageTask(string location)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
+            if (location.EndsWith('/') || location.EndsWith('\\'))
             {
-                AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
+                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 return null;
             }
 
@@ -234,30 +272,29 @@ namespace AIO.UEngine.YooAsset
                 if (!package.IsNeedDownloadFromRemote(location)) return package;
 
                 var info = package.GetAssetInfo(location);
-                if (info is null) throw new SystemException(string.Format("无法获取资源信息 {0}", location));
+                if (info is null) throw new SystemException($"无法获取资源信息 {location}");
+
                 var operation = CreateDownloaderOperation(package, info);
-                operation.BeginDownload();
-                await operation.Task;
-                if (operation.Status == EOperationStatus.Succeed) return package;
-                AssetSystem.LogException("资源获取失败 [{0} : {1}] {2} -> {3}", package.PackageName,
-                    package.GetPackageVersion(), location, operation.Error);
-                return package;
+                await WaitTask(operation, info);
+                if (operation.Status == EOperationStatus.Succeed)
+                {
+                    AddSequenceRecord(package, info, operation);
+                    return package;
+                }
+
+                AssetSystem.LogException($"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                return null;
             }
 
             AssetSystem.LogException($"资源查找失败 [auto : {location}]");
             return null;
         }
 
-        private static Task<YAssetPackage> GetAutoPackageTask(string packageName, AssetInfo location)
-        {
-            return GetAutoPackageTask(packageName, location.Address);
-        }
-
         private static async Task<YAssetPackage> GetAutoPackageTask(string packageName, string location)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
+            if (location.EndsWith('/') || location.EndsWith('\\'))
             {
-                AssetSystem.LogException("资源定位地址无效 [auto : {0}]", location);
+                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 return null;
             }
 
@@ -268,22 +305,27 @@ namespace AIO.UEngine.YooAsset
                 return null;
             }
 
-            if (AssetSystem.IsWhite(location))
-                return package;
+            if (AssetSystem.IsWhite(location)) return package;
 
             if (package.IsNeedDownloadFromRemote(location))
             {
                 var info = package.GetAssetInfo(location);
-                if (info is null) AssetSystem.LogException($"无法获取资源信息 [{packageName} : {location}]");
-                else
+                if (info is null)
                 {
-                    var operation = CreateDownloaderOperation(package, info);
-                    operation.BeginDownload();
-                    await operation.Task;
-                    if (operation.Status != EOperationStatus.Succeed)
-                        AssetSystem.LogException(
-                            $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                    AssetSystem.LogException($"无法获取资源信息 [{packageName} : {location}]");
+                    return null;
                 }
+
+                var operation = CreateDownloaderOperation(package, info);
+                await WaitTask(operation, info);
+                if (operation.Status == EOperationStatus.Succeed)
+                {
+                    AddSequenceRecord(package, info, operation);
+                    return package;
+                }
+
+                AssetSystem.LogException($"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                return null;
             }
 
             if (package.CheckLocationValid(location)) return package;
@@ -291,12 +333,6 @@ namespace AIO.UEngine.YooAsset
             AssetSystem.LogException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
             return null;
         }
-
-        /// <summary>
-        /// 引用计数
-        /// </summary>
-        private static Dictionary<string, OperationHandleBase> ReferenceOPHandle { get; set; } =
-            new Dictionary<string, OperationHandleBase>();
 
         /// <summary>
         /// 是否已经加载
@@ -307,6 +343,24 @@ namespace AIO.UEngine.YooAsset
         {
             return ReferenceOPHandle.ContainsKey(location);
         }
+
+        public static void Destroy()
+        {
+            if (!isInitialize) return;
+
+            foreach (var item in ReferenceOPHandle.Keys.ToArray())
+                ReleaseInternal?.Invoke(ReferenceOPHandle[item], null);
+            ReferenceOPHandle.Clear();
+
+            YooAssets.Destroy();
+            isInitialize = false;
+        }
+
+        /// <summary>
+        /// 引用计数
+        /// </summary>
+        private static Dictionary<string, OperationHandleBase> ReferenceOPHandle { get; set; } =
+            new Dictionary<string, OperationHandleBase>();
 
         private static MethodInfo ReleaseInternal
         {
@@ -323,18 +377,6 @@ namespace AIO.UEngine.YooAsset
         }
 
         private static MethodInfo _ReleaseInternal;
-
-        public static void Destroy()
-        {
-            if (!isInitialize) return;
-
-            foreach (var item in ReferenceOPHandle.Keys.ToArray())
-                ReleaseInternal?.Invoke(ReferenceOPHandle[item], null);
-            ReferenceOPHandle.Clear();
-
-            YooAssets.Destroy();
-            isInitialize = false;
-        }
     }
 }
 #endif

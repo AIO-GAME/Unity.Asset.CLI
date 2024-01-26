@@ -4,30 +4,74 @@
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
+
 #if SUPPORT_YOOASSET
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using UnityEngine;
 using YooAsset;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace AIO.UEngine.YooAsset
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
+
     internal partial class YAssetSystem
     {
-        public class LoadingInfo : IASNetLoading
+        public class LoadingInfo : IASNetLoading, IDisposable
         {
-            /// <summary>
-            /// 当前下载进度
-            /// </summary>
-            public IProgressInfo Progress => _Progress;
+            private class Info
+            {
+                /// <summary>
+                /// 总下载大小
+                /// </summary>
+                public long Total;
 
-            public IDownlandAssetEvent Event { get; set; }
+                /// <summary>
+                /// 当前下载大小
+                /// </summary>
+                public long Current;
+
+                /// <summary>
+                /// 下载操作句柄
+                /// </summary>
+                public DownloaderOperation Operation;
+            }
+
+            IProgressInfo IASNetLoading.Progress => _Progress;
 
             EProgressState IASNetLoading.State => _Progress.State;
+
+            public void Cancel()
+            {
+                foreach (var operation in _Data.Values) operation.Operation.CancelDownload();
+                _Data.Clear();
+                _Progress.State = EProgressState.Cancel;
+            }
+
+            public void CleanEvent()
+            {
+                Event.OnWritePermissionNot = null;
+                Event.OnReadPermissionNot = null;
+                Event.OnNetReachableCarrier = null;
+                Event.OnNetReachableNot = null;
+                Event.OnDiskSpaceNotEnough = null;
+                Event.OnError = null;
+                Event.OnProgress = null;
+                Event.OnComplete = null;
+                Event.OnCancel = null;
+                Event.OnPause = null;
+                Event.OnResume = null;
+                Event.OnBegin = null;
+            }
+
+            public IDownlandAssetEvent Event { get; }
 
             /// <summary>
             /// 当前下载进度
@@ -35,109 +79,237 @@ namespace AIO.UEngine.YooAsset
             private AProgress _Progress { get; }
 
             /// <summary>
-            /// 总下载大小
+            /// 下载操作句柄
             /// </summary>
-            private Dictionary<string, long> TotalDownloadedBytesList;
-
-            /// <summary>
-            /// 当前下载大小
-            /// </summary>
-            private Dictionary<string, long> CurrentDownloadedBytesList;
-
-            private Dictionary<string, DownloaderOperation> operations;
+            private Dictionary<string, Info> _Data;
 
             internal LoadingInfo()
             {
-                operations = new Dictionary<string, DownloaderOperation>();
-                CurrentDownloadedBytesList = new Dictionary<string, long>();
-                TotalDownloadedBytesList = new Dictionary<string, long>();
                 Event = new DownlandAssetEvent();
+                _Data = new Dictionary<string, Info>();
                 _Progress = new AProgress();
-            }
 
-            public void Finish()
-            {
-                CurrentDownloadedBytesList.Clear();
-                TotalDownloadedBytesList.Clear();
-                operations.Clear();
-            }
-
-            /// <summary>
-            /// 暂停下载
-            /// </summary>
-            public void Pause()
-            {
-                foreach (var operation in operations.Values) operation.PauseDownload();
-                _Progress.State = EProgressState.Pause;
-            }
-
-            /// <summary>
-            /// 恢复下载
-            /// </summary>
-            public void Resume()
-            {
-                foreach (var operation in operations.Values) operation.ResumeDownload();
-                _Progress.State = EProgressState.Running;
+                foreach (var operation in Operations.Values) operation.CancelDownload();
+                Operations.Clear();
+                AssetSystem.HandleReset = false;
             }
 
             internal void RegisterEvent(AssetInfo info, DownloaderOperation operation)
             {
+                if (_Data.ContainsKey(info.AssetPath)) return;
+
                 var local = info.AssetPath;
-                if (operations.ContainsKey(local))
+                operation.OnDownloadProgressCallback += OnDownloadProgress;
+                operation.OnDownloadOverCallback += OnDownloadOver;
+                operation.OnDownloadErrorCallback += OnDownloadError;
+                _Data[local] = new Info
                 {
-                    AssetSystem.LogError("当前资源 正在下载中 : {0}", local);
-                    return;
+                    Current = operation.CurrentDownloadBytes,
+                    Total = operation.TotalDownloadBytes,
+                    Operation = operation
+                };
+
+                if (_Progress.State == EProgressState.Pause)
+                {
+                    operation.PauseDownload();
+                    foreach (var item in _Data.Values) item.Operation.PauseDownload();
+                }
+                else
+                {
+                    _Progress.State = EProgressState.Running;
+                    Update();
                 }
 
-                CurrentDownloadedBytesList[local] = operation.CurrentDownloadBytes; // 当前下载大小
-                TotalDownloadedBytesList[local] = operation.TotalDownloadBytes; // 总下载大小
-                Update();
-                operation.OnDownloadProgressCallback += OnDownloadProgressCallback;
-                operation.OnDownloadOverCallback += OnDownloadOver;
-                operation.OnDownloadErrorCallback += (f, r) =>
-                {
-                    AssetSystem.DownloadHandle.Event.OnError?.Invoke(new Exception($"{f}:{r}"));
-                };
-                operations.Add(local, operation);
-                _Progress.State = EProgressState.Running;
                 return;
+
+                void OnDownloadError(string fileName, string error)
+                {
+                    AssetSystem.DownloadHandle.Event.OnError?.Invoke(new Exception($"{fileName} : {error}"));
+                }
 
                 void OnDownloadOver(bool isSucceed)
                 {
+                    if (_Progress.State != EProgressState.Running) return;
                     if (isSucceed)
+                    {
+                        _Data.Remove(local);
+                        Update();
+                    }
+                    else
+                    {
                         AssetSystem.DownloadHandle.Event.OnError?.Invoke(new Exception($"Downloading Fail : {local}"));
-                    operations.Remove(local);
-                    CurrentDownloadedBytesList.Remove(local);
-                    TotalDownloadedBytesList.Remove(local);
-                    Update();
-                    _Progress.State = operations.Count > 0 ? EProgressState.Running : EProgressState.Finish;
+                        _Data.Remove(local);
+                        Update();
+                    }
 
+                    _Progress.State = _Data.Count > 0 ? EProgressState.Running : EProgressState.Finish;
                     if (_Progress.State == EProgressState.Finish) Event.OnComplete?.Invoke(_Progress);
                 }
 
-                void OnDownloadProgressCallback(
-                    int totalDownloadCount,
-                    int currentDownloadCount,
-                    long totalDownloadBytes,
-                    long currentDownloadBytes)
+                void OnDownloadProgress(int _, int __, long total, long current)
                 {
-                    TotalDownloadedBytesList[local] = totalDownloadBytes;
-                    CurrentDownloadedBytesList[local] = currentDownloadBytes;
+                    if (_Progress.State != EProgressState.Running) return;
+                    _Data[local].Total = total;
+                    _Data[local].Current = current;
                     Update();
                 }
             }
 
             private void Update()
             {
-                _Progress.TotalValue = TotalDownloadedBytesList.Values.Sum();
-                _Progress.CurrentValue = CurrentDownloadedBytesList.Values.Sum();
+                _Progress.TotalValue = _Data.Values.Sum(v => v.Total);
+                _Progress.CurrentValue = _Data.Values.Sum(v => v.Current);
                 AssetSystem.DownloadHandle.Event.OnProgress?.Invoke(_Progress);
             }
+
+            public void Dispose()
+            {
+                foreach (var operation in _Data.Values)
+                {
+                    operation.Operation.CancelDownload();
+                    operation.Operation = null;
+                }
+
+                _Data.Clear();
+            }
+        }
+
+        private static async Task WaitTask(DownloaderOperation operation, AssetInfo location)
+        {
+            if (Operations.TryGetValue(location.AssetPath, out var downloaderOperation))
+            {
+                await downloaderOperation.Task; // 如果已经存在下载任务 则直接返回 避免重复下载
+                return;
+            }
+
+            Operations[location.AssetPath] = operation;
+            if (AssetSystem.StatusStop) await Task.Delay(100);
+            switch (Application.internetReachability)
+            {
+                default:
+                case NetworkReachability.NotReachable:
+                {
+                    if (AssetSystem.DownloadEvent.OnNetReachableNot is null)
+                        throw new Exception("NetReachableNot is null");
+
+                    AssetSystem.DownloadEvent.OnNetReachableNot.Invoke(new AProgress
+                    {
+                        TotalValue = Operations[location.AssetPath].TotalDownloadBytes,
+                        CurrentValue = Operations[location.AssetPath].CurrentDownloadBytes,
+                        State = EProgressState.Fail,
+                    });
+                    return;
+                }
+                case NetworkReachability.ReachableViaCarrierDataNetwork:
+                {
+                    if (AssetSystem.AllowReachableCarrier) break;
+                    if (AssetSystem.DownloadEvent.OnNetReachableCarrier is null)
+                        throw new Exception($"OnNetReachableCarrier is null => {location.AssetPath} loading fail");
+
+                    AssetSystem.StatusStop = true;
+                    AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(new AProgress
+                    {
+                        State = EProgressState.Pause,
+                        TotalValue = Operations[location.AssetPath].TotalDownloadBytes,
+                        CurrentValue = Operations[location.AssetPath].CurrentDownloadBytes,
+                    }, () =>
+                    {
+                        AssetSystem.AllowReachableCarrier = true;
+                        AssetSystem.StatusStop = false;
+                        AssetSystem.HandleReset = false;
+                    });
+                    while (AssetSystem.StatusStop) await Task.Delay(100);
+                    break;
+                }
+                case NetworkReachability.ReachableViaLocalAreaNetwork:
+                 break;
+            }
+
+            if (AssetSystem.HandleReset) return;
+            if (!Operations.ContainsKey(location.AssetPath)) return;
+            if (Operations[location.AssetPath].Status == EOperationStatus.Failed) return;
+            Operations[location.AssetPath].BeginDownload();
+            await Operations[location.AssetPath].Task;
+            if (AssetSystem.DownloadHandle is LoadingInfo loading)
+                loading.RegisterEvent(location, Operations[location.AssetPath]);
+            Operations.Remove(location.AssetPath);
+        }
+
+        private static readonly Dictionary<string, DownloaderOperation> Operations =
+            new Dictionary<string, DownloaderOperation>();
+
+        private static IEnumerator WaitCO(DownloaderOperation operation, AssetInfo location)
+        {
+            if (Operations.TryGetValue(location.AssetPath, out var downloaderOperation))
+            {
+                yield return downloaderOperation; // 如果已经存在下载任务 则直接返回 避免重复下载
+                yield break;
+            }
+
+            Operations[location.AssetPath] = operation;
+            if (AssetSystem.StatusStop) yield return new WaitForSeconds(0.1f);
+            switch (Application.internetReachability)
+            {
+                default:
+                case NetworkReachability.NotReachable:
+                {
+                    if (AssetSystem.DownloadEvent.OnNetReachableNot is null)
+                        throw new Exception("NetReachableNot is null");
+
+                    AssetSystem.DownloadEvent.OnNetReachableNot.Invoke(new AProgress
+                    {
+                        TotalValue = Operations[location.AssetPath].TotalDownloadBytes,
+                        CurrentValue = Operations[location.AssetPath].CurrentDownloadBytes,
+                        State = EProgressState.Fail,
+                    });
+                    yield break;
+                }
+                case NetworkReachability.ReachableViaCarrierDataNetwork:
+                {
+                    if (AssetSystem.AllowReachableCarrier) break;
+                    if (AssetSystem.DownloadEvent.OnNetReachableCarrier is null)
+                        throw new Exception(
+                            $"OnNetReachableCarrier is null => {location.AssetPath} loading fail : {Operations[location.AssetPath].TotalDownloadBytes.ToConverseStringFileSize()}");
+
+                    AssetSystem.StatusStop = true;
+                    AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(new AProgress
+                    {
+                        State = EProgressState.Pause,
+                        TotalValue = Operations[location.AssetPath].TotalDownloadBytes,
+                        CurrentValue = Operations[location.AssetPath].CurrentDownloadBytes,
+                    }, () =>
+                    {
+                        AssetSystem.AllowReachableCarrier = true;
+                        AssetSystem.StatusStop = false;
+                        AssetSystem.HandleReset = false;
+                    });
+                    while (AssetSystem.StatusStop) yield return new WaitForSeconds(0.1f);
+                    break;
+                }
+                case NetworkReachability.ReachableViaLocalAreaNetwork:
+                    break;
+            }
+
+            if (AssetSystem.HandleReset) yield break;
+            if (!Operations.ContainsKey(location.AssetPath)) yield break;
+            if (Operations[location.AssetPath].Status == EOperationStatus.Failed) yield break;
+            Operations[location.AssetPath].BeginDownload();
+            yield return Operations[location.AssetPath];
+            if (AssetSystem.DownloadHandle is LoadingInfo loading)
+                loading.RegisterEvent(location, Operations[location.AssetPath]);
+            Operations.Remove(location.AssetPath);
         }
 
         private static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
         {
-            var operation = package.CreateBundleDownloader(location);
+            return Operations.TryGetValue(location.AssetPath, out var operation)
+                ? operation
+                : package.CreateBundleDownloader(location);
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private static void AddSequenceRecord(YAssetPackage package, AssetInfo location, DownloaderOperation operation)
+        {
 #if UNITY_EDITOR
             if (AssetSystem.Parameter.EnableSequenceRecord)
             {
@@ -153,15 +325,7 @@ namespace AIO.UEngine.YooAsset
                 });
             }
 #endif
-
-            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, operation);
-            return operation;
         }
-
-        /// <summary>
-        /// 资源加载器 - 参数
-        /// </summary>
-        public static event Func<YAssetPackage, YAssetParameters> GetParameter;
     }
 }
 #endif

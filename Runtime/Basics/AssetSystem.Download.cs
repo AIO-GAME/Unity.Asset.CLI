@@ -17,7 +17,7 @@ namespace AIO
         /// <summary>
         /// 记录序列资源标签
         /// </summary>
-        public const string TagsRecord = "SequenceRecord";
+        internal const string TagsRecord = "SequenceRecord";
 
         /// <summary>
         /// 获取下载器
@@ -74,22 +74,20 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadTagWithRecord(IEnumerable<string> tag, DownlandAssetEvent dEvent = default)
         {
-            var enumerable = tag as string[] ?? tag.ToArray();
+            var tags = new List<string>(tag) { TagsRecord };
             if (Parameter.ASMode == EASMode.Remote)
             {
                 using (var handle = Proxy.GetDownloader(dEvent))
                 {
                     yield return handle.UpdateHeader();
                     handle.Begin();
-                    handle.CollectNeedTag(TagsRecord);
-                    handle.CollectNeedTag(enumerable);
+                    handle.CollectNeedTag(tags.ToArray());
                     yield return handle.WaitCo();
                 }
             }
             else
             {
-                WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
-                WhiteListLocal.AddRange(GetAssetInfos(enumerable));
+                WhiteListLocal.AddRange(GetAssetInfos(tags));
                 dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
             }
         }
