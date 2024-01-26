@@ -55,6 +55,22 @@ namespace AIO.UEngine.YooAsset
                 _Progress.State = EProgressState.Cancel;
             }
 
+            public void CleanEvent()
+            {
+                Event.OnWritePermissionNot = null;
+                Event.OnReadPermissionNot = null;
+                Event.OnNetReachableCarrier = null;
+                Event.OnNetReachableNot = null;
+                Event.OnDiskSpaceNotEnough = null;
+                Event.OnError = null;
+                Event.OnProgress = null;
+                Event.OnComplete = null;
+                Event.OnCancel = null;
+                Event.OnPause = null;
+                Event.OnResume = null;
+                Event.OnBegin = null;
+            }
+
             public IDownlandAssetEvent Event { get; }
 
             /// <summary>
@@ -160,9 +176,9 @@ namespace AIO.UEngine.YooAsset
 
         private static async Task WaitTask(DownloaderOperation operation, AssetInfo location)
         {
-            if (Operations.ContainsKey(location.AssetPath)) // 如果已经存在下载任务 则直接返回 避免重复下载
+            if (Operations.TryGetValue(location.AssetPath, out var downloaderOperation))
             {
-                await Operations[location.AssetPath].Task;
+                await downloaderOperation.Task; // 如果已经存在下载任务 则直接返回 避免重复下载
                 return;
             }
 
@@ -184,12 +200,11 @@ namespace AIO.UEngine.YooAsset
                     });
                     return;
                 }
-                case NetworkReachability.ReachableViaLocalAreaNetwork:
                 case NetworkReachability.ReachableViaCarrierDataNetwork:
                 {
                     if (AssetSystem.AllowReachableCarrier) break;
                     if (AssetSystem.DownloadEvent.OnNetReachableCarrier is null)
-                        throw new Exception("AssetSystem.DownloadEvent.OnNetReachableCarrier is null");
+                        throw new Exception($"OnNetReachableCarrier is null => {location.AssetPath} loading fail");
 
                     AssetSystem.StatusStop = true;
                     AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(new AProgress
@@ -206,8 +221,8 @@ namespace AIO.UEngine.YooAsset
                     while (AssetSystem.StatusStop) await Task.Delay(100);
                     break;
                 }
-                // case NetworkReachability.ReachableViaLocalAreaNetwork:
-                //  break;
+                case NetworkReachability.ReachableViaLocalAreaNetwork:
+                 break;
             }
 
             if (AssetSystem.HandleReset) return;
@@ -215,17 +230,19 @@ namespace AIO.UEngine.YooAsset
             if (Operations[location.AssetPath].Status == EOperationStatus.Failed) return;
             Operations[location.AssetPath].BeginDownload();
             await Operations[location.AssetPath].Task;
-            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, Operations[location.AssetPath]);
+            if (AssetSystem.DownloadHandle is LoadingInfo loading)
+                loading.RegisterEvent(location, Operations[location.AssetPath]);
             Operations.Remove(location.AssetPath);
         }
 
-        private static readonly Dictionary<string, DownloaderOperation> Operations = new Dictionary<string, DownloaderOperation>();
+        private static readonly Dictionary<string, DownloaderOperation> Operations =
+            new Dictionary<string, DownloaderOperation>();
 
         private static IEnumerator WaitCO(DownloaderOperation operation, AssetInfo location)
         {
-            if (Operations.ContainsKey(location.AssetPath)) // 如果已经存在下载任务 则直接返回 避免重复下载
+            if (Operations.TryGetValue(location.AssetPath, out var downloaderOperation))
             {
-                yield return Operations[location.AssetPath];
+                yield return downloaderOperation; // 如果已经存在下载任务 则直接返回 避免重复下载
                 yield break;
             }
 
@@ -247,12 +264,12 @@ namespace AIO.UEngine.YooAsset
                     });
                     yield break;
                 }
-                case NetworkReachability.ReachableViaLocalAreaNetwork:
                 case NetworkReachability.ReachableViaCarrierDataNetwork:
                 {
                     if (AssetSystem.AllowReachableCarrier) break;
                     if (AssetSystem.DownloadEvent.OnNetReachableCarrier is null)
-                        throw new Exception("AssetSystem.DownloadEvent.OnNetReachableCarrier is null");
+                        throw new Exception(
+                            $"OnNetReachableCarrier is null => {location.AssetPath} loading fail : {Operations[location.AssetPath].TotalDownloadBytes.ToConverseStringFileSize()}");
 
                     AssetSystem.StatusStop = true;
                     AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(new AProgress
@@ -269,8 +286,8 @@ namespace AIO.UEngine.YooAsset
                     while (AssetSystem.StatusStop) yield return new WaitForSeconds(0.1f);
                     break;
                 }
-                // case NetworkReachability.ReachableViaLocalAreaNetwork:
-                //  break;
+                case NetworkReachability.ReachableViaLocalAreaNetwork:
+                    break;
             }
 
             if (AssetSystem.HandleReset) yield break;
@@ -278,14 +295,15 @@ namespace AIO.UEngine.YooAsset
             if (Operations[location.AssetPath].Status == EOperationStatus.Failed) yield break;
             Operations[location.AssetPath].BeginDownload();
             yield return Operations[location.AssetPath];
-            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, Operations[location.AssetPath]);
+            if (AssetSystem.DownloadHandle is LoadingInfo loading)
+                loading.RegisterEvent(location, Operations[location.AssetPath]);
             Operations.Remove(location.AssetPath);
         }
 
         private static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
         {
-            return Operations.ContainsKey(location.AssetPath)
-                ? Operations[location.AssetPath]
+            return Operations.TryGetValue(location.AssetPath, out var operation)
+                ? operation
                 : package.CreateBundleDownloader(location);
         }
 

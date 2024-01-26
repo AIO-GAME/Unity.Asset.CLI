@@ -22,7 +22,7 @@ namespace AIO
         /// <summary>
         /// 当前下载事件
         /// </summary>
-        IDownlandAssetEvent Event { get; }
+        IDownlandAssetEvent Event { get;  }
 
         /// <summary>
         /// 当前下载状态
@@ -33,6 +33,11 @@ namespace AIO
         /// 取消当前所有下载
         /// </summary>
         void Cancel();
+
+        /// <summary>
+        /// 清空当前下载事件
+        /// </summary>
+        void CleanEvent();
     }
 
     public interface IDownlandAssetEvent : IProgressEvent
