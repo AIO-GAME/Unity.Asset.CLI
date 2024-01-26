@@ -222,7 +222,7 @@ namespace AIO.UEngine.YooAsset
                     break;
                 }
                 case NetworkReachability.ReachableViaLocalAreaNetwork:
-                 break;
+                    break;
             }
 
             if (AssetSystem.HandleReset) return;

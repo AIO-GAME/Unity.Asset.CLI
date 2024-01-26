@@ -225,7 +225,7 @@ namespace AIO.UEngine
                     var operation = asset.CreateResourceDownloader();
                     if (operation is null) continue;
                     if (operation.TotalDownloadCount <= 0) continue;
-                    ResourceDownloaderOperations[string.Concat("ALL-", name)] = operation;
+                    ResourceDownloaderOperations[string.Concat("ALL-", name, '-', DateTime.Now.Ticks)] = operation;
                 }
 
                 OpenDownloadAll = true;
@@ -246,7 +246,6 @@ namespace AIO.UEngine
                 if (tags is null || tags.Length == 0) return;
                 foreach (var name in ManifestOperations.Keys)
                 {
-                    AssetSystem.Log($"CollectNeedTagBegin -> {name}");
                     if (!Packages.TryGetValue(name, out var asset)) continue;
                     Tags[name] = 1;
                     var operation =
@@ -269,6 +268,9 @@ namespace AIO.UEngine
 
             protected override async Task OnWaitAsync()
             {
+                CurrentValueDict.Clear();
+                TotalValueDict.Clear();
+
                 foreach (var pair in ResourceDownloaderOperations)
                 {
                     CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
@@ -277,7 +279,7 @@ namespace AIO.UEngine
 
                 TotalValue = TotalValueDict.Sum(pair => pair.Value);
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
-                if (AssetSystem.GetAvailableDiskSpace() < TotalValue) // 检查磁盘空间是否足够
+                if (AssetSystem.GetAvailableDiskSpace() < TotalValue - CurrentValue) // 检查磁盘空间是否足够
                 {
                     State = EProgressState.Fail;
                     if (OnDiskSpaceNotEnough is null)
@@ -340,7 +342,9 @@ namespace AIO.UEngine
                                 break;
                         }
 
-                        CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes + currentDownloadBytes;
+                        TotalValueDict[pair.Key] = totalDownloadBytes;
+                        TotalValue = TotalValueDict.Sum(item => item.Value);
+                        CurrentValueDict[pair.Key] = currentDownloadBytes;
                         CurrentValue = CurrentValueDict.Sum(item => item.Value);
                     }
                 }
@@ -353,26 +357,29 @@ namespace AIO.UEngine
 
             protected override IEnumerator OnWaitCo()
             {
+                CurrentValueDict.Clear();
+                TotalValueDict.Clear();
+
                 foreach (var pair in ResourceDownloaderOperations)
                 {
-                    CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
                     TotalValueDict[pair.Key] = pair.Value.TotalDownloadBytes;
-                }
-
-                if (AssetSystem.GetAvailableDiskSpace() < TotalValue) // 检查磁盘空间是否足够
-                {
-                    State = EProgressState.Fail;
-                    if (OnDiskSpaceNotEnough is null)
-                        throw new Exception(
-                            $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
-                    OnDiskSpaceNotEnough.Invoke(Report);
-                    AssetSystem.LogException(
-                        $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
-                    yield break;
+                    CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
                 }
 
                 TotalValue = TotalValueDict.Sum(pair => pair.Value);
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
+
+                if (AssetSystem.GetAvailableDiskSpace() < TotalValue - CurrentValue) // 检查磁盘空间是否足够
+                {
+                    State = EProgressState.Fail;
+                    if (OnDiskSpaceNotEnough is null)
+                        throw new SystemException(
+                            $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
+                    AssetSystem.LogException(
+                        $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
+                    OnDiskSpaceNotEnough.Invoke(Report);
+                    yield break;
+                }
 
                 foreach (var pair in ResourceDownloaderOperations)
                 {
@@ -400,10 +407,11 @@ namespace AIO.UEngine
                     yield return pair.Value;
 
                     if (pair.Value.Status == EOperationStatus.Succeed) continue;
+
                     State = EProgressState.Fail;
                     yield break;
 
-                    void OnUpdateProgress(int _, int __, long ___, long currentDownloadBytes)
+                    void OnUpdateProgress(int _, int __, long totalDownloadBytes, long currentDownloadBytes)
                     {
                         if (State != EProgressState.Running) return;
                         switch (Application.internetReachability)
@@ -426,6 +434,8 @@ namespace AIO.UEngine
                                 break;
                         }
 
+                        TotalValueDict[pair.Key] = totalDownloadBytes;
+                        TotalValue = TotalValueDict.Sum(item => item.Value);
                         CurrentValueDict[pair.Key] = currentDownloadBytes;
                         CurrentValue = CurrentValueDict.Sum(item => item.Value);
                     }
