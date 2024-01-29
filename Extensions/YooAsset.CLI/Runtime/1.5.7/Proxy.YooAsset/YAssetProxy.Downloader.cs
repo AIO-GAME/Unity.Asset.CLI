@@ -375,15 +375,15 @@ namespace AIO.UEngine
 
                 TotalValue = TotalValueDict.Sum(pair => pair.Value);
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
-
-                if (AssetSystem.GetAvailableDiskSpace() < TotalValue - CurrentValue) // 检查磁盘空间是否足够
+                var endValue = TotalValue - CurrentValue;
+                if (AssetSystem.GetAvailableDiskSpace() < endValue) // 检查磁盘空间是否足够
                 {
                     State = EProgressState.Fail;
                     if (OnDiskSpaceNotEnough is null)
                         throw new SystemException(
-                            $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
+                            $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
                     AssetSystem.LogException(
-                        $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
+                        $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
                     OnDiskSpaceNotEnough.Invoke(Report);
                     yield break;
                 }
