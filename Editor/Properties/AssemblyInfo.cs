@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using UnityEditor;
-using PackageInfo = UnityEditor.PackageManager.PackageInfo;
+﻿using AIO.UEditor;
+using Newtonsoft.Json.Linq;
+using UnityEditor.PackageManager;
 
 namespace AIO
 {
@@ -16,7 +16,7 @@ namespace AIO
         /// </summary>
         public static string Version { get; private set; }
 
-        [InitializeOnLoadMethod]
+        [AInit(mode: EInitAttrMode.Both, int.MaxValue)]
         public static void Initialize()
         {
             var package = PackageInfo.FindForAssembly(typeof(Setting).Assembly);
