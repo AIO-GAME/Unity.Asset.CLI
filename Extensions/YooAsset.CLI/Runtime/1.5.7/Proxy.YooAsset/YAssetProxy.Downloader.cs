@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine.YooAsset;
@@ -175,7 +176,10 @@ namespace AIO.UEngine
                     }
 
                     State = EProgressState.Fail;
-                    Event.OnError?.Invoke(new SystemException($"校验本地资源完整性失败 -> [{pair.Key} -> {pair.Value.Error}]"));
+                    AssetSystem.LogException("校验本地资源完整性失败");
+                    var ex = new SystemException($"[{pair.Key} -> {pair.Value.Error}]");
+                    if (Event.OnError is null) throw ex;
+                    Event.OnError.Invoke(ex);
                     yield break;
                 }
             }
@@ -279,15 +283,18 @@ namespace AIO.UEngine
 
                 TotalValue = TotalValueDict.Sum(pair => pair.Value);
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
-                if (AssetSystem.GetAvailableDiskSpace() < TotalValue - CurrentValue) // 检查磁盘空间是否足够
+                var endValue = TotalValue - CurrentValue;
+                if (AssetSystem.GetAvailableDiskSpace() < endValue) // 检查磁盘空间是否足够
                 {
                     State = EProgressState.Fail;
+
                     if (OnDiskSpaceNotEnough is null)
-                        throw new Exception(
-                            $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
+                        throw new IOException(
+                            $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
+
                     OnDiskSpaceNotEnough.Invoke(Report);
                     AssetSystem.LogException(
-                        $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
+                        $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
                     return;
                 }
 
@@ -374,16 +381,16 @@ namespace AIO.UEngine
                     State = EProgressState.Fail;
                     if (OnDiskSpaceNotEnough is null)
                         throw new SystemException(
-                            $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
+                            $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
                     AssetSystem.LogException(
-                        $"磁盘空间 {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
+                        $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {TotalValue.ToConverseStringFileSize()}");
                     OnDiskSpaceNotEnough.Invoke(Report);
                     yield break;
                 }
 
                 foreach (var pair in ResourceDownloaderOperations)
                 {
-                    CurrentInfo = $"Resource Download -> [{pair.Key}]";
+                    CurrentInfo = $"Resource download : [{pair.Key}]";
                     while (State != EProgressState.Running)
                     {
                         switch (State)
@@ -448,10 +455,10 @@ namespace AIO.UEngine
 
             private void OnDownloadError(string filename, string error)
             {
-                AssetSystem.LogError($"下载资源失败 -> [{filename} -> {error}]");
                 var ex = new SystemException($"{filename} : {error}");
                 if (Event.OnError is null) throw ex;
                 Event.OnError.Invoke(ex);
+                AssetSystem.LogError($"Resource download failure : [{filename} -> {error}]");
             }
 
             protected override void OnPause()

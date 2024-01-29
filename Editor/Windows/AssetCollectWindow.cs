@@ -24,7 +24,8 @@ namespace AIO.UEditor
     {
         [LnkTools(
             Tooltip = "AIO 资源管理工具",
-            IconResource = "Editor/Icon/Asset"
+            IconResource = "Editor/Icon/Asset",
+            ShowMode = ELnkShowMode.Toolbar
         )]
         public static void OpenWindow()
         {

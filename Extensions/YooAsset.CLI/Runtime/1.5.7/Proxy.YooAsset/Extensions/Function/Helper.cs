@@ -51,7 +51,8 @@ namespace AIO.UEngine.YooAsset
         private static void PackageDebug(LoadType type, string packageName, string location)
         {
 #if UNITY_EDITOR
-            AssetSystem.Log($"Load {type.ToString()} : [{packageName} : {location}] -> {GetAssetInfo(location)?.AssetPath}");
+            AssetSystem.Log(
+                $"Load {type.ToString()} : [{packageName} : {location}] -> {GetAssetInfo(location)?.AssetPath}");
 #else
             AssetSystem.Log("{0} : [{1} : {2}]", type.ToString(), packageName, location);
 #endif
@@ -97,7 +98,11 @@ namespace AIO.UEngine.YooAsset
 
         private static IEnumerator GetAutoPackageCO(string location, Action<YAssetPackage> cb)
         {
+#if !UNITY_2019_4_OR_NEWER
             if (location.EndsWith('/') || location.EndsWith('\\'))
+#else
+            if (location.EndsWith("/") || location.EndsWith("\\"))
+#endif
             {
                 cb.Invoke(null);
                 AssetSystem.LogException($"资源查找失败 [auto : {location}]");
@@ -146,7 +151,11 @@ namespace AIO.UEngine.YooAsset
 
         private static IEnumerator GetAutoPackageCO(string packageName, string location, Action<YAssetPackage> cb)
         {
+#if !UNITY_2019_4_OR_NEWER
             if (location.EndsWith('/') || location.EndsWith('\\'))
+#else
+            if (location.EndsWith("/") || location.EndsWith("\\"))
+#endif
             {
                 AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 cb.Invoke(null);
@@ -193,7 +202,8 @@ namespace AIO.UEngine.YooAsset
             if (package.CheckLocationValid(location)) cb.Invoke(package);
             else
             {
-                AssetSystem.LogException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+                AssetSystem.LogException(
+                    $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
                 cb.Invoke(null);
             }
         }
@@ -202,7 +212,11 @@ namespace AIO.UEngine.YooAsset
 
         private static YAssetPackage GetAutoPackageSync(string location)
         {
+#if !UNITY_2019_4_OR_NEWER
             if (location.EndsWith('/') || location.EndsWith('\\'))
+#else
+            if (location.EndsWith("/") || location.EndsWith("\\"))
+#endif
             {
                 AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 return null;
@@ -228,7 +242,11 @@ namespace AIO.UEngine.YooAsset
 
         private static YAssetPackage GetAutoPackageSync(string packageName, string location)
         {
+#if !UNITY_2019_4_OR_NEWER
             if (location.EndsWith('/') || location.EndsWith('\\'))
+#else
+            if (location.EndsWith("/") || location.EndsWith("\\"))
+#endif
             {
                 AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 return null;
@@ -250,7 +268,8 @@ namespace AIO.UEngine.YooAsset
 
             if (!package.CheckLocationValid(location))
             {
-                AssetSystem.LogException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+                AssetSystem.LogException(
+                    $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
                 return null;
             }
 
@@ -259,7 +278,11 @@ namespace AIO.UEngine.YooAsset
 
         private static async Task<YAssetPackage> GetAutoPackageTask(string location)
         {
+#if !UNITY_2019_4_OR_NEWER
             if (location.EndsWith('/') || location.EndsWith('\\'))
+#else
+            if (location.EndsWith("/") || location.EndsWith("\\"))
+#endif
             {
                 AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 return null;
@@ -282,7 +305,8 @@ namespace AIO.UEngine.YooAsset
                     return package;
                 }
 
-                AssetSystem.LogException($"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                AssetSystem.LogException(
+                    $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                 return null;
             }
 
@@ -292,7 +316,11 @@ namespace AIO.UEngine.YooAsset
 
         private static async Task<YAssetPackage> GetAutoPackageTask(string packageName, string location)
         {
+#if !UNITY_2019_4_OR_NEWER
             if (location.EndsWith('/') || location.EndsWith('\\'))
+#else
+            if (location.EndsWith("/") || location.EndsWith("\\"))
+#endif
             {
                 AssetSystem.LogException($"资源查找失败 [auto : {location}]");
                 return null;
@@ -324,7 +352,8 @@ namespace AIO.UEngine.YooAsset
                     return package;
                 }
 
-                AssetSystem.LogException($"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                AssetSystem.LogException(
+                    $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                 return null;
             }
 

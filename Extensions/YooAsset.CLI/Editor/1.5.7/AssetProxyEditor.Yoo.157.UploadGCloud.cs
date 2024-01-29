@@ -174,8 +174,7 @@ namespace AIO.UEditor.CLI
                             Version = config.IsUploadLatest ? "Latest" : config.Version
                         });
                     }
-                    else data2.Version = config.Version;
-
+                    else data2.Version = config.IsUploadLatest ? "Latest" : config.Version;
                     versionContent = AHelper.Json.Serialize(data);
                 }
                 else
