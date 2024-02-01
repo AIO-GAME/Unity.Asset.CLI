@@ -188,17 +188,14 @@ namespace AIO.UEngine
                 if (Application.isPlaying && instance.ASMode == EASMode.Editor)
                 {
 #if SUPPORT_YOOASSET
-                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    var type = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true);
+                    var temp = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
+                        ?.Invoke(null, new object[] { });
+                    if (temp != null)
                     {
-                        if (assembly.GetName().Name != "AIO.Asset.Editor") continue;
-                        var temp = assembly.GetType("AIO.UEditor.AssetCollectRoot", true)
-                            ?.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
-                            ?.Invoke(null, new object[] { });
-                        if (temp == null) break;
-                        assembly.GetType("AIO.UEditor.AssetProxyEditor", true)
-                            ?.GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
+                        Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true)
+                            .GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
                             ?.Invoke(null, new object[] { temp, false });
-                        break;
                     }
 #endif
                 }

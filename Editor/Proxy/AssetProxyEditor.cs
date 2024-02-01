@@ -141,6 +141,7 @@ namespace AIO.UEditor
             }
 
             Editor.ConvertConfig(config);
+            Debug.Log("转换资源收集器配置完成");
         }
 
         private static void SaveScene()
