@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AIO.UEngine;
+using UnityEngine;
 using YooAsset.Editor;
 
 namespace AIO.UEditor.CLI
@@ -183,52 +184,56 @@ namespace AIO.UEditor.CLI
 
         public static void Convert(AssetCollectRoot asset)
         {
-            asset.Save();
+            if (!Application.isPlaying) asset.Save();
             PackageRemoveRepeat(asset);
             PackageUpdateSetting(asset);
             PackageConvert(asset);
             PackageRemoveEmpty();
 
             // 如果启用了序列记录，则需要给每个包新增一个序列记录组
-            if (ASConfig.GetOrCreate().EnableSequenceRecord)
+            if (!ASConfig.GetOrCreate().EnableSequenceRecord) return;
+
+            var bundle = new AssetBundleCollectorPackage
             {
-                foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
+                PackageName = AssetSystem.TagsRecord,
+                PackageDesc = "序列记录包[首包专用](请勿删除)",
+                Groups = new List<AssetBundleCollectorGroup>()
+            };
+            foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
+            {
+                if (package.Groups is null) continue;
+                var recordGroup = new AssetBundleCollectorGroup
                 {
-                    if (package.Groups is null) continue;
-
-                    var recordGroup = new AssetBundleCollectorGroup
+                    GroupName = package.PackageName,
+                    AssetTags = AssetSystem.TagsRecord,
+                    Collectors = new List<AssetBundleCollector>()
+                };
+                foreach (var group in package.Groups)
+                {
+                    if (group.Collectors is null) continue;
+                    foreach (var collector in group.Collectors
+                                 .Where(item => item.CollectorType == ECollectorType.MainAssetCollector)
+                                 .Where(item => !recordGroup.Collectors.Exists(match =>
+                                     match.CollectorGUID == item.CollectorGUID)))
                     {
-                        GroupName = AssetSystem.TagsRecord,
-                        GroupDesc = "序列记录组[首包专用](请勿删除)",
-                        AssetTags = AssetSystem.TagsRecord,
-                        Collectors = new List<AssetBundleCollector>()
-                    };
-                    foreach (var group in package.Groups)
-                    {
-                        if (group.Collectors is null) continue;
-                        foreach (var collector in group.Collectors)
+                        recordGroup.Collectors.Add(new AssetBundleCollector
                         {
-                            if (collector.CollectorType != ECollectorType.MainAssetCollector) continue;
-                            // 如果GUID已经存在，则不添加
-                            if (recordGroup.Collectors.Exists(collector1 =>
-                                    collector1.CollectorGUID == collector.CollectorGUID)) continue;
-                            recordGroup.Collectors.Add(new AssetBundleCollector
-                            {
-                                CollectorGUID = collector.CollectorGUID,
-                                CollectPath = collector.CollectPath,
-                                CollectorType = ECollectorType.MainAssetCollector,
-                                AssetTags = collector.AssetTags,
-                                AddressRuleName = nameof(AIOAddressRecordRule),
-                                FilterRuleName = nameof(AIOFilterRecordRule),
-                                PackRuleName = nameof(PackGroup),
-                                UserData = group.GroupName,
-                            });
-                        }
+                            CollectorGUID = collector.CollectorGUID,
+                            CollectPath = collector.CollectPath,
+                            CollectorType = ECollectorType.MainAssetCollector,
+                            AssetTags = collector.AssetTags,
+                            AddressRuleName = nameof(AIOAddressRecordRule),
+                            FilterRuleName = nameof(AIOFilterRecordRule),
+                            PackRuleName = nameof(PackGroup),
+                            UserData = group.GroupName,
+                        });
                     }
-
-                    package.Groups.Insert(0, recordGroup);
                 }
+
+                bundle.Groups.Insert(0, recordGroup);
             }
+
+            AssetBundleCollectorSettingData.Setting.Packages.Insert(0, bundle);
         }
     }
 }

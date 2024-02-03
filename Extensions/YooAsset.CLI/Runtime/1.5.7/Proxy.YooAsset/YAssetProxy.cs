@@ -144,6 +144,19 @@ namespace AIO.UEngine
                 return;
             }
 
+            if (config.EnableSequenceRecord)
+            {
+                if (list.All(item => item.Name != AssetSystem.TagsRecord))
+                {
+                    list = list.Insert(0, new AssetsPackageConfig
+                    {
+                        Name = AssetSystem.TagsRecord,
+                        Version = "-.-.-",
+                        IsDefault = true
+                    });
+                }
+            }
+
             config.Packages = list;
             config.Packages[0].IsDefault = true;
         }

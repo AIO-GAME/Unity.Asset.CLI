@@ -148,6 +148,8 @@ namespace AIO.UEditor
                     BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
                     BuildConfig.MergeToLatest =
                         GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest, GP_Width_100);
+                    BuildConfig.BuildFirstPackage =
+                        GELayout.ToggleLeft("构建首包资源", BuildConfig.BuildFirstPackage, GP_Width_100);
 
                     EditorGUILayout.Separator();
 
@@ -195,9 +197,10 @@ namespace AIO.UEditor
                                 AssetProxyEditor.BuildArt(BuildConfig, true);
                                 BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                             }
-                            catch (Exception)
+                            catch (Exception e)
                             {
                                 BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                                Debug.LogError(e);
                             }
                         }
                     }
@@ -233,8 +236,12 @@ namespace AIO.UEditor
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
                 {
                     EditorGUILayout.LabelField("构建包名", GP_Width_100);
-                    Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages,
-                        GEStyle.PreDropDown);
+                    if (BuildConfig.BuildFirstPackage)
+                        GUILayout.Label(AssetSystem.TagsRecord, GEStyle.PreDropDown);
+                    else
+                        Data.CurrentPackageIndex = EditorGUILayout.Popup(
+                            Data.CurrentPackageIndex, LookModeDisplayPackages, GEStyle.PreDropDown);
+
                     if (GUI.changed)
                     {
                         if (Data.Packages.Length <= Data.CurrentPackageIndex || Data.CurrentPackageIndex < 0)

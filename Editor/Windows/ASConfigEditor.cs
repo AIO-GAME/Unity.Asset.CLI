@@ -151,6 +151,7 @@ namespace AIO.UEditor
         private void Update()
         {
             var Data = AssetCollectRoot.GetOrCreate();
+            if (Data.Packages.Length == 0) return;
             Target.Packages = new AssetsPackageConfig[Data.Packages.Length];
             for (var index = 0; index < Data.Packages.Length; index++)
             {
@@ -158,9 +159,20 @@ namespace AIO.UEditor
                 {
                     Name = Data.Packages[index].Name,
                     Version = "-.-.-",
-                    IsDefault = index == 0
                 };
             }
+
+            if (Target.EnableSequenceRecord)
+            {
+                Target.Packages = Target.Packages.Insert(0, new AssetsPackageConfig
+                {
+                    Name = AssetSystem.TagsRecord,
+                    Version = "-.-.-",
+                    IsDefault = true
+                });
+            }
+
+            Target.Packages[0].IsDefault = true;
         }
     }
 }
