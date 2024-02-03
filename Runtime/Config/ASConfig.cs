@@ -187,7 +187,6 @@ namespace AIO.UEngine
 
                 if (Application.isPlaying && instance.ASMode == EASMode.Editor)
                 {
-#if SUPPORT_YOOASSET
                     var type = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true);
                     var temp = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
                         ?.Invoke(null, new object[] { });
@@ -197,7 +196,6 @@ namespace AIO.UEngine
                             .GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
                             ?.Invoke(null, new object[] { temp, false });
                     }
-#endif
                 }
             }
 
@@ -272,6 +270,7 @@ namespace AIO.UEngine
             if (SequenceRecord != null) SequenceRecord.Save();
             EditorUtility.SetDirty(this);
         }
+
 #endif
 
         #endregion

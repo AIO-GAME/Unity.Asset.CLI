@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +20,19 @@ namespace AIO
 {
     public partial class AssetSystem
     {
+#if UNITY_EDITOR
+        /// <summary>
+        /// 获取序列记录
+        /// </summary>
+        /// <param name="record">记录</param>
+        [DebuggerNonUserCode, DebuggerHidden, Conditional("UNITY_EDITOR")]
+        public static void AddSequenceRecord(SequenceRecord record)
+        {
+            Parameter.SequenceRecord.Add(record);
+            WhiteListLocal.Add(record.Location);
+        }
+#endif
+
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
             private const string FILE_NAME = "ASSETRECORD";

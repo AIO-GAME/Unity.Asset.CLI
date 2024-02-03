@@ -311,19 +311,32 @@ namespace AIO.UEngine.YooAsset
         private static void AddSequenceRecord(YAssetPackage package, AssetInfo location, DownloaderOperation operation)
         {
 #if UNITY_EDITOR
-            if (AssetSystem.Parameter.EnableSequenceRecord)
+            if (!AssetSystem.Parameter.EnableSequenceRecord) return;
+            AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
             {
-                AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
-                {
-                    GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
-                    PackageName = package.PackageName,
-                    Location = location.Address,
-                    Time = DateTime.Now,
-                    Bytes = operation.TotalDownloadBytes,
-                    Count = operation.TotalDownloadCount,
-                    AssetPath = location.AssetPath,
-                });
-            }
+                GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
+                PackageName = package.PackageName,
+                Location = location.Address,
+                Time = DateTime.Now,
+                Bytes = operation.TotalDownloadBytes,
+                Count = operation.TotalDownloadCount,
+                AssetPath = location.AssetPath,
+            });
+#endif
+        }
+        
+        [Conditional("UNITY_EDITOR")]
+        private static void AddSequenceRecord(YAssetPackage package, AssetInfo location)
+        {
+#if UNITY_EDITOR
+            if (!AssetSystem.Parameter.EnableSequenceRecord) return;
+            AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
+            {
+                GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
+                PackageName = package.PackageName,
+                Location = location.Address,
+                AssetPath = location.AssetPath,
+            });
 #endif
         }
     }

@@ -109,6 +109,7 @@ namespace AIO.UEditor
                 CopyBuildinFileTags = config.FirstPackTag,
                 MergeToLatest = config.MergeToLatest,
             };
+            if (config.BuildFirstPackage) command.BuildPackage = AssetSystem.TagsRecord;
             Editor.BuildArt(command);
         }
 

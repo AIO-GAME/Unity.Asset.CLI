@@ -140,6 +140,9 @@ namespace AIO.UEngine.YooAsset
 
                     AddSequenceRecord(package, info, operation);
                 }
+#if UNITY_EDITOR
+                else AddSequenceRecord(package, package.GetAssetInfo(location));
+#endif
 
                 cb.Invoke(package);
                 yield break;
@@ -198,6 +201,9 @@ namespace AIO.UEngine.YooAsset
 
                 AddSequenceRecord(package, info, operation);
             }
+#if UNITY_EDITOR
+            else AddSequenceRecord(package, package.GetAssetInfo(location));
+#endif
 
             if (package.CheckLocationValid(location)) cb.Invoke(package);
             else
@@ -292,7 +298,14 @@ namespace AIO.UEngine.YooAsset
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
                 if (AssetSystem.IsWhite(location)) return package;
-                if (!package.IsNeedDownloadFromRemote(location)) return package;
+                if (!package.IsNeedDownloadFromRemote(location))
+                {
+#if UNITY_EDITOR
+                    AddSequenceRecord(package, package.GetAssetInfo(location));
+#endif
+                    return package;
+                }
+
 
                 var info = package.GetAssetInfo(location);
                 if (info is null) throw new SystemException($"无法获取资源信息 {location}");
@@ -356,7 +369,9 @@ namespace AIO.UEngine.YooAsset
                     $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                 return null;
             }
-
+#if UNITY_EDITOR
+            AddSequenceRecord(package, package.GetAssetInfo(location));
+#endif
             if (package.CheckLocationValid(location)) return package;
 
             AssetSystem.LogException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");

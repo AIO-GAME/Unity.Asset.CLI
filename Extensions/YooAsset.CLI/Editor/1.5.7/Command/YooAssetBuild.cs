@@ -60,7 +60,7 @@ namespace AIO.UEditor.CLI
 
         private static IEncryptionServices CreateEncryptionServicesInstance(string EncryptionClassName)
         {
-            if (string.IsNullOrEmpty(EncryptionClassName)) return null;
+            if (string.IsNullOrEmpty(EncryptionClassName)) return new EncryptionNone();
             return (from item in EditorTools.GetAssignableTypes(typeof(IEncryptionServices))
                 where item.FullName == EncryptionClassName
                 select (IEncryptionServices)Activator.CreateInstance(item)).FirstOrDefault();
@@ -188,9 +188,8 @@ namespace AIO.UEditor.CLI
                 ? YooAsset.Editor.ECopyBuildinFileOption.ClearAndCopyByTags
                 : YooAsset.Editor.ECopyBuildinFileOption.None;
 
-            if (!string.IsNullOrEmpty(command.EncyptionClassName))
-                buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
-
+            buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
+            
             if (command.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
             {
                 buildParameters.SBPParameters = new BuildParameters.SBPBuildParameters
@@ -198,7 +197,7 @@ namespace AIO.UEditor.CLI
                     WriteLinkXML = true
                 };
             }
-
+           
             Debug.Log(AHelper.Json.Serialize(buildParameters));
 
             var builder = new AssetBundleBuilder();
