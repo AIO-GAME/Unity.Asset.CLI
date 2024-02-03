@@ -189,7 +189,7 @@ namespace AIO.UEditor.CLI
                 : YooAsset.Editor.ECopyBuildinFileOption.None;
 
             buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
-            
+
             if (command.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
             {
                 buildParameters.SBPParameters = new BuildParameters.SBPBuildParameters
@@ -197,7 +197,7 @@ namespace AIO.UEditor.CLI
                     WriteLinkXML = true
                 };
             }
-           
+
             Debug.Log(AHelper.Json.Serialize(buildParameters));
 
             var builder = new AssetBundleBuilder();
@@ -216,15 +216,14 @@ namespace AIO.UEditor.CLI
                 else ManifestGenerate(Path.Combine(output, buildParameters.PackageVersion));
 
                 if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
-                else EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
+                else if (!EHelper.IsCMD()) EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
+
                 AssetProxyEditor.CreateConfig(buildParameters.BuildOutputRoot, command.MergeToLatest);
             }
             else
             {
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
-                    Debug.LogError($"构建失败 {buildResult.ErrorInfo}");
-                else
-                    EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
+                if (EHelper.IsCMD()) Debug.LogError($"构建失败 {buildResult.ErrorInfo}");
+                else EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
             }
         }
 
