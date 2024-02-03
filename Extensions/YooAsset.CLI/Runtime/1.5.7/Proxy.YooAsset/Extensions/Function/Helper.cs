@@ -137,13 +137,11 @@ namespace AIO.UEngine.YooAsset
                         cb.Invoke(null);
                         yield break;
                     }
-
-                    AddSequenceRecord(package, info, operation);
                 }
-#if UNITY_EDITOR
-                else AddSequenceRecord(package, package.GetAssetInfo(location));
-#endif
 
+#if UNITY_EDITOR
+                AddSequenceRecord(package, package.GetAssetInfo(location));
+#endif
                 cb.Invoke(package);
                 yield break;
             }
@@ -198,13 +196,11 @@ namespace AIO.UEngine.YooAsset
                     cb.Invoke(null);
                     yield break;
                 }
-
-                AddSequenceRecord(package, info, operation);
             }
-#if UNITY_EDITOR
-            else AddSequenceRecord(package, package.GetAssetInfo(location));
-#endif
 
+#if UNITY_EDITOR
+            AddSequenceRecord(package, package.GetAssetInfo(location));
+#endif
             if (package.CheckLocationValid(location)) cb.Invoke(package);
             else
             {
@@ -238,7 +234,9 @@ namespace AIO.UEngine.YooAsset
                     AssetSystem.LogException($"不支持同步加载远程资源 [{package.PackageName} : {location}]");
                     return null;
                 }
-
+#if UNITY_EDITOR
+                AddSequenceRecord(package, package.GetAssetInfo(location));
+#endif
                 return package;
             }
 
@@ -279,6 +277,9 @@ namespace AIO.UEngine.YooAsset
                 return null;
             }
 
+#if UNITY_EDITOR
+            AddSequenceRecord(package, package.GetAssetInfo(location));
+#endif
             return package;
         }
 
@@ -298,29 +299,25 @@ namespace AIO.UEngine.YooAsset
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
                 if (AssetSystem.IsWhite(location)) return package;
-                if (!package.IsNeedDownloadFromRemote(location))
+                if (package.IsNeedDownloadFromRemote(location))
                 {
+                    var info = package.GetAssetInfo(location);
+                    if (info is null) throw new SystemException($"无法获取资源信息 {location}");
+
+                    var operation = CreateDownloaderOperation(package, info);
+                    await WaitTask(operation, info);
+                    if (operation.Status != EOperationStatus.Succeed)
+                    {
+                        AssetSystem.LogException(
+                            $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                        return null;
+                    }
+                }
+
 #if UNITY_EDITOR
-                    AddSequenceRecord(package, package.GetAssetInfo(location));
+                AddSequenceRecord(package, package.GetAssetInfo(location));
 #endif
-                    return package;
-                }
-
-
-                var info = package.GetAssetInfo(location);
-                if (info is null) throw new SystemException($"无法获取资源信息 {location}");
-
-                var operation = CreateDownloaderOperation(package, info);
-                await WaitTask(operation, info);
-                if (operation.Status == EOperationStatus.Succeed)
-                {
-                    AddSequenceRecord(package, info, operation);
-                    return package;
-                }
-
-                AssetSystem.LogException(
-                    $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
-                return null;
+                return package;
             }
 
             AssetSystem.LogException($"资源查找失败 [auto : {location}]");
@@ -359,15 +356,12 @@ namespace AIO.UEngine.YooAsset
 
                 var operation = CreateDownloaderOperation(package, info);
                 await WaitTask(operation, info);
-                if (operation.Status == EOperationStatus.Succeed)
+                if (operation.Status != EOperationStatus.Succeed)
                 {
-                    AddSequenceRecord(package, info, operation);
-                    return package;
+                    AssetSystem.LogException(
+                        $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                    return null;
                 }
-
-                AssetSystem.LogException(
-                    $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
-                return null;
             }
 #if UNITY_EDITOR
             AddSequenceRecord(package, package.GetAssetInfo(location));
