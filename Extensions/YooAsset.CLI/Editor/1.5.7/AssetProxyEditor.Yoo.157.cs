@@ -51,9 +51,9 @@ namespace AIO.UEditor.CLI
         /// Tips:
         /// 需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        public async Task UploadGCloud(ASUploadGCloudConfig config)
+        public Task UploadGCloud(ASUploadGCloudConfig config)
         {
-            await UploadGCloudAsync(config);
+            return UploadGCloudAsync(config);
         }
 
         protected class MonoImporter
