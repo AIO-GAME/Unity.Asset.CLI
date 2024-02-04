@@ -212,7 +212,7 @@ namespace AIO.UEditor.CLI
                 {
                     if (group.Collectors is null) continue;
                     foreach (var collector in group.Collectors
-                                 .Where(item => item.CollectorType == ECollectorType.MainAssetCollector)
+                                 // .Where(item => item.CollectorType == ECollectorType.MainAssetCollector)
                                  .Where(item => !recordGroup.Collectors.Exists(match =>
                                      match.CollectorGUID == item.CollectorGUID)))
                     {
@@ -220,7 +220,7 @@ namespace AIO.UEditor.CLI
                         {
                             CollectorGUID = collector.CollectorGUID,
                             CollectPath = collector.CollectPath,
-                            CollectorType = ECollectorType.MainAssetCollector,
+                            CollectorType = collector.CollectorType,
                             AssetTags = collector.AssetTags,
                             AddressRuleName = nameof(AIOAddressRecordRule),
                             FilterRuleName = nameof(AIOFilterRecordRule),

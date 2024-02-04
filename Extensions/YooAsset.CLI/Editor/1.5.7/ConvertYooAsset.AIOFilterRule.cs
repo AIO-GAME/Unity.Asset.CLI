@@ -36,10 +36,6 @@ namespace AIO.UEditor.CLI
                     ?.GetGroup(info.Item2)
                     ?.GetCollector(data.CollectPath);
                 if (collector is null) return false;
-                if (collector.FullPath.Contains("Roguelike/Sprite"))
-                {
-                    Debug.Log(collector.FullPath);
-                }
 
                 var mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : ASConfig.GetOrCreate().ASMode;
                 if (mode == EASMode.Editor &&
@@ -67,9 +63,9 @@ namespace AIO.UEditor.CLI
                     Extension = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
                 };
                 infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
-                if (collector.IsCollectAsset(infoData))
-                    return Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1);
-                return false;
+                if (infoData.Extension.EndsWith("shadervariants")) return true;
+                return collector.IsCollectAsset(infoData) &&
+                       Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1);
             }
         }
 
