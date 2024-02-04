@@ -64,30 +64,25 @@ namespace AIO
             /// </summary>
             public void UpdateLocal()
             {
-                if (File.Exists(LOCAL_PATH))
+                Records = new List<SequenceRecord>();
+                if (!File.Exists(LOCAL_PATH)) return;
+                var temp = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
+                if (temp == null) return;
+                if (temp.Count <= 0) return;
+                var dic = new Dictionary<string, SequenceRecord>();
+                foreach (var item in temp)
                 {
-                    var temp = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
-                    Records = new List<SequenceRecord>();
-                    if (temp == null) return;
-                    var dic = new Dictionary<string, SequenceRecord>();
-                    if (temp.Count > 0)
+                    if (string.IsNullOrEmpty(item.GUID))
                     {
-                        foreach (var item in temp)
-                        {
-                            if (string.IsNullOrEmpty(item.GUID))
-                            {
-                                if (string.IsNullOrEmpty(item.AssetPath)) continue;
-                                item.GUID = AssetDatabase.AssetPathToGUID(item.AssetPath);
-                            }
-
-                            if (string.IsNullOrEmpty(item.GUID)) continue;
-                            dic[item.GUID] = item;
-                        }
-
-                        Records.AddRange(dic.Values);
+                        if (string.IsNullOrEmpty(item.AssetPath)) continue;
+                        item.GUID = AssetDatabase.AssetPathToGUID(item.AssetPath);
                     }
+
+                    if (string.IsNullOrEmpty(item.GUID)) continue;
+                    dic[item.GUID] = item;
                 }
-                else Records = new List<SequenceRecord>();
+
+                Records.AddRange(dic.Values);
             }
 
             /// <summary>

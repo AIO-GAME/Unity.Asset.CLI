@@ -657,15 +657,12 @@ namespace AIO.UEditor
                 width = rect2.x - 10
             };
 
-            GUI.Box(rect, "", GEStyle.ProjectBrowserHeaderBgMiddle);
-
-            if (Config.EnableSequenceRecord &&
-                WindowMode != Mode.LookFirstPackage &&
-                Config.SequenceRecord.ContainsGUID(data.GUID))
-                EditorGUI.DrawRect(rect, ROW_FP_COLOR);
-            else OnDrawShading(rect);
-
             if (CurrentSelectAssetIndex == index) GUI.Box(rect, "", GEStyle.SelectionRect);
+            else
+            {
+                GUI.Box(rect, "", GEStyle.ProjectBrowserHeaderBgMiddle);
+                OnDrawShading(rect);
+            }
 
             EditorGUIUtility.SetIconSize(new Vector2(rect.height - 4, rect.height - 4));
             var content = EditorGUIUtility.ObjectContent(AssetDatabase.LoadMainAssetAtPath(data.AssetPath), null);
@@ -675,6 +672,42 @@ namespace AIO.UEditor
 
             EditorGUI.LabelField(rect3, data.SizeStr, EditorStyles.label);
             EditorGUI.LabelField(rect4, data.GetLatestTime(), EditorStyles.label);
+
+            if (Config.EnableSequenceRecord && WindowMode != Mode.LookFirstPackage)
+            {
+                var rect5 = new Rect(rect)
+                {
+                    width = 22,
+                    x = rect.width - 22
+                };
+                if (Config.SequenceRecord.ContainsGUID(data.GUID))
+                {
+                    if (GUI.Button(rect5, GC_FP_Cancel, GEStyle.TEtoolbarbutton))
+                    {
+                        Config.SequenceRecord.UpdateLocal();
+                        Config.SequenceRecord.RemoveAssetPath(data.AssetPath);
+                        Config.SequenceRecord.Save();
+                        // UpdatePageValuesFirstPackageMode();
+                    }
+                }
+                else
+                {
+                    if (GUI.Button(rect5, GC_FP_OK, GEStyle.TEtoolbarbutton))
+                    {
+                        Config.SequenceRecord.Add(new AssetSystem.SequenceRecord
+                        {
+                            GUID = data.GUID,
+                            AssetPath = data.AssetPath,
+                            Location = data.Address,
+                            PackageName = data.Package,
+                            Bytes = data.Size,
+                            Count = 1,
+                            Time = DateTime.MinValue
+                        });
+                        Config.SequenceRecord.Save();
+                    }
+                }
+            }
 
             var currentEvent = Event.current;
             if (currentEvent.isMouse && rect.Contains(currentEvent.mousePosition))

@@ -11,6 +11,16 @@ namespace AIO.UEditor
     public partial class AssetCollectWindow
     {
         /// <summary>
+        /// 界面内容 - 首包 确定
+        /// </summary>
+        private GUIContent GC_FP_OK;
+
+        /// <summary>
+        /// 界面内容 - 首包 取消
+        /// </summary>
+        private GUIContent GC_FP_Cancel;
+
+        /// <summary>
         /// 界面内容 - 添加
         /// </summary>
         private GUIContent GC_ADD;
@@ -99,7 +109,7 @@ namespace AIO.UEditor
         /// 界面内容 - 报告
         /// </summary>
         private GUIContent GC_REPORT;
-        
+
         /// <summary>
         /// 选择指定配置
         /// </summary>
@@ -146,6 +156,8 @@ namespace AIO.UEditor
             GC_LookMode_Page_MaxRight = GEContent.NewSettingCustom("Editor/Icon/Arrows/Arrow_Right_Bar", "跳转到最后一页");
             GC_LookMode_Page_Right = GEContent.NewSettingCustom("Editor/Icon/Arrows/Arrow_Big_Right", "下一页");
             GC_LookMode_Page_Size = GEContent.NewSettingCustom("Editor/Setting/icon_setting_2", "设置页面大小");
+            GC_FP_OK = GEContent.NewSettingCustom("Editor/Icon/Setting/add-to-list", "添加进入首包列表");
+            GC_FP_Cancel = GEContent.NewSettingCustom("Editor/Icon/Setting/cancel", "从首包列表删除");
 
             GC_LookMode_Detail_Tags = new GUIContent("Tags", "资源标签");
             GC_LookMode_Detail_GUID = new GUIContent("GUID", "资源GUID");
