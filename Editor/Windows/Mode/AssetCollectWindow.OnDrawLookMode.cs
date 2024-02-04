@@ -619,6 +619,9 @@ namespace AIO.UEditor
             }
         }
 
+        // #D6EAF8 
+        private static readonly Color ROW_FP_COLOR = new Color(0.839f, 0.918f, 0.973f, 0.1f);
+
         /// <summary>
         /// 绘制资源展示面板
         /// </summary>
@@ -655,7 +658,12 @@ namespace AIO.UEditor
             };
 
             GUI.Box(rect, "", GEStyle.ProjectBrowserHeaderBgMiddle);
-            OnDrawShading(rect);
+
+            if (Config.EnableSequenceRecord &&
+                WindowMode != Mode.LookFirstPackage &&
+                Config.SequenceRecord.ContainsGUID(data.GUID))
+                EditorGUI.DrawRect(rect, ROW_FP_COLOR);
+            else OnDrawShading(rect);
 
             if (CurrentSelectAssetIndex == index) GUI.Box(rect, "", GEStyle.SelectionRect);
 
