@@ -678,7 +678,7 @@ namespace AIO.UEditor
                 var rect5 = new Rect(rect)
                 {
                     width = 22,
-                    x = rect.width - 22
+                    x = rect.width - 20
                 };
                 if (Config.SequenceRecord.ContainsGUID(data.GUID))
                 {
