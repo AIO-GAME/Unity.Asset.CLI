@@ -169,9 +169,7 @@ namespace AIO.UEngine
                 yield break;
             }
 
-            var remote = Path.Combine(config.URL, "Version",
-                string.Concat(AssetSystem.PlatformNameStr, ".json?t=", DateTime.Now.Ticks));
-
+            var remote = $"{config.URL}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
             var content = string.Empty;
             yield return AssetSystem.NetLoadStringCO(remote, data => { content = data; });
             if (string.IsNullOrEmpty(content))

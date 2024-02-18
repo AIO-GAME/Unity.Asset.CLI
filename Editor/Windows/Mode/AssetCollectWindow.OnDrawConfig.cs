@@ -138,11 +138,6 @@ namespace AIO.UEditor
             {
                 GELayout.Label("加载模式", GP_Width_150);
                 Config.ASMode = GELayout.Popup(Config.ASMode, GEStyle.PreDropDown);
-                if (GUI.changed)
-                {
-                    if (Config.ASMode == EASMode.Editor) UpdateDataConfigMode();
-                }
-
                 if (GELayout.Button("Clean Cache", GEStyle.toolbarbuttonRight, GP_Width_100))
                 {
                     var sandbox = Path.Combine(EHelper.Path.Project, Config.RuntimeRootDirectory);

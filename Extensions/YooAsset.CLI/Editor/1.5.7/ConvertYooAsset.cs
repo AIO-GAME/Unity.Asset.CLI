@@ -224,7 +224,7 @@ namespace AIO.UEditor.CLI
                             AssetTags = collector.AssetTags,
                             AddressRuleName = nameof(AIOAddressRecordRule),
                             FilterRuleName = nameof(AIOFilterRecordRule),
-                            PackRuleName = nameof(PackGroup),
+                            PackRuleName = nameof(PackCollector),
                             UserData = group.GroupName,
                         });
                     }
