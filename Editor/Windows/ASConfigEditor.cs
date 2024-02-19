@@ -162,16 +162,6 @@ namespace AIO.UEditor
                 };
             }
 
-            if (Target.EnableSequenceRecord)
-            {
-                Target.Packages = Target.Packages.Insert(0, new AssetsPackageConfig
-                {
-                    Name = AssetSystem.TagsRecord,
-                    Version = "-.-.-",
-                    IsDefault = true
-                });
-            }
-
             Target.Packages[0].IsDefault = true;
         }
     }
