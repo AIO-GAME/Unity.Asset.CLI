@@ -188,7 +188,7 @@ namespace AIO.UEngine
                 if (!item.IsLatest) continue;
 
                 var temp =
-                    $"{AssetSystem.Parameter.URL}/{item.Name}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
+                    $"{AssetSystem.Parameter.URL}/{AssetSystem.PlatformNameStr}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
                 yield return AssetSystem.NetLoadStringCO(temp, data =>
                 {
                     if (string.IsNullOrEmpty(data))
