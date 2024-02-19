@@ -2,7 +2,7 @@
   "name": "com.aio.cli.asset",
   "displayName": "AIO Unity CLI Asset",
   "description": "AIO Unity CLI Asset",
-  "version": "1.0.35-preview",
+  "version": "1.0.37-preview",
   "unity": "2019.4",
   "unityRelease": "0f1",
   "license": "MIT",
@@ -22,7 +22,7 @@
   "keywords": ["Asset", "YooAsset", "Unity Asset", "Resource"],
   "author": {
     "name": "AIO-GAME",
-    "email": "xinansky99@foxmail.com",
+    "email": "xinansky99@gamil.com",
     "url": "https://github.com/AIO-GAME"
   },
   "dependencies": {

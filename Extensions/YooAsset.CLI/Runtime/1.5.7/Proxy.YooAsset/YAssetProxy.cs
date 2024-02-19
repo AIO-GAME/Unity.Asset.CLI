@@ -187,14 +187,14 @@ namespace AIO.UEngine
                 item.IsLatest = item.Version == "Latest";
                 if (!item.IsLatest) continue;
 
-                var temp =
-                    $"{AssetSystem.Parameter.URL}/{item.Name}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
-                yield return AssetSystem.NetLoadStringCO(temp, data =>
+                var url =
+                    $"{AssetSystem.Parameter.URL}/{AssetSystem.PlatformNameStr}/{item.Name}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
+                yield return AssetSystem.NetLoadStringCO(url, data =>
                 {
                     if (string.IsNullOrEmpty(data))
                     {
                         AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionRequestFailure);
-                        AssetSystem.LogError($"{temp} Request failed");
+                        AssetSystem.LogError($"{url} Request failed");
                         return;
                     }
 
