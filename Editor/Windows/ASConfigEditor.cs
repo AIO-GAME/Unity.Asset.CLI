@@ -141,7 +141,7 @@ namespace AIO.UEditor
 
         private void UpdateRecordQueue()
         {
-            if (Target is null) return;
+            if (Target.Equals(null)) return;
             if (Target.SequenceRecord is null) return;
             // 如果在编辑器下存在本地记录则加载
             if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH)) Target.SequenceRecord.UpdateLocal();
@@ -150,14 +150,14 @@ namespace AIO.UEditor
 
         private void Update()
         {
-            var Data = AssetCollectRoot.GetOrCreate();
-            if (Data.Packages.Length == 0) return;
-            Target.Packages = new AssetsPackageConfig[Data.Packages.Length];
-            for (var index = 0; index < Data.Packages.Length; index++)
+            var Data = AssetCollectRoot.GetOrCreate().GetPackageNames();
+            if (Data.Length == 0) return;
+            Target.Packages = new AssetsPackageConfig[Data.Length];
+            for (var index = 0; index < Data.Length; index++)
             {
                 Target.Packages[index] = new AssetsPackageConfig
                 {
-                    Name = Data.Packages[index].Name,
+                    Name = Data[index],
                     Version = "-.-.-",
                 };
             }

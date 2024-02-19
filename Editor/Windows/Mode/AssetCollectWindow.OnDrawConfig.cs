@@ -58,15 +58,6 @@ namespace AIO.UEditor
                 };
             }
 
-            if (Config.Packages.All(item => item.Name != AssetSystem.TagsRecord))
-            {
-                Config.Packages = Config.Packages.Insert(0, new AssetsPackageConfig
-                {
-                    Name = AssetSystem.TagsRecord,
-                    Version = "-.-.-",
-                });
-            }
-
             if (Config.Packages.Length == 0) return;
             Config.Packages[0].IsDefault = true;
         }

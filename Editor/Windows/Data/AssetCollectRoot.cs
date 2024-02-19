@@ -210,7 +210,7 @@ namespace AIO.UEditor
         
         public string[] GetPackageNames()
         {
-            return Packages.Select(package => package.Name).ToArray();
+            return Packages?.Select(package => package.Name).ToArray();
         }
 
         public void Save()
