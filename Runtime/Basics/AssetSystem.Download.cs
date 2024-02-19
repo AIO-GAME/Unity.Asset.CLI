@@ -59,7 +59,6 @@ namespace AIO
             {
                 using (var handle = Proxy.GetDownloader(dEvent))
                 {
-                    yield return handle.UpdateHeader();
                     handle.Begin();
                     handle.CollectNeedTag(enumerable);
                     yield return handle.WaitCo();
@@ -79,7 +78,6 @@ namespace AIO
             {
                 using (var handle = Proxy.GetDownloader(dEvent))
                 {
-                    yield return handle.UpdateHeader();
                     handle.Begin();
                     handle.CollectNeedTag(tags.ToArray());
                     yield return handle.WaitCo();
@@ -102,7 +100,6 @@ namespace AIO
             {
                 using (var handle = Proxy.GetDownloader(dEvent))
                 {
-                    yield return handle.UpdateHeader();
                     handle.Begin();
                     handle.CollectNeedTag(TagsRecord);
                     yield return handle.WaitCo();
@@ -119,18 +116,17 @@ namespace AIO
         /// 预下载全部远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator DownloadAll(DownlandAssetEvent dEvent = default)
+        public static IEnumerator DownloadAll(DownlandAssetEvent aevent = default)
         {
             if (Parameter.ASMode != EASMode.Remote)
             {
                 WhiteAll = true;
-                dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
+                aevent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
                 yield break;
             }
 
-            using (var handle = Proxy.GetDownloader(dEvent))
+            using (var handle = Proxy.GetDownloader(aevent))
             {
-                yield return handle.UpdateHeader();
                 handle.Begin();
                 handle.CollectNeedAll();
                 yield return handle.WaitCo();
@@ -151,7 +147,8 @@ namespace AIO
 
             using (var handle = Proxy.GetDownloader(dEvent))
             {
-                yield return handle.UpdateHeader();
+                handle.Begin();
+                yield return handle.WaitCo();
             }
         }
     }

@@ -18,11 +18,6 @@ namespace AIO
             Event = dEvent;
         }
 
-        public IEnumerator UpdateHeader()
-        {
-            yield break;
-        }
-
         public void CollectNeedAll()
         {
             AssetSystem.WhiteAll = true;

@@ -8,7 +8,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine.YooAsset;
@@ -115,7 +114,7 @@ namespace AIO.UEngine
             {
                 Packages = null;
                 VersionOperations = null;
-                Tags = null;
+                DownloadTags = null;
                 ManifestOperations = null;
                 PreDownloadContentOperations = null;
                 ResourceDownloaderOperations = null;
@@ -144,28 +143,35 @@ namespace AIO.UEngine
 
             protected override void OnBegin()
             {
-                Tags.Clear();
+                DownloadTags.Clear();
+                DownloadAll = false;
                 PreDownloadContentOperations.Clear();
                 ResourceDownloaderOperations.Clear();
             }
 
             /// <summary>
+            /// 头信息是否已经请求
+            /// </summary>
+            private bool RequestedHeader;
+
+            /// <summary>
             /// 更新资源包头信息
             /// </summary>
-            public IEnumerator UpdateHeader()
+            private IEnumerator UpdateHeaderCo()
             {
+                if (RequestedHeader) yield break;
+
                 if (!Flow) yield break;
                 UpdatePackageManifestBegin(); // 向网络端请求并更新补丁清单
-                foreach (var pair in ManifestOperations) yield return pair.Value;
+                foreach (var operation in ManifestOperations.Values.ToArray()) yield return operation;
                 UpdatePackageManifestEnd();
 
                 if (!Flow) yield break; // 异步向网络端请求最新的资源版本
                 UpdatePackageVersionBegin();
-                foreach (var pair in VersionOperations) yield return pair.Value;
+                foreach (var operation in VersionOperations.Values.ToArray()) yield return operation;
                 UpdatePackageVersionEnd();
 
                 if (!Flow) yield break;
-
                 foreach (var pair in PreDownloadContentOperations)
                 {
                     yield return pair.Value;
@@ -182,6 +188,46 @@ namespace AIO.UEngine
                     Event.OnError.Invoke(ex);
                     yield break;
                 }
+
+                RequestedHeader = true;
+            }
+
+            /// <summary>
+            /// 更新资源包头信息
+            /// </summary>
+            private async Task UpdateHeaderTask()
+            {
+                if (RequestedHeader) return;
+
+                if (!Flow) return;
+                UpdatePackageManifestBegin(); // 向网络端请求并更新补丁清单
+                foreach (var operation in ManifestOperations.Values.ToArray()) await operation.Task;
+                UpdatePackageManifestEnd();
+
+                if (!Flow) return;
+                UpdatePackageVersionBegin(); // 异步向网络端请求最新的资源版本
+                foreach (var operation in VersionOperations.Values.ToArray()) await operation.Task;
+                UpdatePackageVersionEnd();
+
+                if (!Flow) return;
+                foreach (var pair in PreDownloadContentOperations)
+                {
+                    await pair.Value.Task;
+                    if (pair.Value.Status == EOperationStatus.Succeed)
+                    {
+                        Packages.Remove(pair.Key);
+                        continue;
+                    }
+
+                    State = EProgressState.Fail;
+                    AssetSystem.LogException("校验本地资源完整性失败");
+                    var ex = new SystemException($"[{pair.Key} -> {pair.Value.Error}]");
+                    if (Event.OnError is null) throw ex;
+                    Event.OnError.Invoke(ex);
+                    return;
+                }
+
+                RequestedHeader = true;
             }
 
             private void UpdatePackageVersionBegin()
@@ -201,140 +247,136 @@ namespace AIO.UEngine
                     switch (pair.Value.Status)
                     {
                         case EOperationStatus.Succeed: // 本地版本与网络版本不一致
-                            var version = asset.Config.Version;
-                            if (version != pair.Value.PackageVersion)
-                                asset.Config.Version = pair.Value.PackageVersion; // 更新本地版本
+                            if (asset.Config.Version.Equals(pair.Value.PackageVersion)) continue;
+                            asset.Config.Version = pair.Value.PackageVersion; // 更新本地版本
                             break;
                         default:
                             // 如果获取远端资源版本失败，说明当前网络无连接。
                             // 在正常开始游戏之前，需要验证本地清单内容的完整性。
-                            var packageVersion = asset.GetPackageVersion();
-                            var operation = asset.PreDownloadContentAsync(packageVersion);
-                            PreDownloadContentOperations.Add(pair.Key, operation);
+                            if (PreDownloadContentOperations.ContainsKey(pair.Key)) continue;
+                            var operation = asset.PreDownloadContentAsync(asset.GetPackageVersion());
+                            PreDownloadContentOperations[pair.Key] = operation;
                             break;
                     }
                 }
-            }
-
-            #endregion
-
-            #region DownloadAll
-
-            public void CollectNeedAll()
-            {
-                if (!Flow) return;
-                foreach (var name in ManifestOperations.Keys)
-                {
-                    if (!Packages.TryGetValue(name, out var asset)) continue;
-                    var operation = asset.CreateResourceDownloader();
-                    if (operation is null) continue;
-                    if (operation.TotalDownloadCount <= 0) continue;
-                    ResourceDownloaderOperations[string.Concat("ALL-", name, '-', DateTime.Now.Ticks)] = operation;
-                }
-
-                OpenDownloadAll = true;
             }
 
             #endregion
 
             #region Download
 
-            private Dictionary<string, byte> Tags = new Dictionary<string, byte>();
-            private bool OpenDownloadAll;
+            private List<string> DownloadTags = new List<string>();
+            private bool DownloadAll;
 
-            /// <summary>
-            /// 创建补丁下载器
-            /// </summary>
-            private void CollectNeedTagBegin(params string[] tags)
+            public void CollectNeedAll()
             {
-                if (tags is null || tags.Length == 0) return;
-                foreach (var name in ManifestOperations.Keys)
-                {
-                    if (!Packages.TryGetValue(name, out var asset)) continue;
-                    Tags[name] = 1;
-                    var operation =
-                        asset.CreateBundleDownloader(asset.GetAssetInfos(tags)); // 此处暂默认 YooAsset 处理了重复资源的问题
-                    if (operation is null) continue;
-                    if (operation.TotalDownloadCount <= 0) continue;
-                    ResourceDownloaderOperations[string.Concat("Tag-", name, '-', DateTime.Now.Ticks)] = operation;
-                }
+                DownloadAll = true;
             }
 
             public void CollectNeedTag(params string[] tags)
             {
-                CollectNeedTagBegin(tags.ToArray());
+                foreach (var item in tags) DownloadTags.Add(item);
+            }
+
+            /// <summary>
+            /// 创建补丁下载器
+            /// </summary>
+            private void CollectNeedBegin()
+            {
+                ResourceDownloaderOperations.Clear();
+                if (DownloadAll)
+                {
+                    foreach (var name in ManifestOperations.Keys)
+                    {
+                        if (!Packages.TryGetValue(name, out var asset)) continue;
+                        var key = string.Concat("ALL-", name);
+                        // if (ResourceDownloaderOperations.ContainsKey(key)) continue;
+                        var operation = asset.CreateResourceDownloader();
+                        if (operation is null) continue;
+                        if (operation.TotalDownloadBytes <= 0) continue;
+                        ResourceDownloaderOperations[key] = operation;
+                    }
+                }
+                else
+                {
+                    if (DownloadTags is null || DownloadTags.Count == 0) return;
+                    var tags = DownloadTags.ToArray();
+                    foreach (var name in ManifestOperations.Keys)
+                    {
+                        if (!Packages.TryGetValue(name, out var asset)) continue;
+                        var key = string.Concat("Tag-", name);
+                        // if (ResourceDownloaderOperations.ContainsKey(key)) continue;
+                        var operation = asset.CreateBundleDownloader(asset.GetAssetInfos(tags));
+                        if (operation is null) continue;
+                        if (operation.TotalDownloadBytes <= 0) continue;
+                        ResourceDownloaderOperations[key] = operation;
+                    }
+                }
             }
 
             #endregion
 
             private Dictionary<string, long> CurrentValueDict = new Dictionary<string, long>();
             private Dictionary<string, long> TotalValueDict = new Dictionary<string, long>();
+            private Dictionary<string, int> CurrentCountDict = new Dictionary<string, int>();
+            private Dictionary<string, int> TotalCountDict = new Dictionary<string, int>();
+            private Dictionary<string, long> DownloadedFiles = new Dictionary<string, long>();
 
-            protected override async Task OnWaitAsync()
+            private bool OnWaitBegin()
             {
                 CurrentValueDict.Clear();
                 TotalValueDict.Clear();
 
+                TotalValueDict[nameof(DownloadedFiles)] = DownloadedFiles.Sum(pair => pair.Value);
+                CurrentValueDict[nameof(DownloadedFiles)] = TotalValueDict[nameof(DownloadedFiles)];
+
+                TotalCountDict[nameof(DownloadedFiles)] = DownloadedFiles.Count;
+                CurrentCountDict[nameof(DownloadedFiles)] = TotalCountDict[nameof(DownloadedFiles)];
+                
                 foreach (var pair in ResourceDownloaderOperations)
                 {
-                    CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
                     TotalValueDict[pair.Key] = pair.Value.TotalDownloadBytes;
+                    TotalCountDict[pair.Key] = pair.Value.TotalDownloadCount;
+
+                    CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
+                    CurrentCountDict[pair.Key] = pair.Value.CurrentDownloadCount;
                 }
 
                 TotalValue = TotalValueDict.Sum(pair => pair.Value);
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
+                
                 var endValue = TotalValue - CurrentValue;
-                if (AssetSystem.GetAvailableDiskSpace() < endValue) // 检查磁盘空间是否足够
+                var diskSpace = AssetSystem.GetAvailableDiskSpace();
+                if (diskSpace < endValue) // 检查磁盘空间是否足够
                 {
                     State = EProgressState.Fail;
-
                     if (OnDiskSpaceNotEnough is null)
-                        throw new IOException(
-                            $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
-
-                    OnDiskSpaceNotEnough.Invoke(Report);
+                        throw new SystemException(
+                            $"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
                     AssetSystem.LogException(
-                        $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
-                    return;
+                        $"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
+                    OnDiskSpaceNotEnough.Invoke(Report);
+                    return false;
                 }
 
-                foreach (var pair in ResourceDownloaderOperations)
+                foreach (var pair in ResourceDownloaderOperations.ToArray().Where(pair =>
+                             pair.Value.Status != EOperationStatus.Succeed))
                 {
-                    CurrentInfo = $"Resource Download -> [{pair.Key}]";
-                    while (State != EProgressState.Running)
-                    {
-                        switch (State)
-                        {
-                            case EProgressState.Finish:
-                            case EProgressState.Fail:
-                                return;
-                            case EProgressState.Cancel:
-                                if (Event.OnError is null) throw new TaskCanceledException();
-                                Event.OnError.Invoke(new TaskCanceledException());
-                                return;
-                            case EProgressState.Pause:
-                                await Task.Delay(100);
-                                return;
-                        }
-                    }
-
+                    pair.Value.OnStartDownloadFileCallback = OnStartDownloadFileCallback;
                     pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
                     pair.Value.OnDownloadErrorCallback = OnDownloadError;
-                    pair.Value.BeginDownload();
-                    await pair.Value.Task;
-                    if (pair.Value.Status == EOperationStatus.Succeed) continue;
-                    State = EProgressState.Fail;
-                    return;
+                    continue;
 
-                    void OnUpdateProgress(int _, int __, long totalDownloadBytes, long currentDownloadBytes)
+                    void OnUpdateProgress(
+                        int totalDownloadCount, int currentDownloadCount,
+                        long totalDownloadBytes, long currentDownloadBytes)
                     {
                         if (State != EProgressState.Running) return;
                         switch (Application.internetReachability)
                         {
-                            default:
                             case NetworkReachability.NotReachable:
-                                OnNetReachableNot?.Invoke(Report);
                                 Pause();
+                                OnNetReachableNot?.Invoke(Report);
                                 return;
                             case NetworkReachability.ReachableViaCarrierDataNetwork:
                                 if (AllowReachableCarrier) break;
@@ -345,52 +387,81 @@ namespace AIO.UEngine
                                     Resume();
                                 });
                                 break;
-                            case NetworkReachability.ReachableViaLocalAreaNetwork:
-                                break;
                         }
 
-                        TotalValueDict[pair.Key] = totalDownloadBytes;
+                        TotalValueDict[pair.Key] = pair.Value.TotalDownloadBytes;
+                        TotalCountDict[pair.Key] = pair.Value.TotalDownloadCount;
+
+                        CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
+                        CurrentCountDict[pair.Key] = pair.Value.CurrentDownloadCount;
+
                         TotalValue = TotalValueDict.Sum(item => item.Value);
-                        CurrentValueDict[pair.Key] = currentDownloadBytes;
                         CurrentValue = CurrentValueDict.Sum(item => item.Value);
                     }
                 }
 
+                return true;
+            }
+
+            protected override async Task OnWaitAsync()
+            {
+                Debug.Log("OnWaitAsync");
+                await UpdateHeaderTask();
+                CollectNeedBegin();
+                if (!OnWaitBegin())
+                {
+                    State = EProgressState.Fail;
+                    return;
+                }
+
+                foreach (var operation in ResourceDownloaderOperations.Values.ToArray().Where(operation =>
+                             !operation.IsDone || operation.Status != EOperationStatus.Succeed))
+                {
+                    while (State != EProgressState.Running)
+                    {
+                        switch (State)
+                        {
+                            case EProgressState.Finish:
+                            case EProgressState.Fail:
+                                return;
+                            case EProgressState.Cancel:
+                                CurrentInfo = "Resource download : Cancel";
+                                if (Event.OnError is null) throw new TaskCanceledException();
+                                Event.OnError.Invoke(new TaskCanceledException());
+                                return;
+                            case EProgressState.Pause:
+                                CurrentInfo = "Resource download : Pause";
+                                await Task.Delay(100);
+                                break;
+                        }
+                    }
+
+                    operation.BeginDownload();
+                    await operation.Task;
+                    if (operation.Status == EOperationStatus.Succeed) continue;
+                    State = EProgressState.Fail;
+                    return;
+                }
+
                 State = EProgressState.Finish;
 
-                if (OpenDownloadAll) AssetSystem.WhiteAll = true;
-                else if (Tags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
+                if (DownloadAll) AssetSystem.WhiteAll = true;
+                else if (DownloadTags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAssetInfos(DownloadTags));
             }
 
             protected override IEnumerator OnWaitCo()
             {
-                CurrentValueDict.Clear();
-                TotalValueDict.Clear();
-
-                foreach (var pair in ResourceDownloaderOperations)
-                {
-                    TotalValueDict[pair.Key] = pair.Value.TotalDownloadBytes;
-                    CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
-                }
-
-                TotalValue = TotalValueDict.Sum(pair => pair.Value);
-                CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
-                var endValue = TotalValue - CurrentValue;
-                if (AssetSystem.GetAvailableDiskSpace() < endValue) // 检查磁盘空间是否足够
+                yield return UpdateHeaderCo();
+                CollectNeedBegin();
+                if (!OnWaitBegin())
                 {
                     State = EProgressState.Fail;
-                    if (OnDiskSpaceNotEnough is null)
-                        throw new SystemException(
-                            $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
-                    AssetSystem.LogException(
-                        $"Out of disk space : {AssetSystem.GetAvailableDiskSpace().ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
-                    OnDiskSpaceNotEnough.Invoke(Report);
                     yield break;
                 }
 
-                foreach (var pair in ResourceDownloaderOperations)
+                foreach (var operation in ResourceDownloaderOperations.Values.ToArray().Where(operation =>
+                             !operation.IsDone || operation.Status != EOperationStatus.Succeed))
                 {
-                    CurrentInfo = $"Resource download : [{pair.Key}]";
                     while (State != EProgressState.Running)
                     {
                         switch (State)
@@ -399,62 +470,39 @@ namespace AIO.UEngine
                             case EProgressState.Fail:
                                 yield break;
                             case EProgressState.Cancel:
+                                CurrentInfo = "Resource download : Cancel";
                                 if (Event.OnError is null) throw new TaskCanceledException();
                                 Event.OnError.Invoke(new TaskCanceledException());
                                 yield break;
                             case EProgressState.Pause:
+                                CurrentInfo = "Resource download : Pause";
                                 yield return new WaitForSeconds(0.1f);
                                 break;
                         }
                     }
 
-                    pair.Value.OnDownloadProgressCallback = OnUpdateProgress;
-                    pair.Value.OnDownloadErrorCallback = OnDownloadError;
-                    pair.Value.BeginDownload();
-                    yield return pair.Value;
+                    operation.BeginDownload();
+                    yield return operation;
 
-                    if (pair.Value.Status == EOperationStatus.Succeed) continue;
-
+                    if (operation.Status == EOperationStatus.Succeed) continue;
                     State = EProgressState.Fail;
                     yield break;
-
-                    void OnUpdateProgress(int _, int __, long totalDownloadBytes, long currentDownloadBytes)
-                    {
-                        if (State != EProgressState.Running) return;
-                        switch (Application.internetReachability)
-                        {
-                            default:
-                            case NetworkReachability.NotReachable:
-                                OnNetReachableNot?.Invoke(Report);
-                                Pause();
-                                return;
-                            case NetworkReachability.ReachableViaCarrierDataNetwork:
-                                if (AllowReachableCarrier) break;
-                                Pause();
-                                OnNetReachableCarrier?.Invoke(Report, () =>
-                                {
-                                    AllowReachableCarrier = true;
-                                    Resume();
-                                });
-                                break;
-                            case NetworkReachability.ReachableViaLocalAreaNetwork:
-                                break;
-                        }
-
-                        TotalValueDict[pair.Key] = totalDownloadBytes;
-                        TotalValue = TotalValueDict.Sum(item => item.Value);
-                        CurrentValueDict[pair.Key] = currentDownloadBytes;
-                        CurrentValue = CurrentValueDict.Sum(item => item.Value);
-                    }
                 }
 
                 State = EProgressState.Finish;
-                if (OpenDownloadAll) AssetSystem.WhiteAll = true;
-                else if (Tags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAssetInfos(Tags.Keys));
+                if (DownloadAll) AssetSystem.WhiteAll = true;
+                else if (DownloadTags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAssetInfos(DownloadTags));
+            }
+
+            private void OnStartDownloadFileCallback(string filename, long sizeBytes)
+            {
+                DownloadedFiles[filename] = sizeBytes;
+                CurrentInfo = $"Resource download : [{filename}:{sizeBytes}]";
             }
 
             private void OnDownloadError(string filename, string error)
             {
+                DownloadedFiles.Remove(filename);
                 var ex = new SystemException($"{filename} : {error}");
                 if (Event.OnError is null) throw ex;
                 Event.OnError.Invoke(ex);

@@ -146,11 +146,6 @@ namespace AIO
         bool Flow { get; }
 
         /// <summary>
-        /// 更新资源包清单
-        /// </summary>
-        IEnumerator UpdateHeader();
-
-        /// <summary>
         /// 收集需要下载的所有资源
         /// </summary>
         void CollectNeedAll();
