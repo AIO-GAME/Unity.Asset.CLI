@@ -7,6 +7,7 @@
 #if SUPPORT_YOOASSET
 using System.IO;
 using AIO.UEngine;
+using UnityEngine;
 using YooAsset.Editor;
 
 namespace AIO.UEditor.CLI
@@ -46,8 +47,24 @@ namespace AIO.UEditor.CLI
         [DisplayName("AIO Asset Address Record Rule")]
         private class AIOAddressRecordRule : IAddressRule
         {
+            private static IAddressRule _rule;
+
+            private static IAddressRule Rule
+            {
+                get
+                {
+                    if (_rule is null)
+                    {
+                        _rule = new AIOAddressRule();
+                    }
+
+                    return _rule;
+                }
+            }
+
             string IAddressRule.GetAssetAddress(AddressRuleData data)
             {
+                if (Application.isPlaying) return Rule.GetAssetAddress(data);
                 if (!data.UserData.Contains('_')) return "Error : Rule mismatch";
                 var info = data.UserData.SplitOnce('_');
                 var collector = Instance.GetPackage(info.Item1)?.GetGroup(info.Item2).GetCollector(data.CollectPath);

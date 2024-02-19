@@ -9,7 +9,6 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using AIO.UEngine.YooAsset;
@@ -129,32 +128,19 @@ namespace AIO.UEngine
                 return;
             }
 
-            var list = (from object item in array
+            var list = (
+                from object item in array
                 where !(item is null)
                 select new AssetsPackageConfig
                 {
                     Name = fieldInfo.GetValue(item) as string,
                     Version = "-.-.-",
-                    IsDefault = false
                 }).ToArray();
 
             if (list.Length <= 0)
             {
                 AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
                 return;
-            }
-
-            if (config.EnableSequenceRecord)
-            {
-                if (list.All(item => item.Name != AssetSystem.TagsRecord))
-                {
-                    list = list.Insert(0, new AssetsPackageConfig
-                    {
-                        Name = AssetSystem.TagsRecord,
-                        Version = "-.-.-",
-                        IsDefault = true
-                    });
-                }
             }
 
             config.Packages = list;
@@ -171,13 +157,11 @@ namespace AIO.UEngine
 
             var remote = $"{config.URL}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
             var content = string.Empty;
-            yield return AssetSystem.NetLoadStringCO(remote, data => { content = data; });
+            yield return AssetSystem.NetLoadStringCO(remote, data => content = data);
             if (string.IsNullOrEmpty(content))
             {
-#if UNITY_EDITOR
-                AssetSystem.LogError($"{remote} Request failed");
-#endif
                 AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionRequestFailure);
+                AssetSystem.LogError($"{remote} Request failed");
                 yield break;
             }
 
@@ -202,17 +186,15 @@ namespace AIO.UEngine
             {
                 item.IsLatest = item.Version == "Latest";
                 if (!item.IsLatest) continue;
-                var temp = Path.Combine(AssetSystem.Parameter.URL,
-                    AssetSystem.PlatformNameStr, item.Name, item.Version,
-                    $"PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}");
+
+                var temp =
+                    $"{AssetSystem.Parameter.URL}/{item.Name}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
                 yield return AssetSystem.NetLoadStringCO(temp, data =>
                 {
                     if (string.IsNullOrEmpty(data))
                     {
                         AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionRequestFailure);
-#if UNITY_EDITOR
                         AssetSystem.LogError($"{temp} Request failed");
-#endif
                         return;
                     }
 
@@ -236,7 +218,7 @@ namespace AIO.UEngine
                     break;
                 case EASMode.Local:
                     config.Packages = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(
-                        Path.Combine(AssetSystem.BuildInRootDirectory, $"Version/{AssetSystem.PlatformNameStr}.json"));
+                        $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
                     if (config.Packages is null)
                         AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
                     break;

@@ -66,7 +66,7 @@ namespace AIO.UEditor.CLI
                 select (IEncryptionServices)Activator.CreateInstance(item)).FirstOrDefault();
         }
 
-        public static void ArtBuild(AssetBuildCommand command)
+        public static BuildResult ArtBuild(AssetBuildCommand command)
         {
             YooAsset.Editor.EBuildPipeline buildPipeline;
             switch (command.BuildPipeline)
@@ -209,22 +209,13 @@ namespace AIO.UEditor.CLI
                     buildParameters.BuildTarget.ToString(),
                     buildParameters.PackageName);
 
-                if (command.MergeToLatest)
-                {
-                    MergeToLatest(output, buildParameters.PackageVersion);
-                }
+                if (command.MergeToLatest) MergeToLatest(output, buildParameters.PackageVersion);
                 else ManifestGenerate(Path.Combine(output, buildParameters.PackageVersion));
-
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
-                else if (!EHelper.IsCMD()) EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
 
                 AssetProxyEditor.CreateConfig(buildParameters.BuildOutputRoot, command.MergeToLatest);
             }
-            else
-            {
-                if (EHelper.IsCMD()) Debug.LogError($"构建失败 {buildResult.ErrorInfo}");
-                else EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
-            }
+ 
+            return buildResult;
         }
 
         private const string Manifest = "Manifest.json";

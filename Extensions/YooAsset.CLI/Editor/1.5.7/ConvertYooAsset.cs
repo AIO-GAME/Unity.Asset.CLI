@@ -221,7 +221,7 @@ namespace AIO.UEditor.CLI
                             CollectorGUID = collector.CollectorGUID,
                             CollectPath = collector.CollectPath,
                             CollectorType = collector.CollectorType,
-                            AssetTags = collector.AssetTags,
+                            AssetTags = string.Concat(group.AssetTags, ',', collector.AssetTags).Trim(','),
                             AddressRuleName = nameof(AIOAddressRecordRule),
                             FilterRuleName = nameof(AIOFilterRecordRule),
                             PackRuleName = nameof(PackCollector),
