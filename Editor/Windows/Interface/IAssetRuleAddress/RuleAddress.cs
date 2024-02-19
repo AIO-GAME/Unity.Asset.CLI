@@ -34,6 +34,8 @@ namespace AIO.UEditor
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
+                if (string.IsNullOrEmpty(data.AssetPath)) throw new ArgumentNullException(nameof(data.AssetPath));
+                if (string.IsNullOrEmpty(data.GroupName)) throw new ArgumentNullException(nameof(data.GroupName));
                 return Path.Combine(Path.GetFileName(data.GroupName), Path.GetFileName(data.AssetPath))
                     .Replace('\\', '/');
             }

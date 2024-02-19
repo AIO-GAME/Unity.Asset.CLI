@@ -4,6 +4,7 @@
 |*|E-Mail:     |*| xinansky99@gmail.com
 |*|============|*/
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AIO.UEditor
@@ -42,8 +43,15 @@ namespace AIO.UEditor
         /// 构建资源
         /// </summary>
         /// <param name="command">构建命令</param>
-        void BuildArt(AssetBuildCommand command);
+        bool BuildArt(AssetBuildCommand command);
 
+        /// <summary>
+        /// 构建资源列表
+        /// </summary>
+        /// <param name="packageNames">包列表</param>
+        /// <param name="command">构建命令</param>
+        bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command);
+        
         /// <summary>
         /// 上传到GCloud
         /// 生成一份清单文件 记录当前文件夹下的所有文件的MD5值

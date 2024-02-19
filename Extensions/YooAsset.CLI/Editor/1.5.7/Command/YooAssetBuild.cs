@@ -60,13 +60,13 @@ namespace AIO.UEditor.CLI
 
         private static IEncryptionServices CreateEncryptionServicesInstance(string EncryptionClassName)
         {
-            if (string.IsNullOrEmpty(EncryptionClassName)) return null;
+            if (string.IsNullOrEmpty(EncryptionClassName)) return new EncryptionNone();
             return (from item in EditorTools.GetAssignableTypes(typeof(IEncryptionServices))
                 where item.FullName == EncryptionClassName
                 select (IEncryptionServices)Activator.CreateInstance(item)).FirstOrDefault();
         }
 
-        public static void ArtBuild(AssetBuildCommand command)
+        public static BuildResult ArtBuild(AssetBuildCommand command)
         {
             YooAsset.Editor.EBuildPipeline buildPipeline;
             switch (command.BuildPipeline)
@@ -188,8 +188,7 @@ namespace AIO.UEditor.CLI
                 ? YooAsset.Editor.ECopyBuildinFileOption.ClearAndCopyByTags
                 : YooAsset.Editor.ECopyBuildinFileOption.None;
 
-            if (!string.IsNullOrEmpty(command.EncyptionClassName))
-                buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
+            buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
 
             if (command.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
             {
@@ -210,23 +209,13 @@ namespace AIO.UEditor.CLI
                     buildParameters.BuildTarget.ToString(),
                     buildParameters.PackageName);
 
-                if (command.MergeToLatest)
-                {
-                    MergeToLatest(output, buildParameters.PackageVersion);
-                }
+                if (command.MergeToLatest) MergeToLatest(output, buildParameters.PackageVersion);
                 else ManifestGenerate(Path.Combine(output, buildParameters.PackageVersion));
 
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
-                else EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
                 AssetProxyEditor.CreateConfig(buildParameters.BuildOutputRoot, command.MergeToLatest);
             }
-            else
-            {
-                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
-                    Debug.LogError($"构建失败 {buildResult.ErrorInfo}");
-                else
-                    EditorUtility.DisplayDialog("构建失败", buildResult.ErrorInfo, "确定");
-            }
+ 
+            return buildResult;
         }
 
         private const string Manifest = "Manifest.json";

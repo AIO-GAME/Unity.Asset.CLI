@@ -5,7 +5,9 @@
 |*|============|*/
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -82,21 +84,8 @@ namespace AIO.UEditor
             await Editor.UploadFtp(config);
         }
 
-        /// <summary>
-        /// 构建资源
-        /// </summary>
-        /// <param name="config"></param>
-        /// <param name="isTips"></param>
-        public static void BuildArt(ASBuildConfig config, bool isTips = false)
+        public static void BuildArtAll(ASBuildConfig config, bool isTips = false)
         {
-            if (Editor is null)
-            {
-                if (isTips) TipsInstall();
-                return;
-            }
-
-            SaveScene();
-
             var command = new AssetBuildCommand
             {
                 PackageVersion = config.BuildVersion,
@@ -109,7 +98,48 @@ namespace AIO.UEditor
                 CopyBuildinFileTags = config.FirstPackTag,
                 MergeToLatest = config.MergeToLatest,
             };
-            Editor.BuildArt(command);
+            var array = AssetCollectRoot.GetOrCreate().GetPackageNames();
+            if (config.BuildFirstPackage) array = array.Add(AssetSystem.TagsRecord);
+            BuildArtList(array, command, isTips);
+        }
+
+        /// <summary>
+        /// 构建资源
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="isTips"></param>
+        public static void BuildArt(ASBuildConfig config, bool isTips = false)
+        {
+            var command = new AssetBuildCommand
+            {
+                PackageVersion = config.BuildVersion,
+                BuildPackage = config.PackageName,
+                CompressOption = config.CompressedMode,
+                ActiveTarget = config.BuildTarget,
+                BuildPipeline = config.BuildPipeline,
+                OutputRoot = config.BuildOutputPath,
+                BuildMode = config.BuildMode,
+                CopyBuildinFileTags = config.FirstPackTag,
+                MergeToLatest = config.MergeToLatest,
+            };
+            if (config.BuildFirstPackage) command.BuildPackage = AssetSystem.TagsRecord;
+            BuildArt(command, isTips);
+        }
+
+        /// <summary>
+        /// 构建所有资源
+        /// </summary>
+        public static void BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command,
+            bool isTips = false)
+        {
+            if (Editor is null)
+            {
+                if (isTips) TipsInstall();
+                return;
+            }
+
+            SaveScene();
+            Editor.BuildArtList(packageNames, command);
         }
 
         public static void BuildArt(AssetBuildCommand command, bool isTips = false)

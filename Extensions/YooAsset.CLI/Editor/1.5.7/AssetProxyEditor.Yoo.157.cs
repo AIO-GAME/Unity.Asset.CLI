@@ -16,6 +16,7 @@ using AIO.YamlDotNet.Serialization;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using YooAsset.Editor;
 using Object = System.Object;
 
@@ -37,9 +38,42 @@ namespace AIO.UEditor.CLI
             ConvertYooAsset.Convert(config);
         }
 
-        public void BuildArt(AssetBuildCommand command)
+        public bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command)
         {
-            YooAssetBuild.ArtBuild(command);
+            var enumerable = packageNames.ToArray();
+            foreach (var packageName in enumerable)
+            {
+                command.BuildPackage = packageName;
+                var result = YooAssetBuild.ArtBuild(command);
+                if (result.Success) continue;
+                if (EHelper.IsCMD()) Debug.LogError($"构建 {command.BuildPackage} 失败 : {result.ErrorInfo}");
+                else EditorUtility.DisplayDialog($"构建 {command.BuildPackage} 失败", result.ErrorInfo, "确定");
+                return false;
+            }
+
+            if (!EHelper.IsCMD())
+            {
+                EditorUtility.DisplayDialog("构建成功", $"构建 {string.Join(',', enumerable)} 成功", "确定");
+            }
+
+            return true;
+        }
+
+        public bool BuildArt(AssetBuildCommand command)
+        {
+            var result = YooAssetBuild.ArtBuild(command);
+            if (result.Success)
+            {
+                if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
+                else if (!EHelper.IsCMD()) EditorUtility.RevealInFinder(result.OutputPackageDirectory);
+            }
+            else
+            {
+                if (EHelper.IsCMD()) Debug.LogError($"构建失败 {result.ErrorInfo}");
+                else EditorUtility.DisplayDialog("构建失败", result.ErrorInfo, "确定");
+            }
+
+            return result.Success;
         }
 
         /// <summary>
@@ -51,9 +85,9 @@ namespace AIO.UEditor.CLI
         /// Tips:
         /// 需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        public async Task UploadGCloud(ASUploadGCloudConfig config)
+        public Task UploadGCloud(ASUploadGCloudConfig config)
         {
-            await UploadGCloudAsync(config);
+            return UploadGCloudAsync(config);
         }
 
         protected class MonoImporter

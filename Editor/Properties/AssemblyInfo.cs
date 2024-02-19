@@ -1,8 +1,7 @@
-﻿using AIO.UEditor;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using UnityEditor.PackageManager;
 
-namespace AIO
+namespace AIO.UEditor
 {
     internal static class Setting
     {

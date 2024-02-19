@@ -55,9 +55,11 @@ namespace AIO.UEditor
                 {
                     Name = Data.Packages[index].Name,
                     Version = "-.-.-",
-                    IsDefault = index == 0
                 };
             }
+
+            if (Config.Packages.Length == 0) return;
+            Config.Packages[0].IsDefault = true;
         }
 
         /// <summary>
@@ -127,11 +129,6 @@ namespace AIO.UEditor
             {
                 GELayout.Label("加载模式", GP_Width_150);
                 Config.ASMode = GELayout.Popup(Config.ASMode, GEStyle.PreDropDown);
-                if (GUI.changed)
-                {
-                    if (Config.ASMode == EASMode.Editor) UpdateDataConfigMode();
-                }
-
                 if (GELayout.Button("Clean Cache", GEStyle.toolbarbuttonRight, GP_Width_100))
                 {
                     var sandbox = Path.Combine(EHelper.Path.Project, Config.RuntimeRootDirectory);

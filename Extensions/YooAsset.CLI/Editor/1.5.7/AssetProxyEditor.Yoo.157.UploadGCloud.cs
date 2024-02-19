@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace AIO.UEditor.CLI
@@ -128,9 +129,10 @@ namespace AIO.UEditor.CLI
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public static async Task UploadGCloudAsync(ASUploadGCloudConfig config)
+        private static async Task UploadGCloudAsync(ASUploadGCloudConfig config)
         {
             var sw = Stopwatch.StartNew();
+            
             var localFull = config.RootPath;
             var remotePath = config.RemoteRelative;
             var remoteManifest = string.Concat(remotePath, '/', "Manifest.json");
@@ -175,6 +177,7 @@ namespace AIO.UEditor.CLI
                         });
                     }
                     else data2.Version = config.IsUploadLatest ? "Latest" : config.Version;
+
                     versionContent = AHelper.Json.Serialize(data);
                 }
                 else

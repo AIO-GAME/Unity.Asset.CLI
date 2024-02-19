@@ -80,6 +80,11 @@ namespace AIO.UEditor
         [InspectorName("将资源包合并对比至Latest")] public bool MergeToLatest;
 
         /// <summary>
+        /// 构建首包资源
+        /// </summary>
+        [InspectorName("构建首包资源")] public bool BuildFirstPackage;
+
+        /// <summary>
         /// FTP上传配置
         /// </summary>
         [InspectorName("FTP上传配置")] public FTPConfig[] FTPConfigs;

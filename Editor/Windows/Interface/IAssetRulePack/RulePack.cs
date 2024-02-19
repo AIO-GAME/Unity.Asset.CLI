@@ -160,13 +160,33 @@ namespace AIO.UEditor
     }
 
     /// <summary>
+    /// 以整包名称作为资源包名
+    /// 注意：收集的所有文件打进一个资源包
+    /// </summary>
+    public class PackPackage : IAssetRulePack
+    {
+        public string DisplayPackName => "资源打包规则 = 整包名称";
+
+        public int Priority => 5;
+
+        PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
+        {
+            var bundleName = data.PackageName;
+            var result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
+            return result;
+        }
+
+        bool IAssetRulePack.IsRawFilePackRule() => false;
+    }
+
+    /// <summary>
     /// 打包原生文件
     /// </summary>
     public class PackRawFile : IAssetRulePack
     {
         public string DisplayPackName => "资源打包规则 = 打包原生文件";
 
-        public int Priority => 5;
+        public int Priority => 6;
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
@@ -185,7 +205,7 @@ namespace AIO.UEditor
     {
         public string DisplayPackName => "资源打包规则 = 打包着色器变种集合文件";
 
-        public int Priority => 6;
+        public int Priority => 7;
 
         public PackRuleResult GetPackRuleResult(PackRuleData data)
         {

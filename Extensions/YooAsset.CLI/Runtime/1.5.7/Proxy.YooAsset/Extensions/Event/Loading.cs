@@ -291,13 +291,12 @@ namespace AIO.UEngine.YooAsset
             }
 
             if (AssetSystem.HandleReset) yield break;
-            if (!Operations.ContainsKey(location.AssetPath)) yield break;
-            if (Operations[location.AssetPath].Status == EOperationStatus.Failed) yield break;
-            Operations[location.AssetPath].BeginDownload();
-            yield return Operations[location.AssetPath];
+            if (!Operations.TryGetValue(location.AssetPath, out operation)) yield break;
+            if (operation.Status == EOperationStatus.Failed) yield break;
+            operation.BeginDownload();
+            yield return operation;
             if (AssetSystem.DownloadHandle is LoadingInfo loading)
-                loading.RegisterEvent(location, Operations[location.AssetPath]);
-            Operations.Remove(location.AssetPath);
+                loading.RegisterEvent(location, operation);
         }
 
         private static DownloaderOperation CreateDownloaderOperation(YAssetPackage package, AssetInfo location)
@@ -308,22 +307,17 @@ namespace AIO.UEngine.YooAsset
         }
 
         [Conditional("UNITY_EDITOR")]
-        private static void AddSequenceRecord(YAssetPackage package, AssetInfo location, DownloaderOperation operation)
+        private static void AddSequenceRecord(YAssetPackage package, AssetInfo location)
         {
 #if UNITY_EDITOR
-            if (AssetSystem.Parameter.EnableSequenceRecord)
+            if (!AssetSystem.Parameter.EnableSequenceRecord) return;
+            AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
             {
-                AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
-                {
-                    GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
-                    PackageName = package.PackageName,
-                    Location = location.Address,
-                    Time = DateTime.Now,
-                    Bytes = operation.TotalDownloadBytes,
-                    Count = operation.TotalDownloadCount,
-                    AssetPath = location.AssetPath,
-                });
-            }
+                GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
+                PackageName = package.PackageName,
+                Location = location.Address,
+                AssetPath = location.AssetPath,
+            });
 #endif
         }
     }

@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +20,19 @@ namespace AIO
 {
     public partial class AssetSystem
     {
+#if UNITY_EDITOR
+        /// <summary>
+        /// 获取序列记录
+        /// </summary>
+        /// <param name="record">记录</param>
+        [DebuggerNonUserCode, DebuggerHidden, Conditional("UNITY_EDITOR")]
+        public static void AddSequenceRecord(SequenceRecord record)
+        {
+            Parameter.SequenceRecord.Add(record);
+            WhiteListLocal.Add(record.Location);
+        }
+#endif
+
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
             private const string FILE_NAME = "ASSETRECORD";
@@ -50,30 +64,25 @@ namespace AIO
             /// </summary>
             public void UpdateLocal()
             {
-                if (File.Exists(LOCAL_PATH))
+                Records = new List<SequenceRecord>();
+                if (!File.Exists(LOCAL_PATH)) return;
+                var temp = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
+                if (temp == null) return;
+                if (temp.Count <= 0) return;
+                var dic = new Dictionary<string, SequenceRecord>();
+                foreach (var item in temp)
                 {
-                    var temp = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
-                    Records = new List<SequenceRecord>();
-                    if (temp == null) return;
-                    var dic = new Dictionary<string, SequenceRecord>();
-                    if (temp.Count > 0)
+                    if (string.IsNullOrEmpty(item.GUID))
                     {
-                        foreach (var item in temp)
-                        {
-                            if (string.IsNullOrEmpty(item.GUID))
-                            {
-                                if (string.IsNullOrEmpty(item.AssetPath)) continue;
-                                item.GUID = AssetDatabase.AssetPathToGUID(item.AssetPath);
-                            }
-
-                            if (string.IsNullOrEmpty(item.GUID)) continue;
-                            dic[item.GUID] = item;
-                        }
-
-                        Records.AddRange(dic.Values);
+                        if (string.IsNullOrEmpty(item.AssetPath)) continue;
+                        item.GUID = AssetDatabase.AssetPathToGUID(item.AssetPath);
                     }
+
+                    if (string.IsNullOrEmpty(item.GUID)) continue;
+                    dic[item.GUID] = item;
                 }
-                else Records = new List<SequenceRecord>();
+
+                Records.AddRange(dic.Values);
             }
 
             /// <summary>

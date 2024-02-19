@@ -207,6 +207,11 @@ namespace AIO.UEditor
         {
             return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
         }
+        
+        public string[] GetPackageNames()
+        {
+            return Packages?.Select(package => package.Name).ToArray();
+        }
 
         public void Save()
         {

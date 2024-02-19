@@ -5,6 +5,7 @@
 |*|============|*/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -148,6 +149,8 @@ namespace AIO.UEditor
                     BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
                     BuildConfig.MergeToLatest =
                         GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest, GP_Width_100);
+                    // BuildConfig.BuildFirstPackage =
+                    //     GELayout.ToggleLeft("构建首包资源", BuildConfig.BuildFirstPackage, GP_Width_100);
 
                     EditorGUILayout.Separator();
 
@@ -183,31 +186,76 @@ namespace AIO.UEditor
                     {
                         AssetProxyEditor.CreateConfig(BuildConfig.BuildOutputPath, BuildConfig.MergeToLatest, true);
                     }
-
-                    if (Application.isPlaying) GUI.enabled = false;
-                    if (GUILayout.Button("构建资源", GEStyle.toolbarbutton, GP_Width_75))
-                    {
-                        if (EditorUtility.DisplayDialog("构建资源", "确定构建资源?", "确定", "取消"))
-                        {
-                            try
-                            {
-                                AssetProxyEditor.ConvertConfig(Data, false);
-                                AssetProxyEditor.BuildArt(BuildConfig, true);
-                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                            }
-                            catch (Exception)
-                            {
-                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                            }
-                        }
-                    }
-
-                    if (Application.isPlaying) GUI.enabled = true;
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
                 {
                     EditorGUILayout.LabelField(BuildConfig.BuildOutputPath, GEStyle.CenteredLabel);
+
+                    if (Application.isPlaying) GUI.enabled = false;
+                    if (GUILayout.Button("构建指定资源", GEStyle.toolbarbutton, GP_Width_100))
+                    {
+                        if (EditorUtility.DisplayDialog($"构建指定{BuildConfig.PackageName}资源包",
+                                $"构建{BuildConfig.PackageName}资源包", "确定", "取消"))
+                        {
+                            try
+                            {
+                                AssetProxyEditor.ConvertConfig(Data, false);
+                                BuildConfig.BuildFirstPackage = false;
+                                AssetProxyEditor.BuildArt(BuildConfig, true);
+                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                            }
+                            catch (Exception e)
+                            {
+                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                                Debug.LogError(e);
+                            }
+                        }
+                    }
+
+                    if (GUILayout.Button("构建首包资源", GEStyle.toolbarbutton, GP_Width_100))
+                    {
+                        if (EditorUtility.DisplayDialog("构建首包资源包", "构建序列纪录资源包", "确定", "取消"))
+                        {
+                            try
+                            {
+                                AssetProxyEditor.ConvertConfig(Data, false);
+                                BuildConfig.BuildFirstPackage = true;
+                                AssetProxyEditor.BuildArt(BuildConfig, true);
+                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                            }
+                            catch (Exception e)
+                            {
+                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                                Debug.LogError(e);
+                            }
+                        }
+                    }
+
+                    if (GUILayout.Button("构建全部资源包", GEStyle.toolbarbutton, GP_Width_100))
+                    {
+                        var temp = new List<string>(Data.GetPackageNames());
+                        temp.Add(AssetSystem.TagsRecord);
+                        string.Join(',', temp.ToArray());
+                        if (EditorUtility.DisplayDialog("构建全部资源包", $"构建\n {string.Join(',', temp.ToArray())} 资源包?",
+                                "确定", "取消"))
+                        {
+                            try
+                            {
+                                AssetProxyEditor.ConvertConfig(Data, false);
+                                BuildConfig.BuildFirstPackage = true;
+                                AssetProxyEditor.BuildArtAll(BuildConfig, true);
+                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                            }
+                            catch (Exception e)
+                            {
+                                BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                                Debug.LogError(e);
+                            }
+                        }
+                    }
+
+                    if (Application.isPlaying) GUI.enabled = true;
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
@@ -233,8 +281,12 @@ namespace AIO.UEditor
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
                 {
                     EditorGUILayout.LabelField("构建包名", GP_Width_100);
-                    Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages,
-                        GEStyle.PreDropDown);
+                    if (BuildConfig.BuildFirstPackage)
+                        GUILayout.Label(AssetSystem.TagsRecord, GEStyle.PreDropDown);
+                    else
+                        Data.CurrentPackageIndex = EditorGUILayout.Popup(
+                            Data.CurrentPackageIndex, LookModeDisplayPackages, GEStyle.PreDropDown);
+
                     if (GUI.changed)
                     {
                         if (Data.Packages.Length <= Data.CurrentPackageIndex || Data.CurrentPackageIndex < 0)
