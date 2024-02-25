@@ -53,7 +53,7 @@ namespace AIO.UEditor.CLI
 
             if (!EHelper.IsCMD())
             {
-                EditorUtility.DisplayDialog("构建成功", $"构建 {string.Join(',', enumerable)} 成功", "确定");
+                EditorUtility.DisplayDialog("构建成功", $"构建 {string.Join(",", enumerable)} 成功", "确定");
             }
 
             return true;
