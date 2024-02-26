@@ -20,11 +20,11 @@ namespace AIO.UEditor.CLI
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public static async Task UploadFtpAsync(ASUploadFTPConfig config)
+        public static async Task UploadFtpAsync(AsUploadFtpParameter parameter)
         {
-            var localFull = config.RootPath;
-            var handle = AHandle.FTP.Create(config.Server, config.Port, config.User, config.Pass,
-                config.RemoteRelative);
+            var localFull = parameter.RootPath;
+            var handle = AHandle.FTP.Create(parameter.Server, parameter.Port, parameter.User, parameter.Pass,
+                parameter.RemoteRelative);
             await handle.InitAsync();
             EHelper.DisplayProgressBar("上传进度", $"开始上传资源 {handle.Absolute}", 0.1f);
             // 在判断目标文件夹是否有清单文件 如果没有则先删除目标文件夹 再上传

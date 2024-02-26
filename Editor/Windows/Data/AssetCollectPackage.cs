@@ -14,7 +14,7 @@ namespace AIO.UEditor
     /// 资源收集包
     /// </summary>
     [Serializable]
-    public class AssetCollectPackage : IDisposable
+    public sealed class AssetCollectPackage : IDisposable, IEqualityComparer<AssetCollectPackage>
     {
         /// <summary>
         /// 包名
@@ -42,7 +42,7 @@ namespace AIO.UEditor
                 return Groups.Length;
             }
         }
-        
+
         public AssetCollectGroup this[int index]
         {
             get => Groups[index];
@@ -54,53 +54,81 @@ namespace AIO.UEditor
         /// </summary>
         /// <param name="groupName">组名</param>
         /// <returns>收集组</returns>
-        public AssetCollectGroup GetGroup(string groupName)
-        {
-            if (Groups is null) Groups = Array.Empty<AssetCollectGroup>();
-            return Groups.Where(group => (group != null)).FirstOrDefault(group => group.Name == groupName);
-        }
-
-        /// <summary>
-        /// 获取所有标签
-        /// </summary>
-        public string[] GetTags()
+        public AssetCollectGroup GetByGroupName(string groupName)
         {
             if (Groups is null)
             {
                 Groups = Array.Empty<AssetCollectGroup>();
-                return Array.Empty<string>();
+                return null;
             }
 
-            var dictionary = new List<string>();
-            foreach (var group in Groups)
-            {
-                dictionary.AddRange(group.Collectors
-                    .Where(collect => !string.IsNullOrEmpty(collect.Tags))
-                    .SelectMany(collect => collect.Tags.Split(';', ' ', ',')));
-
-                if (string.IsNullOrEmpty(group.Tags)) continue;
-                dictionary.AddRange(group.Tags.Split(';', ' ', ','));
-            }
-
-            return dictionary.Distinct().ToArray();
+            return Groups.Where(group => group != null).FirstOrDefault(group => group.Name == groupName);
         }
 
-        /// <summary>
-        /// 保存
-        /// </summary>
+        public string[] AllTags
+        {
+            get
+            {
+                if (Groups is null)
+                {
+                    Groups = Array.Empty<AssetCollectGroup>();
+                    return Array.Empty<string>();
+                }
+
+                var dictionary = new List<string>();
+                foreach (var group in Groups)
+                {
+                    dictionary.AddRange(group.Collectors
+                        .Where(collect => !string.IsNullOrEmpty(collect.Tags))
+                        .SelectMany(collect => collect.Tags.Split(';', ' ', ',')));
+
+                    if (string.IsNullOrEmpty(group.Tags)) continue;
+                    dictionary.AddRange(group.Tags.Split(';', ' ', ','));
+                }
+
+                return dictionary.Distinct().ToArray();
+            }
+        }
+
         public void Save()
         {
             if (Groups is null) Groups = Array.Empty<AssetCollectGroup>();
             foreach (var group in Groups) group.Save();
         }
 
-        /// <summary>
-        /// 释放
-        /// </summary>
         public void Dispose()
         {
             if (Groups is null) Groups = Array.Empty<AssetCollectGroup>();
             foreach (var item in Groups) item.Dispose();
+        }
+
+        public bool Equals(AssetCollectPackage x, AssetCollectPackage y)
+        {
+            if (x is null) return y is null;
+            if (y is null) return false;
+            return x.GetHashCode() == y.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return GetHashCode(this);
+        }
+
+        public int GetHashCode(AssetCollectPackage obj)
+        {
+            if (obj.Equals(null)) return 0;
+            unchecked
+            {
+                var hashCode = (obj.Name.GetHashCode() * 397) ^
+                               (!string.IsNullOrEmpty(obj.Name) ? obj.Name.GetHashCode() : 0);
+
+                hashCode = (hashCode * 397) ^
+                           (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
+
+                return obj.Groups is null
+                    ? hashCode
+                    : obj.Groups.Aggregate(hashCode, (current, item) => (current * 397) ^ item.GetHashCode());
+            }
         }
     }
 }

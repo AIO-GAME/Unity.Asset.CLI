@@ -35,7 +35,7 @@ namespace AIO
 
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
-            private const string FILE_NAME = "ASSETRECORD";
+            private const string FILE_NAME = "ASSETRECORD.json";
 
             private List<SequenceRecord> Records;
 

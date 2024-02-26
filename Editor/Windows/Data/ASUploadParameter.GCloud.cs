@@ -14,7 +14,7 @@ namespace AIO.UEditor
     /// <summary>
     /// 资源 上传 GCloud 配置
     /// </summary>
-    public class ASUploadGCloudConfig
+    public class AsUploadGCloudParameter : ASUploadParameter
     {
         /// <summary>
         /// Gcloud 路径
@@ -25,38 +25,6 @@ namespace AIO.UEditor
         /// Gsutil 路径
         /// </summary>
         public string GSUTIL_PATH;
-
-        /// <summary>
-        /// 是否上传Latest
-        /// </summary>
-        /// [Ture:上传Latest]
-        /// [False:则上传指定版本 但是不会将指定版本再次与Latest进行同步]
-        public bool IsUploadLatest;
-
-        /// <summary>
-        /// 上传目录 不包含平台 包名 版本
-        /// </summary>
-        public string LocalFullPath = Path.Combine(EHelper.Path.Project, "Bundles");
-
-        /// <summary>
-        /// 上传包名
-        /// </summary>
-        public string PackageName;
-
-        /// <summary>
-        /// 上传平台
-        /// </summary>
-        public BuildTarget BuildTarget = EditorUserBuildSettings.activeBuildTarget;
-
-        /// <summary>
-        /// 上传版本
-        /// </summary>
-        public string Version;
-
-        /// <summary>
-        /// FTP 远程路径
-        /// </summary>
-        public string RemotePath;
 
         /// <summary>
         /// 元数据 键
@@ -74,53 +42,6 @@ namespace AIO.UEditor
         /// 元数据 值
         /// </summary>
         public string MetaDataValue;
-
-        /// <summary>
-        /// 远端相对目录
-        /// </summary>
-        public string RemoteRelative
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(PackageName))
-                    throw new ArgumentNullException($"{PackageName} is null or empty");
-
-                var version = IsUploadLatest ? "Latest" : Version;
-                if (string.IsNullOrEmpty(version))
-                    throw new ArgumentNullException($"{version} is null or empty");
-
-                return (string.IsNullOrEmpty(RemotePath)
-                        ? Path.Combine(BuildTarget.ToString(), PackageName, version)
-                        : Path.Combine(RemotePath, BuildTarget.ToString(), PackageName, version)
-                    ).Replace("\\", "/");
-            }
-        }
-
-
-        /// <summary>
-        /// 更目录
-        /// </summary>
-        /// <exception cref="ArgumentNullException">参数为空</exception>
-        /// <exception cref="DirectoryNotFoundException">目录不存在</exception>
-        public string RootPath
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(LocalFullPath))
-                    throw new ArgumentNullException($"{LocalFullPath} is null or empty");
-
-                if (string.IsNullOrEmpty(PackageName))
-                    throw new ArgumentNullException($"{PackageName} is null or empty");
-
-                var version = IsUploadLatest ? "Latest" : Version;
-                if (string.IsNullOrEmpty(version))
-                    throw new ArgumentNullException($"{version} is null or empty");
-
-                var path = Path.Combine(LocalFullPath, BuildTarget.ToString(), PackageName, version);
-                if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"{path} is not found");
-                return path.Replace("\\", "/");
-            }
-        }
     }
 
     /// <summary>
@@ -257,7 +178,7 @@ namespace AIO.UEditor
                 }
 
                 isUploading = true;
-                var config = new ASUploadGCloudConfig();
+                var config = new AsUploadGCloudParameter();
                 config.RemotePath = BUCKET_NAME;
                 config.PackageName = two;
                 config.Version = three;

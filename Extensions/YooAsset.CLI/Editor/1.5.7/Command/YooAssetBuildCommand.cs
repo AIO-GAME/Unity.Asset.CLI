@@ -47,7 +47,7 @@ namespace AIO.UEditor.CLI
         /// <summary>
         /// 首包资源文件的拷贝方式
         /// </summary>
-        public const string C_COPY_BUILDIN_FILE_OPTION = PREFIX + nameof(CopyBuildinFileOption);
+        public const string C_COPY_BUILDIN_FILE_OPTION = PREFIX + nameof(CopyBuildInFileOption);
 
         /// <summary>
         /// 首包资源文件的标签集合
@@ -94,7 +94,7 @@ namespace AIO.UEditor.CLI
         public EOutputNameStyle OutputNameStyle = EOutputNameStyle.BundleName_HashName;
 
         [Argument(C_COPY_BUILDIN_FILE_OPTION, EArgLabel.Enum)]
-        public ECopyBuildinFileOption CopyBuildinFileOption = ECopyBuildinFileOption.ClearAndCopyAll;
+        public ECopyBuildInFileOption CopyBuildInFileOption = ECopyBuildInFileOption.ClearAndCopyAll;
 
         [Argument(C_COPY_BUILDIN_FILE_TAGS, EArgLabel.String)]
         public string CopyBuildinFileTags = string.Empty;

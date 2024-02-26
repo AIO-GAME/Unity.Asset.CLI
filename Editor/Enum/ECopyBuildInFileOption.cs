@@ -1,6 +1,6 @@
 /*|============|*|
-|*|Author:     |*| xinan                
-|*|Date:       |*| 2024-01-07               
+|*|Author:     |*| xinan
+|*|Date:       |*| 2024-01-07
 |*|E-Mail:     |*| xinansky99@gmail.com
 |*|============|*/
 
@@ -9,9 +9,9 @@ using UnityEngine;
 namespace AIO.UEditor
 {
     /// <summary>
-    /// 首包资源文件的拷贝方式
+    /// 资源文件的拷贝方式
     /// </summary>
-    public enum ECopyBuildinFileOption
+    public enum ECopyBuildInFileOption
     {
         /// <summary>
         /// 不拷贝任何文件

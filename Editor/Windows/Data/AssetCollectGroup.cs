@@ -13,7 +13,7 @@ using Object = UnityEngine.Object;
 namespace AIO.UEditor
 {
     [Serializable]
-    public class AssetCollectGroup : IDisposable, IEqualityComparer<AssetCollectGroup>
+    public sealed class AssetCollectGroup : IDisposable, IEqualityComparer<AssetCollectGroup>
     {
         /// <summary>
         /// 组名
@@ -47,6 +47,12 @@ namespace AIO.UEditor
             }
         }
 
+        public AssetCollectItem this[int index]
+        {
+            get => Collectors[index];
+            set => Collectors[index] = value;
+        }
+
         /// <summary>
         /// 刷新资源
         /// </summary>
@@ -60,18 +66,9 @@ namespace AIO.UEditor
             }
         }
 
-        public AssetCollectItem this[int index]
-        {
-            get => Collectors[index];
-            set => Collectors[index] = value;
-        }
-
-        /// <summary>
-        /// 获取资源收集器
-        /// </summary>
         /// <param name="collectPath">收集器资源路径 会被转化成 GUID</param>
         /// <returns>收集器</returns>
-        public AssetCollectItem GetCollector(string collectPath)
+        public AssetCollectItem GetByPath(string collectPath)
         {
             if (Collectors is null)
             {
@@ -85,12 +82,9 @@ namespace AIO.UEditor
                 .FirstOrDefault(collectItem => collectItem.GUID == guid);
         }
 
-        /// <summary>
-        /// 获取资源收集器
-        /// </summary>
         /// <param name="guid">收集器资源路径GUID</param>
         /// <returns>收集器</returns>
-        public AssetCollectItem GetCollectorGUID(string guid)
+        public AssetCollectItem GetByGUID(string guid)
         {
             if (Collectors is null)
             {
@@ -103,22 +97,18 @@ namespace AIO.UEditor
                 .FirstOrDefault(collectItem => collectItem.GUID == guid);
         }
 
-        /// <summary>
-        /// 获取所有标签
-        /// </summary>
-        /// <returns>标签列表</returns>
-        public string[] GetTags()
+        public string[] AllTags
         {
-            var dictionary = new List<string>();
-            foreach (var collect in Collectors) dictionary.AddRange(collect.GetTags());
-            if (string.IsNullOrEmpty(Tags)) return dictionary.Distinct().ToArray();
-            dictionary.AddRange(Tags.Split(';', ' ', ','));
-            return dictionary.Distinct().ToArray();
+            get
+            {
+                var dictionary = new List<string>();
+                foreach (var collect in Collectors) dictionary.AddRange(collect.AllTags);
+                if (string.IsNullOrEmpty(Tags)) return dictionary.Distinct().ToArray();
+                dictionary.AddRange(Tags.Split(';', ' ', ','));
+                return dictionary.Distinct().ToArray();
+            }
         }
 
-        /// <summary>
-        /// 保存
-        /// </summary>
         public void Save()
         {
             if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
@@ -133,14 +123,8 @@ namespace AIO.UEditor
 
         public bool Equals(AssetCollectGroup x, AssetCollectGroup y)
         {
-            if (x is null)
-            {
-                if (y is null) return true;
-                return false;
-            }
-
+            if (x is null) return y is null;
             if (y is null) return false;
-
             return x.GetHashCode() == y.GetHashCode();
         }
 
@@ -154,14 +138,15 @@ namespace AIO.UEditor
             if (obj.Equals(null)) return 0;
             unchecked
             {
-                var hashCode = obj.Name.GetHashCode();
-                hashCode = (hashCode * 397) ^ (!string.IsNullOrEmpty(obj.Tags) ? obj.Tags.GetHashCode() : 0);
+                var hashCode = (obj.Name.GetHashCode() * 397) ^
+                               (!string.IsNullOrEmpty(obj.Tags) ? obj.Tags.GetHashCode() : 0);
+
                 hashCode = (hashCode * 397) ^
                            (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
-                if (obj.Collectors != null)
-                    hashCode = obj.Collectors.Aggregate(hashCode,
-                        (current, item) => (current * 397) ^ item.GetHashCode());
-                return hashCode;
+
+                return obj.Collectors is null
+                    ? hashCode
+                    : obj.Collectors.Aggregate(hashCode, (current, item) => (current * 397) ^ item.GetHashCode());
             }
         }
     }

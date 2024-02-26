@@ -39,8 +39,8 @@ namespace AIO.UEditor.CLI
                     return false;
 
                 var collector = Instance.GetPackage(info.Item1)
-                    ?.GetGroup(info.Item2)
-                    ?.GetCollector(data.CollectPath);
+                    ?.GetByGroupName(info.Item2)
+                    ?.GetByPath(data.CollectPath);
                 if (collector is null) return false;
       
                 var mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : ASConfig.GetOrCreate().ASMode;
@@ -107,8 +107,8 @@ namespace AIO.UEditor.CLI
                 if (Instance is null || !data.UserData.Contains('_')) return false;
                 var info = data.UserData.SplitOnce('_');
                 var collector = Instance.GetPackage(info.Item1)
-                    ?.GetGroup(info.Item2)
-                    ?.GetCollector(data.CollectPath);
+                    ?.GetByGroupName(info.Item2)
+                    ?.GetByPath(data.CollectPath);
                 if (collector is null) return false;
 
                 var mode = Config.ASMode;

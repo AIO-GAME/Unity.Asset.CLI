@@ -207,7 +207,7 @@ namespace AIO.UEditor
         {
             return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
         }
-        
+
         public string[] GetPackageNames()
         {
             return Packages?.Select(package => package.Name).ToArray();
@@ -568,26 +568,17 @@ namespace AIO.UEditor
             var path = AssetDatabase.GetAssetPath(obj);
             var guid = AssetDatabase.AssetPathToGUID(path);
             if (string.IsNullOrEmpty(guid)) return;
-            var root = GetOrCreate();
-            var list = new List<(string, string, string)>();
-            foreach (var package in root.Packages)
-            {
-                if (package is null) continue;
-                foreach (var group in package.Groups)
-                {
-                    if (group is null) continue;
-                    foreach (var item in group.Collectors)
-                    {
-                        if (item is null) continue;
-                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                        if (!path.StartsWith(item.CollectPath)) continue;
-                        // 是否是否被过滤
-                        var address = item.GetAddress(path);
-                        if (string.IsNullOrEmpty(address)) continue;
-                        list.Add((package.Name, group.Name, address));
-                    }
-                }
-            }
+            var list = (from package in GetOrCreate().Packages
+                where !(package is null)
+                from @group in package.Groups
+                where !(@group is null)
+                from item in @group.Collectors
+                where !(item is null)
+                where item.Type == EAssetCollectItemType.MainAssetCollector
+                where path.StartsWith(item.CollectPath)
+                let address = item.GetAddress(path)
+                where !string.IsNullOrEmpty(address)
+                select (package.Name, @group.Name, address)).ToList();
 
             if (list.Count == 0) Debug.Log($"未找到资源 [{path}] 的可寻址路径");
             else

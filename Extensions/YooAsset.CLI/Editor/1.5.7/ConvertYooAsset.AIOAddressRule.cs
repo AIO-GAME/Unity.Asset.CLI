@@ -21,7 +21,7 @@ namespace AIO.UEditor.CLI
             {
                 if (!data.GroupName.Contains('_')) return "Error : Rule mismatch";
                 var info = data.GroupName.SplitOnce('_');
-                var collector = Instance.GetPackage(info.Item1)?.GetGroup(info.Item2).GetCollector(data.CollectPath);
+                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2).GetByPath(data.CollectPath);
                 if (collector is null) return "Error : Not found collector";
                 if (!Collectors.ContainsKey(collector))
                 {
@@ -67,7 +67,7 @@ namespace AIO.UEditor.CLI
                 if (Application.isPlaying) return Rule.GetAssetAddress(data);
                 if (!data.UserData.Contains('_')) return "Error : Rule mismatch";
                 var info = data.UserData.SplitOnce('_');
-                var collector = Instance.GetPackage(info.Item1)?.GetGroup(info.Item2).GetCollector(data.CollectPath);
+                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2).GetByPath(data.CollectPath);
                 if (collector is null) return "Error : Not found collector";
                 if (!Collectors.ContainsKey(collector))
                 {
