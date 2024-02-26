@@ -47,8 +47,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static async void InstGameObject(string location, Transform parent, Action<GameObject> cb)
         {
-            cb?.Invoke(
-                await Proxy.InstGameObjectTask(SettingToLocalPath(location), parent));
+            cb?.Invoke(await Proxy.InstGameObjectTask(SettingToLocalPath(location), parent));
         }
 
         /// <summary>

@@ -91,9 +91,9 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tag">资源标签</param>
         public static ResourceDownloaderOperation CreateResourceDownloader(string package, string tag)
         {
-            return !Dic.TryGetValue(package, out var asset)
-                ? null
-                : asset.CreateResourceDownloader(new string[] { tag });
+            return Dic.TryGetValue(package, out var asset)
+                ? asset.CreateResourceDownloader(new[] { tag })
+                : null;
         }
 
         /// <summary>
@@ -103,9 +103,9 @@ namespace AIO.UEngine.YooAsset
         /// <param name="package">包名</param>
         public static ResourceDownloaderOperation CreateResourceDownloader(string package, string[] tags)
         {
-            return !Dic.TryGetValue(package, out var asset)
-                ? null
-                : asset.CreateResourceDownloader(tags);
+            return Dic.TryGetValue(package, out var asset)
+                ? asset.CreateResourceDownloader(tags)
+                : null;
         }
 
         /// <summary>
@@ -114,9 +114,9 @@ namespace AIO.UEngine.YooAsset
         /// <param name="package">包名</param>
         public static ResourceDownloaderOperation CreateResourceDownloader(string package)
         {
-            return !Dic.TryGetValue(package, out var asset)
-                ? null
-                : asset.CreateResourceDownloader();
+            return Dic.TryGetValue(package, out var asset)
+                ? asset.CreateResourceDownloader()
+                : null;
         }
 
         #endregion
@@ -131,7 +131,9 @@ namespace AIO.UEngine.YooAsset
         public static ResourceDownloaderOperation CreateBundleDownloader(string package,
             AssetInfo[] assetInfos)
         {
-            return !Dic.TryGetValue(package, out var asset) ? null : asset.CreateBundleDownloader(assetInfos);
+            return Dic.TryGetValue(package, out var asset)
+                ? asset.CreateBundleDownloader(assetInfos)
+                : null;
         }
 
         #endregion
@@ -144,7 +146,9 @@ namespace AIO.UEngine.YooAsset
         /// <param name="package">包名</param>
         public static UpdatePackageVersionOperation UpdatePackageVersionAsync(string package)
         {
-            return !Dic.TryGetValue(package, out var asset) ? null : asset.UpdatePackageVersionAsync();
+            return Dic.TryGetValue(package, out var asset)
+                ? asset.UpdatePackageVersionAsync()
+                : null;
         }
 
         /// <summary>
@@ -154,7 +158,9 @@ namespace AIO.UEngine.YooAsset
         /// <param name="packageVersion">更新的包裹版本</param>
         public static UpdatePackageManifestOperation UpdatePackageManifestAsync(string package, string packageVersion)
         {
-            return !Dic.TryGetValue(package, out var asset) ? null : asset.UpdatePackageManifestAsync(packageVersion);
+            return Dic.TryGetValue(package, out var asset)
+                ? asset.UpdatePackageManifestAsync(packageVersion)
+                : null;
         }
 
         #endregion
@@ -168,7 +174,9 @@ namespace AIO.UEngine.YooAsset
         /// <param name="packageVersion">下载的包裹版本</param>
         public static PreDownloadContentOperation PreDownloadContentAsync(string package, string packageVersion)
         {
-            return !Dic.TryGetValue(package, out var asset) ? null : asset.PreDownloadContentAsync(packageVersion);
+            return Dic.TryGetValue(package, out var asset)
+                ? asset.PreDownloadContentAsync(packageVersion)
+                : null;
         }
 
         #endregion

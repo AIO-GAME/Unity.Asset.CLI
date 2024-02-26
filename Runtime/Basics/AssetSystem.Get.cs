@@ -116,7 +116,7 @@ namespace AIO
         /// <summary>
         /// 获取可用磁盘空间
         /// </summary>
-        /// <returns></returns>
+        /// <returns>剩余空间字节数</returns>
         public static long GetAvailableDiskSpace()
         {
             try

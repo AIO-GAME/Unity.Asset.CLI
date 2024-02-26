@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using YooAsset;
 using Object = UnityEngine.Object;
@@ -165,7 +166,11 @@ namespace AIO.UEngine.YooAsset
         public void UnloadUnusedAssets(bool isForce = false)
         {
             if (isForce) Package.ForceUnloadAllAssets();
-            else Package.UnloadUnusedAssets();
+            else
+            {
+                Resources.UnloadUnusedAssets();
+                Package.UnloadUnusedAssets();
+            }
         }
 
         #region 资源信息

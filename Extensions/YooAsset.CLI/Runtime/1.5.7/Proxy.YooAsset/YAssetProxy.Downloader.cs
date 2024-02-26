@@ -332,7 +332,7 @@ namespace AIO.UEngine
 
                 TotalCountDict[nameof(DownloadedFiles)] = DownloadedFiles.Count;
                 CurrentCountDict[nameof(DownloadedFiles)] = TotalCountDict[nameof(DownloadedFiles)];
-                
+
                 foreach (var pair in ResourceDownloaderOperations)
                 {
                     TotalValueDict[pair.Key] = pair.Value.TotalDownloadBytes;
@@ -344,7 +344,7 @@ namespace AIO.UEngine
 
                 TotalValue = TotalValueDict.Sum(pair => pair.Value);
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
-                
+
                 var endValue = TotalValue - CurrentValue;
                 var diskSpace = AssetSystem.GetAvailableDiskSpace();
                 if (diskSpace < endValue) // 检查磁盘空间是否足够
@@ -445,6 +445,7 @@ namespace AIO.UEngine
 
                 State = EProgressState.Finish;
 
+                await YAssetSystem.ClearCacheResourceTask();
                 if (DownloadAll) AssetSystem.WhiteAll = true;
                 else if (DownloadTags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAssetInfos(DownloadTags));
             }
@@ -489,6 +490,7 @@ namespace AIO.UEngine
                     yield break;
                 }
 
+                yield return YAssetSystem.ClearCacheResourceCO();
                 State = EProgressState.Finish;
                 if (DownloadAll) AssetSystem.WhiteAll = true;
                 else if (DownloadTags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAssetInfos(DownloadTags));

@@ -16,20 +16,6 @@ namespace AIO
         public static bool AllowReachableCarrier { get; set; }
 
         /// <summary>
-        /// 队列暂停中
-        /// </summary>
-        /// <remarks>
-        /// Ture: 暂停中
-        /// False: 没有暂停
-        /// </remarks>
-        internal static bool StatusStop { get; set; }
-
-        /// <summary>
-        /// 下载器是否重置
-        /// </summary>
-        internal static bool HandleReset { get; set; }
-
-        /// <summary>
         /// 主下载器
         /// </summary>
         public static IASNetLoading DownloadHandle { get; private set; }
@@ -86,5 +72,19 @@ namespace AIO
         /// </summary>
         public static bool IsNetReachable =>
             Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork;
+
+        /// <summary>
+        /// 队列暂停中
+        /// </summary>
+        /// <remarks>
+        /// Ture: 暂停中
+        /// False: 没有暂停
+        /// </remarks>
+        internal static bool StatusStop { get; set; }
+
+        /// <summary>
+        /// 下载器是否重置
+        /// </summary>
+        internal static bool HandleReset { get; set; }
     }
 }

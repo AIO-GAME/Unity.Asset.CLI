@@ -20,14 +20,14 @@ namespace AIO.UEngine.YooAsset
 
         protected sealed override InitializeParameters GetParameters()
         {
-            var initParameters = new OfflinePlayModeParameters();
-            initParameters.DecryptionServices = DecryptionServices;
-            initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;
-            initParameters.DownloadFailedTryAgain = DownloadFailedTryAgain;
-            initParameters.BuildinRootDirectory = BuildInRootDirectory;
-            initParameters.SandboxRootDirectory = SandboxRootDirectory;
-            initParameters.DecryptionServices = DecryptionServices;
-            initParameters.LoadingMaxTimeSlice = LoadingMaxTimeSlice;
+            var initParameters = new OfflinePlayModeParameters
+            {
+                DecryptionServices = DecryptionServices,
+                LoadingMaxTimeSlice = LoadingMaxTimeSlice,
+                DownloadFailedTryAgain = DownloadFailedTryAgain,
+                BuildinRootDirectory = BuildInRootDirectory,
+                SandboxRootDirectory = SandboxRootDirectory
+            };
             return initParameters;
         }
     }

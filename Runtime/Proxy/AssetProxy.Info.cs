@@ -48,20 +48,7 @@ namespace AIO.UEngine
         [DebuggerNonUserCode, DebuggerHidden]
         public ICollection<string> GetAssetInfos(in string tag)
         {
-            return GetAssetInfos(new string[] { tag });
-        }
-
-        /// <summary>
-        /// 根据资源标签获取资源信息
-        /// </summary>
-        /// <param name="tag">资源标签</param>
-        /// <param name="tags"></param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public ICollection<string> GetAssetInfos(in string tag, params string[] tags)
-        {
-            var list = new List<string> { tag };
-            list.AddRange(tags);
-            return GetAssetInfos(list);
+            return GetAssetInfos(new[] { tag });
         }
 
         /// <summary>

@@ -507,7 +507,7 @@ namespace AIO.UEngine.YooAsset
             await op.Task;
         }
 
-        public static IEnumerator UnLoadSceneCO(string location, Action cb = null)
+        public static IEnumerator UnLoadSceneCO(string location, Action cb)
         {
             var operation = GetHandle<SceneOperationHandle>(location);
             if (operation is null) yield break;

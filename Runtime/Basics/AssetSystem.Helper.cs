@@ -36,7 +36,9 @@ namespace AIO
                 {
                     case RuntimePlatform.WindowsPlayer:
                     case RuntimePlatform.WindowsEditor:
-                        return "StandaloneWindows64";
+                        return System.Environment.Is64BitOperatingSystem
+                            ? "StandaloneWindows64"
+                            : "StandaloneWindows";
                     case RuntimePlatform.OSXPlayer:
                     case RuntimePlatform.OSXEditor:
                         return "StandaloneOSX";
@@ -46,6 +48,32 @@ namespace AIO
                         return "Android";
                     case RuntimePlatform.WebGLPlayer:
                         return "WebGL";
+                    case RuntimePlatform.Switch:
+                        return "Switch";
+                    case RuntimePlatform.PS4:
+                        return "PS4";
+                    case RuntimePlatform.PS5:
+                        return "PS5";
+                    case RuntimePlatform.LinuxPlayer:
+                    case RuntimePlatform.LinuxEditor:
+                        return System.Environment.Is64BitOperatingSystem
+                            ? "StandaloneLinux64"
+                            : "StandaloneLinux";
+                    case RuntimePlatform.WSAPlayerARM:
+                        return "WSAPlayer";
+                    case RuntimePlatform.XboxOne:
+                        return "XboxOne";
+                    case RuntimePlatform.tvOS:
+                        return "tvOS";
+                    case RuntimePlatform.Lumin:
+                        return "Lumin";
+                    case RuntimePlatform.Stadia:
+                        return "Stadia";
+                    case RuntimePlatform.CloudRendering:
+                        return "CloudRendering";
+                    case RuntimePlatform.GameCoreXboxOne:
+                        return "GameCoreXboxOne";
+
                     default: return Application.platform.ToString();
                 }
 #endif
@@ -59,7 +87,8 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static bool IsNeedDownloadFromRemote(string location)
         {
-            return Parameter.ASMode == EASMode.Remote && Proxy.IsNeedDownloadFromRemote(SettingToLocalPath(location));
+            return Parameter.ASMode == EASMode.Remote && 
+                   Proxy.IsNeedDownloadFromRemote(SettingToLocalPath(location));
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 ﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan 
+|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> 2023-08-22
 |||✩ Document: ||| ->
 |||✩ - - - - - |*/
@@ -24,7 +24,7 @@ namespace AIO.UEngine
             return YAssetSystem.UnLoadSceneTask(location);
         }
 
-        public override IEnumerator UnloadSceneCO(string location, Action cb = null)
+        public override IEnumerator UnloadSceneCO(string location, Action cb)
         {
             return YAssetSystem.UnLoadSceneCO(location, cb);
         }

@@ -212,7 +212,7 @@ namespace AIO.UEngine.YooAsset
 
         #endregion
 
-        private static YAssetPackage GetAutoPackageSync(string location)
+        internal static YAssetPackage GetAutoPackageSync(string location)
         {
 #if !UNITY_2019_4_OR_NEWER
             if (location.EndsWith('/') || location.EndsWith('\\'))
