@@ -404,7 +404,7 @@ namespace AIO
             bool suspendLoad = false,
             int priority = 100)
         {
-            var scene = await Proxy.LoadSceneTask(location, sceneMode, suspendLoad, priority);
+            var scene = await Proxy.LoadSceneTask(SettingToLocalPath(location), sceneMode, suspendLoad, priority);
             cb?.Invoke(scene);
         }
 
