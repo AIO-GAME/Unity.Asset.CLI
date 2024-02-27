@@ -8,18 +8,8 @@ using UnityEngine;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
-        /// <summary>
-        /// 是否允许流量下载
-        /// </summary>
-        public static bool AllowReachableCarrier { get; set; }
-
-        /// <summary>
-        /// 主下载器
-        /// </summary>
-        public static IASNetLoading DownloadHandle { get; private set; }
-
         /// <summary>
         /// 重置下载器
         /// </summary>
@@ -43,48 +33,5 @@ namespace AIO
             DownloadHandle = temp;
             StatusStop = false;
         }
-
-        /// <summary>
-        /// 当前主下载器事件
-        /// </summary>
-        public static IDownlandAssetEvent DownloadEvent => DownloadHandle?.Event;
-
-        /// <summary>
-        /// 下载器状态
-        /// </summary>
-        public static EProgressState DownloadState => DownloadHandle?.State ?? EProgressState.Finish;
-
-        /// <summary>
-        /// 判断当前网络环境是否为流量
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsWifi =>
-            Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork;
-
-        /// <summary>
-        /// 判断当前网络环境是否为无网络
-        /// </summary>
-        public static bool IsNoNet =>
-            Application.internetReachability == NetworkReachability.NotReachable;
-
-        /// <summary>
-        /// 判断当前网络环境是否为流量
-        /// </summary>
-        public static bool IsNetReachable =>
-            Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork;
-
-        /// <summary>
-        /// 队列暂停中
-        /// </summary>
-        /// <remarks>
-        /// Ture: 暂停中
-        /// False: 没有暂停
-        /// </remarks>
-        internal static bool StatusStop { get; set; }
-
-        /// <summary>
-        /// 下载器是否重置
-        /// </summary>
-        internal static bool HandleReset { get; set; }
     }
 }

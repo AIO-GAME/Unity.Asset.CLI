@@ -14,7 +14,7 @@ using Cysharp.Threading.Tasks;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
         /// <summary>
         /// 检测网络请求
@@ -233,7 +233,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 网上加载音频
+        /// 网上加载文本
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>

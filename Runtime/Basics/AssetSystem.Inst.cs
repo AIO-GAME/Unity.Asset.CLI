@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace AIO
 {
-    public static partial class AssetSystem
+    partial class AssetSystem
     {
         /// <summary>
         /// 实例预制件

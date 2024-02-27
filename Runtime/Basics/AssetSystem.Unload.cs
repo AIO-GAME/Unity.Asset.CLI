@@ -9,14 +9,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
         /// <summary>
-        /// 资源回收（卸载引用计数为零的资源）
+        /// 卸载资源（卸载引用计数为零的资源）
         /// </summary>
         /// <param name="isForce">强制回收所有资源</param>
         [DebuggerNonUserCode, DebuggerHidden]
@@ -26,31 +25,28 @@ namespace AIO
         }
 
         /// <summary>
-        /// 释放资源句柄
+        /// 卸载资源 
         /// </summary>
         /// <param name="location">资源地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
         public static void UnloadAsset(string location)
         {
-            Proxy?.FreeHandle(SettingToLocalPath(location));
+            Proxy.HandleFree(SettingToLocalPath(location));
             Log("Free Asset Handle Release : {0}", location);
         }
 
         /// <summary>
-        /// 释放资源句柄
+        /// 卸载资源
         /// </summary>
         /// <param name="locations">资源定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
         public static void UnloadAsset(IEnumerable<string> locations)
         {
-            foreach (var location in locations)
-            {
-                Proxy.FreeHandle(SettingToLocalPath(location));
-            }
+            foreach (var location in locations) Proxy.HandleFree(SettingToLocalPath(location));
         }
 
         /// <summary>
-        /// 释放场景资源句柄
+        /// 卸载场景资源
         /// </summary>
         /// <param name="location">资源定位地址</param>
         /// <param name="onLoadComplete">回调</param>

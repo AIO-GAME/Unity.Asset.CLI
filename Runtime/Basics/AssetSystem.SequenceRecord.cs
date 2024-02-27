@@ -18,9 +18,8 @@ using UnityEngine;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
-#if UNITY_EDITOR
         /// <summary>
         /// 获取序列记录
         /// </summary>
@@ -31,7 +30,7 @@ namespace AIO
             Parameter.SequenceRecord.Add(record);
             WhiteListLocal.Add(record.Location);
         }
-#endif
+
 
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
@@ -131,16 +130,10 @@ namespace AIO
                 AHelper.IO.WriteJsonUTF8(LOCAL_PATH, Records);
             }
 
-            public
-#if UNITY_EDITOR
-                async
-#endif
-                void Dispose()
+            public async void Dispose()
             {
                 if (Records is null) return;
-#if UNITY_EDITOR
                 if (Enable) await AHelper.IO.WriteJsonUTF8Async(LOCAL_PATH, Records);
-#endif
                 Records.Clear();
                 Records = null;
             }

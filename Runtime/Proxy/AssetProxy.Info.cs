@@ -6,10 +6,11 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace AIO.UEngine
 {
-    public partial class AssetProxy
+    partial class AssetProxy
     {
         /// <summary>
         /// 获取下载器
@@ -21,7 +22,7 @@ namespace AIO.UEngine
         /// 释放资源句柄
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public abstract void FreeHandle(string location);
+        public abstract void HandleFree(string location);
 
         /// <summary>
         /// 释放资源句柄
@@ -29,7 +30,7 @@ namespace AIO.UEngine
         [DebuggerNonUserCode, DebuggerHidden]
         public virtual void FreeHandle(IEnumerable<string> locations)
         {
-            foreach (var location in locations) FreeHandle(location);
+            foreach (var location in locations) HandleFree(location);
         }
 
         #region 资源信息
@@ -39,31 +40,21 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public abstract bool IsNeedDownloadFromRemote(in string location);
-
-        /// <summary>
-        /// 根据资源标签获取资源信息
-        /// </summary>
-        /// <param name="tag">资源标签</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public ICollection<string> GetAssetInfos(in string tag)
-        {
-            return GetAssetInfos(new[] { tag });
-        }
+        public abstract bool CheckNeedDownloadFromRemote(string location);
 
         /// <summary>
         /// 根据资源标签获取资源信息
         /// </summary>
         /// <param name="tags">资源标签</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public abstract ICollection<string> GetAssetInfos(IEnumerable<string> tags);
+        public abstract ICollection<string> GetAddressByTag(IEnumerable<string> tags);
 
         /// <summary>
         /// 检查资源定位地址是否有效
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public abstract bool CheckLocationValid(in string location);
+        public abstract bool CheckLocationValid(string location);
 
         /// <summary>
         /// 获取本地包裹的版本信息

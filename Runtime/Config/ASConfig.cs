@@ -73,6 +73,11 @@ namespace AIO.UEngine
         public int Timeout = 60;
 
         /// <summary>
+        /// 异步系统 每帧执行消耗的最大时间切片
+        /// </summary>
+        public int AsyncMaxTimeSlice = 30;
+
+        /// <summary>
         /// 资源包配置
         /// </summary>
         public AssetsPackageConfig[] Packages;

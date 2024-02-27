@@ -4,7 +4,7 @@ using AIO.UEngine;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
         private static AssetProxy Proxy;
 
@@ -33,7 +33,7 @@ namespace AIO
         /// 是否已经初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static bool IsInitialized { get; private set; }
+        public static bool IsInitialized => Proxy?.IsInitialize ?? false;
 
         /// <summary>
         /// 添加白名单

@@ -12,13 +12,8 @@ using AIO.UEngine;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
-        /// <summary>
-        /// 记录序列资源标签
-        /// </summary>
-        public const string TagsRecord = "SequenceRecord";
-
         /// <summary>
         /// 获取下载器
         /// </summary>
@@ -64,7 +59,7 @@ namespace AIO
                     yield return handle.WaitCo();
                 }
             }
-            else WhiteListLocal.AddRange(GetAssetInfos(enumerable));
+            else WhiteListLocal.AddRange(GetAddressByTag(enumerable));
         }
 
         /// <summary>
@@ -85,7 +80,7 @@ namespace AIO
             }
             else
             {
-                WhiteListLocal.AddRange(GetAssetInfos(tags));
+                WhiteListLocal.AddRange(GetAddressByTag(tags));
                 dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
             }
         }
@@ -107,7 +102,7 @@ namespace AIO
             }
             else
             {
-                WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
+                WhiteListLocal.AddRange(GetAddressByTag(TagsRecord));
                 dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
             }
         }

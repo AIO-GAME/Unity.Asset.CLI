@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace AIO
 {
-    public static partial class AssetSystem
+    partial class AssetSystem
     {
         #region 子资源加载
 
@@ -404,8 +404,8 @@ namespace AIO
             bool suspendLoad = false,
             int priority = 100)
         {
-            cb?.Invoke(await Proxy.LoadSceneTask(SettingToLocalPath(location), sceneMode,
-                suspendLoad, priority));
+            var scene = await Proxy.LoadSceneTask(location, sceneMode, suspendLoad, priority);
+            cb?.Invoke(scene);
         }
 
         /// <summary>
@@ -439,7 +439,7 @@ namespace AIO
         public static Task<Scene> LoadSceneTask(
             string location,
             LoadSceneMode sceneMode = LoadSceneMode.Single,
-            bool suspendLoad = true,
+            bool suspendLoad = false,
             int priority = 100)
         {
             return Proxy.LoadSceneTask(SettingToLocalPath(location), sceneMode,

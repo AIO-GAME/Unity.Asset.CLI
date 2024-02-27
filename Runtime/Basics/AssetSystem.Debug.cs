@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
 #if UNITY_EDITOR
         private const string BASE_FORMAT = "<b><color=#9575CD>[ASSET]</color></b>";

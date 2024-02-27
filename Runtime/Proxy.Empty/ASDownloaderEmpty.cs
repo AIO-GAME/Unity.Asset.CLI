@@ -25,7 +25,7 @@ namespace AIO
 
         public void CollectNeedTag(params string[] tags)
         {
-            AssetSystem.AddWhite(AssetSystem.GetAssetInfos(tags));
+            AssetSystem.AddWhite(AssetSystem.GetAddressByTag(tags));
         }
 
         protected override IEnumerator OnWaitCo()

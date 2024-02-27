@@ -30,8 +30,8 @@ namespace AIO
         internal static void ExceptionEvent(AssetSystemException ex)
         {
             _Exception = ex;
-            if (OnException is null) throw new SystemException($"Asset System Exception : {ex}");
-            OnException.Invoke(ex);
+            if (OnException is null) LogException($"Asset System Exception : {ex}");
+            else OnException.Invoke(ex);
         }
 
         /// <summary>
@@ -53,14 +53,6 @@ namespace AIO
         }
 
         /// <summary>
-        /// 收集类型过滤
-        /// </summary>
-        private static bool TypeFilter(Type type)
-        {
-            return !type.IsAbstract && typeof(AssetProxy).IsAssignableFrom(type);
-        }
-
-        /// <summary>
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
@@ -70,7 +62,8 @@ namespace AIO
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (!TypeFilter(type)) continue;
+                    if (type.IsAbstract) continue;
+                    if (!typeof(AssetProxy).IsAssignableFrom(type)) continue;
                     Proxy = (AssetProxy)Activator.CreateInstance(type);
                     break;
                 }
@@ -101,10 +94,10 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy, ASConfig config, IProgressEvent iEvent = default)
+        public static IEnumerator Initialize<T>(T proxy, ASConfig config)
             where T : AssetProxy
         {
-            IsInitialized = false;
+            if (IsInitialized) yield break;
             _Exception = AssetSystemException.None;
 
             if (proxy is null)
@@ -130,8 +123,8 @@ namespace AIO
 #endif
             Parameter = config;
             Proxy = proxy;
-            yield return Proxy.UpdatePackages(Parameter);
-            if (_Exception != AssetSystemException.None) yield break;
+
+            yield return Proxy.UpdatePackagesCO(Parameter);
             try
             {
                 Parameter.Check();
@@ -142,10 +135,10 @@ namespace AIO
                 yield break;
             }
 
-            yield return Proxy.Initialize();
+            if (_Exception != AssetSystemException.None) yield break;
+            yield return Proxy.InitializeCO();
             if (_Exception != AssetSystemException.None) yield break;
             DownloadHandle = Proxy.GetLoadingHandle();
-            IsInitialized = true;
         }
 
         /// <summary>
@@ -184,11 +177,85 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理缓存资源 (清空之后需要重新下载资源)
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
-        public static void CleanCache(Action<bool> cb = null)
+        public static async void ClearUnusedCache(Action<bool> cb)
         {
-            Proxy.CleanCache(cb);
+            var result = await Proxy.ClearUnusedCacheTask();
+            cb?.Invoke(result);
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static async void ClearUnusedCache()
+        {
+            await Proxy.ClearUnusedCacheTask();
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static Task<bool> CleanUnusedCacheTask()
+        {
+            return Proxy.ClearUnusedCacheTask();
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static IEnumerator CleanUnusedCacheCO(Action<bool> cb)
+        {
+            return Proxy.ClearUnusedCacheCO(cb);
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static IEnumerator CleanUnusedCacheCO()
+        {
+            return Proxy.ClearUnusedCacheCO(null);
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static async void ClearAllCache(Action<bool> cb)
+        {
+            var result = await Proxy.ClearAllCacheTask();
+            cb?.Invoke(result);
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static async void ClearAllCache()
+        {
+            await Proxy.ClearAllCacheTask();
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static Task<bool> CleanAllCacheTask()
+        {
+            return Proxy.ClearAllCacheTask();
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static IEnumerator CleanAllCacheCO(Action<bool> cb)
+        {
+            return Proxy.ClearAllCacheCO(cb);
+        }
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static IEnumerator CleanAllCacheCO()
+        {
+            return Proxy.ClearAllCacheCO(null);
         }
     }
 }

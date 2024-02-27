@@ -34,7 +34,7 @@ using UnityEngine;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
 
 <#
