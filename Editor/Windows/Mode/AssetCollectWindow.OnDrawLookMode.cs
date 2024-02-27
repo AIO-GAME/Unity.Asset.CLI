@@ -841,7 +841,7 @@ namespace AIO.UEditor
             if (Data.Length <= i) return;
             if (Data.Packages[i] is null || Data.Packages[i].Groups is null || j < 0) return;
             if (Data.Packages[i].Length <= j) return;
-            LookModeDisplayTags[key] = Data.Packages[i].Groups[j].GetTags();
+            LookModeDisplayTags[key] = Data.Packages[i].Groups[j].AllTags;
             LookModeDisplayGroups[LookModeDisplayPackages[i]] = GetGroupDisPlayNames(Data.Packages[i].Groups);
             LookModeDisplayCollectors[key] = GetCollectorDisPlayNames(Data.Packages[i].Groups[j].Collectors);
             LookModeDisplayCollectors[key] = GetCollectorDisPlayNames(LookModeDisplayCollectors[key]);

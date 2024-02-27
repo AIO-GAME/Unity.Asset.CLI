@@ -22,10 +22,10 @@ namespace AIO.UEditor.CLI
         /// <summary>
         /// 上传到GCloud 对比清单文件上传
         /// </summary>
-        private static async Task<bool> UploadGCloudExist(ASUploadGCloudConfig config)
+        private static async Task<bool> UploadGCloudExist(AsUploadGCloudParameter parameter)
         {
-            var location = config.RootPath;
-            var remotePath = config.RemoteRelative;
+            var location = parameter.LocalFullPath;
+            var remotePath = parameter.RemoteRelative;
             var remoteManifest = string.Concat(remotePath, '/', "Manifest.json");
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "开始进行清单对比", 0.1f);
 
@@ -96,7 +96,7 @@ namespace AIO.UEditor.CLI
 
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "上传新增修改文件", 0.7f);
             var succeed = await PrGCloud.UploadDirAsync(remotePath.PathGetLastFloder(), location,
-                config.MetaDataKey, config.MetaDataValue);
+                parameter.MetaDataKey, parameter.MetaDataValue);
             if (!succeed)
             {
                 Debug.LogError("上传新增修改文件失败");
@@ -114,7 +114,7 @@ namespace AIO.UEditor.CLI
             }
 
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "更新资源清单配置", 0.83f);
-            succeed = await PrGCloud.UploadFileAsync(remoteManifest, temp, config.MetaDataKey, config.MetaDataValue);
+            succeed = await PrGCloud.UploadFileAsync(remoteManifest, temp, parameter.MetaDataKey, parameter.MetaDataValue);
             if (!succeed)
             {
                 Debug.LogError("上传远端资源清单配置失败");
@@ -129,28 +129,28 @@ namespace AIO.UEditor.CLI
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        private static async Task UploadGCloudAsync(ASUploadGCloudConfig config)
+        private static async Task UploadGCloudAsync(AsUploadGCloudParameter parameter)
         {
             var sw = Stopwatch.StartNew();
             
-            var localFull = config.RootPath;
-            var remotePath = config.RemoteRelative;
+            var localFull = parameter.LocalFullPath;
+            var remotePath = parameter.RemoteRelative;
             var remoteManifest = string.Concat(remotePath, '/', "Manifest.json");
             bool succeed;
 
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "判断是否有清单", 0.1f);
             // 在判断目标文件夹是否有清单文件 如果有则对比清单文件的MD5值 如果一致则不上传
-            if (await PrGCloud.ExistsAsync(remoteManifest)) succeed = await UploadGCloudExist(config);
+            if (await PrGCloud.ExistsAsync(remoteManifest)) succeed = await UploadGCloudExist(parameter);
             else
             {
                 EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "上传资源", 0.2f);
                 succeed = await PrGCloud.UploadDirAsync(remotePath.PathGetLastFloder(), localFull,
-                    config.MetaDataKey, config.MetaDataValue);
+                    parameter.MetaDataKey, parameter.MetaDataValue);
             }
 
             if (succeed)
             {
-                var versionPath = $"{config.RemotePath}/Version/{config.BuildTarget.ToString()}.json";
+                var versionPath = $"{parameter.RemotePath}/Version/{parameter.BuildTarget.ToString()}.json";
                 EHelper.DisplayProgressBar("[Google Cloud] 上传进度", $"更新版本 {versionPath}", 0.9f);
 
                 string versionContent;
@@ -167,16 +167,16 @@ namespace AIO.UEditor.CLI
                         data = new List<AssetsPackageConfig>();
                     }
 
-                    var data2 = data.Find(item => item.Name == config.PackageName);
+                    var data2 = data.Find(item => item.Name == parameter.PackageName);
                     if (data2 is null)
                     {
                         data.Add(new AssetsPackageConfig
                         {
-                            Name = config.PackageName,
-                            Version = config.IsUploadLatest ? "Latest" : config.Version
+                            Name = parameter.PackageName,
+                            Version = parameter.IsUploadLatest ? "Latest" : parameter.Version
                         });
                     }
-                    else data2.Version = config.IsUploadLatest ? "Latest" : config.Version;
+                    else data2.Version = parameter.IsUploadLatest ? "Latest" : parameter.Version;
 
                     versionContent = AHelper.Json.Serialize(data);
                 }
@@ -186,8 +186,8 @@ namespace AIO.UEditor.CLI
                     {
                         new AssetsPackageConfig
                         {
-                            Name = config.PackageName,
-                            Version = config.IsUploadLatest ? "Latest" : config.Version
+                            Name = parameter.PackageName,
+                            Version = parameter.IsUploadLatest ? "Latest" : parameter.Version
                         }
                     });
                 }
@@ -195,7 +195,7 @@ namespace AIO.UEditor.CLI
                 var versionTemp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 await AHelper.IO.WriteUTF8Async(versionTemp, versionContent);
                 succeed = await PrGCloud.UploadFileAsync(versionPath, versionTemp,
-                    config.MetaDataKey, config.MetaDataValue);
+                    parameter.MetaDataKey, parameter.MetaDataValue);
                 AHelper.IO.DeleteFile(versionTemp);
             }
 

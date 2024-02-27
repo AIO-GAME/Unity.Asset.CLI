@@ -4,7 +4,8 @@
     "references": [
         "AIO.Asset.Runtime",
         "AIO.Core.Runtime",
-        "AIO.Core.Editor"
+        "AIO.Core.Editor",
+        "YooAsset.Editor"
     ],
     "includePlatforms": [
         "Editor"

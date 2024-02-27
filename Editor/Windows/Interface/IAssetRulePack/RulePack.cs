@@ -7,6 +7,7 @@
 using System;
 using System.IO;
 using UnityEditor;
+using YooAsset.Editor;
 using PackRuleResult = AIO.UEditor.AssetRulePackResult;
 using PackRuleData = AIO.UEditor.AssetRuleData;
 

@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
         /// <summary>
         /// 预加载资源
@@ -21,7 +21,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadSubAssets<TObject>(string location) where TObject : Object
         {
-            return Proxy.PreLoadSubAssets<TObject>(SettingToLocalPath(location));
+            return Proxy.PreLoadSubAssetsTask<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadSubAssets(string location)
         {
-            return Proxy.PreLoadSubAssets<Object>(SettingToLocalPath(location));
+            return Proxy.PreLoadSubAssetsTask<Object>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadAsset<TObject>(string location) where TObject : Object
         {
-            return Proxy.PreLoadAsset<TObject>(SettingToLocalPath(location));
+            return Proxy.PreLoadAssetTask<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadAsset(string location, Type type)
         {
-            return Proxy.PreLoadAsset(SettingToLocalPath(location), type);
+            return Proxy.PreLoadAssetTask(SettingToLocalPath(location), type);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Task PreLoadRaw(string location)
         {
-            return Proxy.PreLoadRaw(SettingToLocalPath(location));
+            return Proxy.PreLoadRawTask(SettingToLocalPath(location));
         }
     }
 }

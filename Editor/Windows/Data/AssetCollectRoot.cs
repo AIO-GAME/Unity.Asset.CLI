@@ -191,6 +191,17 @@ namespace AIO.UEditor
 
         [InspectorName("包含资源GUID")] public bool IncludeAssetGUID;
 
+        [InspectorName("首包打包规则")] public PackRule SequenceRecordPackRule = PackRule.PackGroup;
+
+        public enum PackRule
+        {
+            [InspectorName("文件路径")] PackSeparately,
+            [InspectorName("父类文件夹路径")] PackDirectory,
+            [InspectorName("收集器下顶级文件夹路径")] PackTopDirectory,
+            [InspectorName("收集器路径")] PackCollector,
+            [InspectorName("分组名称")] PackGroup,
+        }
+
         /// <summary>
         /// 资源收集配置
         /// </summary>
@@ -207,7 +218,7 @@ namespace AIO.UEditor
         {
             return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
         }
-        
+
         public string[] GetPackageNames()
         {
             return Packages?.Select(package => package.Name).ToArray();
@@ -568,26 +579,17 @@ namespace AIO.UEditor
             var path = AssetDatabase.GetAssetPath(obj);
             var guid = AssetDatabase.AssetPathToGUID(path);
             if (string.IsNullOrEmpty(guid)) return;
-            var root = GetOrCreate();
-            var list = new List<(string, string, string)>();
-            foreach (var package in root.Packages)
-            {
-                if (package is null) continue;
-                foreach (var group in package.Groups)
-                {
-                    if (group is null) continue;
-                    foreach (var item in group.Collectors)
-                    {
-                        if (item is null) continue;
-                        if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
-                        if (!path.StartsWith(item.CollectPath)) continue;
-                        // 是否是否被过滤
-                        var address = item.GetAddress(path);
-                        if (string.IsNullOrEmpty(address)) continue;
-                        list.Add((package.Name, group.Name, address));
-                    }
-                }
-            }
+            var list = (from package in GetOrCreate().Packages
+                where !(package is null)
+                from @group in package.Groups
+                where !(@group is null)
+                from item in @group.Collectors
+                where !(item is null)
+                where item.Type == EAssetCollectItemType.MainAssetCollector
+                where path.StartsWith(item.CollectPath)
+                let address = item.GetAddress(path)
+                where !string.IsNullOrEmpty(address)
+                select (package.Name, @group.Name, address)).ToList();
 
             if (list.Count == 0) Debug.Log($"未找到资源 [{path}] 的可寻址路径");
             else

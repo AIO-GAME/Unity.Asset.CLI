@@ -65,7 +65,7 @@ namespace AIO.UEditor.CLI
             var content = EHelper.Prefs.LoadJson(nameof(YooAssetBuildCommand),
                 new AssetBuildCommand
                 {
-                    CopyBuildinFileOption = ECopyBuildinFileOption.None,
+                    CopyBuildInFileOption = ECopyBuildInFileOption.None,
                     OutputNameStyle = EOutputNameStyle.HashName
                 });
             Commond = content;
@@ -139,9 +139,9 @@ namespace AIO.UEditor.CLI
 
             Commond.OutputNameStyle = GELayout.Popup("文件名称样式", Commond.OutputNameStyle);
 
-            Commond.CopyBuildinFileOption = GELayout.Popup("首包资源文件的拷贝方式", Commond.CopyBuildinFileOption);
+            Commond.CopyBuildInFileOption = GELayout.Popup("首包资源文件的拷贝方式", Commond.CopyBuildInFileOption);
 
-            Commond.CopyBuildinFileTags = GELayout.Field("首包资源文件的标签集合", Commond.CopyBuildinFileTags);
+            Commond.CopyBuildInFileTags = GELayout.Field("首包资源文件的标签集合", Commond.CopyBuildInFileTags);
 
             Commond.VerifyBuildingResult = GELayout.ToggleLeft("验证构建结果", Commond.VerifyBuildingResult);
 

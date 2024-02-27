@@ -113,10 +113,10 @@ namespace AIO.UEditor
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                var temp = data.AssetPath.Replace(data.CollectPath, "");
-                temp = temp.Trim('/', '\\');
-                if (string.IsNullOrEmpty(data.UserData)) return temp.Replace('\\', '/');
-                return Path.Combine(data.UserData, temp).Replace('\\', '/');
+                var temp = data.AssetPath.Replace(data.CollectPath, "").Trim('/', '\\');
+                return string.IsNullOrEmpty(data.UserData)
+                    ? temp.Replace('\\', '/')
+                    : string.Concat(data.UserData, '/', temp).Replace('\\', '/');
             }
         }
 
@@ -128,8 +128,9 @@ namespace AIO.UEditor
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                if (string.IsNullOrEmpty(data.UserData)) return Path.GetFileName(data.AssetPath);
-                return Path.Combine(data.UserData, Path.GetFileName(data.AssetPath)).Replace('\\', '/');
+                return string.IsNullOrEmpty(data.UserData)
+                    ? Path.GetFileName(data.AssetPath)
+                    : string.Concat(data.UserData, '/', Path.GetFileName(data.AssetPath)).Replace('\\', '/');
             }
         }
     }

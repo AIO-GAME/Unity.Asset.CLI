@@ -12,13 +12,8 @@ using AIO.UEngine;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
-        /// <summary>
-        /// 记录序列资源标签
-        /// </summary>
-        internal const string TagsRecord = "SequenceRecord";
-
         /// <summary>
         /// 获取下载器
         /// </summary>
@@ -45,7 +40,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadTagWithRecord(string tag, DownlandAssetEvent dEvent = default)
         {
-            yield return DownloadTagWithRecord(new[] { tag }, dEvent);
+            yield return DownloadTag(new[] { TagsRecord, tag }, dEvent);
         }
 
         /// <summary>
@@ -64,7 +59,7 @@ namespace AIO
                     yield return handle.WaitCo();
                 }
             }
-            else WhiteListLocal.AddRange(GetAssetInfos(enumerable));
+            else WhiteListLocal.AddRange(GetAddressByTag(enumerable));
         }
 
         /// <summary>
@@ -85,7 +80,7 @@ namespace AIO
             }
             else
             {
-                WhiteListLocal.AddRange(GetAssetInfos(tags));
+                WhiteListLocal.AddRange(GetAddressByTag(tags));
                 dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
             }
         }
@@ -107,7 +102,7 @@ namespace AIO
             }
             else
             {
-                WhiteListLocal.AddRange(GetAssetInfos(TagsRecord));
+                WhiteListLocal.AddRange(GetAddressByTag(TagsRecord));
                 dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
             }
         }
@@ -116,20 +111,21 @@ namespace AIO
         /// 预下载全部远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator DownloadAll(DownlandAssetEvent aevent = default)
+        public static IEnumerator DownloadAll(DownlandAssetEvent dEvent = default)
         {
-            if (Parameter.ASMode != EASMode.Remote)
+            if (Parameter.ASMode == EASMode.Remote)
+            {
+                using (var handle = Proxy.GetDownloader(dEvent))
+                {
+                    handle.Begin();
+                    handle.CollectNeedAll();
+                    yield return handle.WaitCo();
+                }
+            }
+            else
             {
                 WhiteAll = true;
-                aevent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
-                yield break;
-            }
-
-            using (var handle = Proxy.GetDownloader(aevent))
-            {
-                handle.Begin();
-                handle.CollectNeedAll();
-                yield return handle.WaitCo();
+                dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
             }
         }
 
@@ -139,17 +135,15 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadHeader(DownlandAssetEvent dEvent = default)
         {
-            if (Parameter.ASMode != EASMode.Remote)
+            if (Parameter.ASMode == EASMode.Remote)
             {
-                dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
-                yield break;
+                using (var handle = Proxy.GetDownloader(dEvent))
+                {
+                    handle.Begin();
+                    yield return handle.WaitCo();
+                }
             }
-
-            using (var handle = Proxy.GetDownloader(dEvent))
-            {
-                handle.Begin();
-                yield return handle.WaitCo();
-            }
+            else dEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
         }
     }
 }

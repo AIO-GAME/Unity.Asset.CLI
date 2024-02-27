@@ -10,6 +10,9 @@ namespace AIO.UEditor
 {
     public static class AssetCollectSetting
     {
+        /// <summary>
+        /// 资源可寻址类型列表
+        /// </summary>
         public static DisplayList<IAssetRuleAddress> MapAddress
         {
             get
@@ -19,6 +22,9 @@ namespace AIO.UEditor
             }
         }
 
+        /// <summary>
+        /// 资源收集类型列表
+        /// </summary>
         public static DisplayList<IAssetRuleFilter> MapCollect
         {
             get
@@ -28,6 +34,9 @@ namespace AIO.UEditor
             }
         }
 
+        /// <summary>
+        /// 资源过滤类型列表
+        /// </summary>
         public static DisplayList<IAssetRuleFilter> MapFilter
         {
             get
@@ -38,6 +47,9 @@ namespace AIO.UEditor
         }
 
 
+        /// <summary>
+        /// 资源打包类型列表
+        /// </summary>
         public static DisplayList<IAssetRulePack> MapPacks
         {
             get

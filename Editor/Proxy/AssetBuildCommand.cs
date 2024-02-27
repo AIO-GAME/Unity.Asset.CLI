@@ -54,12 +54,12 @@ namespace AIO.UEditor
         /// <summary>
         /// 首包资源文件的拷贝方式
         /// </summary>
-        public const string C_COPY_BUILDIN_FILE_OPTION = PREFIX + nameof(CopyBuildinFileOption);
+        public const string C_COPY_BUILD_IN_FILE_OPTION = PREFIX + nameof(CopyBuildInFileOption);
 
         /// <summary>
         /// 首包资源文件的标签集合
         /// </summary>
-        public const string C_COPY_BUILDIN_FILE_TAGS = PREFIX + nameof(CopyBuildinFileTags);
+        public const string C_COPY_BUILD_IN_FILE_TAGS = PREFIX + nameof(CopyBuildInFileTags);
 
         /// <summary>
         /// 文件输出根目录
@@ -108,11 +108,11 @@ namespace AIO.UEditor
         [Argument(C_OUTPUT_NAME_STYLE, EArgLabel.Enum)]
         public EOutputNameStyle OutputNameStyle = EOutputNameStyle.BundleName_HashName;
 
-        [Argument(C_COPY_BUILDIN_FILE_OPTION, EArgLabel.Enum)]
-        public ECopyBuildinFileOption CopyBuildinFileOption = ECopyBuildinFileOption.ClearAndCopyAll;
+        [Argument(C_COPY_BUILD_IN_FILE_OPTION, EArgLabel.Enum)]
+        public ECopyBuildInFileOption CopyBuildInFileOption = ECopyBuildInFileOption.ClearAndCopyAll;
 
-        [Argument(C_COPY_BUILDIN_FILE_TAGS, EArgLabel.String)]
-        public string CopyBuildinFileTags = string.Empty;
+        [Argument(C_COPY_BUILD_IN_FILE_TAGS, EArgLabel.String)]
+        public string CopyBuildInFileTags = string.Empty;
 
         [Argument(C_OUTPUT_ROOT, EArgLabel.String)]
         public string OutputRoot = string.Empty;

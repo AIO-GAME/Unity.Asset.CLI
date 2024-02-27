@@ -37,8 +37,8 @@ namespace AIO.UEditor.CLI
             if (Enum.IsDefined(typeof(EOutputNameStyle), buildArgs.OutputNameStyle))
                 buildArgs.OutputNameStyle = EOutputNameStyle.BundleName_HashName;
 
-            if (Enum.IsDefined(typeof(ECopyBuildinFileOption), buildArgs.CopyBuildinFileOption))
-                buildArgs.CopyBuildinFileOption = ECopyBuildinFileOption.None;
+            if (Enum.IsDefined(typeof(ECopyBuildInFileOption), buildArgs.CopyBuildInFileOption))
+                buildArgs.CopyBuildInFileOption = ECopyBuildInFileOption.None;
 
             if (Enum.IsDefined(typeof(ECompressOption), buildArgs.CompressOption))
                 buildArgs.CompressOption = ECompressMode.LZ4;
@@ -148,7 +148,7 @@ namespace AIO.UEditor.CLI
                 BuildMode = buildMode,
                 PackageName = command.BuildPackage,
                 SharedPackRule = new ZeroRedundancySharedPackRule(),
-                CopyBuildinFileTags = command.CopyBuildinFileTags,
+                CopyBuildinFileTags = command.CopyBuildInFileTags,
                 VerifyBuildingResult = command.VerifyBuildingResult,
                 PackageVersion = command.PackageVersion,
                 BuildOutputRoot = command.OutputRoot,

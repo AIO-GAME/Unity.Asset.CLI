@@ -7,46 +7,41 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace AIO
 {
-    public partial class AssetSystem
+    partial class AssetSystem
     {
-        /// <summary>
-        /// 运行时 内置文件目录 
-        /// </summary>
-        /// <remarks>
-        /// (Application.streamingAssetsPath)/RuntimeRootDirectory
-        /// </remarks>
-        public static string BuildInRootDirectory { get; private set; }
-
-        /// <summary>
-        /// 运行时 缓存文件目录 
-        /// </summary>
-        /// <remarks>
-        /// (Application.persistentDataPath)/RuntimeRootDirectory
-        /// </remarks>
-        public static string SandboxRootDirectory { get; private set; }
-
         /// <summary>
         /// 获取指定标签资源可寻址列表
         /// </summary>
         /// <param name="tag">资源标签</param>
         /// <returns>寻址列表</returns>
-        public static ICollection<string> GetAssetInfos(string tag)
+        public static ICollection<string> GetAddressByTag(string tag)
         {
-            return Proxy.GetAssetInfos(tag);
+            return Proxy.GetAddressByTag(new[] { tag });
+        }
+
+        /// <summary>
+        /// 根据资源标签获取资源信息
+        /// </summary>
+        /// <param name="tag">资源标签</param>
+        /// <param name="tags">资源标签</param>
+        public static ICollection<string> GetAddressByTag(string tag, params string[] tags)
+        {
+            return Proxy.GetAddressByTag(tags.Append(tag));
         }
 
         /// <summary>
         /// 获取指定标签资源可寻址列表
         /// </summary>
-        /// <param name="tag">资源标签</param>
+        /// <param name="tags">资源标签</param>
         /// <returns>寻址列表</returns>
-        public static ICollection<string> GetAssetInfos(IEnumerable<string> tag)
+        public static ICollection<string> GetAddressByTag(IEnumerable<string> tags)
         {
-            return Proxy.GetAssetInfos(tag);
+            return Proxy.GetAddressByTag(tags);
         }
 
         /// <summary>
@@ -116,7 +111,7 @@ namespace AIO
         /// <summary>
         /// 获取可用磁盘空间
         /// </summary>
-        /// <returns></returns>
+        /// <returns>剩余空间字节数</returns>
         public static long GetAvailableDiskSpace()
         {
             try

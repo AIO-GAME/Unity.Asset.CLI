@@ -12,13 +12,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
+using AIO.YamlDotNet.Core;
 using AIO.YamlDotNet.Serialization;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using YooAsset.Editor;
-using Object = System.Object;
 
 namespace AIO.UEditor.CLI
 {
@@ -53,7 +53,7 @@ namespace AIO.UEditor.CLI
 
             if (!EHelper.IsCMD())
             {
-                EditorUtility.DisplayDialog("构建成功", $"构建 {string.Join(',', enumerable)} 成功", "确定");
+                EditorUtility.DisplayDialog("构建成功", $"构建 {string.Join(",", enumerable)} 成功", "确定");
             }
 
             return true;
@@ -85,14 +85,14 @@ namespace AIO.UEditor.CLI
         /// Tips:
         /// 需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        public Task UploadGCloud(ASUploadGCloudConfig config)
+        public Task UploadGCloud(AsUploadGCloudParameter parameter)
         {
-            return UploadGCloudAsync(config);
+            return UploadGCloudAsync(parameter);
         }
 
         protected class MonoImporter
         {
-            [YamlMember(typeof(Icon), ScalarStyle = YamlDotNet.Core.ScalarStyle.Any)]
+            [YamlMember(typeof(Icon), ScalarStyle = ScalarStyle.Any)]
             public Icon icon { get; set; }
 
             public MonoImporter(string guid)
@@ -102,13 +102,13 @@ namespace AIO.UEditor.CLI
 
             public class Icon
             {
-                [YamlMember(typeof(int), ScalarStyle = YamlDotNet.Core.ScalarStyle.Plain)]
+                [YamlMember(typeof(int), ScalarStyle = ScalarStyle.Plain)]
                 public int fileID { get; set; }
 
-                [YamlMember(typeof(string), ScalarStyle = YamlDotNet.Core.ScalarStyle.Plain)]
+                [YamlMember(typeof(string), ScalarStyle = ScalarStyle.Plain)]
                 public string guid { get; set; }
 
-                [YamlMember(typeof(int), ScalarStyle = YamlDotNet.Core.ScalarStyle.Plain)]
+                [YamlMember(typeof(int), ScalarStyle = ScalarStyle.Plain)]
                 public int type { get; set; }
 
                 public Icon(string guid)
@@ -134,9 +134,9 @@ namespace AIO.UEditor.CLI
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public async Task UploadFtp(ASUploadFTPConfig config)
+        public async Task UploadFtp(AsUploadFtpParameter parameter)
         {
-            await UploadFtpAsync(config);
+            await UploadFtpAsync(parameter);
         }
 
         [MenuItem("YooAsset/Create Config")]

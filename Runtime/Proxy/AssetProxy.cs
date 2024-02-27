@@ -6,12 +6,15 @@
 
 using System;
 using System.Collections;
+using System.Threading.Tasks;
+using UnityEngine.Scripting;
 
 namespace AIO.UEngine
 {
     /// <summary>
     /// 资源管理系统 - 资源代理
     /// </summary>
+    [Preserve]
     public abstract partial class AssetProxy : IDisposable
     {
         /// <summary>
@@ -21,15 +24,25 @@ namespace AIO.UEngine
         public abstract void UnloadUnusedAssets(bool isForce = false);
 
         /// <summary>
-        /// 初始化
+        /// 是否已经初始化
         /// </summary>
-        public abstract IEnumerator Initialize();
+        public abstract bool IsInitialize { get; }
+
+        /// <summary>
+        /// 初始化协程
+        /// </summary>
+        public abstract IEnumerator InitializeCO();
+
+        /// <summary>
+        /// 初始化任务
+        /// </summary>
+        public abstract Task InitializeTask();
 
         /// <summary>
         /// 更新资源包
         /// </summary>
         /// <returns></returns>
-        public abstract IEnumerator UpdatePackages(ASConfig config);
+        public abstract IEnumerator UpdatePackagesCO(ASConfig config);
 
         /// <summary>
         /// 释放资源句柄
@@ -44,7 +57,7 @@ namespace AIO.UEngine
         /// Ture: 已经加载
         /// False: 未加载
         /// </returns>
-        public abstract bool IsAlreadyLoad(string location);
+        public abstract bool AlreadyLoad(string location);
 
         /// <summary>
         /// 获取下载器
@@ -52,8 +65,38 @@ namespace AIO.UEngine
         public abstract IASNetLoading GetLoadingHandle();
 
         /// <summary>
-        /// 清空资源缓存
+        /// 清理包裹未使用的缓存文件
         /// </summary>
-        public abstract void CleanCache(Action<bool> cb);
+        public abstract Task<bool> ClearUnusedCacheTask();
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件
+        /// </summary>
+        public abstract IEnumerator ClearUnusedCacheCO(Action<bool> cb);
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件
+        /// </summary>
+        public abstract Task<bool> ClearAllCacheTask();
+
+        /// <summary>
+        /// 清理包裹未使用的缓存文件
+        /// </summary>
+        public abstract IEnumerator ClearAllCacheCO(Action<bool> cb);
+
+        public sealed override bool Equals(object obj)
+        {
+            return false;
+        }
+
+        public sealed override string ToString()
+        {
+            return string.Empty;
+        }
+
+        public sealed override int GetHashCode()
+        {
+            return 0;
+        }
     }
 }

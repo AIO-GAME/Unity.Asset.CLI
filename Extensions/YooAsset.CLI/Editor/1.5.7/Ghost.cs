@@ -24,13 +24,13 @@ namespace AIO.UEditor.CLI
             [MenuItem("AIO/CLI/UnInstall/YooAsset[" + Version + "](CN)", false, 0)]
             internal static void UnInstallCN()
             {
-                EHelper.Ghost.OpenupmUnInstall(Scopes, true);
+                EHelper.Ghost.UnInstallOpenUpm(Scopes, true);
             }
 
             [MenuItem("AIO/CLI/UnInstall/YooAsset[" + Version + "]", false, 0)]
             internal static void UnInstall()
             {
-                EHelper.Ghost.OpenupmUnInstall(Scopes);
+                EHelper.Ghost.UnInstallOpenUpm(Scopes);
             }
         }
     }

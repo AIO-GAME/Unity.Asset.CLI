@@ -9,8 +9,39 @@ using IFilterRule = AIO.UEditor.IAssetRuleFilter;
 
 namespace AIO.UEditor
 {
-    public partial class RuleCollect
+    public static partial class RuleCollect
     {
+        /// <summary>
+        /// 判断是否为自定义收集规则
+        /// </summary>
+        internal static bool IsCollectAssetCustom(IEnumerable<string> filterCollect, string extension)
+        {
+            if (filterCollect is null) return false;
+            foreach (var collect in filterCollect)
+            {
+                switch (collect[0])
+                {
+                    case '.':
+                    {
+                        if (collect.Substring(1) == extension) return true;
+                        break;
+                    }
+                    case '*':
+                    {
+                        if (collect.Substring(1) == extension) return true;
+                        break;
+                    }
+                    default:
+                    {
+                        if (collect == extension) return true;
+                        break;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public class CollectFBX : IFilterRule
         {
             public string DisplayFilterName => "*.fbx";
@@ -59,37 +90,6 @@ namespace AIO.UEditor
             {
                 return data.Extension == "unity";
             }
-        }
-
-        /// <summary>
-        /// 判断是否为自定义收集规则
-        /// </summary>
-        internal static bool IsCollectAssetCustom(IEnumerable<string> filterCollect, string extension)
-        {
-            if (filterCollect is null) return false;
-            foreach (var collect in filterCollect)
-            {
-                switch (collect[0])
-                {
-                    case '.':
-                    {
-                        if (collect.Substring(1) == extension) return true;
-                        break;
-                    }
-                    case '*':
-                    {
-                        if (collect.Substring(1) == extension) return true;
-                        break;
-                    }
-                    default:
-                    {
-                        if (collect == extension) return true;
-                        break;
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }

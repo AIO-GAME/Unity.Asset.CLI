@@ -236,8 +236,7 @@ namespace AIO.UEditor
                     {
                         var temp = new List<string>(Data.GetPackageNames());
                         temp.Add(AssetSystem.TagsRecord);
-                        string.Join(',', temp.ToArray());
-                        if (EditorUtility.DisplayDialog("构建全部资源包", $"构建\n {string.Join(',', temp.ToArray())} 资源包?",
+                        if (EditorUtility.DisplayDialog("构建全部资源包", $"构建\n {string.Join(",", temp.ToArray())} 资源包?",
                                 "确定", "取消"))
                         {
                             try

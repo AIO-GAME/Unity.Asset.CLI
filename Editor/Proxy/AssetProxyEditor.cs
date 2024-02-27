@@ -7,7 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AIO.UEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -22,10 +21,12 @@ namespace AIO.UEditor
     {
         private static IAssetProxyEditor Editor;
 
-        static AssetProxyEditor()
+        [AInit(mode: EInitAttrMode.Both, int.MaxValue)]
+        public static void Initialize()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+                if (!assembly.GetName().Name.Contains("Editor")) continue;
                 foreach (var type in assembly.GetTypes())
                 {
                     if (type.IsAbstract) continue;
@@ -56,7 +57,7 @@ namespace AIO.UEditor
         /// <summary>
         /// 上传到GCloud
         /// </summary>
-        public static async Task UploadGCloud(ASUploadGCloudConfig config, bool isTips = false)
+        public static async Task UploadGCloud(AsUploadGCloudParameter parameter, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -64,16 +65,16 @@ namespace AIO.UEditor
                 return;
             }
 
-            PrGCloud.Gcloud = string.IsNullOrEmpty(config.GCLOUD_PATH) ? "gcloud" : config.GCLOUD_PATH;
-            PrGCloud.Gsutil = string.IsNullOrEmpty(config.GSUTIL_PATH) ? "gsutil" : config.GSUTIL_PATH;
-            await Editor.UploadGCloud(config);
+            PrGCloud.Gcloud = string.IsNullOrEmpty(parameter.GCLOUD_PATH) ? "gcloud" : parameter.GCLOUD_PATH;
+            PrGCloud.Gsutil = string.IsNullOrEmpty(parameter.GSUTIL_PATH) ? "gsutil" : parameter.GSUTIL_PATH;
+            await Editor.UploadGCloud(parameter);
         }
 
 
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public static async Task UploadFtp(ASUploadFTPConfig config, bool isTips = false)
+        public static async Task UploadFtp(AsUploadFtpParameter parameter, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -81,7 +82,7 @@ namespace AIO.UEditor
                 return;
             }
 
-            await Editor.UploadFtp(config);
+            await Editor.UploadFtp(parameter);
         }
 
         public static void BuildArtAll(ASBuildConfig config, bool isTips = false)
@@ -95,7 +96,7 @@ namespace AIO.UEditor
                 BuildPipeline = config.BuildPipeline,
                 OutputRoot = config.BuildOutputPath,
                 BuildMode = config.BuildMode,
-                CopyBuildinFileTags = config.FirstPackTag,
+                CopyBuildInFileTags = config.FirstPackTag,
                 MergeToLatest = config.MergeToLatest,
             };
             var array = AssetCollectRoot.GetOrCreate().GetPackageNames();
@@ -119,7 +120,7 @@ namespace AIO.UEditor
                 BuildPipeline = config.BuildPipeline,
                 OutputRoot = config.BuildOutputPath,
                 BuildMode = config.BuildMode,
-                CopyBuildinFileTags = config.FirstPackTag,
+                CopyBuildInFileTags = config.FirstPackTag,
                 MergeToLatest = config.MergeToLatest,
             };
             if (config.BuildFirstPackage) command.BuildPackage = AssetSystem.TagsRecord;
@@ -207,20 +208,20 @@ namespace AIO.UEditor
 
             private void OnGUI()
             {
-                GELayout.Separator();
-                using (GELayout.VHorizontal())
+                EditorGUILayout.Separator();
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    type = GELayout.Popup(type);
-                    isCN = GELayout.ToggleLeft("国区", isCN, GUILayout.Width(45));
+                    type = (Types)EditorGUILayout.EnumPopup(type);
+                    isCN = EditorGUILayout.ToggleLeft("国区", isCN, GUILayout.Width(45));
                 }
 
-                GELayout.Separator();
-                if (GELayout.Button("确定"))
+                EditorGUILayout.Separator();
+                if (GUILayout.Button("确定"))
                 {
                     switch (type)
                     {
                         case Types.YooAsset:
-                            EHelper.Ghost.OpenupmInstall("com.tuyoogame.yooasset", "1.5.7", isCN);
+                            EHelper.Ghost.InstallOpenUpm("com.tuyoogame.yooasset", "1.5.7", isCN);
                             break;
                     }
 

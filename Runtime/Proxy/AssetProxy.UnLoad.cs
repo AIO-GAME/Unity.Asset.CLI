@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace AIO.UEngine
 {
-    public partial class AssetProxy
+    partial class AssetProxy
     {
         public abstract Task UnloadSceneTask(string location);
 
-        public abstract IEnumerator UnloadSceneCO(string location, Action cb = null);
+        public abstract IEnumerator UnloadSceneCO(string location, Action cb);
     }
 }

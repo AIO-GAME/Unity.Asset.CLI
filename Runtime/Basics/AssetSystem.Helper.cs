@@ -6,52 +6,12 @@
 
 using System.Diagnostics;
 using AIO.UEngine;
-using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace AIO
 {
     [IgnoreConsoleJump]
-    public static partial class AssetSystem
+    partial class AssetSystem
     {
-        /// <summary>
-        /// 运行平台
-        /// </summary>
-        public static RuntimePlatform Platform => Application.platform;
-
-        /// <summary>
-        /// 平台名称 字符串
-        /// </summary>
-        /// <returns></returns>
-        public static string PlatformNameStr
-        {
-            get
-            {
-#if UNITY_EDITOR
-                return EditorUserBuildSettings.activeBuildTarget.ToString();
-#else
-                switch (Application.platform)
-                {
-                    case RuntimePlatform.WindowsPlayer:
-                    case RuntimePlatform.WindowsEditor:
-                        return "StandaloneWindows64";
-                    case RuntimePlatform.OSXPlayer:
-                    case RuntimePlatform.OSXEditor:
-                        return "StandaloneOSX";
-                    case RuntimePlatform.IPhonePlayer:
-                        return "iOS";
-                    case RuntimePlatform.Android:
-                        return "Android";
-                    case RuntimePlatform.WebGLPlayer:
-                        return "WebGL";
-                    default: return Application.platform.ToString();
-                }
-#endif
-            }
-        }
-
         /// <summary>
         /// 是否需要从远端更新下载
         /// </summary>
@@ -59,7 +19,8 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static bool IsNeedDownloadFromRemote(string location)
         {
-            return Parameter.ASMode == EASMode.Remote && Proxy.IsNeedDownloadFromRemote(SettingToLocalPath(location));
+            return Parameter.ASMode == EASMode.Remote &&
+                   Proxy.CheckNeedDownloadFromRemote(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -81,7 +42,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static bool IsAlreadyLoad(string location)
         {
-            return Proxy.IsAlreadyLoad(SettingToLocalPath(location));
+            return Proxy.AlreadyLoad(SettingToLocalPath(location));
         }
 
         /// <summary>
