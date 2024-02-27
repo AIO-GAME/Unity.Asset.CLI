@@ -512,12 +512,12 @@ namespace AIO.UEditor
             DoEditorDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
             DoConfigDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
 
-            ViewSetting = new ViewRect(150, DoEditorDrawRect.height)
+            ViewSetting = new ViewRect(250, DoEditorDrawRect.height)
             {
                 IsShow = true,
                 IsAllowHorizontal = false,
                 DragHorizontalWidth = 5,
-                width = 150
+                width = 250
             };
             ViewConfig = new ViewRect(550, DoEditorDrawRect.height)
             {

@@ -191,6 +191,17 @@ namespace AIO.UEditor
 
         [InspectorName("包含资源GUID")] public bool IncludeAssetGUID;
 
+        [InspectorName("首包打包规则")] public PackRule SequenceRecordPackRule = PackRule.PackGroup;
+
+        public enum PackRule
+        {
+            [InspectorName("文件路径")] PackSeparately,
+            [InspectorName("父类文件夹路径")] PackDirectory,
+            [InspectorName("收集器下顶级文件夹路径")] PackTopDirectory,
+            [InspectorName("收集器路径")] PackCollector,
+            [InspectorName("分组名称")] PackGroup,
+        }
+
         /// <summary>
         /// 资源收集配置
         /// </summary>

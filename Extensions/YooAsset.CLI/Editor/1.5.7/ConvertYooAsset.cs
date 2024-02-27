@@ -208,6 +208,8 @@ namespace AIO.UEditor.CLI
                     AssetTags = AssetSystem.TagsRecord,
                     Collectors = new List<AssetBundleCollector>()
                 };
+
+                var packRule = asset.SequenceRecordPackRule.ToString();
                 foreach (var group in package.Groups)
                 {
                     if (group.Collectors is null) continue;
@@ -224,7 +226,7 @@ namespace AIO.UEditor.CLI
                             AssetTags = string.Concat(group.AssetTags, ',', collector.AssetTags).Trim(','),
                             AddressRuleName = nameof(AIOAddressRecordRule),
                             FilterRuleName = nameof(AIOFilterRecordRule),
-                            PackRuleName = nameof(PackCollector),
+                            PackRuleName = packRule,
                             UserData = group.GroupName,
                         });
                     }

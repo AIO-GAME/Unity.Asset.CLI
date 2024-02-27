@@ -94,27 +94,63 @@ namespace AIO.UEditor
 
             using (new EditorGUILayout.VerticalScope(GEStyle.Badge))
             {
-                Data.EnableAddressable = EditorGUILayout.ToggleLeft("开启地址化", Data.EnableAddressable,
-                    min);
-                Data.IncludeAssetGUID = EditorGUILayout.ToggleLeft("包含资源GUID", Data.IncludeAssetGUID,
-                    min);
-                Data.UniqueBundleName = EditorGUILayout.ToggleLeft("唯一Bundle名称", Data.UniqueBundleName,
-                    min);
-            }
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("开启地址化", GUILayout.Width(100));
+                    if (GUILayout.Button(Data.EnableAddressable ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Data.EnableAddressable = !Data.EnableAddressable;
+                }
 
-            EditorGUILayout.Separator();
-            using (new EditorGUILayout.VerticalScope(GEStyle.Badge))
-            {
-                Config.OutputLog = EditorGUILayout.ToggleLeft("开启日志输出", Config.OutputLog,
-                    min);
-                Config.LoadPathToLower = EditorGUILayout.ToggleLeft("定位地址小写", Config.LoadPathToLower,
-                    min);
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("包含资源GUID", GUILayout.Width(100));
+                    if (GUILayout.Button(Data.IncludeAssetGUID ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Data.IncludeAssetGUID = !Data.IncludeAssetGUID;
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("唯一Bundle名称", GUILayout.Width(100));
+                    if (GUILayout.Button(Data.UniqueBundleName ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Data.UniqueBundleName = !Data.UniqueBundleName;
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("首包打包规则", GUILayout.Width(100));
+                    Data.SequenceRecordPackRule =
+                        GELayout.Popup(Data.SequenceRecordPackRule, GEStyle.ToolbarDropDownRight);
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("日志输出", GUILayout.Width(100));
+                    if (GUILayout.Button(Config.OutputLog ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Config.OutputLog = !Config.OutputLog;
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("定位地址小写", GUILayout.Width(100));
+                    if (GUILayout.Button(Config.LoadPathToLower ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Config.LoadPathToLower = !Config.LoadPathToLower;
+                }
+
                 if (Config.ASMode == EASMode.Remote)
                 {
-                    Config.AutoSaveVersion = EditorGUILayout.ToggleLeft("自动激活清单", Config.AutoSaveVersion,
-                        min);
-                    Config.AppendTimeTicks = EditorGUILayout.ToggleLeft("请求附加时间磋", Config.AppendTimeTicks,
-                        min);
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                    {
+                        EditorGUILayout.LabelField("自动激活清单", GUILayout.Width(100));
+                        if (GUILayout.Button(Config.AutoSaveVersion ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                            Config.AutoSaveVersion = !Config.AutoSaveVersion;
+                    }
+
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                    {
+                        EditorGUILayout.LabelField("请求附加时间磋", GUILayout.Width(100));
+                        if (GUILayout.Button(Config.AppendTimeTicks ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                            Config.AppendTimeTicks = !Config.AppendTimeTicks;
+                    }
                 }
             }
         }
