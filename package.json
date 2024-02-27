@@ -2,7 +2,7 @@
   "name": "com.aio.cli.asset",
   "displayName": "AIO Unity CLI Asset",
   "description": "AIO Unity CLI Asset",
-  "version": "1.0.37-preview",
+  "version": "1.1.1-preview",
   "unity": "2019.4",
   "unityRelease": "0f1",
   "license": "MIT",
@@ -14,10 +14,10 @@
     "url": "https://github.com/AIO-GAME/Unity.Asset.CLI.git"
   },
   "dependencies": {
-    "com.aio.package": "1.0.35-preview"
+    "com.aio.package": "1.0.36-preview"
   },
   "relatedPackages": {
-    "com.aio.package": "1.0.35-preview"
+    "com.aio.package": "1.0.36-preview"
   },
   "keywords": ["Asset", "YooAsset", "Unity Asset", "Resource"],
   "author": {
