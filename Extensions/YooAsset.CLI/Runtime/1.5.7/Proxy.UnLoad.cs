@@ -27,10 +27,10 @@ namespace AIO.UEngine.YooAsset
         {
             if (string.IsNullOrEmpty(location)) return;
             if (operation is null) return;
-            if (ReferenceOPHandle.ContainsKey(location))
+            if (ReferenceOPHandle.TryGetValue(location, out var value))
             {
-                ReleaseInternal?.Invoke(ReferenceOPHandle[location], null);
                 ReferenceOPHandle.Remove(location);
+                ReleaseInternal?.Invoke(value, null);
             }
 
             ReferenceOPHandle[location] = operation;
@@ -40,8 +40,8 @@ namespace AIO.UEngine.YooAsset
         {
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
             {
-                ReleaseInternal?.Invoke(operation, null);
                 ReferenceOPHandle.Remove(location);
+                ReleaseInternal?.Invoke(operation, null);
             }
         }
 
@@ -83,23 +83,23 @@ namespace AIO.UEngine.YooAsset
 
         public override async Task UnloadSceneTask(string location)
         {
-            if (ReferenceOPHandle.TryGetValue(location, out var value))
+            if (ReferenceOPHandle.TryGetValue(location, out var operation))
             {
-                if (value is SceneOperationHandle handle)
-                    await handle.UnloadAsync().Task;
-                ReleaseInternal?.Invoke(value, null);
                 ReferenceOPHandle.Remove(location);
+                if (operation is SceneOperationHandle handle)
+                    await handle.UnloadAsync().Task;
+                ReleaseInternal?.Invoke(operation, null);
             }
         }
 
         public override IEnumerator UnloadSceneCO(string location, Action cb)
         {
-            if (ReferenceOPHandle.TryGetValue(location, out var value))
+            if (ReferenceOPHandle.TryGetValue(location, out var operation))
             {
-                if (value is SceneOperationHandle handle)
-                    yield return handle.UnloadAsync();
-                ReleaseInternal?.Invoke(value, null);
                 ReferenceOPHandle.Remove(location);
+                if (operation is SceneOperationHandle handle)
+                    yield return handle.UnloadAsync();
+                ReleaseInternal?.Invoke(operation, null);
             }
         }
 
