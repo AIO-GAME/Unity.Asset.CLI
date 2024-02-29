@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| USER
-|*|Date:       |*| 2024-01-11
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
-#if SUPPORT_YOOASSET
+﻿#if SUPPORT_YOOASSET
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -114,7 +108,8 @@ namespace AIO.UEditor.CLI
             }
 
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "更新资源清单配置", 0.83f);
-            succeed = await PrGCloud.UploadFileAsync(remoteManifest, temp, parameter.MetaDataKey, parameter.MetaDataValue);
+            succeed = await PrGCloud.UploadFileAsync(remoteManifest, temp, parameter.MetaDataKey,
+                parameter.MetaDataValue);
             if (!succeed)
             {
                 Debug.LogError("上传远端资源清单配置失败");
@@ -127,18 +122,17 @@ namespace AIO.UEditor.CLI
         }
 
         /// <summary>
-        /// 上传到Ftp
+        /// 上传到GCloud
         /// </summary>
         private static async Task UploadGCloudAsync(AsUploadGCloudParameter parameter)
         {
-            var sw = Stopwatch.StartNew();
-            
             var localFull = parameter.LocalFullPath;
             var remotePath = parameter.RemoteRelative;
             var remoteManifest = string.Concat(remotePath, '/', "Manifest.json");
             bool succeed;
-
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "判断是否有清单", 0.1f);
+
+            var sw = Stopwatch.StartNew();
             // 在判断目标文件夹是否有清单文件 如果有则对比清单文件的MD5值 如果一致则不上传
             if (await PrGCloud.ExistsAsync(remoteManifest)) succeed = await UploadGCloudExist(parameter);
             else

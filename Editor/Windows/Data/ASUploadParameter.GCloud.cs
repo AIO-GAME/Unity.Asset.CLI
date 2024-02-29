@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-26
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEditor;
@@ -186,6 +180,8 @@ namespace AIO.UEditor
                 config.MetaDataKey = MetaDataKey;
                 config.MetaDataValue = MetaDataValue;
                 config.LocalFullPath = DirTreeFiled.DirPath.Replace("\\", "/");
+                config.GCLOUD_PATH = GCLOUD_PATH;
+                config.GSUTIL_PATH = GSUTIL_PATH;
                 await AssetProxyEditor.UploadGCloud(config);
                 isUploading = false;
             }

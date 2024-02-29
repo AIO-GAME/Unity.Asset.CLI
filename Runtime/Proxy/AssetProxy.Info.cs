@@ -1,10 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -17,21 +11,6 @@ namespace AIO.UEngine
         /// </summary>
         /// <returns></returns>
         public abstract IASDownloader GetDownloader(DownlandAssetEvent progress = default);
-
-        /// <summary>
-        /// 释放资源句柄
-        /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public abstract void HandleFree(string location);
-
-        /// <summary>
-        /// 释放资源句柄
-        /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public virtual void FreeHandle(IEnumerable<string> locations)
-        {
-            foreach (var location in locations) HandleFree(location);
-        }
 
         #region 资源信息
 

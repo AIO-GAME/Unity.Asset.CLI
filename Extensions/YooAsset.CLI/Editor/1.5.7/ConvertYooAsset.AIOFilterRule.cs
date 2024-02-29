@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| USER
-|*|Date:       |*| 2024-01-08
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
-#if SUPPORT_YOOASSET
+﻿#if SUPPORT_YOOASSET
 using System.IO;
 using AIO.UEngine;
 using UnityEngine;
@@ -42,7 +36,7 @@ namespace AIO.UEditor.CLI
                     ?.GetByGroupName(info.Item2)
                     ?.GetByPath(data.CollectPath);
                 if (collector is null) return false;
-      
+
                 var mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : ASConfig.GetOrCreate().ASMode;
                 if (mode == EASMode.Editor &&
                     collector.LoadType == EAssetLoadType.Runtime)

@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-04
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-namespace AIO.UEditor
+﻿namespace AIO.UEditor
 {
     public struct AssetRuleData
     {
@@ -17,12 +11,12 @@ namespace AIO.UEditor
         /// 资源路径 (不包含扩展名)
         /// </summary>
         public string AssetPath;
-        
+
         /// <summary>
         /// 扩展名 (小写 .xxx)
         /// </summary>
         public string Extension;
-        
+
         /// <summary>
         /// 用户数据
         /// </summary>

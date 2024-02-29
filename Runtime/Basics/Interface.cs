@@ -1,11 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-15
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-using System;
-using System.Collections;
+﻿using System;
 
 namespace AIO
 {
@@ -22,13 +15,13 @@ namespace AIO
         /// <summary>
         /// 当前下载事件
         /// </summary>
-        IDownlandAssetEvent Event { get;  }
+        IDownlandAssetEvent Event { get; }
 
         /// <summary>
         /// 当前下载状态
         /// </summary>
         EProgressState State { get; }
-        
+
         /// <summary>
         /// 取消当前所有下载
         /// </summary>
@@ -122,7 +115,7 @@ namespace AIO
         /// <summary>
         /// 下载恢复
         /// </summary>
-        public Action OnResume { get; set; } 
+        public Action OnResume { get; set; }
 
         /// <summary>
         /// 下载暂停

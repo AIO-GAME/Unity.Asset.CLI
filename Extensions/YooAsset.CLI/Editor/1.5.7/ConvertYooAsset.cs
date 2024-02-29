@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-05
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-#if SUPPORT_YOOASSET
+﻿#if SUPPORT_YOOASSET
 using System;
 using System.Collections.Generic;
 using System.IO;

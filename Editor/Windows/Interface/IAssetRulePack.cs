@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-06
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-namespace AIO.UEditor
+﻿namespace AIO.UEditor
 {
     public struct AssetRulePackResult
     {
@@ -32,7 +26,7 @@ namespace AIO.UEditor
         /// 打包规则优先级
         /// </summary>
         int Priority { get; }
-        
+
         /// <summary>
         /// 获取打包规则结果
         /// </summary>

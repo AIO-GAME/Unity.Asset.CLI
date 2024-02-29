@@ -1,10 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using AIO.UEngine;
 
 namespace AIO

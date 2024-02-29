@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-01
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -159,7 +153,7 @@ namespace AIO.UEditor
                     {
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
                         listItems.Add(collector);
-                        _ = collector.CollectAssetTask(package.Name, group.Name, dic =>
+                        collector.CollectAssetTask(package.Name, group.Name, dic =>
                         {
                             foreach (var pair in dic)
                             {

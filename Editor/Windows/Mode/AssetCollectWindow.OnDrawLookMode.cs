@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-01
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -850,7 +844,7 @@ namespace AIO.UEditor
             var listTypes = new List<string>();
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
             {
-                _ = Data.Packages[i].Groups[j].Collectors[k].CollectAssetTask(
+                Data.Packages[i].Groups[j].Collectors[k].CollectAssetTask(
                     Data.Packages[i].Name, Data.Packages[i].Groups[j].Name, dic =>
                     {
                         foreach (var pair in dic)

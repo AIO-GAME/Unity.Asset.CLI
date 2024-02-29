@@ -1,9 +1,3 @@
-/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2024-01-22
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
 using System.ComponentModel;
 
 namespace AIO

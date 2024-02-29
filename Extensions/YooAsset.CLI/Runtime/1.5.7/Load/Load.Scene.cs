@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2024-02-27
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
-#if SUPPORT_YOOASSET
+﻿#if SUPPORT_YOOASSET
 using System;
 using System.Collections;
 using System.Threading.Tasks;
@@ -35,34 +29,8 @@ namespace AIO.UEngine.YooAsset
             var operation = HandleGet<SceneOperationHandle>(location);
             if (operation != null)
             {
-                switch (operation.Status)
-                {
-                    case EOperationStatus.Processing:
-                        yield return LoadCheckOPCo(operation, succeed =>
-                        {
-                            if (succeed)
-                            {
-                                operation.ActivateScene();
-                                cb?.Invoke(operation.SceneObject);
-                            }
-                            else
-                            {
-                                AssetSystem.LogException($"场景配置 异常错误 : {location} {sceneMode}");
-                                cb?.Invoke(SceneManager.GetActiveScene());
-                            }
-                        });
-                        yield break;
-                    case EOperationStatus.Succeed:
-                        operation.ActivateScene();
-                        cb?.Invoke(operation.SceneObject);
-                        yield break;
-                    default:
-                    case EOperationStatus.None:
-                    case EOperationStatus.Failed:
-                        yield return operation.UnloadAsync();
-                        HandleFree(location);
-                        break;
-                }
+                yield return operation.UnloadAsync();
+                HandleFree(location);
             }
 
             ResPackage package = null;
@@ -102,28 +70,8 @@ namespace AIO.UEngine.YooAsset
             var operation = HandleGet<SceneOperationHandle>(location);
             if (operation != null)
             {
-                switch (operation.Status)
-                {
-                    case EOperationStatus.Processing:
-                        if (await LoadCheckOPTask(operation))
-                        {
-                            operation.ActivateScene();
-                            return operation.SceneObject;
-                        }
-
-                        AssetSystem.LogException($"场景配置 异常错误 : {location} {sceneMode}");
-                        return SceneManager.GetActiveScene();
-
-                    case EOperationStatus.Succeed:
-                        operation.ActivateScene();
-                        return operation.SceneObject;
-                    default:
-                    case EOperationStatus.None:
-                    case EOperationStatus.Failed:
-                        await operation.UnloadAsync().Task;
-                        HandleFree(location);
-                        break;
-                }
+                await operation.UnloadAsync().Task;
+                HandleFree(location);
             }
 
             var package = await GetAutoPackageTask(location);

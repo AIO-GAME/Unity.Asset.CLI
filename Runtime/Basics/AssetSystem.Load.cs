@@ -1,10 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -404,7 +398,7 @@ namespace AIO
             bool suspendLoad = false,
             int priority = 100)
         {
-            var scene = await Proxy.LoadSceneTask(location, sceneMode, suspendLoad, priority);
+            var scene = await Proxy.LoadSceneTask(SettingToLocalPath(location), sceneMode, suspendLoad, priority);
             cb?.Invoke(scene);
         }
 

@@ -1,10 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-15
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-#if SUPPORT_YOOASSET
+﻿#if SUPPORT_YOOASSET
 
 using System;
 using System.Collections;

@@ -1,10 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Object = UnityEngine.Object;

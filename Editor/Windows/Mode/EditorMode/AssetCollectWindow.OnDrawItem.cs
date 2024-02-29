@@ -1,15 +1,6 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-01
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
-using UnityEditor.SceneManagement;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -48,7 +39,7 @@ namespace AIO.UEditor
                 item.Type = GELayout.Popup(item.Type, GEStyle.PreDropDown, GP_Width_80);
 
                 if (item.Path is null) GUI.enabled = true;
-                item.Path = EditorGUILayout.ObjectField(item.Path, typeof(UnityEngine.Object),
+                item.Path = EditorGUILayout.ObjectField(item.Path, typeof(Object),
                     false, GTOption.WidthMin(120), GTOption.WidthMax(240));
                 if (item.Path is null) GUI.enabled = false;
 

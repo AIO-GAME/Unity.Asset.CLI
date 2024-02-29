@@ -1,12 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-using UnityEngine;
-
-namespace AIO
+﻿namespace AIO
 {
     partial class AssetSystem
     {

@@ -1,9 +1,3 @@
-/*|============|*|
-|*|Author:     |*| star fire
-|*|Date:       |*| 2024-01-03
-|*|E-Mail:     |*| 1398581458@qq.com
-|*|============|*/
-
 using System;
 using System.Collections.Generic;
 using System.Linq;

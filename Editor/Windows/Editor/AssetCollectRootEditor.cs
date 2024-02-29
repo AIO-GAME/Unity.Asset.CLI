@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| USER
-|*|Date:       |*| 2024-01-22
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -13,7 +7,7 @@ namespace AIO.UEditor
     /// AssetCollectRoot
     /// </summary>
     [CustomEditor(typeof(AssetCollectRoot))]
-    public class AssetCollectRootEditor : NILInspector<AssetCollectRoot>
+    public class AssetCollectRootEditor : AFInspector<AssetCollectRoot>
     {
         protected override void OnGUI()
         {

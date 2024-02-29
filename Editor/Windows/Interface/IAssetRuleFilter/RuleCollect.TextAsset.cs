@@ -1,13 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-04
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using IFilterRule = AIO.UEditor.IAssetRuleFilter;
+﻿using IFilterRule = AIO.UEditor.IAssetRuleFilter;
 
 namespace AIO.UEditor
 {

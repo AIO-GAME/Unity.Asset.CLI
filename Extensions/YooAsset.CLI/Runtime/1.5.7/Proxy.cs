@@ -1,10 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-#if SUPPORT_YOOASSET
+﻿#if SUPPORT_YOOASSET
 
 using System.Collections;
 using System.Linq;
@@ -44,7 +38,7 @@ namespace AIO.UEngine.YooAsset
 
             EventParameter = null;
 
-            foreach (var handle in ReferenceOPHandle.Values)
+            foreach (var handle in ReferenceOPHandle.Values.Where(handle => handle.IsValid))
                 ReleaseInternal?.Invoke(handle, null);
 
             ReferenceOPHandle.Clear();
