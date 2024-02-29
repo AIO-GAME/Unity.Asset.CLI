@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-19
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using AIO.UEngine;
 using UnityEditor;

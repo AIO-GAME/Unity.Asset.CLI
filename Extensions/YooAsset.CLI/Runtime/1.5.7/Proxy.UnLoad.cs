@@ -30,7 +30,8 @@ namespace AIO.UEngine.YooAsset
             if (ReferenceOPHandle.TryGetValue(location, out var value))
             {
                 ReferenceOPHandle.Remove(location);
-                ReleaseInternal?.Invoke(value, null);
+                ReleaseOperationHandle(value);
+                AssetSystem.Log("Free Asset Handle Release : {0}", location);
             }
 
             ReferenceOPHandle[location] = operation;
@@ -41,7 +42,8 @@ namespace AIO.UEngine.YooAsset
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
             {
                 ReferenceOPHandle.Remove(location);
-                ReleaseInternal?.Invoke(operation, null);
+                ReleaseOperationHandle(operation);
+                AssetSystem.Log("Free Asset Handle Release : {0}", location);
             }
         }
 
@@ -60,25 +62,45 @@ namespace AIO.UEngine.YooAsset
                 }
                 else
                 {
-                    Resources.UnloadUnusedAssets();
-                    value.Package.UnloadUnusedAssets();
+                    Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
+                    {
+                        value.Package.UnloadUnusedAssets();
+                        AssetSystem.Log("Free Package Handle Release : {0}", packageName);
+                    }));
                 }
             }
         }
 
         public override void UnloadUnusedAssets(bool isForce = false)
         {
+            foreach (var key in ReferenceOPHandle.Keys.ToArray())
+            {
+                if (ReferenceOPHandle[key].IsValid) continue;
+                if (ReferenceOPHandle[key].Status != EOperationStatus.Failed) continue;
+                ReferenceOPHandle.Remove(key);
+            }
+
             if (isForce)
             {
+                ReferenceOPHandle.Clear();
                 foreach (var value in Dic.Values)
                     value.Package.ForceUnloadAllAssets();
             }
             else
             {
-                Resources.UnloadUnusedAssets();
-                foreach (var value in Dic.Values)
-                    value.Package.UnloadUnusedAssets();
+                Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
+                {
+                    foreach (var value in Dic.Values)
+                        value.Package.UnloadUnusedAssets();
+                }));
             }
+        }
+
+        private static IEnumerator UnloadUnusedAssetsCo(Action<AsyncOperation> completed)
+        {
+            var operation = Resources.UnloadUnusedAssets();
+            operation.completed += completed;
+            yield return operation;
         }
 
         public override async Task UnloadSceneTask(string location)
@@ -88,7 +110,11 @@ namespace AIO.UEngine.YooAsset
                 ReferenceOPHandle.Remove(location);
                 if (operation is SceneOperationHandle handle)
                     await handle.UnloadAsync().Task;
-                ReleaseInternal?.Invoke(operation, null);
+                Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
+                {
+                    ReleaseOperationHandle(operation);
+                    AssetSystem.Log("Free Scene Handle Release : {0}", location);
+                }));
             }
         }
 
@@ -99,8 +125,36 @@ namespace AIO.UEngine.YooAsset
                 ReferenceOPHandle.Remove(location);
                 if (operation is SceneOperationHandle handle)
                     yield return handle.UnloadAsync();
-                ReleaseInternal?.Invoke(operation, null);
+                yield return Resources.UnloadUnusedAssets();
+
+                ReleaseOperationHandle(operation);
+                AssetSystem.Log("Free Scene Handle Release : {0}", location);
             }
+        }
+
+        private static void ReleaseOperationHandle(OperationHandleBase operation)
+        {
+            if (!operation.IsValid) return;
+            switch (operation)
+            {
+                case AllAssetsOperationHandle handle:
+                    handle.Dispose();
+                    return;
+                case RawFileOperationHandle handle:
+                    handle.Dispose();
+                    return;
+                case SceneOperationHandle handle:
+                    handle.UnloadAsync();
+                    return;
+                case SubAssetsOperationHandle handle:
+                    handle.Dispose();
+                    return;
+                case AssetOperationHandle handle:
+                    handle.Dispose();
+                    return;
+            }
+
+            operation = null;
         }
 
         public override IEnumerator ClearUnusedCacheCO(Action<bool> cb)

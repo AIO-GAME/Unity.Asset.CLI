@@ -13,7 +13,7 @@ using MessageType = UnityEditor.MessageType;
 namespace AIO.UEditor
 {
     [CustomEditor(typeof(ASConfig))]
-    public class ASConfigEditor : NILInspector<ASConfig>
+    public class ASConfigEditor : AFInspector<ASConfig>
     {
         [MenuItem("AIO/Gen/Asset System Config")]
         public static void Create()
@@ -157,7 +157,7 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal(GSBackground))
             {
-                GELayout.Label("自动序列记录", OptionLabelWidth_100);
+                GELayout.Label("下载失败尝试次数", OptionLabelWidth_100);
                 using (GELayout.VHorizontal(GSValue))
                     Target.DownloadFailedTryAgain = GELayout.Slider(Target.DownloadFailedTryAgain, 1, 100);
             }

@@ -44,7 +44,7 @@ namespace AIO.UEngine.YooAsset
 
             EventParameter = null;
 
-            foreach (var handle in ReferenceOPHandle.Values)
+            foreach (var handle in ReferenceOPHandle.Values.Where(handle => handle.IsValid))
                 ReleaseInternal?.Invoke(handle, null);
 
             ReferenceOPHandle.Clear();

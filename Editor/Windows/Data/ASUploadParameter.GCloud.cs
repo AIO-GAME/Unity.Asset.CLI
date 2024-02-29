@@ -186,6 +186,8 @@ namespace AIO.UEditor
                 config.MetaDataKey = MetaDataKey;
                 config.MetaDataValue = MetaDataValue;
                 config.LocalFullPath = DirTreeFiled.DirPath.Replace("\\", "/");
+                config.GCLOUD_PATH = GCLOUD_PATH;
+                config.GSUTIL_PATH = GSUTIL_PATH;
                 await AssetProxyEditor.UploadGCloud(config);
                 isUploading = false;
             }

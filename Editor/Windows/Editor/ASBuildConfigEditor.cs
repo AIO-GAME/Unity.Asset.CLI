@@ -14,7 +14,7 @@ namespace AIO.UEditor
     /// ASBuildConfig
     /// </summary>
     [CustomEditor(typeof(ASBuildConfig))]
-    public class ASBuildConfigEditor : NILInspector<ASBuildConfig>
+    public class ASBuildConfigEditor : AFInspector<ASBuildConfig>
     {
         protected override void OnGUI()
         {

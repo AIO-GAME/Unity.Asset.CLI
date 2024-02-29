@@ -428,7 +428,7 @@ namespace AIO.UEditor
             }
         }
 
-        public async Task CollectAssetTask(string package, string group,
+        public void CollectAssetTask(string package, string group,
             Action<Dictionary<string, AssetDataInfo>> cb = null)
         {
             AssetDataInfos.Clear();
@@ -449,14 +449,18 @@ namespace AIO.UEditor
 
             if (AllowThread)
             {
-                await Task.Factory.StartNew(() => { CollectAsset(tags, pathToLower); });
+                // Runner.Update(CollectAsset, tags, pathToLower);
+                Task.Factory.StartNew(() =>
+                {
+                    CollectAsset(tags, pathToLower);
+                    cb?.Invoke(AssetDataInfos);
+                });
             }
             else
             {
                 CollectAsset(tags, pathToLower);
+                cb?.Invoke(AssetDataInfos);
             }
-
-            cb?.Invoke(AssetDataInfos);
         }
 
         public void UpdateData()

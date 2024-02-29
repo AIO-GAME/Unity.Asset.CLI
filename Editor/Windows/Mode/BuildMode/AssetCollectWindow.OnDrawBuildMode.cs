@@ -260,7 +260,11 @@ namespace AIO.UEditor
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
                 {
                     EditorGUILayout.LabelField("构建版本", GP_Width_100, GP_Height_20);
-                    BuildConfig.BuildVersion = GELayout.Field(BuildConfig.BuildVersion, GP_Height_20);
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
+                    {
+                        BuildConfig.BuildVersion = GELayout.Field(BuildConfig.BuildVersion, GP_Height_20);
+                    }
+
                     if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20, GP_Height_20))
                     {
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
@@ -347,14 +351,24 @@ namespace AIO.UEditor
                             }
                         }
 
-                        if (CurrentTagIndex != 0) GELayout.HelpBox(BuildConfig.FirstPackTag);
+                        if (CurrentTagIndex != 0)
+                        {
+                            using (new EditorGUILayout.HorizontalScope(GEStyle.TEToolbar))
+                            {
+                                GELayout.HelpBox(BuildConfig.FirstPackTag);
+                            }
+                        }
                     }
                 }
 
-                using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
+                using (new EditorGUILayout.HorizontalScope(GEStyle.TEToolbar))
                 {
                     EditorGUILayout.LabelField("缓存清理数量", GP_Width_100);
-                    BuildConfig.AutoCleanCacheNum = GELayout.Slider(BuildConfig.AutoCleanCacheNum, 1, 20);
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
+                    {
+                        BuildConfig.AutoCleanCacheNum = EditorGUILayout.IntSlider(
+                            BuildConfig.AutoCleanCacheNum, 1, 20);
+                    }
                 }
             }
         }

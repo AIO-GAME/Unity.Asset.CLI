@@ -1,9 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-14
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.IO;

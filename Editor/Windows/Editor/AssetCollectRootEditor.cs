@@ -13,7 +13,7 @@ namespace AIO.UEditor
     /// AssetCollectRoot
     /// </summary>
     [CustomEditor(typeof(AssetCollectRoot))]
-    public class AssetCollectRootEditor : NILInspector<AssetCollectRoot>
+    public class AssetCollectRootEditor : AFInspector<AssetCollectRoot>
     {
         protected override void OnGUI()
         {

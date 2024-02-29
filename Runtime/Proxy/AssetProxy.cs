@@ -17,12 +17,7 @@ namespace AIO.UEngine
     [Preserve]
     public abstract partial class AssetProxy : IDisposable
     {
-        /// <summary>
-        /// 资源回收（卸载引用计数为零的资源）
-        /// </summary>
-        /// <param name="isForce">强制回收所有资源</param>
-        public abstract void UnloadUnusedAssets(bool isForce = false);
-
+      
         /// <summary>
         /// 是否已经初始化
         /// </summary>
@@ -63,26 +58,6 @@ namespace AIO.UEngine
         /// 获取下载器
         /// </summary>
         public abstract IASNetLoading GetLoadingHandle();
-
-        /// <summary>
-        /// 清理包裹未使用的缓存文件
-        /// </summary>
-        public abstract Task<bool> ClearUnusedCacheTask();
-
-        /// <summary>
-        /// 清理包裹未使用的缓存文件
-        /// </summary>
-        public abstract IEnumerator ClearUnusedCacheCO(Action<bool> cb);
-
-        /// <summary>
-        /// 清理包裹未使用的缓存文件
-        /// </summary>
-        public abstract Task<bool> ClearAllCacheTask();
-
-        /// <summary>
-        /// 清理包裹未使用的缓存文件
-        /// </summary>
-        public abstract IEnumerator ClearAllCacheCO(Action<bool> cb);
 
         public sealed override bool Equals(object obj)
         {
