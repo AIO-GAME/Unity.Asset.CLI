@@ -1,9 +1,3 @@
-/*|============|*|
-|*|Author:     |*| xi nan
-|*|Date:       |*| 2024-01-03
-|*|E-Mail:     |*| 1398581458@qq.com
-|*|============|*/
-
 using System.IO;
 using UnityEditor;
 using UnityEngine;

@@ -1,9 +1,3 @@
-/*|============|*|
-|*|Author:     |*| xinan
-|*|Date:       |*| 2024-01-07
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
 using UnityEngine;
 
 namespace AIO.UEditor

@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2024-01-08
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AIO.UEditor
@@ -51,7 +45,7 @@ namespace AIO.UEditor
         /// <param name="packageNames">包列表</param>
         /// <param name="command">构建命令</param>
         bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command);
-        
+
         /// <summary>
         /// 上传到GCloud
         /// 生成一份清单文件 记录当前文件夹下的所有文件的MD5值

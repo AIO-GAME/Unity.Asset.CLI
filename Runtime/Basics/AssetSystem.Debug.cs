@@ -1,9 +1,3 @@
-/*|============|*|
-|*|Author:     |*| xi nan
-|*|Date:       |*| 2024-01-07
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
 using System;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;

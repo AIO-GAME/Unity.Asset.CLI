@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| USER
-|*|Date:       |*| 2024-01-08
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
-#if SUPPORT_YOOASSET
+﻿#if SUPPORT_YOOASSET
 using System;
 using System.IO;
 using YooAsset.Editor;
@@ -20,7 +14,8 @@ namespace AIO.UEditor.CLI
             {
                 if (!data.GroupName.Contains('_')) throw new Exception("Error : Rule mismatch");
                 var info = data.GroupName.SplitOnce('_');
-                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2)?.GetByPath(data.CollectPath);
+                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2)
+                    ?.GetByPath(data.CollectPath);
                 if (collector is null) throw new Exception("Error : Not found collector");
                 if (!Collectors.ContainsKey(collector))
                 {

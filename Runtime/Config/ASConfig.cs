@@ -1,20 +1,16 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-22
-|||✩ - - - - - |*/
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace AIO.UEngine
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
+
     [Description("资源系统配置")]
     [Serializable]
     [HelpURL(

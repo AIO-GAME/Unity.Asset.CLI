@@ -1,10 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2024-02-27
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace AIO.UEngine
 {

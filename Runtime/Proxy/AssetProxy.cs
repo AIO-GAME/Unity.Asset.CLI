@@ -1,10 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-22
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine.Scripting;
@@ -17,7 +11,6 @@ namespace AIO.UEngine
     [Preserve]
     public abstract partial class AssetProxy : IDisposable
     {
-      
         /// <summary>
         /// 是否已经初始化
         /// </summary>

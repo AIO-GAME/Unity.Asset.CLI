@@ -1,10 +1,4 @@
-﻿/*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
-|||✩ Date:     ||| -> 2023-08-11
-|||✩ Document: ||| ->
-|||✩ - - - - - |*/
-
-#if SUPPORT_YOOASSET
+﻿#if SUPPORT_YOOASSET
 
 using System.Linq;
 using YooAsset;

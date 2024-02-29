@@ -1,13 +1,6 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2023-12-06
-|*|E-Mail:     |*| xinansky99@foxmail.com
-|*|============|*/
-
-using System;
+﻿using System;
 using System.IO;
 using UnityEditor;
-using YooAsset.Editor;
 using PackRuleResult = AIO.UEditor.AssetRulePackResult;
 using PackRuleData = AIO.UEditor.AssetRuleData;
 
