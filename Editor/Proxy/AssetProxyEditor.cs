@@ -59,6 +59,9 @@ namespace AIO.UEditor
                 return;
             }
 
+            if (!AHelper.IO.ExistsDir(parameter.LocalFullPath))
+                throw new Exception($"本地文件夹不存在 -> {parameter.LocalFullPath}");
+
             PrGCloud.Gcloud = string.IsNullOrEmpty(parameter.GCLOUD_PATH) ? "gcloud" : parameter.GCLOUD_PATH;
             PrGCloud.Gsutil = string.IsNullOrEmpty(parameter.GSUTIL_PATH) ? "gsutil" : parameter.GSUTIL_PATH;
             await Editor.UploadGCloud(parameter);

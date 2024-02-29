@@ -172,16 +172,18 @@ namespace AIO.UEditor
                 }
 
                 isUploading = true;
-                var config = new AsUploadGCloudParameter();
-                config.RemotePath = BUCKET_NAME;
-                config.PackageName = two;
-                config.Version = three;
-                config.BuildTarget = (BuildTarget)Enum.Parse(typeof(BuildTarget), one, false);
-                config.MetaDataKey = MetaDataKey;
-                config.MetaDataValue = MetaDataValue;
-                config.LocalFullPath = DirTreeFiled.DirPath.Replace("\\", "/");
-                config.GCLOUD_PATH = GCLOUD_PATH;
-                config.GSUTIL_PATH = GSUTIL_PATH;
+                var config = new AsUploadGCloudParameter
+                {
+                    RemotePath = BUCKET_NAME,
+                    PackageName = two,
+                    Version = three,
+                    BuildTarget = (BuildTarget)Enum.Parse(typeof(BuildTarget), one, false),
+                    MetaDataKey = MetaDataKey,
+                    MetaDataValue = MetaDataValue,
+                    LocalFullPath = DirTreeFiled.DirPath.Replace("\\", "/"),
+                    GCLOUD_PATH = GCLOUD_PATH,
+                    GSUTIL_PATH = GSUTIL_PATH
+                };
                 await AssetProxyEditor.UploadGCloud(config);
                 isUploading = false;
             }
