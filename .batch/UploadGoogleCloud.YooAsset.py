@@ -4,13 +4,13 @@ import argparse
 import base64
 import hashlib
 import json
-import sys
 import os
+import shutil
 import subprocess
+import sys
 import tempfile
 import time
-import shutil
-from typing import Dict, Tuple, List, Callable
+from typing import Dict, Tuple, List
 
 # 获取当前文件的路径
 fileCurrent = os.path.abspath(__file__)
@@ -34,7 +34,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def copy_file(source_path, destination_path):
+def local_copy_file(source_path, destination_path):
     try:
         shutil.copy(source_path, destination_path)
     except FileNotFoundError:
@@ -45,19 +45,25 @@ def copy_file(source_path, destination_path):
         print(f"An error occurred: {e}")
 
 
-def delete_dir(path: str):
+def local_delete_dir(path: str):
     if os.path.exists(path):
         shutil.rmtree(path)
 
 
-def delete_file(path: str):
+def local_delete_file(path: str):
     if os.path.exists(path):
         os.remove(path)
 
 
+def local_calculate_md5(location):
+    with open(location, 'rb') as f:
+        data = f.read()
+    return hashlib.md5(data).hexdigest()
+
+
 def gcloud_delete_files(remotes: List[str]):
     messages = " ".join(["\"gs://{0}\"".format(item.replace('\\', '/').rstrip('/')) for item in set(remotes) if item])
-    command = f"gsutil -m rm -r {messages}"
+    command = f"gsutil -m -o \"GSUtil:parallel_process_count=1\" rm -r {messages}"
     # print(f"执行命令：{command}")
     try:
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, text=True, bufsize=1)
@@ -65,12 +71,6 @@ def gcloud_delete_files(remotes: List[str]):
         return process.returncode
     except subprocess.CalledProcessError:
         return -1
-
-
-def calculate_md5(location):
-    with open(location, 'rb') as f:
-        data = f.read()
-    return hashlib.md5(data).hexdigest()
 
 
 def gcloud_get_file_md5(remote):
@@ -106,7 +106,7 @@ def gcloud_read_text(remote):
     return content
 
 
-def exists(remote):
+def gcloud_exists(remote):
     remote = remote.replace('\\', '/')
     command = "gsutil ls \"gs://{0}\"".format(remote)
     # print("执行命令：{0}".format(command))
@@ -127,10 +127,10 @@ def gcloud_upload_file(remote, location):
         return
     remote = remote.replace('\\', '/').rstrip('/')
     if args.metaDataKey and args.metaDataValue:
-        command = "gsutil -m -h \"{0}:{1}\" cp \"{2}\" \"gs://{3}\"".format(
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=5\" -h \"{0}:{1}\" cp \"{2}\" \"gs://{3}\"".format(
             args.metaDataKey, args.metaDataValue, location, remote)
     else:
-        command = "gsutil -m cp \"{0}\" \"gs://{1}/\"".format(location, remote)
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=5\" cp \"{0}\" \"gs://{1}/\"".format(location, remote)
     # print("执行命令：{0}".format(command))
     try:
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, text=True, bufsize=1)
@@ -144,19 +144,23 @@ def gcloud_upload_file(remote, location):
             return process.returncode
     except subprocess.CalledProcessError:
         return -1
-    return -1
+    return 0
 
 
 def gcloud_upload_dir(remote, location):
     location = location.replace('\\', '/').rstrip('/')
     if not os.path.exists(location):
         return -1
+    # 给temp_dir目录下的文件添加权限
+    for root, dirs, files in os.walk(location):
+        for file in files:
+            os.chmod(os.path.join(root, file), 0o777)
     remote = remote.replace('\\', '/').rstrip('/')
     if args.metaDataKey and args.metaDataValue:
-        command = "gsutil -m -h \"{0}:{1}\" cp -r \"{2}\" \"gs://{3}\"".format(
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=5\" -h \"{0}:{1}\" cp -r -f \"{2}\" \"gs://{3}\"".format(
             args.metaDataKey, args.metaDataValue, location, remote)
     else:
-        command = "gsutil -m cp -r \"{0}\" \"gs://{1}\"".format(location, remote)
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=5\" cp -r -f \"{0}\" \"gs://{1}\"".format(location, remote)
 
     print("执行命令：{0}".format(command))
     try:
@@ -171,32 +175,14 @@ def gcloud_upload_dir(remote, location):
             return process.returncode
     except subprocess.CalledProcessError:
         return -1
-    return -1
-
-
-def comparison_manifest(current: Dict[str, str], target: Dict[str, str]) -> Tuple[
-    Dict[str, str], Dict[str, str], Dict[str, str]]:
-    delete = {}  # 删除
-    change = {}  # 修改
-
-    add = {key: value for key, value in current.items() if key not in target}  # 新增
-
-    for key, value in target.items():
-        if key not in current:  # 如果当前清单文件中不存在 则代表需要删除目标版本指定文件
-            delete[key] = value
-            continue
-
-        if current[key] != value:  # 修改
-            change[key] = value
-
-    return add, delete, change
+    return 0
 
 
 def gcloud_update_version():
     version_path = "{0}/Version/{1}.json".format(args.remotePath, args.buildTarget)
     print("上传版本信息")
     version_content = {}
-    if exists(version_path):
+    if gcloud_exists(version_path):
         temp = gcloud_read_text(version_path)
         version_content = json.loads(temp) if temp else []
         has = False
@@ -219,6 +205,24 @@ def gcloud_update_version():
     return exit_code
 
 
+def comparison_manifest(current: Dict[str, str], target: Dict[str, str]) -> Tuple[
+    Dict[str, str], Dict[str, str], Dict[str, str]]:
+    delete = {}  # 删除
+    change = {}  # 修改
+
+    add = {key: value for key, value in current.items() if key not in target}  # 新增
+
+    for key, value in target.items():
+        if key not in current:  # 如果当前清单文件中不存在 则代表需要删除目标版本指定文件
+            delete[key] = value
+            continue
+
+        if current[key] != value:  # 修改
+            change[key] = value
+
+    return add, delete, change
+
+
 args = parse_arguments()
 
 start_time = time.time()  # 记录起始时间
@@ -228,13 +232,13 @@ _Remote = "{0}/{1}/{2}/{3}".format(args.remotePath, args.buildTarget, args.packa
 _RemoteManifest = "{0}/Manifest.json".format(_Remote)
 _Local = "{0}/{1}/{2}/{3}".format(args.localPath, args.buildTarget, args.packageName, args.version)
 _LocalManifest = "{0}/Manifest.json".format(_Local)
-isExist = exists(_RemoteManifest)
+_IsExist = gcloud_exists(_RemoteManifest)
 
 exitCode = 0
 print("获取资源清单 {0}".format(_RemoteManifest))
-if isExist:
+if _IsExist:
     _RemoteManifestMD5 = gcloud_get_file_md5(_RemoteManifest)
-    _LocalManifestMD5 = calculate_md5(_LocalManifest)
+    _LocalManifestMD5 = local_calculate_md5(_LocalManifest)
     print("比较清单 MD5 [远端:{0}] {2} [本地:{1}]".format(
         _RemoteManifestMD5, _LocalManifestMD5, (_RemoteManifestMD5 == _LocalManifestMD5 and "==" or "!=")))
     if _RemoteManifestMD5 == _LocalManifestMD5:
@@ -264,7 +268,7 @@ if isExist:
             remoteManifest[key] = value
             locationTemp = "{0}/{1}".format(_Local, key)
             if os.path.exists(locationTemp):
-                copy_file(locationTemp, "{0}/{1}".format(temp_dir, key))
+                local_copy_file(locationTemp, "{0}/{1}".format(temp_dir, key))
                 print("{0} : {1}".format(value, key))
             else:
                 print("目标新增文件不存在 : {0} 目标源结构被篡改 请重新构建资源".format(locationTemp))
@@ -275,7 +279,7 @@ if isExist:
             remoteManifest[key] = value
             locationTemp = "{0}/{1}".format(_Local, key)
             if os.path.exists(locationTemp):
-                copy_file(locationTemp, "{0}/{1}".format(temp_dir, key))
+                local_copy_file(locationTemp, "{0}/{1}".format(temp_dir, key))
                 print("{0} : {1}".format(value, key))
                 add_files[key] = value
             else:
@@ -294,14 +298,14 @@ if isExist:
         table = []
         for key, value in delete_files.items():
             table.append("{0}/{1}".format(_Remote, key))
-        print("删除远端文件")
+        print("删除远端文件 {0}".format(len(table)))
         gcloud_delete_files(table)
 
     if len(add_files.keys()) > 0:
-        print("上传新增文件")
+        print("上传新增或修改文件列表 {0}".format(len(add_files)))
         exitCode = gcloud_upload_dir(
             "{0}/{1}/{2}".format(args.remotePath, args.buildTarget, args.packageName), temp_dir)
-        delete_dir(temp_dir)
+        local_delete_dir(temp_dir)
         if exitCode != 0:
             print("上传新增文件失败")
             sys.exit(exitCode)
@@ -311,14 +315,14 @@ if isExist:
     with open(temp_file, "w") as f:
         f.write(remoteManifestStr)
     exitCode = gcloud_upload_file(_RemoteManifest, temp_file)
-    delete_file(temp_file)
+    local_delete_file(temp_file)
 else:
     exitCode = gcloud_upload_dir(_Remote, _Local)
 
 if exitCode == 0:
     exitCode = gcloud_update_version()
 else:
-    print("上传清单失败")
+    print("上传清单失败 {0}".format(exitCode))
 
 end_time = time.time()  # 记录结束时间
 
