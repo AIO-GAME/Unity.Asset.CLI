@@ -12,25 +12,22 @@ import tempfile
 import time
 from typing import Dict, Tuple, List
 
-# 获取当前文件的路径
-fileCurrent = os.path.abspath(__file__)
-# 获取当前文件的所在目录
-dirCurrent = os.path.dirname(fileCurrent)
 
-
-# 获取传入的参数
-
-def parse_arguments():
-    parser = argparse.ArgumentParser(description='上传谷歌云')
-    parser.add_argument('-t', '--buildTarget', type=str, required=True,
-                        choices=["Android", "iOS", "StandaloneWindows64", "WebGL", "StandaloneOSX"], help='目标平台')
+# -t ${Platform} -l ${localPath} -r ${server}
+# -mk 'cache-control' -mv 'public, max-age=604800'
+# -mk 'content-type' -mv 'application/json'
+# -mk 'content-encoding' -mv 'gzip'
+def parse_arguments():  # 获取传入的参数
+    parser = argparse.ArgumentParser(description='上传谷歌云资源')
+    parser.add_argument('-v', '--version', type=str, required=False, help='版本号', default="Latest")
+    parser.add_argument('-d', '--isLatest', type=bool, required=False, help='默认最新版本', default=False)
+    parser.add_argument('-mk', '--metaDataKey', type=str, required=False, help='元数据键')
+    parser.add_argument('-mv', '--metaDataValue', type=str, required=False, help='元数据值')
     parser.add_argument('-l', '--localPath', type=str, required=True, help='本地上传目录')
     parser.add_argument('-r', '--remotePath', type=str, required=True, help='谷歌云远端目录')
     parser.add_argument('-p', '--packageName', type=str, required=True, help='包名')
-    parser.add_argument('-v', '--version', type=str, required=True, choices=["Latest", "Other"], help='版本号')
-    parser.add_argument('-d', '--isLatest', type=bool, required=False, help='默认最新版本')
-    parser.add_argument('-mk', '--metaDataKey', type=str, required=False, help='元数据键')
-    parser.add_argument('-mv', '--metaDataValue', type=str, required=False, help='元数据值')
+    parser.add_argument('-t', '--buildTarget', type=str, required=True, help='目标平台',
+                        choices=["Android", "iOS", "StandaloneWindows64", "WebGL", "StandaloneOSX"])
     return parser.parse_args()
 
 
@@ -56,8 +53,8 @@ def local_delete_file(path: str):
 
 
 def local_calculate_md5(location):
-    with open(location, 'rb') as f:
-        data = f.read()
+    with open(location, 'rb') as file:
+        data = file.read()
     return hashlib.md5(data).hexdigest()
 
 
@@ -97,8 +94,8 @@ def gcloud_read_text(remote):
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, text=True, bufsize=1)
         process.communicate()
         if process.returncode == 0:
-            with open(local, "r") as f:
-                content = f.read()
+            with open(local, "r") as file:
+                content = file.read()
         if os.path.exists(local):
             os.remove(local)
     except subprocess.CalledProcessError:
@@ -180,8 +177,8 @@ def gcloud_upload_dir(remote, location):
 
 def gcloud_update_version():
     version_path = "{0}/Version/{1}.json".format(args.remotePath, args.buildTarget)
-    print("上传版本信息")
-    version_content = {}
+    print("[更新版本] {0} : {1}".format(args.packageName, args.version))
+    version_content = []
     if gcloud_exists(version_path):
         temp = gcloud_read_text(version_path)
         version_content = json.loads(temp) if temp else []
@@ -195,35 +192,40 @@ def gcloud_update_version():
             version_content.append({"Name": args.packageName, "Version": args.isLatest and "Latest" or args.version})
     else:
         version_content.append({"Name": args.packageName, "Version": args.isLatest and "Latest" or args.version})
-    version_str = json.dumps(version_content)
-    print("更新清单 版本信息 {0} ：{1}".format(args.packageName, args.isLatest and "Latest" or args.version))
-    tmep = tempfile.mktemp()
-    with open(tmep, "w") as f:
-        f.write(version_str)
-    exit_code = gcloud_upload_file(version_path, tmep)
-    os.remove(tmep)
+    version_str = json.dumps(version_content, indent=4, separators=(',', ': '), sort_keys=True)
+    version_table = tempfile.mktemp()
+    with open(version_table, "w") as file:
+        file.write(version_str)
+    exit_code = gcloud_upload_file(version_path, version_table)
+    os.remove(version_table)
     return exit_code
 
 
-def comparison_manifest(current: Dict[str, str], target: Dict[str, str]) -> Tuple[
-    Dict[str, str], Dict[str, str], Dict[str, str]]:
+def comparison_manifest(current: Dict[str, str], target: Dict[str, str]) \
+        -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
     delete = {}  # 删除
     change = {}  # 修改
 
-    add = {key: value for key, value in current.items() if key not in target}  # 新增
+    add = {aKey: aValue for aKey, aValue in current.items() if aKey not in target}  # 新增
 
-    for key, value in target.items():
-        if key not in current:  # 如果当前清单文件中不存在 则代表需要删除目标版本指定文件
-            delete[key] = value
+    for iKey, iValue in target.items():
+        if iKey not in current:  # 如果当前清单文件中不存在 则代表需要删除目标版本指定文件
+            delete[iKey] = iValue
             continue
 
-        if current[key] != value:  # 修改
-            change[key] = value
+        if current[iKey] != iValue:  # 修改
+            change[iKey] = current[iKey]
 
     return add, delete, change
 
 
 args = parse_arguments()
+if args.isLatest:
+    args.version = "Latest"
+
+if args.version == "":
+    print("版本号不能为空")
+    sys.exit(-1)
 
 start_time = time.time()  # 记录起始时间
 
@@ -232,17 +234,19 @@ _Remote = "{0}/{1}/{2}/{3}".format(args.remotePath, args.buildTarget, args.packa
 _RemoteManifest = "{0}/Manifest.json".format(_Remote)
 _Local = "{0}/{1}/{2}/{3}".format(args.localPath, args.buildTarget, args.packageName, args.version)
 _LocalManifest = "{0}/Manifest.json".format(_Local)
-_IsExist = gcloud_exists(_RemoteManifest)
 
 exitCode = 0
-print("获取资源清单 {0}".format(_RemoteManifest))
-if _IsExist:
+sys.stdout.write("\r[清单状态] {0} 获取中".format(_RemoteManifest))
+if gcloud_exists(_RemoteManifest):
+    sys.stdout.write("\r[清单状态] {0} 已存在".format(_RemoteManifest))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
     _RemoteManifestMD5 = gcloud_get_file_md5(_RemoteManifest)
     _LocalManifestMD5 = local_calculate_md5(_LocalManifest)
-    print("比较清单 MD5 [远端:{0}] {2} [本地:{1}]".format(
+    print("[比较清单] MD5 (远端:{0}) {2} (本地:{1})".format(
         _RemoteManifestMD5, _LocalManifestMD5, (_RemoteManifestMD5 == _LocalManifestMD5 and "==" or "!=")))
     if _RemoteManifestMD5 == _LocalManifestMD5:
-        print("清单一致")
+        print("[清单一致] 无需更新")
         sys.exit(0)
         pass
 
@@ -255,15 +259,16 @@ if _IsExist:
     remoteManifest = json.loads(remoteManifestStr)
     add_files, delete_files, change_files = comparison_manifest(locationManifest, remoteManifest)
     if len(add_files) == 0 and len(delete_files) == 0 and len(change_files) == 0:
-        print("清单一致")
+        print("[清单一致] 无需更新")
         sys.exit(0)
         pass
 
-    temp_dir = os.path.join(tempfile.mktemp(), args.isLatest and "Latest" or args.version)
+    print("[^-^-^-->]")
+    temp_dir = os.path.join(tempfile.mktemp(), args.version)
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir, exist_ok=True)
     if len(add_files) > 0:
-        print("新增文件列表 - {0} ------->".format(len(add_files)))
+        print("[新增文件] - {0}".format(len(add_files)))
         for key, value in add_files.items():
             remoteManifest[key] = value
             locationTemp = "{0}/{1}".format(_Local, key)
@@ -274,7 +279,7 @@ if _IsExist:
                 print("目标新增文件不存在 : {0} 目标源结构被篡改 请重新构建资源".format(locationTemp))
 
     if len(change_files) > 0:
-        print("修改文件列表 - {0} ------->".format(len(change_files)))
+        print("[修改文件] - {0}".format(len(change_files)))
         for key, value in change_files.items():
             remoteManifest[key] = value
             locationTemp = "{0}/{1}".format(_Local, key)
@@ -286,7 +291,7 @@ if _IsExist:
                 print("目标修改文件不存在 : {0} 目标源结构被篡改 请重新构建资源".format(locationTemp))
 
     if len(delete_files) > 0:
-        print("删除文件列表 - {0} ------->".format(len(delete_files)))
+        print("[删除文件] - {0}".format(len(delete_files)))
         for key, value in delete_files.items():
             if remoteManifest.get(key):
                 del remoteManifest[key]
@@ -295,22 +300,22 @@ if _IsExist:
                 print("目标删除文件不存在 : {0} 目标源结构被篡改 请重新构建资源".format(key))
 
     if len(delete_files.keys()) > 0:
+        print("[^-^-^-->]")
         table = []
         for key, value in delete_files.items():
             table.append("{0}/{1}".format(_Remote, key))
-        print("删除远端文件 {0}".format(len(table)))
         gcloud_delete_files(table)
 
     if len(add_files.keys()) > 0:
-        print("上传新增或修改文件列表 {0}".format(len(add_files)))
-        exitCode = gcloud_upload_dir(
-            "{0}/{1}/{2}".format(args.remotePath, args.buildTarget, args.packageName), temp_dir)
+        print("[^-^-^-->]")
+        exitCode = gcloud_upload_dir("{0}/{1}/{2}".format(args.remotePath, args.buildTarget, args.packageName),
+                                     temp_dir)
         local_delete_dir(temp_dir)
         if exitCode != 0:
-            print("上传新增文件失败")
+            print("[新增修改] 任务失败")
             sys.exit(exitCode)
 
-    remoteManifestStr = json.dumps(remoteManifest)
+    remoteManifestStr = json.dumps(remoteManifest, indent=4, separators=(',', ': '), sort_keys=True)
     temp_file = tempfile.mktemp()
     with open(temp_file, "w") as f:
         f.write(remoteManifestStr)
@@ -320,11 +325,14 @@ else:
     exitCode = gcloud_upload_dir(_Remote, _Local)
 
 if exitCode == 0:
+    sys.stdout.write("\r[清单状态] {0} 不存在".format(_RemoteManifest))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
     exitCode = gcloud_update_version()
 else:
-    print("上传清单失败 {0}".format(exitCode))
+    print("[上传失败] {0}".format(exitCode))
 
 end_time = time.time()  # 记录结束时间
 
 elapsed_time = end_time - start_time  # 计算经过的时间（单位为秒）
-print("上传{0} 所用时间 ：{1:.2f}秒".format(exitCode == 0 and "成功" or "失败", elapsed_time))
+print("[上传{0}] 所用时间 ：{1:.2f}秒".format(exitCode == 0 and "成功" or "失败", elapsed_time))
