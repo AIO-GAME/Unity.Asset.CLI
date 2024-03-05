@@ -1,8 +1,10 @@
 ﻿#if SUPPORT_YOOASSET
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using AIO.UEngine;
 
 namespace AIO.UEditor.CLI
 {
@@ -28,16 +30,8 @@ namespace AIO.UEditor.CLI
                 parameter.RemoteRelative);
             await handle.InitAsync();
             EHelper.DisplayProgressBar("上传进度", $"开始上传资源 {handle.Absolute}", 0.1f);
-            // 在判断目标文件夹是否有清单文件 如果没有则先删除目标文件夹 再上传
-            var progress = new AProgressEvent
-            {
-                OnComplete = report => { EHelper.DisplayDialog("结束", report.ToString(), "确定"); },
-                OnError = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); },
-                OnProgress = current =>
-                {
-                    EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f);
-                }
-            };
+
+            bool succeed;
             // 在判断目标文件夹是否有清单文件 如果有则对比清单文件的MD5值 如果一致则不上传
             if (await handle.CheckFileAsync("Manifest.json"))
             {
@@ -102,17 +96,75 @@ namespace AIO.UEditor.CLI
                 // 然后再将需要新增 删除 更新的文件上传到Ftp 上传完成后更新清单文件
                 var content = AHelper.Json.Serialize(remote.Sort());
                 var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                await handle.UploadFileAsync(stream, "Manifest.json");
+                succeed = await handle.UploadFileAsync(stream, "Manifest.json");
             }
             else
             {
+                // 在判断目标文件夹是否有清单文件 如果没有则先删除目标文件夹 再上传
+                var progress = new AProgressEvent
+                {
+                    // OnComplete = report => { EHelper.DisplayDialog("结束", report.ToString(), "确定"); },
+                    OnError = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); },
+                    OnProgress = current =>
+                    {
+                        EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f);
+                    }
+                };
                 EHelper.DisplayProgressBar("上传", $"[FTP] 远端版本清单不存在 : 准备开始上传资源 : {localFull} -> {handle.Absolute}",
                     0.2f);
-                await handle.UploadDirAsync(localFull, progress);
+                succeed = await handle.UploadDirAsync(localFull, progress);
             }
 
-            EHelper.DisplayDialog("Info", $"资源上传完成", "确定");
-            return true;
+            if (succeed) // 上传成功后更新版本清单
+            {
+                var versionPath = $"{handle.URI}/Version/{parameter.BuildTarget.ToString()}.json";
+                EHelper.DisplayProgressBar("[FTP] 上传进度", $"更新版本 {versionPath}", 0.9f);
+                string versionContent;
+                if (await handle.CheckFileAsync(versionPath))
+                {
+                    List<AssetsPackageConfig> data;
+                    try
+                    {
+                        data = AHelper.Json.Deserialize<List<AssetsPackageConfig>>(
+                            await handle.GetTextAsync(versionPath));
+                    }
+                    catch (Exception)
+                    {
+                        data = new List<AssetsPackageConfig>();
+                    }
+
+                    var data2 = data.Find(item => item.Name == parameter.PackageName);
+                    if (data2 is null)
+                    {
+                        data.Add(new AssetsPackageConfig
+                        {
+                            Name = parameter.PackageName,
+                            Version = parameter.IsUploadLatest ? "Latest" : parameter.Version
+                        });
+                    }
+                    else data2.Version = parameter.IsUploadLatest ? "Latest" : parameter.Version;
+
+                    versionContent = AHelper.Json.Serialize(data);
+                }
+                else
+                {
+                    versionContent = AHelper.Json.Serialize(new[]
+                    {
+                        new AssetsPackageConfig
+                        {
+                            Name = parameter.PackageName,
+                            Version = parameter.IsUploadLatest ? "Latest" : parameter.Version
+                        }
+                    });
+                }
+
+                var versionTemp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                await AHelper.IO.WriteUTF8Async(versionTemp, versionContent);
+                succeed = await handle.UploadFileAsync(versionPath, versionTemp);
+                AHelper.IO.DeleteFile(versionTemp);
+            }
+
+            return succeed;
         }
     }
 }
