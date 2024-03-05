@@ -127,10 +127,10 @@ def gcloud_upload_file(remote, location):
         return
     remote = remote.replace('\\', '/').rstrip('/')
     if args.metaDataKey and args.metaDataValue:
-        command = "gsutil -m -o \"GSUtil:parallel_process_count=5\" -h \"{0}:{1}\" cp \"{2}\" \"gs://{3}\"".format(
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=1\" -h \"{0}:{1}\" cp \"{2}\" \"gs://{3}\"".format(
             args.metaDataKey, args.metaDataValue, location, remote)
     else:
-        command = "gsutil -m -o \"GSUtil:parallel_process_count=5\" cp \"{0}\" \"gs://{1}/\"".format(location, remote)
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=1\" cp \"{0}\" \"gs://{1}/\"".format(location, remote)
     # print("执行命令：{0}".format(command))
     try:
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, text=True, bufsize=1)
@@ -157,10 +157,10 @@ def gcloud_upload_dir(remote, location):
             os.chmod(os.path.join(root, file), 0o777)
     remote = remote.replace('\\', '/').rstrip('/')
     if args.metaDataKey and args.metaDataValue:
-        command = "gsutil -m -o \"GSUtil:parallel_process_count=5\" -h \"{0}:{1}\" cp -r -f \"{2}\" \"gs://{3}\"".format(
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=1\" -h \"{0}:{1}\" cp -r \"{2}\" \"gs://{3}\"".format(
             args.metaDataKey, args.metaDataValue, location, remote)
     else:
-        command = "gsutil -m -o \"GSUtil:parallel_process_count=5\" cp -r -f \"{0}\" \"gs://{1}\"".format(location, remote)
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=1\" cp -r \"{0}\" \"gs://{1}\"".format(location, remote)
 
     print("执行命令：{0}".format(command))
     try:

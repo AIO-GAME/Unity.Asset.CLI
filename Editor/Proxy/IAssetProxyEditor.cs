@@ -24,14 +24,14 @@ namespace AIO.UEditor
         /// 转换配置
         /// </summary>
         /// <param name="config">收集器配置</param>
-        void ConvertConfig(AssetCollectRoot config);
+        bool ConvertConfig(AssetCollectRoot config);
 
         /// <summary>
         /// 创建配置
         /// </summary>
         /// <param name="bundlesDir">导出目标文件夹</param>
         /// <param name="mergeToLatest">合并Latest</param>
-        void CreateConfig(string bundlesDir, bool mergeToLatest);
+        bool CreateConfig(string bundlesDir, bool mergeToLatest);
 
         /// <summary>
         /// 构建资源
@@ -55,11 +55,11 @@ namespace AIO.UEditor
         /// Tips:
         /// 需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        Task UploadGCloud(AsUploadGCloudParameter parameter);
+        Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters);
 
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        Task UploadFtp(AsUploadFtpParameter parameter);
+        Task<bool> UploadFtp(ICollection<AsUploadFtpParameter> parameters);
     }
 }

@@ -129,24 +129,17 @@ namespace AIO.UEditor
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUILayout.LabelField("输出路径", GTOption.Width(98));
-
+                    EditorGUILayout.Separator();
                     if (string.IsNullOrEmpty(BuildConfig.BuildOutputPath) ||
                         Directory.GetParent(BuildConfig.BuildOutputPath) == null)
                     {
-                        EditorGUILayout.Separator();
-                        if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_50))
+                        if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_75))
                             BuildConfig.BuildOutputPath =
                                 EditorUtility.OpenFolderPanel("请选择导出路径", BuildConfig.BuildOutputPath, "");
                     }
 
-                    BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild, GP_Width_100);
-                    BuildConfig.MergeToLatest =
-                        GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest, GP_Width_100);
                     // BuildConfig.BuildFirstPackage =
                     //     GELayout.ToggleLeft("构建首包资源", BuildConfig.BuildFirstPackage, GP_Width_100);
-
-                    EditorGUILayout.Separator();
 
                     if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_75))
                     {
@@ -184,7 +177,11 @@ namespace AIO.UEditor
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
                 {
-                    EditorGUILayout.LabelField(BuildConfig.BuildOutputPath, GEStyle.CenteredLabel);
+                    EditorGUILayout.LabelField("输出路径", GP_Width_100);
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
+                    {
+                        EditorGUILayout.LabelField(BuildConfig.BuildOutputPath, GEStyle.HeaderLabel);
+                    }
 
                     if (Application.isPlaying) GUI.enabled = false;
                     if (GUILayout.Button("构建指定资源", GEStyle.toolbarbutton, GP_Width_100))
@@ -253,10 +250,24 @@ namespace AIO.UEditor
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
                 {
+                    EditorGUILayout.LabelField("构建选项", GP_Width_100);
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
+                    {
+                        BuildConfig.MergeToLatest = GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest,
+                            GP_Width_120);
+                        BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild,
+                            GP_Width_120);
+                    }
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
+                {
                     EditorGUILayout.LabelField("构建版本", GP_Width_100, GP_Height_20);
                     using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
                     {
-                        BuildConfig.BuildVersion = GELayout.Field(BuildConfig.BuildVersion, GP_Height_20);
+                        BuildConfig.BuildVersion = GELayout.FieldDelayed(BuildConfig.BuildVersion,
+                            GEStyle.ToolbarBoldLabel,
+                            GP_Height_20);
                     }
 
                     if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20, GP_Height_20))

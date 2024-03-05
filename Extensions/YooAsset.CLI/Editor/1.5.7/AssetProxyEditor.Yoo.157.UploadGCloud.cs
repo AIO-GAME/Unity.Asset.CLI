@@ -1,12 +1,10 @@
 ﻿#if SUPPORT_YOOASSET
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace AIO.UEditor.CLI
@@ -121,10 +119,20 @@ namespace AIO.UEditor.CLI
             return true;
         }
 
+        private static async Task<bool> UploadGCloudAsync(IEnumerable<AsUploadGCloudParameter> parameters)
+        {
+            foreach (var parameter in parameters)
+            {
+                if (!await UploadGCloudAsync(parameter)) return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// 上传到GCloud
         /// </summary>
-        private static async Task UploadGCloudAsync(AsUploadGCloudParameter parameter)
+        private static async Task<bool> UploadGCloudAsync(AsUploadGCloudParameter parameter)
         {
             var localFull = parameter.LocalFullPath;
             var remotePath = parameter.RemoteRelative;
@@ -132,9 +140,11 @@ namespace AIO.UEditor.CLI
             bool succeed;
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "判断是否有清单", 0.1f);
 
-            var sw = Stopwatch.StartNew();
             // 在判断目标文件夹是否有清单文件 如果有则对比清单文件的MD5值 如果一致则不上传
-            if (await PrGCloud.ExistsAsync(remoteManifest)) succeed = await UploadGCloudExist(parameter);
+            if (await PrGCloud.ExistsAsync(remoteManifest))
+            {
+                succeed = await UploadGCloudExist(parameter);
+            }
             else
             {
                 EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "上传资源", 0.2f);
@@ -193,8 +203,7 @@ namespace AIO.UEditor.CLI
                 AHelper.IO.DeleteFile(versionTemp);
             }
 
-            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
-            EHelper.DisplayDialog("Info", info, "确定");
+            return succeed;
         }
     }
 }

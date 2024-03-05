@@ -6,8 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
-using AIO.YamlDotNet.Core;
-using AIO.YamlDotNet.Serialization;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -22,14 +20,14 @@ namespace AIO.UEditor.CLI
         public string Scopes => Ghost.YooAsset.Scopes;
         public string Name => Ghost.YooAsset.Name;
 
-        public void CreateConfig(string bundlesDir, bool mergeToLatest)
+        public bool CreateConfig(string bundlesDir, bool mergeToLatest)
         {
-            CreateConfig157(bundlesDir, mergeToLatest);
+            return CreateConfig157(bundlesDir, mergeToLatest);
         }
 
-        public void ConvertConfig(AssetCollectRoot config)
+        public bool ConvertConfig(AssetCollectRoot config)
         {
-            ConvertYooAsset.Convert(config);
+            return ConvertYooAsset.Convert(config);
         }
 
         public bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command)
@@ -40,14 +38,8 @@ namespace AIO.UEditor.CLI
                 command.BuildPackage = packageName;
                 var result = YooAssetBuild.ArtBuild(command);
                 if (result.Success) continue;
-                if (EHelper.IsCMD()) Debug.LogError($"构建 {command.BuildPackage} 失败 : {result.ErrorInfo}");
-                else EditorUtility.DisplayDialog($"构建 {command.BuildPackage} 失败", result.ErrorInfo, "确定");
+                Debug.LogError($"构建 {command.BuildPackage} 失败 : {result.ErrorInfo}");
                 return false;
-            }
-
-            if (!EHelper.IsCMD())
-            {
-                EditorUtility.DisplayDialog("构建成功", $"构建 {string.Join(",", enumerable)} 成功", "确定");
             }
 
             return true;
@@ -61,11 +53,7 @@ namespace AIO.UEditor.CLI
                 if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) Debug.Log("构建资源成功");
                 else if (!EHelper.IsCMD()) EditorUtility.RevealInFinder(result.OutputPackageDirectory);
             }
-            else
-            {
-                if (EHelper.IsCMD()) Debug.LogError($"构建失败 {result.ErrorInfo}");
-                else EditorUtility.DisplayDialog("构建失败", result.ErrorInfo, "确定");
-            }
+            else Debug.LogError($"构建失败 {result.ErrorInfo}");
 
             return result.Success;
         }
@@ -79,39 +67,9 @@ namespace AIO.UEditor.CLI
         /// Tips:
         /// 需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        public Task UploadGCloud(AsUploadGCloudParameter parameter)
+        public Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters)
         {
-            return UploadGCloudAsync(parameter);
-        }
-
-        protected class MonoImporter
-        {
-            [YamlMember(typeof(Icon), ScalarStyle = ScalarStyle.Any)]
-            public Icon icon { get; set; }
-
-            public MonoImporter(string guid)
-            {
-                icon = new Icon(guid);
-            }
-
-            public class Icon
-            {
-                [YamlMember(typeof(int), ScalarStyle = ScalarStyle.Plain)]
-                public int fileID { get; set; }
-
-                [YamlMember(typeof(string), ScalarStyle = ScalarStyle.Plain)]
-                public string guid { get; set; }
-
-                [YamlMember(typeof(int), ScalarStyle = ScalarStyle.Plain)]
-                public int type { get; set; }
-
-                public Icon(string guid)
-                {
-                    fileID = 2800000;
-                    type = 3;
-                    this.guid = guid;
-                }
-            }
+            return UploadGCloudAsync(parameters);
         }
 
         // [LnkTools(IconResource = "Editor/Icon/App/Microsoft")]
@@ -128,9 +86,9 @@ namespace AIO.UEditor.CLI
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public async Task UploadFtp(AsUploadFtpParameter parameter)
+        public async Task<bool> UploadFtp(ICollection<AsUploadFtpParameter> parameters)
         {
-            await UploadFtpAsync(parameter);
+            return await UploadFtpAsync(parameters);
         }
 
         [MenuItem("YooAsset/Create Config")]
@@ -144,12 +102,12 @@ namespace AIO.UEditor.CLI
         /// </summary>
         /// <param name="BundlesDir">构建目录</param>
         /// <param name="MergeToLatest">开启合并Latest</param>
-        private static void CreateConfig157(string BundlesDir, bool MergeToLatest)
+        private static bool CreateConfig157(string BundlesDir, bool MergeToLatest)
         {
             if (!Directory.Exists(BundlesDir))
             {
                 Debug.LogWarningFormat("Bundles 目录不存在 : 无需创建配置文件");
-                return;
+                return false;
             }
 
             var BundlesConfigDir = Path.Combine(BundlesDir, "Version");
@@ -227,6 +185,8 @@ namespace AIO.UEditor.CLI
                     pair.Value.Values.ToArray()
                 );
             }
+
+            return true;
         }
     }
 }

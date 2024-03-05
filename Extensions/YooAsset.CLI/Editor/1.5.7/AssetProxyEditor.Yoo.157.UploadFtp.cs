@@ -1,20 +1,27 @@
 ﻿#if SUPPORT_YOOASSET
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEditor;
-using UnityEngine;
 
 namespace AIO.UEditor.CLI
 {
     internal partial class AssetProxyEditor_Yoo_157
     {
+        private static async Task<bool> UploadFtpAsync(IEnumerable<AsUploadFtpParameter> parameters)
+        {
+            foreach (var parameter in parameters)
+            {
+                if (!await UploadFtpAsync(parameter)) return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public static async Task UploadFtpAsync(AsUploadFtpParameter parameter)
+        private static async Task<bool> UploadFtpAsync(AsUploadFtpParameter parameter)
         {
             var localFull = parameter.RootPath;
             var handle = AHandle.FTP.Create(parameter.Server, parameter.Port, parameter.User, parameter.Pass,
@@ -22,12 +29,14 @@ namespace AIO.UEditor.CLI
             await handle.InitAsync();
             EHelper.DisplayProgressBar("上传进度", $"开始上传资源 {handle.Absolute}", 0.1f);
             // 在判断目标文件夹是否有清单文件 如果没有则先删除目标文件夹 再上传
-            var progress = new AProgressEvent();
-            progress.OnComplete = report => { EHelper.DisplayDialog("结束", report.ToString(), "确定"); };
-            progress.OnError = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); };
-            progress.OnProgress = current =>
+            var progress = new AProgressEvent
             {
-                EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f);
+                OnComplete = report => { EHelper.DisplayDialog("结束", report.ToString(), "确定"); },
+                OnError = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); },
+                OnProgress = current =>
+                {
+                    EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f);
+                }
             };
             // 在判断目标文件夹是否有清单文件 如果有则对比清单文件的MD5值 如果一致则不上传
             if (await handle.CheckFileAsync("Manifest.json"))
@@ -41,7 +50,7 @@ namespace AIO.UEditor.CLI
                 if (localMD5 == remoteMD5)
                 {
                     EHelper.DisplayDialog("消息", "当前远端版本清单对比一致 无需上传!", "确定");
-                    return;
+                    return true;
                 }
 
                 var current = await AHelper.IO.ReadJsonUTF8Async<Dictionary<string, string>>(manifestPath);
@@ -61,7 +70,7 @@ namespace AIO.UEditor.CLI
                     else
                     {
                         EHelper.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
-                        return;
+                        return false;
                     }
                 }
 
@@ -86,7 +95,7 @@ namespace AIO.UEditor.CLI
                     else
                     {
                         EHelper.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
-                        return;
+                        return false;
                     }
                 }
 
@@ -103,6 +112,7 @@ namespace AIO.UEditor.CLI
             }
 
             EHelper.DisplayDialog("Info", $"资源上传完成", "确定");
+            return true;
         }
     }
 }
