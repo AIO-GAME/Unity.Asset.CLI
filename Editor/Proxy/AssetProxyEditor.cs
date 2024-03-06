@@ -71,7 +71,7 @@ namespace AIO.UEditor
 
             var succeed = await Editor.UploadGCloud(parameters);
             var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
-            EHelper.DisplayDialog("Info", info, "确定");
+            EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
 
@@ -95,7 +95,7 @@ namespace AIO.UEditor
             var sw = Stopwatch.StartNew();
             var succeed = await Editor.UploadGCloud(new[] { parameter });
             var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
-            EHelper.DisplayDialog("Info", info, "确定");
+            EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
 
@@ -114,7 +114,7 @@ namespace AIO.UEditor
             var sw = Stopwatch.StartNew();
             var succeed = await Editor.UploadFtp(new[] { parameter });
             var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
-            EHelper.DisplayDialog("Info", info, "确定");
+            EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
 
