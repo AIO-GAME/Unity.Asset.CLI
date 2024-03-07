@@ -78,8 +78,8 @@ namespace AIO.UEditor
                                 {
                                     if (GUILayout.Button("更新首包配置", GEStyle.toolbarbutton, GP_Width_100))
                                     {
-                                        GUI.FocusControl(null);
                                         UpdateUploadFirstPack(BuildConfig.FTPConfigs[i]);
+                                        GUI.FocusControl(null);
                                     }
                                 }
 

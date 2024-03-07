@@ -56,6 +56,21 @@ def local_copy_file(source_path, destination_path):
         print(f"An error occurred: {e}")
 
 
+def local_get_folder_size(folder_path):
+    total_size = 0
+
+    # 遍历文件夹中的所有文件和子文件夹
+    for dir_path, dir_names, filenames in os.walk(folder_path):
+        for filename in filenames:
+            file_path = os.path.join(dir_path, filename)
+            # 获取文件大小并累加到总大小
+            total_size += os.path.getsize(file_path)
+
+    # 将字节大小转换为更合适的单位（如MB）
+    total_size_mb = total_size / (1024 * 1024)
+    return total_size_mb
+
+
 def local_delete_dir(path: str):
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -156,6 +171,19 @@ def gcloud_upload_file(remote, location):
     return 0
 
 
+def gcloud_clean_cache(project: str, root: str, is_async: bool = False):
+    command_temp = f'gcloud compute url-maps invalidate-cdn-cache --project={project} rol-balancer --path=/{root}/*'
+    if is_async:
+        command_temp += ' --async'
+    print("[执行命令] {0}".format(command_temp))
+    try:
+        process_temp = subprocess.Popen(command_temp, shell=True, stdout=subprocess.PIPE, text=True, bufsize=1)
+        process_temp.communicate()
+        return process_temp.returncode
+    except subprocess.CalledProcessError:
+        return -1
+
+
 def gcloud_upload_dir(remote, location):
     location = location.replace('\\', '/').rstrip('/')
     if not os.path.exists(location):
@@ -164,13 +192,12 @@ def gcloud_upload_dir(remote, location):
     for root, dirs, files in os.walk(location):
         for file in files:
             os.chmod(os.path.join(root, file), 0o777)
-    remote = remote.replace('\\', '/').rstrip('/')
-    command = "gsutil -m -o \"GSUtil:parallel_process_count=1\" {0} cp -r \"{1}\" \"gs://{2}\"".format(
-        metaData, location, remote)
-    print("[执行命令] {0}".format(command))
     try:
+        remote = remote.replace('\\', '/').rstrip('/')
+        command = "gsutil -m -o \"GSUtil:parallel_process_count=1\" {0} cp -r \"{1}\" \"gs://{2}\"".format(
+            metaData, location, remote)
+        print("[执行命令] {0}".format(command))
         # 循环读取子进程的输出 会导致多线程上传失效
-        # os.system(command)
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, text=True, bufsize=1)
         while True:
             output = process.stdout.readline()
@@ -183,6 +210,18 @@ def gcloud_upload_dir(remote, location):
     except subprocess.CalledProcessError:
         return -1
     return 0
+
+
+def gcloud_update_meta(remote, meta_data_key, meta_data_value):
+    remote = remote.replace('\\', '/').rstrip('/')
+    command = "gsutil setmeta -h \"{0}:{1}\" \"gs://{2}\"".format(meta_data_key, meta_data_value, remote)
+    print("[执行命令] {0}".format(command))
+    try:
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, text=True, bufsize=1)
+        process.communicate()
+        return process.returncode
+    except subprocess.CalledProcessError:
+        return -1
 
 
 def gcloud_update_version():
