@@ -124,18 +124,90 @@ namespace AIO.UEditor
             public string LocalFullPath => DirTreeFiled.GetFullPath();
 
             /// <summary>
+            /// 是否存在远端首包配置
+            /// </summary>
+            public Task<bool> IsExistRemoteFirstPack()
+            {
+                var remote = AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Path.Combine(Server, RemotePath));
+                return AHelper.FTP.CheckFileAsync(remote, User, Pass);
+            }
+
+            /// <summary>
             /// 上传首包配置
             /// </summary>
-            public async Task UploadFirstPack(string target)
+            public async Task<bool> UploadFirstPack(string target)
             {
-                var versionDir = Path.Combine(Server, RemotePath, "Version");
-                if (!await AHelper.FTP.CheckDirAsync(versionDir, User, Pass))
-                    await AHelper.FTP.CreateDirAsync(versionDir, User, Pass);
+                try
+                {
+                    var versionDir = Path.Combine(Server, RemotePath, "Version");
+                    if (!await AHelper.FTP.CheckDirAsync(versionDir, User, Pass))
+                        await AHelper.FTP.CreateDirAsync(versionDir, User, Pass);
 
+                    var remote = AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Path.Combine(Server, RemotePath));
+                    var op = AHelper.FTP.UploadFile(remote, User, Pass, target);
+                    op.Begin();
+                    await op.WaitAsync();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    return false;
+                }
+
+                return true;
+            }
+
+            /// <summary>
+            /// 合并首包配置
+            /// </summary>
+            public async Task<bool> MergeFirstPack(string target)
+            {
                 var remote = AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Path.Combine(Server, RemotePath));
-                var op = AHelper.FTP.UploadFile(remote, User, Pass, target);
-                op.Begin();
-                await op.WaitAsync();
+                var status = false;
+                try
+                {
+                    var dic = new Dictionary<string, AssetSystem.SequenceRecord>();
+                    var op = await AHelper.FTP.GetTextAsync(remote, User, Pass);
+                    var remote_data = AHelper.Json.Deserialize<AssetSystem.SequenceRecord[]>(op);
+                    if (remote_data != null)
+                    {
+                        foreach (var item in remote_data)
+                        {
+                            if (item is null) continue;
+                            if (string.IsNullOrEmpty(item.GUID)) continue;
+                            dic[item.GUID] = item;
+                        }
+                    }
+
+                    var local_data = AHelper.IO.ReadJsonUTF8<AssetSystem.SequenceRecord[]>(target);
+                    if (local_data != null)
+                    {
+                        foreach (var item in local_data)
+                        {
+                            if (item is null) continue;
+                            if (string.IsNullOrEmpty(item.GUID)) continue;
+                            dic[item.GUID] = item;
+                        }
+                    }
+
+
+                    var data = dic.Values.ToList();
+                    data.Sort((a, b) => b.Time.CompareTo(a.Time));
+                    var content = AHelper.Json.Serialize(data);
+                    using (var op2 = AHelper.FTP.UploadFile(remote, User, Pass, Encoding.UTF8.GetBytes(content)))
+                    {
+                        op2.Begin();
+                        await op2.WaitAsync();
+                    }
+
+                    status = true;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+
+                return status;
             }
 
             /// <summary>

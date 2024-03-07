@@ -7,7 +7,6 @@ using System.Linq;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 using YooAsset;
 using YooAsset.Editor;
 
@@ -185,8 +184,8 @@ namespace AIO.UEditor.CLI
                 : buildParameters.CopyBuildinFileTags;
 
             buildParameters.CopyBuildinFileOption = !string.IsNullOrEmpty(buildParameters.CopyBuildinFileTags)
-                ? YooAsset.Editor.ECopyBuildinFileOption.ClearAndCopyByTags
-                : YooAsset.Editor.ECopyBuildinFileOption.None;
+                ? ECopyBuildinFileOption.ClearAndCopyByTags
+                : ECopyBuildinFileOption.None;
 
             buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
 
@@ -214,7 +213,7 @@ namespace AIO.UEditor.CLI
 
                 AssetProxyEditor.CreateConfig(buildParameters.BuildOutputRoot, command.MergeToLatest);
             }
- 
+
             return buildResult;
         }
 
@@ -237,7 +236,19 @@ namespace AIO.UEditor.CLI
             var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories)
                 .Where(filePath => filePath != Manifest)
                 .ToDictionary(filePath => filePath, filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
+            hashtable.Remove("OutputCache");
+            hashtable.Remove("OutputCache.manifest");
 
+            var versionName = dir.Replace("\\", "/");
+            var versionNameIndex = versionName.LastIndexOf('/');
+            var version = versionName.Substring(versionNameIndex + 1);
+
+            var packageName = dir.PathGetLastFloder().Replace("\\", "/");
+            var packageNameIndex = packageName.LastIndexOf('/');
+            var package = packageName.Substring(packageNameIndex + 1);
+            var key = $"PackageManifest_{package}.version";
+            hashtable.Remove($"BuildReport_{package}_{version}.json");
+            hashtable[key] = AHelper.IO.GetFileMD5(Path.Combine(dir, key));
             AHelper.IO.WriteJson(manifestPath, hashtable.Sort());
         }
 
@@ -257,9 +268,16 @@ namespace AIO.UEditor.CLI
                 IDictionary<string, string>>
             ComparisonManifest(Dictionary<string, string> current, Dictionary<string, string> target)
         {
+            current.Remove("Manifest.json");
+            current.Remove("OutputCache");
+            current.Remove("OutputCache.manifest");
+
+            target.Remove("Manifest.json");
+            target.Remove("OutputCache");
+            target.Remove("OutputCache.manifest");
+
             var delete = new Dictionary<string, string>(); // 删除
             var change = new Dictionary<string, string>(); // 修改
-
             var add = current
                 .Where(item => !target.ContainsKey(item.Key))
                 .ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
@@ -274,7 +292,7 @@ namespace AIO.UEditor.CLI
 
                 if (current[item.Key] != item.Value) // 修改
                 {
-                    change.Add(item.Key, item.Value);
+                    change.Add(item.Key, current[item.Key]);
                 }
             }
 
@@ -310,6 +328,16 @@ namespace AIO.UEditor.CLI
         {
             var tuple = ComparisonManifest(currentPath, latestPath);
             var latest = AHelper.IO.ReadJson<Dictionary<string, string>>(latestManifestPath);
+
+            foreach (var pair in tuple.Item2) // 删除
+            {
+                latest.Remove(pair.Key);
+                var target = Path.Combine(latestPath, pair.Key);
+                if (!File.Exists(target)) continue;
+                Console.WriteLine($"删除文件 : {target}");
+                File.Delete(target);
+            }
+
             foreach (var pair in tuple.Item1) // 新增
             {
                 latest[pair.Key] = pair.Value;
@@ -326,15 +354,6 @@ namespace AIO.UEditor.CLI
                     else EditorUtility.DisplayDialog("Error", $"新增文件不存在 : {source} 目标源结构被篡改 请重新构建资源", "确定");
                     return;
                 }
-            }
-
-            foreach (var pair in tuple.Item2) // 删除
-            {
-                latest.Remove(pair.Key);
-                var target = Path.Combine(latestPath, pair.Key);
-                if (!File.Exists(target)) continue;
-                Console.WriteLine($"删除文件 : {target}");
-                File.Delete(target);
             }
 
             foreach (var pair in tuple.Item3) // 修改
@@ -372,6 +391,10 @@ namespace AIO.UEditor.CLI
             {
                 Directory.CreateDirectory(latestPath);
                 AHelper.IO.CopyDirAll(currentPath, latestPath);
+                AHelper.IO.DeleteFile(Path.Combine(latestPath, "OutputCache"));
+                AHelper.IO.DeleteFile(Path.Combine(latestPath, "OutputCache.manifest"));
+                AHelper.IO.DeleteFile(Path.Combine(latestPath,
+                    $"BuildReport_{Path.GetFileName(rootPath)}_{version}.json"));
                 return;
             }
 

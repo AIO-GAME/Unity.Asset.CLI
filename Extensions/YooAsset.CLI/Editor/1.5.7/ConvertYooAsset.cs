@@ -176,7 +176,7 @@ namespace AIO.UEditor.CLI
             AssetBundleCollectorSettingData.Setting.Packages = packages;
         }
 
-        public static void Convert(AssetCollectRoot asset)
+        public static bool Convert(AssetCollectRoot asset)
         {
             if (!Application.isPlaying) asset.Save();
             PackageRemoveRepeat(asset);
@@ -185,7 +185,7 @@ namespace AIO.UEditor.CLI
             PackageRemoveEmpty();
 
             // 如果启用了序列记录，则需要给每个包新增一个序列记录组
-            if (!ASConfig.GetOrCreate().EnableSequenceRecord) return;
+            if (!ASConfig.GetOrCreate().EnableSequenceRecord) return true;
 
             var bundle = new AssetBundleCollectorPackage
             {
@@ -230,6 +230,7 @@ namespace AIO.UEditor.CLI
             }
 
             AssetBundleCollectorSettingData.Setting.Packages.Insert(0, bundle);
+            return true;
         }
     }
 }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -48,38 +50,75 @@ namespace AIO.UEditor
             Editor.CreateConfig(BundlesDir, MergeToLatest);
         }
 
-        /// <summary>
-        /// 上传到GCloud
-        /// </summary>
-        public static async Task UploadGCloud(AsUploadGCloudParameter parameter, bool isTips = false)
+        public static async Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters,
+            bool isTips = false)
         {
             if (Editor is null)
             {
                 if (isTips) TipsInstall();
-                return;
+                return false;
             }
 
-            PrGCloud.Gcloud = string.IsNullOrEmpty(parameter.GCLOUD_PATH) ? "gcloud" : parameter.GCLOUD_PATH;
-            PrGCloud.Gsutil = string.IsNullOrEmpty(parameter.GSUTIL_PATH) ? "gsutil" : parameter.GSUTIL_PATH;
-            await Editor.UploadGCloud(parameter);
+            var sw = Stopwatch.StartNew();
+            foreach (var parameter in parameters)
+            {
+                if (!AHelper.IO.ExistsDir(parameter.LocalFullPath))
+                    throw new Exception($"本地文件夹不存在 -> {parameter.LocalFullPath}");
+
+                if (!string.IsNullOrEmpty(parameter.GCLOUD_PATH)) PrGCloud.Gcloud = parameter.GCLOUD_PATH;
+                if (!string.IsNullOrEmpty(parameter.GSUTIL_PATH)) PrGCloud.Gsutil = parameter.GSUTIL_PATH;
+            }
+
+            var succeed = await Editor.UploadGCloud(parameters);
+            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            EHelper.DisplayDialog("消息", info, "确定");
+            return succeed;
+        }
+
+        /// <summary>
+        /// 上传到GCloud
+        /// </summary>
+        public static async Task<bool> UploadGCloud(AsUploadGCloudParameter parameter, bool isTips = false)
+        {
+            if (Editor is null)
+            {
+                if (isTips) TipsInstall();
+                return false;
+            }
+
+            if (!AHelper.IO.ExistsDir(parameter.LocalFullPath))
+                throw new Exception($"本地文件夹不存在 -> {parameter.LocalFullPath}");
+
+            if (!string.IsNullOrEmpty(parameter.GCLOUD_PATH)) PrGCloud.Gcloud = parameter.GCLOUD_PATH;
+            if (!string.IsNullOrEmpty(parameter.GSUTIL_PATH)) PrGCloud.Gsutil = parameter.GSUTIL_PATH;
+
+            var sw = Stopwatch.StartNew();
+            var succeed = await Editor.UploadGCloud(new[] { parameter });
+            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            EHelper.DisplayDialog("消息", info, "确定");
+            return succeed;
         }
 
 
         /// <summary>
         /// 上传到Ftp
         /// </summary>
-        public static async Task UploadFtp(AsUploadFtpParameter parameter, bool isTips = false)
+        public static async Task<bool> UploadFtp(AsUploadFtpParameter parameter, bool isTips = false)
         {
             if (Editor is null)
             {
                 if (isTips) TipsInstall();
-                return;
+                return false;
             }
 
-            await Editor.UploadFtp(parameter);
+            var sw = Stopwatch.StartNew();
+            var succeed = await Editor.UploadFtp(new[] { parameter });
+            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            EHelper.DisplayDialog("消息", info, "确定");
+            return succeed;
         }
 
-        public static void BuildArtAll(ASBuildConfig config, bool isTips = false)
+        public static bool BuildArtAll(ASBuildConfig config, bool isTips = false)
         {
             var command = new AssetBuildCommand
             {
@@ -95,7 +134,7 @@ namespace AIO.UEditor
             };
             var array = AssetCollectRoot.GetOrCreate().GetPackageNames();
             if (config.BuildFirstPackage) array = array.Add(AssetSystem.TagsRecord);
-            BuildArtList(array, command, isTips);
+            return BuildArtList(array, command, isTips);
         }
 
         /// <summary>
@@ -103,7 +142,7 @@ namespace AIO.UEditor
         /// </summary>
         /// <param name="config"></param>
         /// <param name="isTips"></param>
-        public static void BuildArt(ASBuildConfig config, bool isTips = false)
+        public static bool BuildArt(ASBuildConfig config, bool isTips = false)
         {
             var command = new AssetBuildCommand
             {
@@ -118,36 +157,45 @@ namespace AIO.UEditor
                 MergeToLatest = config.MergeToLatest,
             };
             if (config.BuildFirstPackage) command.BuildPackage = AssetSystem.TagsRecord;
-            BuildArt(command, isTips);
+            return BuildArt(command, isTips);
         }
 
         /// <summary>
         /// 构建所有资源
         /// </summary>
-        public static void BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command,
+        public static bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command,
             bool isTips = false)
         {
             if (Editor is null)
             {
                 if (isTips) TipsInstall();
-                return;
+                return false;
             }
 
             SaveScene();
-            Editor.BuildArtList(packageNames, command);
+            var sw = Stopwatch.StartNew();
+            var enumerable = packageNames as string[] ?? packageNames.ToArray();
+            var succeed = Editor.BuildArtList(enumerable, command);
+            var info =
+                $"构建 {string.Join(",", enumerable)} {(succeed ? "成功" : "失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            EHelper.DisplayDialog("构建成功", info, "确定");
+            return succeed;
         }
 
-        public static void BuildArt(AssetBuildCommand command, bool isTips = false)
+        public static bool BuildArt(AssetBuildCommand command, bool isTips = false)
         {
             if (Editor is null)
             {
                 if (isTips) TipsInstall();
-                return;
+                return false;
             }
 
             SaveScene();
-
-            Editor.BuildArt(command);
+            var sw = Stopwatch.StartNew();
+            var succeed = Editor.BuildArt(command);
+            var info = $"构建 {command.BuildPackage} {(succeed ? "成功" : "失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            EHelper.DisplayDialog("构建成功", info, "确定");
+            return succeed;
         }
 
         /// <summary>

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace AIO.UEditor
 {
@@ -180,8 +182,47 @@ namespace AIO.UEditor
         /// </summary>
         private static async void UpdateUploadFirstPack(ASBuildConfig.FTPConfig config)
         {
-            await config.UploadFirstPack(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
-            EditorUtility.DisplayDialog("提示", "上传成功", "确定");
+            if (await config.IsExistRemoteFirstPack())
+            {
+                var onDrawLookDataItemMenu = new GenericMenu();
+                onDrawLookDataItemMenu.AddItem(new GUIContent("覆盖首包配置"), false, OAction);
+                onDrawLookDataItemMenu.AddItem(new GUIContent("合并首包配置"), false, MAction);
+                onDrawLookDataItemMenu.DropDown(new Rect(Screen.width / 2f, Screen.height / 2f, 0, 0));
+                return;
+
+                async void MAction()
+                {
+                    EditorUtility.DisplayProgressBar("合并首包配置", "正在上传首包配置", 0.5f);
+                    if (await config.MergeFirstPack(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
+                    {
+                        EditorUtility.ClearProgressBar();
+                        EditorUtility.DisplayDialog("提示", "合并成功", "确定");
+                    }
+                    else
+                    {
+                        EditorUtility.ClearProgressBar();
+                        EditorUtility.DisplayDialog("提示", "合并失败", "确定");
+                    }
+                }
+            }
+
+            OAction();
+            return;
+
+            async void OAction()
+            {
+                EditorUtility.DisplayProgressBar("覆盖首包配置", "正在上传首包配置", 0.5f);
+                if (await config.UploadFirstPack(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
+                {
+                    EditorUtility.ClearProgressBar();
+                    EditorUtility.DisplayDialog("提示", "覆盖成功", "确定");
+                }
+                else
+                {
+                    EditorUtility.ClearProgressBar();
+                    EditorUtility.DisplayDialog("提示", "覆盖失败", "确定");
+                }
+            }
         }
 
         /// <summary>
