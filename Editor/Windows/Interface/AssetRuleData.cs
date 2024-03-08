@@ -1,5 +1,8 @@
 ﻿namespace AIO.UEditor
 {
+    /// <summary>
+    /// 资源规则数据
+    /// </summary>
     public struct AssetRuleData
     {
         /// <summary>

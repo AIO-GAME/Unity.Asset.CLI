@@ -5,7 +5,7 @@ using UnityEditor;
 namespace AIO
 {
     /// <summary>
-    /// 
+    /// 资源数据信息
     /// </summary>
     public struct AssetDataInfo
     {

@@ -162,8 +162,12 @@ namespace AIO.UEditor
                 )
                 {
                     CurrentPageValues.Clear();
-                    CurrentPageValues.Add(LookModeData[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                        .Where(data => !LookModeDataFilter(data)));
+                    lock (LookModeData)
+                    {
+                        CurrentPageValues.Add(LookModeData[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
+                            .Where(data => !LookModeDataFilter(data)));
+                    }
+
                     CurrentPageValues.PageIndex = 0;
                     LookModeCollectorsALLSize = CurrentPageValues.Sum(data => data.Size);
                     TempTable[nameof(SearchText)] = SearchText;
@@ -844,12 +848,21 @@ namespace AIO.UEditor
             var listTypes = new List<string>();
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
             {
-                Data.Packages[i].Groups[j].Collectors[k].CollectAssetTask(
+                Data.Packages[i].Groups[j].Collectors[k].CollectAssetAsync(
                     Data.Packages[i].Name, Data.Packages[i].Groups[j].Name, dic =>
                     {
+                        Runner.StartCoroutine(() =>
+                        {
+                            foreach (var pair in dic)
+                            {
+                                listTypes.Add(pair.Value.Type);
+                            }
+
+                            LookModeDisplayTypes[(i, j)] = listTypes.Distinct().ToArray();
+                            Repaint();
+                        });
                         foreach (var pair in dic)
                         {
-                            listTypes.Add(pair.Value.Type);
                             LookModeData[(i, j)].Add(pair.Value);
                             if (!LookModeDataFilter(pair.Value))
                             {
@@ -858,9 +871,7 @@ namespace AIO.UEditor
                             }
                         }
 
-                        LookModeDisplayTypes[(i, j)] = listTypes.Distinct().ToArray();
                         CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
-                        Repaint();
                     });
             }
         }

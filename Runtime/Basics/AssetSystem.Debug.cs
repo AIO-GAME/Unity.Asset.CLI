@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace AIO
@@ -22,70 +23,146 @@ namespace AIO
 
         #region LOG
 
+        /// <summary>
+        ///   <para>Logs a formatted warning message to the Unity Console.</para>
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogWarning(string format, params object[] args)
         {
+#if UNITY_EDITOR
+            if (Parameter is null || Parameter.OutputLog)
+#else
             if (Parameter.OutputLog)
+#endif
                 Debug.LogWarningFormat($"{BASE_WARNING_FORMAT} {format}", args);
         }
 
+        /// <summary>
+        ///   <para>A variant of Debug.Log that logs a warning message to the console.</para>
+        /// </summary>
+        /// <param name="message">String or object to be converted to string representation for display.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
-        public static void LogWarning(string args)
+        public static void LogWarning(string message)
         {
+#if UNITY_EDITOR
+            if (Parameter is null || Parameter.OutputLog)
+#else
             if (Parameter.OutputLog)
-                Debug.LogWarning($"{BASE_WARNING_FORMAT} {args}");
+#endif
+                Debug.LogWarning($"{BASE_WARNING_FORMAT} {message}");
         }
 
+        /// <summary>
+        ///   <para>A variant of Debug.Log that logs an error message to the console.</para>
+        /// </summary>
+        /// <param name="exception">Runtime Exception.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
-        public static void LogException(Exception args)
+        public static void LogException(Exception exception)
         {
-            if (Parameter.OutputLog)
 #if UNITY_EDITOR
-                Debug.LogError($"{BASE_EXCEPTION_FORMAT} {args}");
+            if (Parameter is null || Parameter.OutputLog)
 #else
-                Debug.LogException(new Exception($"{BASE_EXCEPTION_FORMAT} {args}"));
+            if (Parameter.OutputLog)
+#endif
+#if UNITY_EDITOR
+                Debug.LogError($"{BASE_EXCEPTION_FORMAT} {exception}");
+#else
+                Debug.LogException(new Exception($"{BASE_EXCEPTION_FORMAT} {exception}"));
 #endif
         }
 
+        /// <summary>
+        ///   <para>A variant of Debug.Log that logs an error message to the console.</para>
+        /// </summary>
+        /// <param name="exception">Runtime Exception.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
-        public static void LogException(string args)
+        public static void LogException(string exception)
         {
+#if UNITY_EDITOR
+            if (Parameter is null || Parameter.OutputLog)
+#else
             if (Parameter.OutputLog)
-                Debug.LogError($"{BASE_EXCEPTION_FORMAT} {args}");
+#endif
+                Debug.LogError($"{BASE_EXCEPTION_FORMAT} {exception}");
         }
 
+        /// <summary>
+        ///   <para>A variant of Debug.Log that logs an error message to the console.</para>
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogException(string format, params object[] args)
         {
+#if UNITY_EDITOR
+            if (Parameter is null || Parameter.OutputLog)
+#else
             if (Parameter.OutputLog)
+#endif
                 Debug.LogErrorFormat($"{BASE_EXCEPTION_FORMAT} {format}", args);
         }
 
+        /// <summary>
+        ///   <para>Logs a message to the Unity Console.</para>
+        /// </summary>
+        /// <param name="message">String or object to be converted to string representation for display.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
-        public static void Log(string args)
+        public static void Log(string message)
         {
+#if UNITY_EDITOR
+            if (Parameter is null || Parameter.OutputLog)
+#else
             if (Parameter.OutputLog)
-                Debug.Log($"{BASE_LOG_FORMAT} {args}");
+#endif
+                Debug.Log($"{BASE_LOG_FORMAT} {message}");
         }
 
+        /// <summary>
+        ///   <para>Logs a formatted message to the Unity Console.</para>
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void Log(string format, params object[] args)
         {
+#if UNITY_EDITOR
+            if (Parameter is null || Parameter.OutputLog)
+#else
             if (Parameter.OutputLog)
+#endif
                 Debug.LogFormat($"{BASE_LOG_FORMAT} {format}", args);
         }
 
+        /// <summary>
+        ///   <para>A variant of Debug.Log that logs an error message to the console.</para>
+        /// </summary>
+        /// <param name="message">String or object to be converted to string representation for display.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
-        public static void LogError(string args)
+        public static void LogError(string message)
         {
+#if UNITY_EDITOR
+            if (Parameter is null || Parameter.OutputLog)
+#else
             if (Parameter.OutputLog)
-                Debug.LogError($"{BASE_ERROR_FORMAT} {args}");
+#endif
+                Debug.LogError($"{BASE_ERROR_FORMAT} {message}");
         }
 
+        /// <summary>
+        ///   <para>Logs a formatted error message to the Unity console.</para>
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
         public static void LogError(string format, params object[] args)
         {
+#if UNITY_EDITOR
+            if (Parameter is null || Parameter.OutputLog)
+#else
             if (Parameter.OutputLog)
+#endif
                 Debug.LogErrorFormat($"{BASE_ERROR_FORMAT} {format}", args);
         }
 
