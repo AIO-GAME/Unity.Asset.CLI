@@ -2,7 +2,7 @@
 
 namespace AIO.UEditor
 {
-    public partial class RuleCollect
+    partial class RuleCollect
     {
         public class CollectFontOTF : IFilterRule
         {

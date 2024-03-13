@@ -137,14 +137,14 @@ namespace AIO.UEngine.YooAsset
                 case RawFileOperationHandle handle:
                     handle.Dispose();
                     return;
-                case SceneOperationHandle handle:
-                    handle.UnloadAsync();
-                    return;
                 case SubAssetsOperationHandle handle:
                     handle.Dispose();
                     return;
                 case AssetOperationHandle handle:
                     handle.Dispose();
+                    return;
+                case SceneOperationHandle handle:
+                    if (!handle.IsMainScene()) handle.UnloadAsync();
                     return;
             }
 
@@ -169,8 +169,9 @@ namespace AIO.UEngine.YooAsset
                 await Task.WhenAll(enumerable);
 #endif
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                AssetSystem.LogException(e);
                 return false;
             }
 

@@ -153,7 +153,7 @@ namespace AIO.UEditor
                     {
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
                         listItems.Add(collector);
-                        collector.CollectAssetTask(package.Name, group.Name, dic =>
+                        collector.CollectAssetAsync(package.Name, group.Name, dic =>
                         {
                             foreach (var pair in dic)
                             {

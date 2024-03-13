@@ -27,14 +27,10 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = HandleGet<SceneOperationHandle>(location);
-            if (operation != null)
-            {
-                yield return operation.UnloadAsync();
-                HandleFree(location);
-            }
+            if (operation != null) HandleFree(location);
 
             ResPackage package = null;
-            yield return GetAutoPackageCO(location, ya => package = ya);
+            yield return GetAutoPackageCO(location, resPackage => package = resPackage);
             if (package is null) throw new Exception($"场景配置 异常错误 : {location} {sceneMode}");
 
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
@@ -68,11 +64,7 @@ namespace AIO.UEngine.YooAsset
             int priority = 100)
         {
             var operation = HandleGet<SceneOperationHandle>(location);
-            if (operation != null)
-            {
-                await operation.UnloadAsync().Task;
-                HandleFree(location);
-            }
+            if (operation != null) HandleFree(location);
 
             var package = await GetAutoPackageTask(location);
             if (package is null)
@@ -84,6 +76,7 @@ namespace AIO.UEngine.YooAsset
             operation = package.LoadSceneAsync(location, sceneMode, suspendLoad, priority);
             if (await LoadCheckOPTask(operation))
             {
+                operation.ActivateScene();
                 HandleAdd(location, operation);
                 return operation.SceneObject;
             }
