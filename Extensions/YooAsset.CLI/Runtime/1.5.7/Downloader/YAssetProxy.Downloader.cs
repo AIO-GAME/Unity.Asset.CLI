@@ -326,33 +326,29 @@ namespace AIO.UEngine.YooAsset
 
             private Dictionary<string, long> CurrentValueDict = new Dictionary<string, long>();
             private Dictionary<string, long> TotalValueDict = new Dictionary<string, long>();
-            private Dictionary<string, int> CurrentCountDict = new Dictionary<string, int>();
-            private Dictionary<string, int> TotalCountDict = new Dictionary<string, int>();
             private Dictionary<string, long> DownloadedFiles = new Dictionary<string, long>();
+
+            private long FirstValue = -1;
 
             private bool OnWaitBegin()
             {
                 CurrentValueDict.Clear();
                 TotalValueDict.Clear();
 
-                TotalValueDict[nameof(DownloadedFiles)] = DownloadedFiles.Sum(pair => pair.Value);
-                CurrentValueDict[nameof(DownloadedFiles)] = TotalValueDict[nameof(DownloadedFiles)];
-
-                TotalCountDict[nameof(DownloadedFiles)] = DownloadedFiles.Count;
-                CurrentCountDict[nameof(DownloadedFiles)] = TotalCountDict[nameof(DownloadedFiles)];
+                CurrentValueDict[nameof(DownloadedFiles)] = DownloadedFiles.Sum(pair => pair.Value);
 
                 foreach (var pair in ResourceDownloaderOperations)
                 {
                     TotalValueDict[pair.Key] = pair.Value.TotalDownloadBytes;
-                    TotalCountDict[pair.Key] = pair.Value.TotalDownloadCount;
-
                     CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
-                    CurrentCountDict[pair.Key] = pair.Value.CurrentDownloadCount;
                 }
 
-                TotalValue = TotalValueDict.Sum(pair => pair.Value);
-                CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
+                if (FirstValue < 0)
+                {
+                    FirstValue = TotalValue = TotalValueDict.Sum(pair => pair.Value);
+                }
 
+                CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
                 var endValue = TotalValue - CurrentValue;
                 var diskSpace = AssetSystem.GetAvailableDiskSpace();
                 if (diskSpace < endValue) // 检查磁盘空间是否足够
@@ -389,21 +385,16 @@ namespace AIO.UEngine.YooAsset
                             case NetworkReachability.ReachableViaCarrierDataNetwork:
                                 if (AllowReachableCarrier) break;
                                 Pause();
-                                OnNetReachableCarrier?.Invoke(Report, () =>
-                                {
-                                    AllowReachableCarrier = true;
-                                    Resume();
-                                });
+                                OnNetReachableCarrier?.Invoke(Report,
+                                    () =>
+                                    {
+                                        AllowReachableCarrier = true;
+                                        Resume();
+                                    });
                                 break;
                         }
 
-                        TotalValueDict[pair.Key] = pair.Value.TotalDownloadBytes;
-                        TotalCountDict[pair.Key] = pair.Value.TotalDownloadCount;
-
                         CurrentValueDict[pair.Key] = pair.Value.CurrentDownloadBytes;
-                        CurrentCountDict[pair.Key] = pair.Value.CurrentDownloadCount;
-
-                        TotalValue = TotalValueDict.Sum(item => item.Value);
                         CurrentValue = CurrentValueDict.Sum(item => item.Value);
                     }
                 }
@@ -413,7 +404,11 @@ namespace AIO.UEngine.YooAsset
 
             protected override async Task OnWaitAsync()
             {
-                Debug.Log("OnWaitAsync");
+                while (Application.internetReachability == NetworkReachability.NotReachable)
+                {
+                    await Task.Delay(1);
+                }
+
                 await UpdateHeaderTask();
                 CollectNeedBegin();
                 if (!OnWaitBegin())
@@ -459,6 +454,11 @@ namespace AIO.UEngine.YooAsset
 
             protected override IEnumerator OnWaitCo()
             {
+                while (Application.internetReachability == NetworkReachability.NotReachable)
+                {
+                    yield return new WaitForSeconds(1);
+                }
+
                 yield return UpdateHeaderCo();
                 CollectNeedBegin();
                 if (!OnWaitBegin())
@@ -507,6 +507,7 @@ namespace AIO.UEngine.YooAsset
             {
                 DownloadedFiles[filename] = sizeBytes;
                 CurrentInfo = $"Resource download : [{filename}:{sizeBytes}]";
+                AssetSystem.Log($"Resource download : [{filename}:{sizeBytes}]");
             }
 
             private void OnDownloadError(string filename, string error)
