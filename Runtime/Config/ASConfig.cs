@@ -165,12 +165,11 @@ namespace AIO.UEngine
 #if UNITY_EDITOR
             if (instance is null)
             {
-                foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new string[] { "Assets" })
+                foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new[] { "Assets" })
                              .Select(AssetDatabase.GUIDToAssetPath)
                              .Select(AssetDatabase.LoadAssetAtPath<ASConfig>)
                              .Where(value => value != null))
                 {
-                    if (item.Equals(null)) continue;
                     instance = item;
                     break;
                 }
@@ -190,7 +189,7 @@ namespace AIO.UEngine
                 {
                     var type = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true);
                     var temp = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
-                        ?.Invoke(null, new object[] { });
+                        ?.Invoke(null, Array.Empty<object>());
                     if (temp != null)
                     {
                         Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true)
