@@ -36,7 +36,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.LogFormat(LogType.Warning, $"{BASE_WARNING_FORMAT} {format}", args);
+                Debug.unityLogger.LogFormat(LogType.Warning, $"{string.Intern(BASE_WARNING_FORMAT)} {format}", args);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.Log(LogType.Warning, $"{BASE_WARNING_FORMAT} {message}");
+                Debug.unityLogger.Log(LogType.Warning, $"{string.Intern(BASE_WARNING_FORMAT)} {message}");
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace AIO
             if (Parameter.OutputLog)
 #endif
 #if UNITY_EDITOR
-                Debug.unityLogger.Log(LogType.Error, $"{BASE_EXCEPTION_FORMAT} {exception}");
+                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_EXCEPTION_FORMAT)} {exception}");
 #else
                 Debug.unityLogger.LogException(new Exception($"{BASE_EXCEPTION_FORMAT} {exception}"));
 #endif
@@ -85,7 +85,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.Log(LogType.Error, $"{BASE_EXCEPTION_FORMAT} {exception}");
+                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_EXCEPTION_FORMAT)} {exception}");
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.LogFormat(LogType.Error, $"{BASE_EXCEPTION_FORMAT} {format}", args);
+                Debug.unityLogger.LogFormat(LogType.Error, $"{string.Intern(BASE_EXCEPTION_FORMAT)} {format}", args);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.Log(LogType.Log, $"{BASE_LOG_FORMAT} {message}");
+                Debug.unityLogger.Log(LogType.Log, $"{string.Intern(BASE_LOG_FORMAT)} {message}");
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.LogFormat(LogType.Log, $"{BASE_LOG_FORMAT} {format}", args);
+                Debug.unityLogger.LogFormat(LogType.Log, $"{string.Intern(BASE_LOG_FORMAT)} {format}", args);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.Log(LogType.Error, $"{BASE_ERROR_FORMAT} {message}");
+                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_ERROR_FORMAT)} {message}");
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.LogFormat(LogType.Error, $"{BASE_ERROR_FORMAT} {format}", args);
+                Debug.unityLogger.LogFormat(LogType.Error, $"{string.Intern(BASE_ERROR_FORMAT)} {format}", args);
         }
 
         #endregion
