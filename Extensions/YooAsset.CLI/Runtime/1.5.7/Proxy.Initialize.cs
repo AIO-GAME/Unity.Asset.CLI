@@ -143,9 +143,6 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         /// 更新资源包列表
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public override IEnumerator UpdatePackagesCO(ASConfig config)
         {
             switch (config.ASMode)
@@ -188,17 +185,16 @@ namespace AIO.UEngine.YooAsset
                 return;
             }
 
-            var packages = type.GetField("Packages", BindingFlags.Instance | BindingFlags.Public)
-                ?.GetValue(CollectRoot);
+            var packages = type.GetField("Packages", BindingFlags.Instance | BindingFlags.Public)?.
+                GetValue(CollectRoot);
             if (!(packages is Array array))
             {
                 AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
                 return;
             }
 
-            var fieldInfo = assembly
-                .GetType("AIO.UEditor.AssetCollectPackage", true)
-                .GetField("Name", BindingFlags.Instance | BindingFlags.Public);
+            var fieldInfo = assembly.GetType("AIO.UEditor.AssetCollectPackage", true).
+                GetField("Name", BindingFlags.Instance | BindingFlags.Public);
             if (fieldInfo is null)
             {
                 AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
@@ -237,25 +233,40 @@ namespace AIO.UEngine.YooAsset
             yield return AssetSystem.NetLoadStringCO(remote, data => content = data);
             if (string.IsNullOrEmpty(content))
             {
+#if UNITY_EDITOR
+                throw new Exception($"{remote} Request failed");
+#else
                 AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionRequestFailure);
                 AssetSystem.LogError($"{remote} Request failed");
                 yield break;
+#endif
             }
 
             try
             {
                 config.Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(content);
             }
+#if UNITY_EDITOR
+            catch (Exception e)
+            {
+                throw new Exception($"ASConfig Remote Version Parsing Json Failure : {e}");
+            }
+#else
             catch (Exception)
             {
                 AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionParsingJsonFailure);
                 yield break;
             }
+#endif
 
             if (config.Packages is null || config.Packages.Length == 0)
             {
+#if UNITY_EDITOR
+                throw new ArgumentNullException($"Please set the ASConfig Packages configuration");
+#else
                 AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
                 yield break;
+#endif
             }
 
             foreach (var item in config.Packages)
@@ -273,9 +284,13 @@ namespace AIO.UEngine.YooAsset
                 {
                     if (string.IsNullOrEmpty(data))
                     {
+#if UNITY_EDITOR
+                        throw new Exception($"{url} Request failed");
+#else
                         AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionRequestFailure);
                         AssetSystem.LogError($"{url} Request failed");
                         return;
+#endif
                     }
 
                     item.Version = data;

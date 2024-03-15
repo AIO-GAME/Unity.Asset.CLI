@@ -25,7 +25,16 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DownloadTag(string tag, DownlandAssetEvent dEvent = default)
         {
-            yield return DownloadTag(new[] { tag }, dEvent);
+            if (Parameter.ASMode == EASMode.Remote)
+            {
+                using (var handle = Proxy.GetDownloader(dEvent))
+                {
+                    handle.Begin();
+                    handle.CollectNeedTag(tag);
+                    yield return handle.WaitCo();
+                }
+            }
+            else WhiteListLocal.AddRange(GetAddressByTag(tag));
         }
 
         /// <summary>

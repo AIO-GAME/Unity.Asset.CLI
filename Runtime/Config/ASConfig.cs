@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -132,12 +133,12 @@ namespace AIO.UEngine
                 case EASMode.Remote:
                     if (string.IsNullOrEmpty(URL))
                         throw new Exception("Please set the remote URL");
+                    if (string.IsNullOrEmpty(RuntimeRootDirectory))
+                        throw new Exception("Please set the runtime root directory");
                     if (Packages.Any(value => string.IsNullOrEmpty(value.Name)))
                         throw new Exception("Please set the package name");
                     if (Packages.Any(value => string.IsNullOrEmpty(value.Version)))
                         throw new Exception("Please set the package version");
-                    if (string.IsNullOrEmpty(RuntimeRootDirectory))
-                        throw new Exception("Please set the runtime root directory");
                     break;
                 case EASMode.Local:
                     if (string.IsNullOrEmpty(RuntimeRootDirectory))
@@ -163,43 +164,44 @@ namespace AIO.UEngine
         public static ASConfig GetOrCreate()
         {
 #if UNITY_EDITOR
-            if (instance is null)
+            if (!instance)
             {
-                foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new[] { "Assets" })
-                             .Select(AssetDatabase.GUIDToAssetPath)
-                             .Select(AssetDatabase.LoadAssetAtPath<ASConfig>)
-                             .Where(value => value != null))
+                foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new[] { "Assets" }).
+                             Select(AssetDatabase.GUIDToAssetPath).
+                             Select(AssetDatabase.LoadAssetAtPath<ASConfig>))
                 {
-                    instance = item;
-                    break;
+                    if (item)
+                    {
+                        instance = item;
+                        break;
+                    }
                 }
 
-                if (instance is null)
+                if (!instance)
                 {
                     instance = CreateInstance<ASConfig>();
                     instance.ASMode = EASMode.Editor;
                     instance.Packages = Array.Empty<AssetsPackageConfig>();
-                    if (!Directory.Exists(Path.Combine(Application.dataPath, "Resources")))
-                        Directory.CreateDirectory(Path.Combine(Application.dataPath, "Resources"));
+                    var resourcesDir = Path.Combine(Application.dataPath, "Resources");
+                    if (!Directory.Exists(resourcesDir)) Directory.CreateDirectory(resourcesDir);
                     AssetDatabase.CreateAsset(instance, "Assets/Resources/ASConfig.asset");
                     AssetDatabase.SaveAssets();
                 }
 
                 if (Application.isPlaying && instance.ASMode == EASMode.Editor)
                 {
-                    var type = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true);
-                    var temp = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
-                        ?.Invoke(null, Array.Empty<object>());
-                    if (temp != null)
-                    {
-                        Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true)
-                            .GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
-                            ?.Invoke(null, new object[] { temp, false });
-                    }
+                    var temp = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true).
+                        GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)?.
+                        Invoke(null, Array.Empty<object>());
+                    if (temp is null) throw new Exception("Not found AssetCollectRoot.asset ! Please create it !");
+
+                    Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true).
+                        GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)?.
+                        Invoke(null, new[] { temp, false });
                 }
             }
 
-            if (instance is null) throw new Exception("Not found ASConfig.asset ! Please create it !");
+            if (!instance) throw new Exception("Not found ASConfig.asset ! Please create it !");
             return instance;
 #else
             return GetResource();
@@ -264,10 +266,11 @@ namespace AIO.UEngine
             return config;
         }
 
+        [Conditional("UNITY_EDITOR")]
         public void Save()
         {
             if (Equals(null)) return;
-            if (SequenceRecord != null) SequenceRecord.Save();
+            SequenceRecord?.Save();
             EditorUtility.SetDirty(this);
         }
 

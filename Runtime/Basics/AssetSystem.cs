@@ -24,7 +24,14 @@ namespace AIO
         internal static void ExceptionEvent(AssetSystemException ex)
         {
             _Exception = ex;
-            if (OnException is null) LogException($"Asset System Exception : {ex}");
+            if (OnException is null)
+            {
+#if UNITY_EDITOR
+                LogException($"Asset System Exception : {ex}");
+#else
+                throw new Exception($"Asset System Exception : {ex}");
+#endif
+            }
             else OnException.Invoke(ex);
         }
 
@@ -52,12 +59,16 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize(ASConfig config)
         {
+            var proxyType = typeof(AssetProxy);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+#if UNITY_EDITOR
+                if (assembly.FullName.Contains("Editor")) continue;
+#endif
                 foreach (var type in assembly.GetTypes())
                 {
                     if (type.IsAbstract) continue;
-                    if (!typeof(AssetProxy).IsAssignableFrom(type)) continue;
+                    if (proxyType.IsAssignableFrom(type) == false) continue;
                     Proxy = (AssetProxy)Activator.CreateInstance(type);
                     break;
                 }
@@ -88,8 +99,7 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy, ASConfig config)
-            where T : AssetProxy
+        public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : AssetProxy
         {
             if (IsInitialized) yield break;
             _Exception = AssetSystemException.None;
@@ -123,11 +133,19 @@ namespace AIO
             {
                 Parameter.Check();
             }
+#if UNITY_EDITOR
+            catch (Exception e)
+            {
+                throw new Exception($"ASConfig Check Error : {e.Message}");
+            }
+#else
             catch (Exception)
             {
                 ExceptionEvent(AssetSystemException.ASConfigCheckError);
                 yield break;
             }
+#endif
+
 
             if (_Exception != AssetSystemException.None) yield break;
             yield return Proxy.InitializeCO();

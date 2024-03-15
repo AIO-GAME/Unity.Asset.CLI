@@ -126,6 +126,22 @@ namespace AIO
         /// 下载取消
         /// </summary>
         public Action OnCancel { get; set; }
+
+        public void Dispose()
+        {
+            OnProgress = null;
+            OnComplete = null;
+            OnBegin = null;
+            OnError = null;
+            OnResume = null;
+            OnPause = null;
+            OnCancel = null;
+            OnNetReachableNot = null;
+            OnNetReachableCarrier = null;
+            OnDiskSpaceNotEnough = null;
+            OnWritePermissionNot = null;
+            OnReadPermissionNot = null;
+        }
     }
 
     /// <summary>

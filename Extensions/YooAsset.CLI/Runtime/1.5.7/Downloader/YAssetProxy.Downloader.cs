@@ -126,6 +126,14 @@ namespace AIO.UEngine.YooAsset
                 ManifestOperations = null;
                 PreDownloadContentOperations = null;
                 ResourceDownloaderOperations = null;
+                OnError = null;
+                OnProgress = null;
+                OnComplete = null;
+                OnNetReachableNot = null;
+                OnNetReachableCarrier = null;
+                OnDiskSpaceNotEnough = null;
+                OnWritePermissionNot = null;
+                OnReadPermissionNot = null;
             }
 
             #region Update Package Header
