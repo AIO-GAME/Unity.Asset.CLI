@@ -326,7 +326,6 @@ namespace AIO.UEngine.YooAsset
 
             private Dictionary<string, long> CurrentValueDict = new Dictionary<string, long>();
             private Dictionary<string, long> TotalValueDict = new Dictionary<string, long>();
-            private Dictionary<string, long> DownloadedFiles = new Dictionary<string, long>();
 
             private long FirstValue = -1;
 
@@ -334,8 +333,6 @@ namespace AIO.UEngine.YooAsset
             {
                 CurrentValueDict.Clear();
                 TotalValueDict.Clear();
-
-                CurrentValueDict[nameof(DownloadedFiles)] = DownloadedFiles.Sum(pair => pair.Value);
 
                 foreach (var pair in ResourceDownloaderOperations)
                 {
@@ -346,6 +343,11 @@ namespace AIO.UEngine.YooAsset
                 if (FirstValue < 0)
                 {
                     FirstValue = TotalValue = TotalValueDict.Sum(pair => pair.Value);
+                    CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
+                }
+                else
+                {
+                    CurrentValueDict[nameof(FirstValue)] = FirstValue - TotalValueDict.Sum(pair => pair.Value);
                 }
 
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
@@ -505,14 +507,12 @@ namespace AIO.UEngine.YooAsset
 
             private void OnStartDownloadFileCallback(string filename, long sizeBytes)
             {
-                DownloadedFiles[filename] = sizeBytes;
                 CurrentInfo = $"Resource download : [{filename}:{sizeBytes}]";
                 AssetSystem.Log($"Resource download : [{filename}:{sizeBytes}]");
             }
 
             private void OnDownloadError(string filename, string error)
             {
-                DownloadedFiles.Remove(filename);
                 var ex = new SystemException($"{filename} : {error}");
                 if (Event.OnError is null) throw ex;
                 Event.OnError.Invoke(ex);
