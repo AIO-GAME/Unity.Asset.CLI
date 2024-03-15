@@ -11,57 +11,60 @@ namespace AIO.UEditor
     {
         protected override void OnGUI()
         {
-            using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+            using (new EditorGUILayout.VerticalScope(GEStyle.GridList))
             {
-                EditorGUILayout.LabelField(string.Empty, GTOption.Width(100));
-                if (GUILayout.Button("保存", GEStyle.toolbarbuttonRight))
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                 {
-                    GUI.FocusControl(null);
-                    Target.Save();
-#if UNITY_2021_1_OR_NEWER
-                    AssetDatabase.SaveAssetIfDirty(Target);
-#else
-                    AssetDatabase.SaveAssets();
-#endif
-                    if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
+                    EditorGUILayout.LabelField(string.Empty, GTOption.Width(100));
+                    if (GUILayout.Button("保存", GEStyle.toolbarbuttonRight))
                     {
-                        AssetDatabase.Refresh();
+                        GUI.FocusControl(null);
+                        Target.Save();
+#if UNITY_2021_1_OR_NEWER
+                        AssetDatabase.SaveAssetIfDirty(Target);
+#else
+                        AssetDatabase.SaveAssets();
+#endif
+                        if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
+                        {
+                            AssetDatabase.Refresh();
+                        }
+                    }
+
+                    if (GUILayout.Button("打开", GEStyle.toolbarbuttonRight))
+                    {
+                        AssetCollectWindow.WindowMode = AssetCollectWindow.Mode.Editor;
+                        EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
                     }
                 }
 
-                if (GUILayout.Button("打开", GEStyle.toolbarbutton))
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                 {
-                    AssetCollectWindow.WindowMode = AssetCollectWindow.Mode.Editor;
-                    EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
+                    EditorGUILayout.LabelField("开启可寻址路径", GTOption.Width(100));
+                    if (GUILayout.Button(Target.EnableAddressable ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Target.EnableAddressable = !Target.EnableAddressable;
                 }
-            }
 
-            using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
-            {
-                EditorGUILayout.LabelField("开启可寻址路径", GTOption.Width(100));
-                if (GUILayout.Button(Target.EnableAddressable ? "已启用" : "已禁用", GEStyle.toolbarbutton))
-                    Target.EnableAddressable = !Target.EnableAddressable;
-            }
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("包含资源GUID", GTOption.Width(100));
+                    if (GUILayout.Button(Target.IncludeAssetGUID ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Target.IncludeAssetGUID = !Target.IncludeAssetGUID;
+                }
 
-            using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
-            {
-                EditorGUILayout.LabelField("包含资源GUID", GTOption.Width(100));
-                if (GUILayout.Button(Target.IncludeAssetGUID ? "已启用" : "已禁用", GEStyle.toolbarbutton))
-                    Target.IncludeAssetGUID = !Target.IncludeAssetGUID;
-            }
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("唯一资源包名", GTOption.Width(100));
+                    if (GUILayout.Button(Target.UniqueBundleName ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Target.UniqueBundleName = !Target.UniqueBundleName;
+                }
 
-            using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
-            {
-                EditorGUILayout.LabelField("唯一资源包名", GTOption.Width(100));
-                if (GUILayout.Button(Target.UniqueBundleName ? "已启用" : "已禁用", GEStyle.toolbarbutton))
-                    Target.UniqueBundleName = !Target.UniqueBundleName;
-            }
-
-            using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
-            {
-                EditorGUILayout.LabelField("首包资源规则", GTOption.Width(100));
-                Target.SequenceRecordPackRule =
-                    GELayout.Popup(Target.SequenceRecordPackRule, GEStyle.TEToolbarDropDown);
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("首包资源规则", GTOption.Width(100));
+                    Target.SequenceRecordPackRule =
+                        GELayout.Popup(Target.SequenceRecordPackRule, GEStyle.toolbarbuttonRight);
+                }
             }
         }
     }

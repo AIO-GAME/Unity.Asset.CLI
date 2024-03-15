@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public partial class AssetCollectWindow
+    partial class AssetCollectWindow
     {
         /// <summary>
         /// 更新 资源查询模式 数据

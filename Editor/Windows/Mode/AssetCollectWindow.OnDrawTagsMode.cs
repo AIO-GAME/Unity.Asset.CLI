@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public partial class AssetCollectWindow
+    partial class AssetCollectWindow
     {
         /// <summary>
         /// 绘制 标签模式 导航栏
@@ -34,31 +34,41 @@ namespace AIO.UEditor
                 if (TagsModeDisplayCollectors.Length == 1)
                 {
                     LookModeDisplayCollectorsIndex = 0;
-                    EditorGUILayout.Popup(0, TagsModeDisplayCollectors,
-                        GEStyle.PreDropDown, GP_Width_100);
+                    EditorGUILayout.Popup(0,
+                        TagsModeDisplayCollectors,
+                        GEStyle.PreDropDown,
+                        GP_Width_100);
                 }
                 else if (TagsModeDisplayCollectors.Length >= 31)
                 {
                     LookModeDisplayCollectorsIndex = EditorGUILayout.Popup(LookModeDisplayCollectorsIndex,
-                        TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
+                        TagsModeDisplayCollectors,
+                        GEStyle.PreDropDown,
+                        GP_Width_100);
                 }
                 else
                 {
                     LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
-                        TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
+                        TagsModeDisplayCollectors,
+                        GEStyle.PreDropDown,
+                        GP_Width_100);
                 }
             }
 
             if (TagsModeDisplayTypes.Length > 0)
             {
                 LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
-                    TagsModeDisplayTypes, GEStyle.PreDropDown, GP_Width_100);
+                    TagsModeDisplayTypes,
+                    GEStyle.PreDropDown,
+                    GP_Width_100);
             }
 
             if (TagsModeDisplayTags.Length > 0)
             {
                 LookModeDisplayTagsIndex = EditorGUILayout.MaskField(LookModeDisplayTagsIndex,
-                    TagsModeDisplayTags, GEStyle.PreDropDown, GP_Width_100);
+                    TagsModeDisplayTags,
+                    GEStyle.PreDropDown,
+                    GP_Width_100);
             }
 
             if (GUI.changed)
@@ -155,20 +165,21 @@ namespace AIO.UEditor
                         listItems.Add(collector);
                         collector.CollectAssetAsync(package.Name, group.Name, dic =>
                         {
+                            Runner.StartCoroutine(() =>
+                            {
+                                listTypes.AddRange(dic.Select(pair => pair.Value.Type));
+                                TagsModeDisplayTypes = listTypes.Distinct().ToArray();
+                                Repaint();
+                            });
                             foreach (var pair in dic)
                             {
-                                listTypes.Add(pair.Value.Type);
                                 CurrentTagValues.Add(pair.Value);
-                                if (!LookModeDataFilter(pair.Value))
-                                {
-                                    CurrentPageValues.Add(pair.Value);
-                                    LookModeCollectorsALLSize += pair.Value.Size;
-                                }
+                                if (LookModeDataFilter(pair.Value)) continue;
+                                CurrentPageValues.Add(pair.Value);
+                                LookModeCollectorsALLSize += pair.Value.Size;
                             }
 
                             CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
-                            TagsModeDisplayTypes = listTypes.Distinct().ToArray();
-                            Repaint();
                         });
                     }
                 }

@@ -64,11 +64,13 @@ namespace AIO.UEditor
             DoConfigDrawRect.x = 5;
             DoConfigDrawRect.height = CurrentHeight - DrawHeaderHeight;
             DoConfigDrawRect.width = ViewConfig.width;
-            ViewConfig.Draw(DoConfigDrawRect, () =>
-            {
-                ViewConfig.MaxWidth = CurrentWidth - ViewSetting.MinWidth;
-                OnDrawConfigScroll = GELayout.VScrollView(OnDrawASConfig, OnDrawConfigScroll);
-            }, GEStyle.INThumbnailShadow);
+            ViewConfig.Draw(DoConfigDrawRect,
+                () =>
+                {
+                    ViewConfig.MaxWidth = CurrentWidth - ViewSetting.MinWidth;
+                    OnDrawConfigScroll = GELayout.VScrollView(OnDrawASConfig, OnDrawConfigScroll);
+                },
+                GEStyle.INThumbnailShadow);
 
             DoConfigDrawRect.x += ViewConfig.width;
             DoConfigDrawRect.width = CurrentWidth - ViewConfig.width;
@@ -111,13 +113,6 @@ namespace AIO.UEditor
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                 {
-                    EditorGUILayout.LabelField("首包打包规则", GUILayout.Width(100));
-                    Data.SequenceRecordPackRule =
-                        GELayout.Popup(Data.SequenceRecordPackRule, GEStyle.ToolbarDropDownRight);
-                }
-
-                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
-                {
                     EditorGUILayout.LabelField("日志输出", GUILayout.Width(100));
                     if (GUILayout.Button(Config.OutputLog ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
                         Config.OutputLog = !Config.OutputLog;
@@ -145,6 +140,13 @@ namespace AIO.UEditor
                         if (GUILayout.Button(Config.AppendTimeTicks ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
                             Config.AppendTimeTicks = !Config.AppendTimeTicks;
                     }
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("首包打包规则", GUILayout.Width(100));
+                    Data.SequenceRecordPackRule =
+                        GELayout.Popup(Data.SequenceRecordPackRule, GEStyle.toolbarbuttonRight);
                 }
             }
         }
@@ -247,7 +249,7 @@ namespace AIO.UEditor
                             if (string.IsNullOrEmpty(Config.URL)) GUI.enabled = true;
                         }
 
-                        Config.URL = GELayout.AreaText(Config.URL, GUILayout.Height(50));
+                        Config.URL = GELayout.AreaText(Config.URL, GUILayout.Height(50), GUILayout.ExpandWidth(true));
 
                         if (string.IsNullOrEmpty(Config.URL)) GUI.enabled = false;
                         using (new EditorGUILayout.HorizontalScope())
@@ -272,7 +274,8 @@ namespace AIO.UEditor
                         break;
                     default:
                         GUI.enabled = false;
-                        GELayout.List("资源包配置", Config.Packages,
+                        GELayout.List("资源包配置",
+                            Config.Packages,
                             config =>
                             {
                                 config.Name = GELayout.Field(config.Name);

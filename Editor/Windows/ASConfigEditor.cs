@@ -116,7 +116,8 @@ namespace AIO.UEditor
                         break;
                     default:
                         GUI.enabled = false;
-                        GELayout.List("资源包配置", Target.Packages,
+                        GELayout.List("资源包配置",
+                            Target.Packages,
                             config => { config.Name = GELayout.Field(config.Name); },
                             null);
                         GUI.enabled = true;
@@ -174,11 +175,16 @@ namespace AIO.UEditor
             using (GELayout.VHorizontal(GSBackground))
             {
                 GELayout.Label("远端资源地址", OptionLabelWidth_100);
-                Target.URL = GELayout.AreaText(Target.URL, GSValue, GTOption.WidthMin(50));
+
                 if (!string.IsNullOrEmpty(Target.URL))
                 {
-                    if (GELayout.Button("打开", GSValue, 55)) Application.OpenURL(Target.URL);
+                    if (GELayout.Button("打开", GSValue)) Application.OpenURL(Target.URL);
                 }
+            }
+
+            using (GELayout.VHorizontal(GSBackground))
+            {
+                Target.URL = GELayout.AreaText(Target.URL, GEStyle.ToolbarTextField, GTOption.WidthExpand(true));
             }
 
             if (Target.EnableSequenceRecord)
@@ -259,26 +265,34 @@ namespace AIO.UEditor
                 {
                     using (GELayout.VHorizontal())
                     {
-                        GELayout.Label($"{++index:000} : {record.PackageName}", GEStyle.HeaderLabel,
-                            GTOption.WidthMin(10), GTOption.WidthMax(100));
+                        GELayout.Label($"{++index:000} : {record.PackageName}",
+                            GEStyle.HeaderLabel,
+                            GTOption.WidthMin(10),
+                            GTOption.WidthMax(100));
 
                         GELayout.Label(record.Location,
                             GTOption.WidthMin(50));
 
-                        if (GELayout.Button("寻址路径", GSValue,
-                                GTOption.WidthMin(20), GTOption.WidthMax(75)))
+                        if (GELayout.Button("寻址路径",
+                                GSValue,
+                                GTOption.WidthMin(20),
+                                GTOption.WidthMax(75)))
                         {
                             EditorGUIUtility.systemCopyBuffer = record.Location;
                         }
 
-                        if (GELayout.Button("资源路径", GSValue,
-                                GTOption.WidthMin(20), GTOption.WidthMax(75)))
+                        if (GELayout.Button("资源路径",
+                                GSValue,
+                                GTOption.WidthMin(20),
+                                GTOption.WidthMax(75)))
                         {
                             EditorGUIUtility.systemCopyBuffer = record.AssetPath;
                         }
 
-                        if (GELayout.Button("定位", GSValue,
-                                GTOption.WidthMin(20), GTOption.WidthMax(50)))
+                        if (GELayout.Button("定位",
+                                GSValue,
+                                GTOption.WidthMin(20),
+                                GTOption.WidthMax(50)))
                         {
                             var path = record.AssetPath;
                             if (File.Exists(path))

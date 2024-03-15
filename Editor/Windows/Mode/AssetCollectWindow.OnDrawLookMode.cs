@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
-    public partial class AssetCollectWindow
+    partial class AssetCollectWindow
     {
         /// <summary>
         /// 绘制 资源查询模式 导航栏
@@ -164,8 +164,8 @@ namespace AIO.UEditor
                     CurrentPageValues.Clear();
                     lock (LookModeData)
                     {
-                        CurrentPageValues.Add(LookModeData[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                            .Where(data => !LookModeDataFilter(data)));
+                        CurrentPageValues.Add(LookModeData[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].
+                            Where(data => !LookModeDataFilter(data)));
                     }
 
                     CurrentPageValues.PageIndex = 0;
