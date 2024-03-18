@@ -14,7 +14,7 @@ using YooAsset;
 namespace AIO.UEngine.YooAsset
 {
     [IgnoreConsoleJump(true)]
-    public partial class Proxy : AssetProxy
+    public partial class Proxy : ASProxy
     {
         public override IEnumerator InitializeCO()
         {

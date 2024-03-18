@@ -6,7 +6,7 @@ namespace AIO
 {
     partial class AssetSystem
     {
-        private static AssetProxy Proxy;
+        private static ASProxy Proxy;
 
         /// <summary>
         /// 白名单 - 定位指定白名单 - 允许同步加载

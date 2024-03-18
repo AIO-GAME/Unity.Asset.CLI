@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace AIO.UEngine
 {
-    partial class AssetProxy
+    partial class ASProxy
     {
         /// <summary>
         /// 同步实例化GameObject

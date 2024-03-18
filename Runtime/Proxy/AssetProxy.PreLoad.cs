@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEngine
 {
-    partial class AssetProxy
+    partial class ASProxy
     {
         /// <summary>
         /// 预加载资源

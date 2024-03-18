@@ -49,7 +49,7 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
             if (parameters.Parameters is null)
             {
-                AssetSystem.ExceptionEvent(AssetSystemException.SettingConfigInitializeFailure);
+                AssetSystem.ExceptionEvent(ASException.SettingConfigInitializeFailure);
                 return null;
             }
 
@@ -76,7 +76,7 @@ namespace AIO.UEngine.YooAsset
                     {
                         if (parameter.RemoteServices is null)
                         {
-                            AssetSystem.ExceptionEvent(AssetSystemException.SettingConfigInitializeFailure);
+                            AssetSystem.ExceptionEvent(ASException.SettingConfigInitializeFailure);
                             return null;
                         }
 
@@ -91,7 +91,7 @@ namespace AIO.UEngine.YooAsset
                     {
                         if (parameter.RemoteServices is null)
                         {
-                            AssetSystem.ExceptionEvent(AssetSystemException.SettingConfigInitializeFailure);
+                            AssetSystem.ExceptionEvent(ASException.SettingConfigInitializeFailure);
                             return null;
                         }
 

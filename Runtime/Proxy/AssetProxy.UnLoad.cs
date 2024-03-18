@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AIO.UEngine
 {
-    partial class AssetProxy
+    partial class ASProxy
     {
         /// <summary>
         /// 卸载场景 - 任务 

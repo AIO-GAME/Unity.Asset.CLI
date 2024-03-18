@@ -9,7 +9,7 @@ namespace AIO.UEngine
     /// 资源管理系统 - 资源代理
     /// </summary>
     [Preserve]
-    public abstract partial class AssetProxy : IDisposable
+    public abstract partial class ASProxy : IDisposable
     {
         /// <summary>
         /// 是否已经初始化

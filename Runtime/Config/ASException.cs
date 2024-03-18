@@ -5,7 +5,7 @@ namespace AIO
     /// <summary>
     /// 资源异常枚举
     /// </summary>
-    public enum AssetSystemException
+    public enum ASException
     {
         /// <summary>
         /// 无异常

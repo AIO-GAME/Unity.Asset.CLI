@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace AIO.UEngine
 {
-    partial class AssetProxy
+    partial class ASProxy
     {
         /// <summary>
         /// 异步加载场景

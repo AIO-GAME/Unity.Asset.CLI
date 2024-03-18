@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AIO.UEngine
 {
-    partial class AssetProxy
+    partial class ASProxy
     {
         /// <summary>
         /// 获取下载器

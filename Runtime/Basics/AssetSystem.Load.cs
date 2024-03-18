@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -185,48 +186,46 @@ namespace AIO
             /// <summary>
             /// 处理进度
             /// </summary>
-            float Progress { get; }
+            byte Progress { get; }
         }
 
         public interface IAsyncHandle<T> : IAsyncHandle where T : Object
         {
+            /// <summary>
+            /// 结果
+            /// </summary>
             T Result { get; }
 
+            /// <summary>
+            /// 获取异步等待器
+            /// </summary>
             TaskAwaiter<T> GetAwaiter();
         }
 
-        internal class LoadAssetHandleCo<T> : IAsyncHandle<T> where T : Object
+        [StructLayout(LayoutKind.Auto)]
+        internal class LoadAssetHandle<T> : IAsyncHandle<T> where T : Object
         {
-            private IEnumerator CO => _CO ?? (_CO = Proxy.LoadAssetCO<T>(Location, OnCompletedCo));
-            private IEnumerator _CO;
+            private IEnumerator CO
+            {
+                get
+                {
+                    if (_CO is null) _CO = Proxy.LoadAssetCO<T>(Location, OnCompletedCo);
+                    return _CO;
+                }
+            }
 
-            internal readonly string Location;
-
+            // 指定第0个内存槽
             public bool IsDone { get; set; }
 
+            // 第1个内存槽
+            public byte Progress { get; private set; }
+
+            private IEnumerator _CO;
+            private string Location;
             public T Result { get; set; }
+            private Action<T> OnCompleted;
 
-            public float Progress { get; private set; }
-
-            public Action<T> OnCompleted;
-
-            private void OnCompletedCo(T asset)
-            {
-                Progress = 1;
-                Result = asset;
-                IsDone = true;
-                OnCompleted?.Invoke(Result);
-            }
-
-            private void OnCompletedTask()
-            {
-                Progress = 1;
-                Result = Awaiter.GetResult();
-                IsDone = true;
-                OnCompleted?.Invoke(Result);
-            }
-
-            public LoadAssetHandleCo(string location, Action<T> onCompleted = null)
+            public LoadAssetHandle(string location, Action<T> onCompleted)
             {
                 Location = location;
                 OnCompleted = onCompleted;
@@ -234,6 +233,27 @@ namespace AIO
                 Progress = 0;
                 Result = null;
                 _CO = null;
+            }
+
+            public LoadAssetHandle(string location)
+            {
+                Location = location;
+                IsDone = false;
+                Progress = 0;
+                Result = null;
+                OnCompleted = null;
+                _CO = null;
+            }
+
+            #region region
+
+            private void OnCompletedCo(T asset)
+            {
+                Progress = 100;
+                Result = asset;
+                IsDone = true;
+                OnCompleted?.Invoke(Result);
+                Dispose();
             }
 
             bool IEnumerator.MoveNext()
@@ -245,25 +265,40 @@ namespace AIO
             {
                 Progress = 0;
                 IsDone = false;
-                CO?.Reset();
+                CO.Reset();
             }
 
             object IEnumerator.Current => CO.Current;
+
+            #endregion
+
+            #region Task
+
+            private void OnCompletedTask()
+            {
+                Progress = 100;
+                Result = Awaiter.GetResult();
+                IsDone = true;
+                OnCompleted?.Invoke(Result);
+                Dispose();
+            }
 
             private TaskAwaiter<T> Awaiter;
 
             public TaskAwaiter<T> GetAwaiter()
             {
-                var Task = Proxy.LoadAssetTask<T>(Location);
-                Awaiter = Task.GetAwaiter();
+                Awaiter = Proxy.LoadAssetTask<T>(Location).GetAwaiter();
                 Awaiter.OnCompleted(OnCompletedTask);
                 return Awaiter;
             }
 
-            void IDisposable.Dispose()
+            #endregion
+
+            public void Dispose()
             {
+                OnCompleted = null;
+                Location = null;
                 _CO = null;
-                Result = null;
             }
         }
 
@@ -275,7 +310,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IAsyncHandle<TObject> LoadAssetCO<TObject>(string location) where TObject : Object
         {
-            return new LoadAssetHandleCo<TObject>(SettingToLocalPath(location));
+            return new LoadAssetHandle<TObject>(SettingToLocalPath(location));
         }
 
         /// <summary>
@@ -288,7 +323,7 @@ namespace AIO
         public static IAsyncHandle<TObject> LoadAssetCO<TObject>(string location, Action<TObject> cb)
             where TObject : Object
         {
-            return new LoadAssetHandleCo<TObject>(SettingToLocalPath(location), cb);
+            return new LoadAssetHandle<TObject>(SettingToLocalPath(location), cb);
         }
 
         /// <summary>

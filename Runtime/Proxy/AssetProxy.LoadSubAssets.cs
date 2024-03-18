@@ -8,7 +8,7 @@ namespace AIO.UEngine
     /// <summary>
     /// AssetProxy_LoadSubAssets
     /// </summary>
-    partial class AssetProxy
+    partial class ASProxy
     {
         #region 子资源加载
 

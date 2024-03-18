@@ -75,51 +75,51 @@ namespace AIO
             get
             {
 #if UNITY_EDITOR
-                return EditorUserBuildSettings.activeBuildTarget.ToString();
+                return string.Intern(EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
                 switch (Application.platform)
                 {
                     case RuntimePlatform.WindowsPlayer:
                     case RuntimePlatform.WindowsEditor:
-                        return System.Environment.Is64BitOperatingSystem
+                        return string.Intern(System.Environment.Is64BitOperatingSystem
                             ? "StandaloneWindows64"
-                            : "StandaloneWindows";
+                            : "StandaloneWindows");
                     case RuntimePlatform.OSXPlayer:
                     case RuntimePlatform.OSXEditor:
-                        return "StandaloneOSX";
+                        return string.Intern("StandaloneOSX");
                     case RuntimePlatform.IPhonePlayer:
-                        return "iOS";
+                        return string.Intern("iOS");
                     case RuntimePlatform.Android:
-                        return "Android";
+                        return string.Intern("Android");
                     case RuntimePlatform.WebGLPlayer:
-                        return "WebGL";
+                        return string.Intern("WebGL");
                     case RuntimePlatform.Switch:
-                        return "Switch";
+                        return string.Intern("Switch");
                     case RuntimePlatform.PS4:
-                        return "PS4";
+                        return string.Intern("PS4");
                     case RuntimePlatform.PS5:
-                        return "PS5";
+                        return string.Intern("PS5");
                     case RuntimePlatform.LinuxPlayer:
                     case RuntimePlatform.LinuxEditor:
-                        return System.Environment.Is64BitOperatingSystem
+                        return string.Intern(System.Environment.Is64BitOperatingSystem
                             ? "StandaloneLinux64"
-                            : "StandaloneLinux";
+                            : "StandaloneLinux");
                     case RuntimePlatform.WSAPlayerARM:
-                        return "WSAPlayer";
+                        return string.Intern("WSAPlayer");
                     case RuntimePlatform.XboxOne:
-                        return "XboxOne";
+                        return string.Intern("XboxOne");
                     case RuntimePlatform.tvOS:
-                        return "tvOS";
+                        return string.Intern("tvOS");
                     case RuntimePlatform.Lumin:
-                        return "Lumin";
+                        return string.Intern("Lumin");
                     case RuntimePlatform.Stadia:
-                        return "Stadia";
+                        return string.Intern("Stadia");
                     case RuntimePlatform.CloudRendering:
-                        return "CloudRendering";
+                        return string.Intern("CloudRendering");
                     case RuntimePlatform.GameCoreXboxOne:
-                        return "GameCoreXboxOne";
+                        return string.Intern("GameCoreXboxOne");
 
-                    default: return Application.platform.ToString();
+                    default: return string.Intern(Application.platform.ToString());
                 }
 #endif
             }

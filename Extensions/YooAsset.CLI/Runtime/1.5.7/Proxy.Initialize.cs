@@ -71,7 +71,7 @@ namespace AIO.UEngine.YooAsset
                     break;
 #endif
                 default:
-                    AssetSystem.ExceptionEvent(AssetSystemException.NoSupportEASMode);
+                    AssetSystem.ExceptionEvent(ASException.NoSupportEASMode);
                     return null;
             }
 
@@ -93,7 +93,7 @@ namespace AIO.UEngine.YooAsset
             if (AssetSystem.PackageConfigs is null)
             {
                 AssetSystem.LogError("AssetSystem PackageConfigs is null");
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 return;
             }
 
@@ -124,14 +124,14 @@ namespace AIO.UEngine.YooAsset
                 var parameters = EventParameter.Invoke(package);
                 if (parameters is null)
                 {
-                    AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                    AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                     AssetSystem.LogException($"AssetSystem {package.Config.Name} Parameter is null");
                 }
 
                 var operation = package.InitializeAsync(parameters);
                 if (operation is null)
                 {
-                    AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                    AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                     AssetSystem.LogException("{Load} -> {0}", package.Config);
                     continue;
                 }
@@ -151,17 +151,17 @@ namespace AIO.UEngine.YooAsset
                     UpdatePackagesLocal(config);
                     break;
                 case EASMode.Remote:
-                    yield return UpdatePackagesRemote(config);
-                    break;
+                    return UpdatePackagesRemote(config);
                 case EASMode.Editor:
 #if UNITY_EDITOR
                     UpdatePackagesEditor(config);
                     break;
 #endif
                 default:
-                    AssetSystem.ExceptionEvent(AssetSystemException.NoSupportEASMode);
+                    AssetSystem.ExceptionEvent(ASException.NoSupportEASMode);
                     break;
             }
+            return null;
         }
 
         private static void UpdatePackagesLocal(ASConfig config)
@@ -169,7 +169,7 @@ namespace AIO.UEngine.YooAsset
             config.Packages = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(
                 $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
             if (config.Packages is null)
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
         }
 
         [Conditional("UNITY_EDITOR")]
@@ -181,7 +181,7 @@ namespace AIO.UEngine.YooAsset
             var CollectRoot = getOrCreate?.Invoke(null, new object[] { });
             if (CollectRoot is null)
             {
-                AssetSystem.ExceptionEvent(AssetSystemException.NoFoundAssetCollectRoot);
+                AssetSystem.ExceptionEvent(ASException.NoFoundAssetCollectRoot);
                 return;
             }
 
@@ -189,7 +189,7 @@ namespace AIO.UEngine.YooAsset
                 GetValue(CollectRoot);
             if (!(packages is Array array))
             {
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 return;
             }
 
@@ -197,7 +197,7 @@ namespace AIO.UEngine.YooAsset
                 GetField("Name", BindingFlags.Instance | BindingFlags.Public);
             if (fieldInfo is null)
             {
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 return;
             }
 
@@ -212,7 +212,7 @@ namespace AIO.UEngine.YooAsset
 
             if (list.Length <= 0)
             {
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 return;
             }
 
@@ -224,7 +224,7 @@ namespace AIO.UEngine.YooAsset
         {
             if (string.IsNullOrEmpty(config.URL))
             {
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlIsNull);
+                AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlIsNull);
                 yield break;
             }
 
@@ -236,7 +236,7 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
                 throw new Exception($"{remote} Request failed");
 #else
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionRequestFailure);
+                AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
                 AssetSystem.LogError($"{remote} Request failed");
                 yield break;
 #endif
@@ -254,7 +254,7 @@ namespace AIO.UEngine.YooAsset
 #else
             catch (Exception)
             {
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionParsingJsonFailure);
+                AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionParsingJsonFailure);
                 yield break;
             }
 #endif
@@ -264,7 +264,7 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
                 throw new ArgumentNullException($"Please set the ASConfig Packages configuration");
 #else
-                AssetSystem.ExceptionEvent(AssetSystemException.ASConfigPackagesIsNull);
+                AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 yield break;
 #endif
             }
@@ -274,7 +274,7 @@ namespace AIO.UEngine.YooAsset
                 item.IsLatest = item.Version == "Latest"; // 如果使用Latest则认为是最新版本 同时需要获取最新版本号
                 if (!item.IsLatest) continue;
                 var url = string.Format("{0}/{1}/{2}/{3}/PackageManifest_{4}.version?t={5}",
-                    AssetSystem.Parameter.URL,
+                    config.URL,
                     AssetSystem.PlatformNameStr,
                     item.Name,
                     item.Version,
@@ -287,7 +287,7 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
                         throw new Exception($"{url} Request failed");
 #else
-                        AssetSystem.ExceptionEvent(AssetSystemException.ASConfigRemoteUrlRemoteVersionRequestFailure);
+                        AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
                         AssetSystem.LogError($"{url} Request failed");
                         return;
 #endif

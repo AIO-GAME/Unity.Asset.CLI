@@ -5,7 +5,7 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEngine
 {
-    partial class AssetProxy
+    partial class ASProxy
     {
         /// <summary>
         /// 同步加载原生文件

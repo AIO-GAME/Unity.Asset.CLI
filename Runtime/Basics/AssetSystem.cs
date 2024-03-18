@@ -17,11 +17,11 @@ namespace AIO
         /// <summary>
         /// 系统初始化异常
         /// </summary>
-        public static event Action<AssetSystemException> OnException;
+        public static event Action<ASException> OnException;
 
-        private static AssetSystemException _Exception;
+        private static ASException _Exception;
 
-        internal static void ExceptionEvent(AssetSystemException ex)
+        internal static void ExceptionEvent(ASException ex)
         {
             _Exception = ex;
             if (OnException is null)
@@ -39,7 +39,7 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(ASConfig config) where T : AssetProxy, new()
+        public static IEnumerator Initialize<T>(ASConfig config) where T : ASProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), config);
         }
@@ -50,7 +50,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize()
         {
-            yield return Initialize(ASConfig.GetOrCreate());
+            return Initialize(ASConfig.GetOrCreate());
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize(ASConfig config)
         {
-            var proxyType = typeof(AssetProxy);
+            var proxyType = typeof(ASProxy);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
 #if UNITY_EDITOR
@@ -69,19 +69,19 @@ namespace AIO
                 {
                     if (type.IsAbstract) continue;
                     if (proxyType.IsAssignableFrom(type) == false) continue;
-                    Proxy = (AssetProxy)Activator.CreateInstance(type);
+                    Proxy = (ASProxy)Activator.CreateInstance(type);
                     break;
                 }
             }
 
-            yield return Initialize(Proxy, config);
+            return Initialize(Proxy, config);
         }
 
         /// <summary>
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy) where T : AssetProxy
+        public static IEnumerator Initialize<T>(T proxy) where T : ASProxy
         {
             return Initialize(proxy, ASConfig.GetOrCreate());
         }
@@ -90,7 +90,7 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>() where T : AssetProxy, new()
+        public static IEnumerator Initialize<T>() where T : ASProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), ASConfig.GetOrCreate());
         }
@@ -99,20 +99,20 @@ namespace AIO
         /// 系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : AssetProxy
+        public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : ASProxy
         {
             if (IsInitialized) yield break;
-            _Exception = AssetSystemException.None;
+            _Exception = ASException.None;
 
             if (proxy is null)
             {
-                ExceptionEvent(AssetSystemException.AssetProxyIsNull);
+                ExceptionEvent(ASException.AssetProxyIsNull);
                 yield break;
             }
 
             if (config is null)
             {
-                ExceptionEvent(AssetSystemException.ASConfigIsNull);
+                ExceptionEvent(ASException.ASConfigIsNull);
                 yield break;
             }
 
@@ -141,15 +141,15 @@ namespace AIO
 #else
             catch (Exception)
             {
-                ExceptionEvent(AssetSystemException.ASConfigCheckError);
+                ExceptionEvent(ASException.ASConfigCheckError);
                 yield break;
             }
 #endif
 
 
-            if (_Exception != AssetSystemException.None) yield break;
+            if (_Exception != ASException.None) yield break;
             yield return Proxy.InitializeCO();
-            if (_Exception != AssetSystemException.None) yield break;
+            if (_Exception != ASException.None) yield break;
             DownloadHandle = Proxy.GetLoadingHandle();
         }
 
