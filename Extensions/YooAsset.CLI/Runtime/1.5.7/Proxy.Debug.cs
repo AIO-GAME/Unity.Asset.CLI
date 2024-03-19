@@ -2,13 +2,14 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Unity.Profiling;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        [DebuggerNonUserCode]
+        [DebuggerNonUserCode, IgnoredByDeepProfiler]
         internal class YALogger : ILogger
         {
             [IgnoreConsoleJump]
@@ -35,24 +36,26 @@ namespace AIO.UEngine.YooAsset
                 AssetSystem.LogException(exception);
             }
         }
-
+#if DEBUG
         private enum LoadType
         {
             Sync,
             Coroutine,
             Async
         }
+#endif
 
 #if UNITY_EDITOR
+        [IgnoredByDeepProfiler]
         private string GetLocation(string location)
         {
-            return (
-                from asset in Dic.Values
-                where asset.CheckLocationValid(location)
-                select asset.GetAssetInfo(location)
-            ).FirstOrDefault()?.AssetPath;
+            return (from asset in Dic.Values
+                    where asset.CheckLocationValid(location)
+                    select asset.GetAssetInfo(location)).
+                FirstOrDefault()?.AssetPath;
         }
 
+        [IgnoredByDeepProfiler]
         private string GetType(LoadType type)
         {
             switch (type)
@@ -70,7 +73,7 @@ namespace AIO.UEngine.YooAsset
 
 #endif
 
-        [Conditional("DEBUG"), IgnoreConsoleJump]
+        [Conditional("DEBUG"), IgnoreConsoleJump, IgnoredByDeepProfiler]
         private void PackageDebug(LoadType type, string location)
         {
 #if UNITY_EDITOR
@@ -80,7 +83,7 @@ namespace AIO.UEngine.YooAsset
 #endif
         }
 
-        [Conditional("DEBUG"), IgnoreConsoleJump]
+        [Conditional("DEBUG"), IgnoreConsoleJump, IgnoredByDeepProfiler]
         private void PackageDebug(LoadType type, string packageName, string location)
         {
 #if UNITY_EDITOR

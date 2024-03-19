@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.Profiling;
 using Debug = UnityEngine.Debug;
 
 namespace AIO
@@ -29,6 +30,7 @@ namespace AIO
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(LogWarning))]
         public static void LogWarning(string format, params object[] args)
         {
 #if UNITY_EDITOR
@@ -44,6 +46,7 @@ namespace AIO
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(LogWarning))]
         public static void LogWarning(string message)
         {
 #if UNITY_EDITOR
@@ -59,6 +62,7 @@ namespace AIO
         /// </summary>
         /// <param name="exception">Runtime Exception.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(LogException))]
         public static void LogException(Exception exception)
         {
 #if UNITY_EDITOR
@@ -78,6 +82,7 @@ namespace AIO
         /// </summary>
         /// <param name="exception">Runtime Exception.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(LogException))]
         public static void LogException(string exception)
         {
 #if UNITY_EDITOR
@@ -94,6 +99,7 @@ namespace AIO
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(LogException))]
         public static void LogException(string format, params object[] args)
         {
 #if UNITY_EDITOR
@@ -109,6 +115,7 @@ namespace AIO
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(Log))]
         public static void Log(string message)
         {
 #if UNITY_EDITOR
@@ -125,6 +132,7 @@ namespace AIO
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(Log))]
         public static void Log(string format, params object[] args)
         {
 #if UNITY_EDITOR
@@ -140,6 +148,7 @@ namespace AIO
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(LogError))]
         public static void LogError(string message)
         {
 #if UNITY_EDITOR
@@ -156,6 +165,7 @@ namespace AIO
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Debug), nameof(LogError))]
         public static void LogError(string format, params object[] args)
         {
 #if UNITY_EDITOR

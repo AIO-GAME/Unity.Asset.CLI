@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using UnityEngine.Profiling;
 using YooAsset;
 using Object = UnityEngine.Object;
 
@@ -65,6 +66,7 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(operation?.AssetObject);
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetSync))]
         public override TObject LoadAssetSync<TObject>(string location)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
@@ -80,6 +82,7 @@ namespace AIO.UEngine.YooAsset
             return operation?.GetAssetObject<TObject>();
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetSync))]
         public override Object LoadAssetSync(string location, Type type)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
@@ -95,6 +98,7 @@ namespace AIO.UEngine.YooAsset
             return operation?.AssetObject;
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetTask))]
         public override async Task<TObject> LoadAssetTask<TObject>(string location)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
@@ -104,13 +108,14 @@ namespace AIO.UEngine.YooAsset
                 if (package is null) return null;
                 operation = package.LoadAssetAsync<TObject>(location);
                 if (!await LoadCheckOPTask(operation)) return null;
+
                 HandleAdd(location, operation);
             }
-
 
             return operation?.GetAssetObject<TObject>();
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetTask))]
         public override async Task<Object> LoadAssetTask(string location, Type type)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
@@ -127,4 +132,5 @@ namespace AIO.UEngine.YooAsset
         }
     }
 }
+
 #endif

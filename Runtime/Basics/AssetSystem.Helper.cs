@@ -1,5 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using AIO.UEngine;
+using UnityEngine.Profiling;
 
 namespace AIO
 {
@@ -39,15 +44,38 @@ namespace AIO
             return Proxy.AlreadyLoad(SettingToLocalPath(location));
         }
 
+        private static readonly Dictionary<string, string> LocalPathCache = new Dictionary<string, string>(64);
+
         /// <summary>
         /// 根据设置 获取资源定位地址
         /// </summary>
         /// <param name="location">资源定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        private static string SettingToLocalPath(string location)
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string SettingToLocalPath(in string location)
         {
-            if (string.IsNullOrEmpty(location)) return string.Empty;
-            return Parameter.LoadPathToLower ? location.ToLower() : location;
+            if (string.IsNullOrEmpty(location)) // 为空不支持
+            {
+                throw new Exception("AssetSystem SettingToLocalPath input location is null or empty");
+            }
+
+            if (CultureInfo.CurrentCulture.CompareInfo.IsSuffix(location, "/", CompareOptions.None) ||
+                CultureInfo.CurrentCulture.CompareInfo.IsSuffix(location, "\\", CompareOptions.None)) // 以 / 或者 \ 结尾 不支持
+            {
+                throw new Exception("AssetSystem SettingToLocalPath input location is end with / or \\");
+            }
+
+            if (Parameter.LoadPathToLower)
+            {
+                if (LocalPathCache.TryGetValue(location, out var address))
+                {
+                    return address;
+                }
+
+                address = LocalPathCache[location] = location.ToLower(); // 转小写 会产生40b左右的GC
+                return address;
+            }
+
+            return location;
         }
     }
 }

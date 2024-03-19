@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
+using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,13 +19,16 @@ namespace AIO
         /// 获取序列记录
         /// </summary>
         /// <param name="record">记录</param>
+        [ProfilerSpace(nameof(AssetSystem), nameof(AddSequenceRecord))]
         [DebuggerNonUserCode, DebuggerHidden, Conditional("UNITY_EDITOR")]
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
         public static void AddSequenceRecord(SequenceRecord record)
         {
             Parameter.SequenceRecord.Add(record);
             WhiteListLocal.Add(record.Location);
         }
-
 
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
@@ -65,12 +69,6 @@ namespace AIO
                 var dic = new Dictionary<string, SequenceRecord>();
                 foreach (var item in temp)
                 {
-                    if (string.IsNullOrEmpty(item.GUID))
-                    {
-                        if (string.IsNullOrEmpty(item.AssetPath)) continue;
-                        item.GUID = AssetDatabase.AssetPathToGUID(item.AssetPath);
-                    }
-
                     if (string.IsNullOrEmpty(item.GUID)) continue;
                     dic[item.GUID] = item;
                 }
@@ -135,7 +133,7 @@ namespace AIO
             public void Add(SequenceRecord record)
             {
                 if (!Enable) return;
-                if (record is null) return;
+                if (record.IsNull) return;
                 if (ContainsGUID(record.GUID)) return;
                 Records.Add(record);
             }
@@ -238,17 +236,61 @@ namespace AIO
         /// <summary>
         /// 资源包记录序列
         /// </summary>
-        public class SequenceRecord
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
+        public struct SequenceRecord
         {
             /// <summary>
             /// 资源GUID Key
             /// </summary>
-            public string GUID;
+            public string GUID
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(_GUID))
+                    {
+                        _GUID = AssetDatabase.AssetPathToGUID(AssetPath);
+                    }
+
+                    return _GUID;
+                }
+            }
+
+            private string _GUID;
 
             /// <summary>
             /// 资源包名
             /// </summary>
             public string PackageName;
+
+            /// <summary>
+            /// 设置资源包名
+            /// </summary>
+            /// <param name="packageName">资源包名</param>
+            public void SetPackageName(string packageName)
+            {
+                PackageName = packageName;
+            }
+
+            /// <summary>
+            /// 资源包寻址路径
+            /// </summary>
+            /// <param name="assetPath">资源路径</param>
+            public void SetAssetPath(string assetPath)
+            {
+                AssetPath = assetPath;
+                _GUID = string.Empty;
+            }
+
+            /// <summary>
+            /// 设置寻址路径
+            /// </summary>
+            /// <param name="guid">资源GUID</param>
+            public void SetGUID(string guid)
+            {
+                _GUID = guid;
+            }
 
             /// <summary>
             /// 资源包寻址路径
@@ -274,6 +316,13 @@ namespace AIO
             /// 记录数量
             /// </summary>
             public int Count;
+
+            /// <summary>
+            /// 是否为空
+            /// </summary>
+            public bool IsNull => string.IsNullOrEmpty(AssetPath) ||
+                                  string.IsNullOrEmpty(GUID);
+
 
             public override string ToString()
             {

@@ -14,7 +14,7 @@ namespace AIO
         /// 检测网络请求
         /// </summary>
         /// <returns>Ture:成功 False:异常</returns>
-        private static bool LoadCheckNet(UnityWebRequest operation)
+        internal static bool LoadCheckNet(UnityWebRequest operation)
         {
 #if UNITY_2020_1_OR_NEWER
             switch (operation.result)

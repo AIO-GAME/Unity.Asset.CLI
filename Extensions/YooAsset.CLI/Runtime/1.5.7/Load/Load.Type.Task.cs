@@ -1,7 +1,5 @@
 ﻿#if SUPPORT_YOOASSET
 
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using YooAsset;
 
@@ -9,6 +7,7 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(LoadCheckOPTask))]
         private static async Task<bool> LoadCheckOPTask(OperationHandleBase operation)
         {
             if (!operation.IsValid)
@@ -24,25 +23,26 @@ namespace AIO.UEngine.YooAsset
                 return false;
             }
 
-            return operation.Status == EOperationStatus.Succeed;
+            return true;
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(GetAutoPackageTask))]
         private async Task<ResPackage> GetAutoPackageTask(string location)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
-            {
-                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
-                return null;
-            }
-
             PackageDebug(LoadType.Async, location);
-            foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
+            foreach (var package in Dic.Values)
             {
+                if (!package.CheckLocationValid(location)) continue;
                 if (AssetSystem.IsWhite(location)) return package;
+
                 if (package.IsNeedDownloadFromRemote(location))
                 {
                     var info = package.GetAssetInfo(location);
-                    if (info is null) throw new SystemException($"无法获取资源信息 {location}");
+                    if (info is null)
+                    {
+                        AssetSystem.LogException($"无法获取资源信息 {location}");
+                        return null;
+                    }
 
                     var operation = CreateDownloaderOperation(package, info);
                     await WaitTask(operation, info);
@@ -64,14 +64,9 @@ namespace AIO.UEngine.YooAsset
             return null;
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(GetAutoPackageTask))]
         private async Task<ResPackage> GetAutoPackageTask(string packageName, string location)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
-            {
-                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
-                return null;
-            }
-
             PackageDebug(LoadType.Async, packageName, location);
             if (!Dic.TryGetValue(packageName, out var package))
             {
@@ -79,7 +74,10 @@ namespace AIO.UEngine.YooAsset
                 return null;
             }
 
-            if (AssetSystem.IsWhite(location)) return package;
+            if (AssetSystem.IsWhite(location))
+            {
+                return package;
+            }
 
             if (package.IsNeedDownloadFromRemote(location))
             {
@@ -95,16 +93,19 @@ namespace AIO.UEngine.YooAsset
                 if (operation.Status != EOperationStatus.Succeed)
                 {
                     AssetSystem.LogException(
-                        $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                        $"资源获取失败 [{packageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                     return null;
                 }
             }
 #if UNITY_EDITOR
             AddSequenceRecord(package, package.GetAssetInfo(location));
 #endif
-            if (package.CheckLocationValid(location)) return package;
+            if (package.CheckLocationValid(location))
+            {
+                return package;
+            }
 
-            AssetSystem.LogException($"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+            AssetSystem.LogException($"[{packageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
             return null;
         }
     }

@@ -37,9 +37,18 @@ namespace AIO.UEngine
         /// 释放资源句柄
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public virtual void FreeHandle(IEnumerable<string> locations)
+        public virtual void FreeHandle(string[] locations)
         {
             foreach (var location in locations) HandleFree(location);
+        }
+
+        /// <summary>
+        /// 释放资源句柄
+        /// </summary>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public virtual void FreeHandle(IList<string> locations)
+        {
+            for (var index = 0; index < locations.Count; index++) HandleFree(locations[index]);
         }
 
         /// <summary>

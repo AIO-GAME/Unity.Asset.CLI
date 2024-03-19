@@ -10,34 +10,36 @@ namespace AIO.UEngine.YooAsset
 {
     public partial class Proxy
     {
-        private T HandleGet<T>(string location) where T : OperationHandleBase
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(HandleGet))]
+        private T HandleGet<T>(in string location) where T : OperationHandleBase
         {
             return ReferenceOPHandle.TryGetValue(location, out var operation)
                 ? (T)operation
                 : null;
         }
 
-        private void HandleAdd<T>(string location, T operation) where T : OperationHandleBase
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(HandleAdd))]
+        private void HandleAdd<T>(in string location, T operation) where T : OperationHandleBase
         {
-            if (string.IsNullOrEmpty(location)) return;
             if (operation is null) return;
-            if (ReferenceOPHandle.TryGetValue(location, out var value))
+            if (ReferenceOPHandle.ContainsKey(location))
             {
-                ReferenceOPHandle.Remove(location);
-                ReleaseOperationHandle(value);
-                AssetSystem.Log("Free Asset Handle Release : {0}", location);
+                ReleaseOperationHandle(ReferenceOPHandle[location]);
+                ReferenceOPHandle[location] = null;
+                AssetSystem.Log(string.Intern("Free Asset Handle Release : {0}"), location);
             }
 
             ReferenceOPHandle[location] = operation;
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(HandleFree))]
         public override void HandleFree(string location)
         {
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
             {
-                ReferenceOPHandle.Remove(location);
                 ReleaseOperationHandle(operation);
-                AssetSystem.Log("Free Asset Handle Release : {0}", location);
+                ReferenceOPHandle.Remove(location);
+                AssetSystem.Log(string.Intern("Free Asset Handle Release : {0}"), location);
             }
         }
 
@@ -46,6 +48,7 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="packageName">指定包名</param>
         /// <param name="isForce">是否强制回收</param>
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadUnusedAssets))]
         public void UnloadUnusedAssets(string packageName, bool isForce = false)
         {
             if (Dic.TryGetValue(packageName, out var value))
@@ -59,12 +62,13 @@ namespace AIO.UEngine.YooAsset
                     Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
                     {
                         value.Package.UnloadUnusedAssets();
-                        AssetSystem.Log("Free Package Handle Release : {0}", packageName);
+                        AssetSystem.Log(string.Intern("Free Asset Handle Release : {0}"), packageName);
                     }));
                 }
             }
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadUnusedAssets))]
         public override void UnloadUnusedAssets(bool isForce = false)
         {
             foreach (var key in ReferenceOPHandle.Keys.ToArray())
@@ -90,6 +94,7 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadUnusedAssetsCo))]
         private static IEnumerator UnloadUnusedAssetsCo(Action<AsyncOperation> completed)
         {
             var operation = Resources.UnloadUnusedAssets();
@@ -97,6 +102,7 @@ namespace AIO.UEngine.YooAsset
             yield return operation;
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadSceneTask))]
         public override async Task UnloadSceneTask(string location)
         {
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
@@ -112,6 +118,7 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadSceneCO))]
         public override IEnumerator UnloadSceneCO(string location, Action cb)
         {
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
@@ -126,31 +133,35 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ReleaseOperationHandle))]
         private static void ReleaseOperationHandle(OperationHandleBase operation)
         {
-            if (!operation.IsValid) return;
-            switch (operation)
+            if (operation.IsValid)
             {
-                case AllAssetsOperationHandle handle:
-                    handle.Dispose();
-                    return;
-                case RawFileOperationHandle handle:
-                    handle.Dispose();
-                    return;
-                case SubAssetsOperationHandle handle:
-                    handle.Dispose();
-                    return;
-                case AssetOperationHandle handle:
-                    handle.Dispose();
-                    return;
-                case SceneOperationHandle handle:
-                    if (!handle.IsMainScene()) handle.UnloadAsync();
-                    return;
+                switch (operation)
+                {
+                    case AllAssetsOperationHandle handle:
+                        handle.Dispose();
+                        break;
+                    case RawFileOperationHandle handle:
+                        handle.Dispose();
+                        break;
+                    case SubAssetsOperationHandle handle:
+                        handle.Dispose();
+                        break;
+                    case AssetOperationHandle handle:
+                        handle.Dispose();
+                        break;
+                    case SceneOperationHandle handle:
+                        if (!handle.IsMainScene()) handle.UnloadAsync();
+                        break;
+                }
             }
 
-            operation = null;
+            operation = null; // 释放引用
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ClearUnusedCacheCO))]
         public override IEnumerator ClearUnusedCacheCO(Action<bool> cb)
         {
             var enumerable = Dic.Values.Select(package => package.ClearUnusedCacheFilesAsync());
@@ -158,6 +169,7 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(true);
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ClearUnusedCacheTask))]
         public override async Task<bool> ClearUnusedCacheTask()
         {
             try
@@ -178,6 +190,7 @@ namespace AIO.UEngine.YooAsset
             return true;
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ClearAllCacheCO))]
         public override IEnumerator ClearAllCacheCO(Action<bool> cb)
         {
             var enumerable = Dic.Values.Select(package => package.ClearAllCacheFilesAsync());
@@ -185,6 +198,7 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(true);
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ClearAllCacheTask))]
         public override async Task<bool> ClearAllCacheTask()
         {
             try

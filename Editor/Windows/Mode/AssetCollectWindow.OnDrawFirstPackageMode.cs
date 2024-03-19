@@ -155,7 +155,7 @@ namespace AIO.UEditor
                 if (asset.ContainsKey(Config.SequenceRecord[i].AssetPath)) continue;
                 var temp = AssetCollectRoot.AssetToAddress(
                     Config.SequenceRecord[i].AssetPath);
-                Config.SequenceRecord[i].PackageName = temp.Item1;
+                Config.SequenceRecord[i].SetPackageName(temp.Item1);
                 var info = new AssetDataInfo
                 {
                     AssetPath = Config.SequenceRecord[i].AssetPath,

@@ -173,8 +173,7 @@ namespace AIO.UEditor
                     {
                         foreach (var item in remote_data)
                         {
-                            if (item is null) continue;
-                            if (string.IsNullOrEmpty(item.GUID)) continue;
+                            if (item.IsNull) continue;
                             dic[item.GUID] = item;
                         }
                     }
@@ -184,8 +183,7 @@ namespace AIO.UEditor
                     {
                         foreach (var item in local_data)
                         {
-                            if (item is null) continue;
-                            if (string.IsNullOrEmpty(item.GUID)) continue;
+                            if (item.IsNull) continue;
                             dic[item.GUID] = item;
                         }
                     }

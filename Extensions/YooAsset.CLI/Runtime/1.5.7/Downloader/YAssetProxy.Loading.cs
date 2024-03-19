@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Unity.Profiling;
 using UnityEngine;
 using YooAsset;
 
@@ -124,6 +125,7 @@ namespace AIO.UEngine.YooAsset
                 loading.RegisterEvent(location, operation);
         }
 
+        [ProfilerSpace(nameof(AssetSystem), nameof(CreateDownloaderOperation))]
         private static DownloaderOperation CreateDownloaderOperation(ResPackage package, AssetInfo location)
         {
             return DownloaderOperations.TryGetValue(location.AssetPath, out var operation)
@@ -131,18 +133,20 @@ namespace AIO.UEngine.YooAsset
                 : package.CreateBundleDownloader(location);
         }
 
-        [Conditional("UNITY_EDITOR")]
+        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(AddSequenceRecord))]
+        [Conditional("UNITY_EDITOR"), IgnoredByDeepProfiler]
         private static void AddSequenceRecord(ResPackage package, AssetInfo location)
         {
 #if UNITY_EDITOR
             if (!AssetSystem.Parameter.EnableSequenceRecord) return;
-            AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
+            var record = new AssetSystem.SequenceRecord
             {
-                GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
                 PackageName = package.PackageName,
                 Location = location.Address,
                 AssetPath = location.AssetPath,
-            });
+            };
+            record.SetGUID(AssetDatabase.AssetPathToGUID(location.AssetPath));
+            AssetSystem.AddSequenceRecord(record);
 #endif
         }
     }

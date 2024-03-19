@@ -692,16 +692,17 @@ namespace AIO.UEditor
                 {
                     if (GUI.Button(rect5, GC_FP_OK, GEStyle.TEtoolbarbutton))
                     {
-                        Config.SequenceRecord.Add(new AssetSystem.SequenceRecord
+                        var record = new AssetSystem.SequenceRecord
                         {
-                            GUID = data.GUID,
                             AssetPath = data.AssetPath,
                             Location = data.Address,
                             PackageName = data.Package,
                             Bytes = data.Size,
                             Count = 1,
                             Time = DateTime.MinValue
-                        });
+                        };
+                        record.SetGUID(data.GUID);
+                        Config.SequenceRecord.Add(record);
                         Config.SequenceRecord.Save();
                     }
                 }
@@ -746,16 +747,17 @@ namespace AIO.UEditor
                             {
                                 onDrawLookDataItemMenu.AddItem(new GUIContent("添加 首包列表"), false, () =>
                                 {
-                                    Config.SequenceRecord.Add(new AssetSystem.SequenceRecord
+                                    var record = new AssetSystem.SequenceRecord
                                     {
-                                        GUID = data.GUID,
                                         AssetPath = data.AssetPath,
                                         Location = data.Address,
                                         PackageName = data.Package,
                                         Bytes = data.Size,
                                         Count = 1,
                                         Time = DateTime.MinValue
-                                    });
+                                    };
+                                    record.SetGUID(data.GUID);
+                                    Config.SequenceRecord.Add(record);
                                     Config.SequenceRecord.Save();
                                 });
                             }
