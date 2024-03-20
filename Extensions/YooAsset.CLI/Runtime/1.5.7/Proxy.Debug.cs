@@ -9,7 +9,10 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        [DebuggerNonUserCode, IgnoredByDeepProfiler]
+        [DebuggerNonUserCode]
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
         internal class YALogger : ILogger
         {
             [IgnoreConsoleJump]
@@ -46,7 +49,9 @@ namespace AIO.UEngine.YooAsset
 #endif
 
 #if UNITY_EDITOR
+#if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
+#endif
         private string GetLocation(string location)
         {
             return (from asset in Dic.Values
@@ -55,7 +60,9 @@ namespace AIO.UEngine.YooAsset
                 FirstOrDefault()?.AssetPath;
         }
 
+#if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
+#endif
         private string GetType(LoadType type)
         {
             switch (type)
@@ -73,7 +80,10 @@ namespace AIO.UEngine.YooAsset
 
 #endif
 
-        [Conditional("DEBUG"), IgnoreConsoleJump, IgnoredByDeepProfiler]
+        [Conditional("DEBUG"), IgnoreConsoleJump]
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
         private void PackageDebug(LoadType type, string location)
         {
 #if UNITY_EDITOR
@@ -83,7 +93,10 @@ namespace AIO.UEngine.YooAsset
 #endif
         }
 
-        [Conditional("DEBUG"), IgnoreConsoleJump, IgnoredByDeepProfiler]
+        [Conditional("DEBUG"), IgnoreConsoleJump]
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
         private void PackageDebug(LoadType type, string packageName, string location)
         {
 #if UNITY_EDITOR

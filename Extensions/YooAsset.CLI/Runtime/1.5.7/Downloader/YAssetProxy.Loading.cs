@@ -134,7 +134,10 @@ namespace AIO.UEngine.YooAsset
         }
 
         [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(AddSequenceRecord))]
-        [Conditional("UNITY_EDITOR"), IgnoredByDeepProfiler]
+        [Conditional("UNITY_EDITOR")]
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
         private static void AddSequenceRecord(ResPackage package, AssetInfo location)
         {
 #if UNITY_EDITOR

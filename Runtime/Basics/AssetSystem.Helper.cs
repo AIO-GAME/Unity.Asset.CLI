@@ -55,27 +55,21 @@ namespace AIO
         {
             if (string.IsNullOrEmpty(location)) // 为空不支持
             {
-                throw new Exception("AssetSystem SettingToLocalPath input location is null or empty");
+                LogException("AssetSystem SettingToLocalPath input location is null or empty");
+                return string.Empty;
             }
 
-            if (CultureInfo.CurrentCulture.CompareInfo.IsSuffix(location, "/", CompareOptions.None) ||
-                CultureInfo.CurrentCulture.CompareInfo.IsSuffix(location, "\\", CompareOptions.None)) // 以 / 或者 \ 结尾 不支持
+            // 判断是否以 / 或者 \ 结尾
+            if (location.EndsWith("/", StringComparison.CurrentCulture) ||
+                location.EndsWith("\\", StringComparison.CurrentCulture))
             {
-                throw new Exception("AssetSystem SettingToLocalPath input location is end with / or \\");
+                LogException($"AssetSystem SettingToLocalPath input location is end with / or \\ -> {location}");
+                return string.Empty;
             }
 
-            if (Parameter.LoadPathToLower)
-            {
-                if (LocalPathCache.TryGetValue(location, out var address))
-                {
-                    return address;
-                }
-
-                address = LocalPathCache[location] = location.ToLower(); // 转小写 会产生40b左右的GC
-                return address;
-            }
-
-            return location;
+            if (!Parameter.LoadPathToLower) return location;
+            if (LocalPathCache.TryGetValue(location, out var address)) return address;
+            return LocalPathCache[location] = location.ToLower(); // 转小写 会产生40b左右的GC
         }
     }
 }
