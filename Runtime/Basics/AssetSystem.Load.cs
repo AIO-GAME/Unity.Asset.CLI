@@ -309,7 +309,7 @@ namespace AIO
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetCO))]
+        [ProfilerScope]
         public static IAsyncHandle<TObject> LoadAssetCO<TObject>(string location) where TObject : Object
         {
             return new LoadAssetHandle<TObject>(SettingToLocalPath(location));
@@ -322,7 +322,7 @@ namespace AIO
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetCO))]
+        [ProfilerScope]
         public static IAsyncHandle<TObject> LoadAssetCO<TObject>(string location, Action<TObject> cb)
             where TObject : Object
         {
@@ -335,7 +335,7 @@ namespace AIO
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetCO))]
+        [ProfilerScope]
         public static IEnumerator LoadAssetCO(string location, Action<Object> cb)
         {
             return Proxy.LoadAssetCO(SettingToLocalPath(location), cb);
@@ -348,7 +348,7 @@ namespace AIO
         /// <param name="type">资源类型</param>
         /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetCO))]
+        [ProfilerScope]
         public static IEnumerator LoadAssetCO(string location, Type type, Action<Object> cb)
         {
             return Proxy.LoadAssetCO(SettingToLocalPath(location), type, cb);
@@ -360,7 +360,7 @@ namespace AIO
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAsset))]
+        [ProfilerScope]
         public static TObject LoadAsset<TObject>(string location) where TObject : Object
         {
             return Proxy.LoadAssetSync<TObject>(SettingToLocalPath(location));
@@ -372,7 +372,7 @@ namespace AIO
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAsset))]
+        [ProfilerScope]
         public static Object LoadAsset(string location, Type type)
         {
             return Proxy.LoadAssetSync(SettingToLocalPath(location), type);
@@ -383,7 +383,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAsset))]
+        [ProfilerScope]
         public static Object LoadAsset(string location)
         {
             return Proxy.LoadAssetSync(SettingToLocalPath(location), typeof(Object));
@@ -395,7 +395,7 @@ namespace AIO
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetTask))]
+        [ProfilerScope]
         public static Task<TObject> LoadAssetTask<TObject>(string location) where TObject : Object
         {
             return Proxy.LoadAssetTask<TObject>(SettingToLocalPath(location));
@@ -407,7 +407,7 @@ namespace AIO
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        [ProfilerSpace(nameof(AssetSystem), nameof(LoadAssetTask))]
+        [ProfilerScope]
         public static Task<Object> LoadAssetTask(string location, Type type)
         {
             return Proxy.LoadAssetTask(SettingToLocalPath(location), type);

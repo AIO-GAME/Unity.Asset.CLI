@@ -10,7 +10,7 @@ namespace AIO.UEngine.YooAsset
 {
     public partial class Proxy
     {
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(HandleGet))]
+        [ProfilerScope]
         private T HandleGet<T>(in string location) where T : OperationHandleBase
         {
             return ReferenceOPHandle.TryGetValue(location, out var operation)
@@ -18,7 +18,7 @@ namespace AIO.UEngine.YooAsset
                 : null;
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(HandleAdd))]
+        [ProfilerScope]
         private void HandleAdd<T>(in string location, T operation) where T : OperationHandleBase
         {
             if (operation is null) return;
@@ -32,7 +32,7 @@ namespace AIO.UEngine.YooAsset
             ReferenceOPHandle[location] = operation;
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(HandleFree))]
+        [ProfilerScope]
         public override void HandleFree(string location)
         {
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
@@ -48,7 +48,7 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="packageName">指定包名</param>
         /// <param name="isForce">是否强制回收</param>
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadUnusedAssets))]
+        [ProfilerScope]
         public void UnloadUnusedAssets(string packageName, bool isForce = false)
         {
             if (Dic.TryGetValue(packageName, out var value))
@@ -68,7 +68,7 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadUnusedAssets))]
+        [ProfilerScope]
         public override void UnloadUnusedAssets(bool isForce = false)
         {
             foreach (var key in ReferenceOPHandle.Keys.ToArray())
@@ -94,7 +94,7 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadUnusedAssetsCo))]
+        [ProfilerScope]
         private static IEnumerator UnloadUnusedAssetsCo(Action<AsyncOperation> completed)
         {
             var operation = Resources.UnloadUnusedAssets();
@@ -102,7 +102,7 @@ namespace AIO.UEngine.YooAsset
             yield return operation;
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadSceneTask))]
+        [ProfilerScope]
         public override async Task UnloadSceneTask(string location)
         {
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
@@ -118,7 +118,7 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(UnloadSceneCO))]
+        [ProfilerScope]
         public override IEnumerator UnloadSceneCO(string location, Action cb)
         {
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
@@ -133,7 +133,7 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ReleaseOperationHandle))]
+        [ProfilerScope]
         private static void ReleaseOperationHandle(OperationHandleBase operation)
         {
             if (operation.IsValid)
@@ -161,7 +161,7 @@ namespace AIO.UEngine.YooAsset
             operation = null; // 释放引用
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ClearUnusedCacheCO))]
+        [ProfilerScope]
         public override IEnumerator ClearUnusedCacheCO(Action<bool> cb)
         {
             var enumerable = Dic.Values.Select(package => package.ClearUnusedCacheFilesAsync());
@@ -169,7 +169,7 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(true);
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ClearUnusedCacheTask))]
+        [ProfilerScope]
         public override async Task<bool> ClearUnusedCacheTask()
         {
             try
@@ -190,7 +190,7 @@ namespace AIO.UEngine.YooAsset
             return true;
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ClearAllCacheCO))]
+        [ProfilerScope]
         public override IEnumerator ClearAllCacheCO(Action<bool> cb)
         {
             var enumerable = Dic.Values.Select(package => package.ClearAllCacheFilesAsync());
@@ -198,7 +198,7 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(true);
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(ClearAllCacheTask))]
+        [ProfilerScope]
         public override async Task<bool> ClearAllCacheTask()
         {
             try

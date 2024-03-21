@@ -7,7 +7,7 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(LoadCheckOPTask))]
+        [ProfilerScope]
         private static async Task<bool> LoadCheckOPTask(OperationHandleBase operation)
         {
             if (!operation.IsValid)
@@ -26,7 +26,7 @@ namespace AIO.UEngine.YooAsset
             return true;
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(GetAutoPackageTask))]
+        [ProfilerScope]
         private async Task<ResPackage> GetAutoPackageTask(string location)
         {
             PackageDebug(LoadType.Async, location);
@@ -64,7 +64,7 @@ namespace AIO.UEngine.YooAsset
             return null;
         }
 
-        [ProfilerSpace(nameof(AssetSystem), nameof(Proxy), nameof(GetAutoPackageTask))]
+        [ProfilerScope]
         private async Task<ResPackage> GetAutoPackageTask(string packageName, string location)
         {
             PackageDebug(LoadType.Async, packageName, location);
