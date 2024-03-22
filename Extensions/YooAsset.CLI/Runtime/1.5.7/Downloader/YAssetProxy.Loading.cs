@@ -125,7 +125,7 @@ namespace AIO.UEngine.YooAsset
                 loading.RegisterEvent(location, operation);
         }
 
-        [ProfilerScope]
+
         private static DownloaderOperation CreateDownloaderOperation(ResPackage package, AssetInfo location)
         {
             return DownloaderOperations.TryGetValue(location.AssetPath, out var operation)
@@ -133,7 +133,7 @@ namespace AIO.UEngine.YooAsset
                 : package.CreateBundleDownloader(location);
         }
 
-        [ProfilerScope]
+
         [Conditional("UNITY_EDITOR")]
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]

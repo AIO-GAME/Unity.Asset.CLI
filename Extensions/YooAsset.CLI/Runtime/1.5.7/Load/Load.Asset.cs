@@ -66,7 +66,7 @@ namespace AIO.UEngine.YooAsset
             cb?.Invoke(operation?.AssetObject);
         }
 
-        [ProfilerScope]
+
         public override TObject LoadAssetSync<TObject>(string location)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
@@ -82,7 +82,7 @@ namespace AIO.UEngine.YooAsset
             return operation?.GetAssetObject<TObject>();
         }
 
-        [ProfilerScope]
+
         public override Object LoadAssetSync(string location, Type type)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
@@ -98,7 +98,7 @@ namespace AIO.UEngine.YooAsset
             return operation?.AssetObject;
         }
 
-        [ProfilerScope]
+
         public override async Task<TObject> LoadAssetTask<TObject>(string location)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
@@ -115,7 +115,7 @@ namespace AIO.UEngine.YooAsset
             return operation?.GetAssetObject<TObject>();
         }
 
-        [ProfilerScope]
+
         public override async Task<Object> LoadAssetTask(string location, Type type)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
