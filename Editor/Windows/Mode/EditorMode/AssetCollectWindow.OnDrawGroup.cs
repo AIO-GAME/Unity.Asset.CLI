@@ -55,7 +55,7 @@ namespace AIO.UEditor
                                     "Yes",
                                     "No"))
                             {
-                                Data.CurrentPackage.Groups = Data.CurrentPackage.Groups.RemoveAt(i);
+                                Data.CurrentPackage.Groups = Data.CurrentPackage.Groups.RemoveAt(i).Exclude();
                                 if (--Data.CurrentGroupIndex < 0) Data.CurrentGroupIndex = 0;
                                 if (Data.CurrentGroupIndex >= Data.Packages[Data.CurrentPackageIndex].Groups.Length)
                                     ViewGroupList.IsShow = false;

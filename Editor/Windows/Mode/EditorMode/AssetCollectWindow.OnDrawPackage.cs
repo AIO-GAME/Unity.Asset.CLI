@@ -46,7 +46,7 @@ namespace AIO.UEditor
                             if (EditorUtility.DisplayDialog("Delete Package",
                                     $"Are you sure you want to delete {Data.Packages[i].Name}?", "Yes", "No"))
                             {
-                                Data.Packages = Data.Packages.RemoveAt(i);
+                                Data.Packages = Data.Packages.RemoveAt(i).Exclude();
                                 if (--Data.CurrentPackageIndex < 0) Data.CurrentPackageIndex = 0;
                                 if (Data.CurrentPackageIndex >= Data.Packages.Length) ViewGroupList.IsShow = false;
                             }

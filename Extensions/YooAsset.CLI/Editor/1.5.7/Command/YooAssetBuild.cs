@@ -93,9 +93,9 @@ namespace AIO.UEditor.CLI
                         command.BuildPackage);
                     if (Directory.Exists(target))
                     {
-                        var dirs = Directory.GetDirectories(target)
-                            .Where(directory => !directory.EndsWith("Simulate") && !directory.EndsWith("OutputCache"))
-                            .ToArray();
+                        var dirs = Directory.GetDirectories(target).
+                            Where(directory => !directory.EndsWith("Simulate") && !directory.EndsWith("OutputCache")).
+                            ToArray();
                         if (dirs.Length > 0)
                         {
                             // 如果为增量更新 则判断是否需要清理缓存 
@@ -103,9 +103,8 @@ namespace AIO.UEditor.CLI
                             var cleanCacheNum = ASBuildConfig.GetOrCreate().AutoCleanCacheNum;
                             if (dirs.Length >= cleanCacheNum)
                             {
-                                var caches = dirs.SortQuick((s, t) =>
+                                var caches = dirs.Sort((s, t) => // 如果缓存数量大于等于设置的缓存数量 则清理缓存 缓存清理机制为删除最早的缓存
                                 {
-                                    // 如果缓存数量大于等于设置的缓存数量 则清理缓存 缓存清理机制为删除最早的缓存
                                     var st = Directory.GetCreationTimeUtc(s);
                                     var tt = Directory.GetCreationTimeUtc(t);
                                     var result = tt.CompareTo(st);
@@ -233,9 +232,9 @@ namespace AIO.UEditor.CLI
                 return;
             }
 
-            var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories)
-                .Where(filePath => filePath != Manifest)
-                .ToDictionary(filePath => filePath, filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
+            var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories).
+                Where(filePath => filePath != Manifest).ToDictionary(filePath => filePath,
+                    filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
             hashtable.Remove("OutputCache");
             hashtable.Remove("OutputCache.manifest");
 
@@ -278,9 +277,8 @@ namespace AIO.UEditor.CLI
 
             var delete = new Dictionary<string, string>(); // 删除
             var change = new Dictionary<string, string>(); // 修改
-            var add = current
-                .Where(item => !target.ContainsKey(item.Key))
-                .ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
+            var add = current.Where(item => !target.ContainsKey(item.Key)).
+                ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
 
             foreach (var item in target) // 遍历最新版本清单
             {

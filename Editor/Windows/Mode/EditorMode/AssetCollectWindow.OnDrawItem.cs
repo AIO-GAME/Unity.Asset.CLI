@@ -140,15 +140,15 @@ namespace AIO.UEditor
                         }
 
                         if (ItemCollectorsSearching) ItemCollectorsSearchResult.Remove(item);
-                        Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Remove(item);
+                        Data.CurrentGroup.Collectors = Data.CurrentGroup.Collectors.Remove(item).Exclude();
                         if (Data.CurrentGroup.Collectors.Length == 0)
                         {
                             ItemCollectorsSearch = null;
                             ItemCollectorsSearchResult.Clear();
                         }
-                    }
 
-                    return;
+                        return;
+                    }
                 }
             }
 

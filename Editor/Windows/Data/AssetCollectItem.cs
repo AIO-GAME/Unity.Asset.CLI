@@ -120,6 +120,22 @@ namespace AIO.UEditor
 
     partial class AssetCollectItem
     {
+        public bool IsValidate
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(CollectPath)) return false;
+                if (CollectPath.Contains("/Resources/") || CollectPath.EndsWith("Resources"))
+                {
+                    AssetSystem.LogWarning("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
+                    return false;
+                }
+
+                if (!AHelper.IO.Exists(FullPath)) return false;
+                return true;
+            }
+        }
+
         /// <summary>
         /// 收集器全路径
         /// </summary>
@@ -472,15 +488,11 @@ namespace AIO.UEditor
             Action<Dictionary<string, AssetDataInfo>> cb = null)
         {
             AssetDataInfos.Clear();
+            if (!IsValidate) return;
+            if (Type != EAssetCollectItemType.MainAssetCollector) return;
+
             PackageName = package;
             GroupName = group;
-            if (Type != EAssetCollectItemType.MainAssetCollector) return;
-            if (!AHelper.IO.Exists(FullPath)) return;
-            if (CollectPath.Contains("/Resources/") || CollectPath.EndsWith("Resources"))
-            {
-                AssetSystem.LogWarning("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
-                return;
-            }
 
             var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
             var pathToLower = ASConfig.GetOrCreate().LoadPathToLower;
@@ -536,6 +548,13 @@ namespace AIO.UEditor
                    x.Address == y.Address &&
                    x.RuleCollect == y.RuleCollect &&
                    x.RuleFilter == y.RuleFilter;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is AssetCollectItem item)
+                return Equals(this, item);
+            return false;
         }
 
         public int GetHashCode(AssetCollectItem obj)

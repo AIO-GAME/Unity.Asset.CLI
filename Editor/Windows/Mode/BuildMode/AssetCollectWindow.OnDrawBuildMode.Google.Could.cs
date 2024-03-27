@@ -85,7 +85,7 @@ namespace AIO.UEditor
                                 GUI.FocusControl(null);
                                 if (EditorUtility.DisplayDialog("提示", "确定删除?", "确定", "取消"))
                                 {
-                                    BuildConfig.GCloudConfigs = BuildConfig.GCloudConfigs.RemoveAt(i);
+                                    BuildConfig.GCloudConfigs = BuildConfig.GCloudConfigs.RemoveAt(i).Exclude();
                                     return;
                                 }
                             }

@@ -96,7 +96,7 @@ namespace AIO.UEditor
                                 GUI.FocusControl(null);
                                 if (EditorUtility.DisplayDialog("提示", "确定删除?", "确定", "取消"))
                                 {
-                                    BuildConfig.FTPConfigs = BuildConfig.FTPConfigs.RemoveAt(i);
+                                    BuildConfig.FTPConfigs = BuildConfig.FTPConfigs.RemoveAt(i).Exclude();
                                     return;
                                 }
                             }
