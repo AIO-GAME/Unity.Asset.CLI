@@ -53,7 +53,7 @@ namespace AIO.UEngine.YooAsset
                 return null;
             }
 
-            AssetSystem.Log("[{0}:{1}] is {2}", Config.Name, Config.Version, parameters.Mode);
+            AssetSystem.LogFormat("[{0}:{1}] is {2}", Config.Name, Config.Version, parameters.Mode);
 #endif
             Mode = parameters.Mode;
             parameters.UpdateParameters();

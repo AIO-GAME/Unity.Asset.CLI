@@ -69,7 +69,7 @@ namespace AIO.UEngine.YooAsset
             var package = await GetAutoPackageTask(location);
             if (package is null)
             {
-                AssetSystem.LogException("场景配置 异常错误:{0} {1}", location, sceneMode);
+                AssetSystem.LogExceptionFormat("场景配置 异常错误:{0} {1}", location, sceneMode);
                 return SceneManager.GetActiveScene();
             }
 
@@ -81,7 +81,7 @@ namespace AIO.UEngine.YooAsset
                 return operation.SceneObject;
             }
 
-            AssetSystem.LogException("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode);
+            AssetSystem.LogExceptionFormat("加载场景 资源异常:{0} {1} {2}", package.PackageName, location, sceneMode);
             return SceneManager.GetActiveScene();
         }
 

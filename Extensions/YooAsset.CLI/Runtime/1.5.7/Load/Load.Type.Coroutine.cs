@@ -61,7 +61,7 @@ namespace AIO.UEngine.YooAsset
                     yield return WaitCO(operation, info);
                     if (operation.Status != EOperationStatus.Succeed)
                     {
-                        AssetSystem.LogException("获取远端资源失败 [{0} : {1}] {2} -> {3}",
+                        AssetSystem.LogExceptionFormat("获取远端资源失败 [{0} : {1}] {2} -> {3}",
                             package.PackageName, package.GetPackageVersion(), location, operation.Error);
                         cb.Invoke(null);
                         yield break;
@@ -114,7 +114,7 @@ namespace AIO.UEngine.YooAsset
                 yield return WaitCO(operation, info);
                 if (operation.Status != EOperationStatus.Succeed)
                 {
-                    AssetSystem.LogException("资源获取失败 [{0} : {1}] {2} -> {3}",
+                    AssetSystem.LogExceptionFormat("资源获取失败 [{0} : {1}] {2} -> {3}",
                         package.PackageName, package.GetPackageVersion(), location, operation.Error);
                     cb.Invoke(null);
                     yield break;

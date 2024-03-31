@@ -1,5 +1,6 @@
 {
     "name": "AIO.Asset.Runtime",
+    "rootNamespace": "",
     "references": [
         "UniTask",
         "UniTask.Addressables",
@@ -8,7 +9,9 @@
         "UniTask.YooAsset",
         "UniTask.TextMeshPro",
         "YooAsset",
-        "AIO.Core.Runtime"
+        "AIO.Core.Runtime",
+        "com.bbbirder.injection",
+        "com.bbbirder.directattribute"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

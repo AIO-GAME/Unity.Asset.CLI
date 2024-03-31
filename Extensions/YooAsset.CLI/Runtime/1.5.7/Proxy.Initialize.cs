@@ -116,7 +116,7 @@ namespace AIO.UEngine.YooAsset
 
                 if (Dic.ContainsKey(item.Name))
                 {
-                    AssetSystem.LogError("Asset Package Name Repeat : {0}", item.Name);
+                    AssetSystem.LogErrorFormat("Asset Package Name Repeat : {0}", item.Name);
                     continue;
                 }
 
@@ -133,7 +133,7 @@ namespace AIO.UEngine.YooAsset
                 if (operation is null)
                 {
                     AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
-                    AssetSystem.LogException("{Load} -> {0}", package.Config);
+                    AssetSystem.LogExceptionFormat("{Load} -> {0}", package.Config);
                     continue;
                 }
 
@@ -172,9 +172,9 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
                         throw new Exception($"{remote} Request failed");
 #else
-                AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
-                AssetSystem.LogError($"{remote} Request failed");
-                yield break;
+                        AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
+                        AssetSystem.LogError($"{remote} Request failed");
+                        yield break;
 #endif
                     }
 

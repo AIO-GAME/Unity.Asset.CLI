@@ -7,7 +7,6 @@ using UnityEngine.Scripting;
 [assembly: AlwaysLinkAssembly]
 #endif
 
-[assembly: ProfilerScope]
 [assembly: ComVisible(false)]
 [assembly: InternalsVisibleTo("AIO.Asset.Editor")]
 [assembly: InternalsVisibleTo("AIO.FGUI.Runtime")]

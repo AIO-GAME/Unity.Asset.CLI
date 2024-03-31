@@ -11,13 +11,13 @@ namespace AIO.UEngine.YooAsset
         {
             if (!operation.IsValid)
             {
-                AssetSystem.LogError("操作句柄失效 -> {0}", operation.LastError);
+                AssetSystem.LogErrorFormat("操作句柄失效 -> {0}", operation.LastError);
                 return false;
             }
 
             if (operation.Status == EOperationStatus.Failed)
             {
-                AssetSystem.LogError("资源加载失败 -> {0}", operation.LastError);
+                AssetSystem.LogErrorFormat("资源加载失败 -> {0}", operation.LastError);
                 return false;
             }
 

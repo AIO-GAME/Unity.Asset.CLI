@@ -25,12 +25,11 @@ namespace AIO.UEngine.YooAsset
             {
                 ReleaseOperationHandle(ReferenceOPHandle[location]);
                 ReferenceOPHandle[location] = null;
-                AssetSystem.Log(string.Intern("Free Asset Handle Release : {0}"), location);
+                AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), location);
             }
 
             ReferenceOPHandle[location] = operation;
         }
-
 
         public override void HandleFree(string location)
         {
@@ -38,7 +37,7 @@ namespace AIO.UEngine.YooAsset
             {
                 ReleaseOperationHandle(operation);
                 ReferenceOPHandle.Remove(location);
-                AssetSystem.Log(string.Intern("Free Asset Handle Release : {0}"), location);
+                AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), location);
             }
         }
 
@@ -60,7 +59,7 @@ namespace AIO.UEngine.YooAsset
                     Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
                     {
                         value.Package.UnloadUnusedAssets();
-                        AssetSystem.Log(string.Intern("Free Asset Handle Release : {0}"), packageName);
+                        AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), packageName);
                     }));
                 }
             }
@@ -111,7 +110,7 @@ namespace AIO.UEngine.YooAsset
                 Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
                 {
                     ReleaseOperationHandle(operation);
-                    AssetSystem.Log("Free Scene Handle Release : {0}", location);
+                    AssetSystem.LogFormat("Free Scene Handle Release : {0}", location);
                 }));
             }
         }
@@ -127,7 +126,7 @@ namespace AIO.UEngine.YooAsset
                 yield return Resources.UnloadUnusedAssets();
 
                 ReleaseOperationHandle(operation);
-                AssetSystem.Log("Free Scene Handle Release : {0}", location);
+                AssetSystem.LogFormat("Free Scene Handle Release : {0}", location);
             }
         }
 

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
@@ -20,23 +19,11 @@ namespace AIO
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static async void LoadSubAssets<TObject>(string location, Action<TObject[]> cb) where TObject : Object
+        public static void LoadSubAssets(string location, Action<Object[]> cb)
         {
-            cb?.Invoke(
-                await Proxy.LoadSubAssetsTask<TObject>(SettingToLocalPath(location)));
-        }
-
-        /// <summary>
-        /// 同步加载原生文件
-        /// </summary>
-        /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static async void LoadSubAssets(string location, Action<Object[]> cb)
-        {
-            cb?.Invoke(await Proxy.LoadSubAssetsTask<Object>(Parameter.LoadPathToLower
+            Proxy.LoadSubAssetsTask<Object>(Parameter.LoadPathToLower
                 ? location.ToLower()
-                : location));
+                : location).ContinueWith(task => { cb?.Invoke(task.Result); });
         }
 
         /// <summary>
@@ -46,9 +33,22 @@ namespace AIO
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static async void LoadSubAssets(string location, Type type, Action<Object[]> cb)
+        public static void LoadSubAssets(string location, Type type, Action<Object[]> cb)
         {
-            cb?.Invoke(await Proxy.LoadSubAssetsTask(SettingToLocalPath(location), type));
+            Proxy.LoadSubAssetsTask(SettingToLocalPath(location), type).
+                ContinueWith(task => { cb?.Invoke(task.Result); });
+        }
+
+        /// <summary>
+        /// 同步加载原生文件
+        /// </summary>
+        /// <param name="location">资源的定位地址</param>
+        /// <param name="cb">回调</param>
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static void LoadSubAssets<TObject>(string location, Action<TObject[]> cb) where TObject : Object
+        {
+            Proxy.LoadSubAssetsTask<TObject>(SettingToLocalPath(location)).
+                ContinueWith(task => { cb?.Invoke(task.Result); });
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static async void LoadAsset<TObject>(string location, Action<TObject> cb) where TObject : Object
         {
             cb?.Invoke(await Proxy.LoadAssetTask<TObject>(SettingToLocalPath(location)));
@@ -160,9 +160,10 @@ namespace AIO
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static async void LoadAsset(string location, Action<Object> cb)
+        public static void LoadAsset(string location, Action<Object> cb)
         {
-            cb?.Invoke(await Proxy.LoadAssetTask<Object>(SettingToLocalPath(location)));
+            Proxy.LoadAssetTask<Object>(SettingToLocalPath(location)).
+                ContinueWith(task => { cb?.Invoke(task.Result); });
         }
 
         /// <summary>

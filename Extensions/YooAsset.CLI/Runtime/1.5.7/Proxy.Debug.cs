@@ -3,7 +3,8 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using Unity.Profiling;
-using YooAsset;
+using UnityEngine;
+using ILogger = YooAsset.ILogger;
 
 namespace AIO.UEngine.YooAsset
 {
@@ -15,24 +16,33 @@ namespace AIO.UEngine.YooAsset
 #endif
         internal class YALogger : ILogger
         {
+#if UNITY_2021_3_OR_NEWER
+            [HideInCallstack]
+#endif
             [IgnoreConsoleJump]
             public void Log(string message)
             {
                 AssetSystem.Log(message);
             }
-
+#if UNITY_2021_3_OR_NEWER
+            [HideInCallstack]
+#endif
             [IgnoreConsoleJump]
             public void Warning(string message)
             {
                 AssetSystem.LogWarning(message);
             }
-
+#if UNITY_2021_3_OR_NEWER
+            [HideInCallstack]
+#endif
             [IgnoreConsoleJump]
             public void Error(string message)
             {
                 AssetSystem.LogError(message);
             }
-
+#if UNITY_2021_3_OR_NEWER
+            [HideInCallstack]
+#endif
             [IgnoreConsoleJump]
             public void Exception(Exception exception)
             {
@@ -84,6 +94,9 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
 #endif
+#if UNITY_2021_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private void PackageDebug(LoadType type, string location)
         {
 #if UNITY_EDITOR
@@ -96,6 +109,9 @@ namespace AIO.UEngine.YooAsset
         [Conditional("DEBUG"), IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
+#endif
+#if UNITY_2021_3_OR_NEWER
+        [HideInCallstack]
 #endif
         private void PackageDebug(LoadType type, string packageName, string location)
         {

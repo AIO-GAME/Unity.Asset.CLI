@@ -127,7 +127,7 @@ namespace AIO.UEditor
                 if (string.IsNullOrEmpty(CollectPath)) return false;
                 if (CollectPath.Contains("/Resources/") || CollectPath.EndsWith("Resources"))
                 {
-                    AssetSystem.LogWarning("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
+                    AssetSystem.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
                     return false;
                 }
 
@@ -242,13 +242,13 @@ namespace AIO.UEditor
             var rootPath = data.AssetPath.Substring(0, data.AssetPath.LastIndexOf('/'));
             if (rootPath.EndsWith("Editor"))
             {
-                AssetSystem.LogWarning("Editor 目录下的资源不允许打包 已自动过滤 -> {0}", data.AssetPath);
+                AssetSystem.LogWarningFormat("Editor 目录下的资源不允许打包 已自动过滤 -> {0}", data.AssetPath);
                 return false;
             }
 
             if (rootPath.Contains("Resources/") || rootPath.EndsWith("Resources")) // 判断是否为Resources目录下的资源
             {
-                AssetSystem.LogWarning("Resources 目录下的资源不允许打包 已自动过滤 -> {0}", data.AssetPath);
+                AssetSystem.LogWarningFormat("Resources 目录下的资源不允许打包 已自动过滤 -> {0}", data.AssetPath);
                 return false;
             }
 
@@ -453,7 +453,7 @@ namespace AIO.UEditor
                         fileInfo.FullName.Length - len - data.Extension.Length - 1).Replace("\\", "/");
                     if (AssetDataInfos.ContainsKey(data.AssetPath))
                     {
-                        AssetSystem.LogWarning("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", fileInfo.FullName);
+                        AssetSystem.LogWarningFormat("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", fileInfo.FullName);
                     }
                     else
                     {
@@ -469,7 +469,7 @@ namespace AIO.UEditor
             {
                 if (AssetDataInfos.ContainsKey(data.CollectPath))
                 {
-                    AssetSystem.LogWarning("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", data.CollectPath);
+                    AssetSystem.LogWarningFormat("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", data.CollectPath);
                 }
                 else
                 {
@@ -531,7 +531,7 @@ namespace AIO.UEditor
             RuleFilters?.Clear();
             RuleCollects?.Clear();
             UpdateData();
-            if (_Path == null) AssetSystem.LogWarning("收集器路径为空 !!! -> {0}", CollectPath);
+            if (_Path == null) AssetSystem.LogWarningFormat("收集器路径为空 !!! -> {0}", CollectPath);
         }
 
         public bool Equals(AssetCollectItem x, AssetCollectItem y)
