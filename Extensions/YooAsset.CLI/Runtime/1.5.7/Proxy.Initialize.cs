@@ -227,9 +227,10 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
                                     throw new Exception($"{url} Request failed");
 #else
-                        AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
-                        AssetSystem.LogError($"{url} Request failed");
-                        return;
+                                    AssetSystem.ExceptionEvent(ASException.
+                                        ASConfigRemoteUrlRemoteVersionRequestFailure);
+                                    AssetSystem.LogError($"{url} Request failed");
+                                    yield break;
 #endif
                                 }
 

@@ -16,7 +16,7 @@ namespace AIO.UEngine.YooAsset
 #endif
         internal class YALogger : ILogger
         {
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
@@ -24,7 +24,7 @@ namespace AIO.UEngine.YooAsset
             {
                 AssetSystem.Log(message);
             }
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
@@ -32,7 +32,7 @@ namespace AIO.UEngine.YooAsset
             {
                 AssetSystem.LogWarning(message);
             }
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
@@ -40,7 +40,7 @@ namespace AIO.UEngine.YooAsset
             {
                 AssetSystem.LogError(message);
             }
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
@@ -49,14 +49,13 @@ namespace AIO.UEngine.YooAsset
                 AssetSystem.LogException(exception);
             }
         }
-#if DEBUG
+
         private enum LoadType
         {
             Sync,
             Coroutine,
             Async
         }
-#endif
 
 #if UNITY_EDITOR
 #if UNITY_2022_1_OR_NEWER
@@ -93,8 +92,6 @@ namespace AIO.UEngine.YooAsset
         [Conditional("DEBUG"), IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
-#endif
-#if UNITY_2021_3_OR_NEWER
         [HideInCallstack]
 #endif
         private void PackageDebug(LoadType type, string location)
@@ -102,15 +99,13 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
             AssetSystem.Log($"{type} : [auto : {location}] -> {GetLocation(location)}");
 #else
-            AssetSystem.Log("{0} : [auto : {1}]", type, location);
+            AssetSystem.LogFormat("{0} : [auto : {1}]", type, location);
 #endif
         }
 
         [Conditional("DEBUG"), IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
-#endif
-#if UNITY_2021_3_OR_NEWER
         [HideInCallstack]
 #endif
         private void PackageDebug(LoadType type, string packageName, string location)
@@ -118,7 +113,7 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
             AssetSystem.Log($"Load {type} : [{packageName} : {location}] -> {GetLocation(location)}");
 #else
-            AssetSystem.Log("{0} : [{1} : {2}]", type.ToString(), packageName, location);
+            AssetSystem.LogFormat("{0} : [{1} : {2}]", type.ToString(), packageName, location);
 #endif
         }
     }
