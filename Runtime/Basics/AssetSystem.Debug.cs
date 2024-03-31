@@ -29,7 +29,7 @@ namespace AIO
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG"), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static void LogWarningFormat(string format, params object[] args)
@@ -62,7 +62,7 @@ namespace AIO
         /// </summary>
         /// <param name="exception">Runtime Exception.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG"), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static void LogException(Exception exception)
@@ -84,7 +84,7 @@ namespace AIO
         /// </summary>
         /// <param name="exception">Runtime Exception.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG"), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static void LogException(string exception)
@@ -103,7 +103,7 @@ namespace AIO
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG"), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static void LogExceptionFormat(string format, params object[] args)
@@ -121,7 +121,7 @@ namespace AIO
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG"), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static void Log(string message)
@@ -140,7 +140,7 @@ namespace AIO
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG"), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static void LogFormat(string format, params object[] args)
@@ -158,7 +158,7 @@ namespace AIO
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG"), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static void LogError(string message)
@@ -177,7 +177,7 @@ namespace AIO
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
         [DebuggerHidden, DebuggerNonUserCode, IgnoreConsoleJump, Conditional("DEBUG"), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static void LogErrorFormat(string format, params object[] args)

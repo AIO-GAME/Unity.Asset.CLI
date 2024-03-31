@@ -45,13 +45,13 @@ namespace AIO.UEditor.CLI
             [MenuItem("AIO/CLI/Install/YooAsset[" + Version + "](CN)", false, 0)]
             internal static void InstallCN()
             {
-                EHelper.Ghost.OpenupmInstall(Scopes, Version, true);
+                EHelper.Ghost.InstallOpenUpm(Scopes, Version, true);
             }
 
             [MenuItem("AIO/CLI/Install/YooAsset[" + Version + "]", false, 0)]
             internal static void Install()
             {
-                EHelper.Ghost.OpenupmInstall(Scopes, Version);
+                EHelper.Ghost.InstallOpenUpm(Scopes, Version);
             }
         }
     }

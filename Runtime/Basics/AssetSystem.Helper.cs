@@ -15,6 +15,9 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
         public static bool IsNeedDownloadFromRemote(string location)
         {
             return Parameter.ASMode == EASMode.Remote &&
@@ -27,6 +30,9 @@ namespace AIO
         /// <param name="location">资源定位地址</param>
         /// <returns>Ture:有效 False:无效</returns>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
         public static bool CheckLocationValid(string location)
         {
             return Proxy.CheckLocationValid(SettingToLocalPath(location));
@@ -38,7 +44,7 @@ namespace AIO
         /// <param name="location">寻址地址</param>
         /// <returns>Ture 已经加载 False 未加载</returns>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         public static bool IsAlreadyLoad(string location)
@@ -53,7 +59,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         private static string SettingToLocalPath(in string location)

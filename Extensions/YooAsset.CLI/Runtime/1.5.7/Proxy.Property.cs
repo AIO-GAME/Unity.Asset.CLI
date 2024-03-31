@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿#if SUPPORT_YOOASSET
+using YooAsset;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
@@ -66,3 +67,4 @@ namespace AIO.UEngine.YooAsset
         private static MethodInfo _ReleaseInternal;
     }
 }
+#endif
