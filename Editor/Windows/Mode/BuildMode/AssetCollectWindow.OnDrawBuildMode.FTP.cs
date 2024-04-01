@@ -21,21 +21,13 @@ namespace AIO.UEditor
             if (!string.IsNullOrEmpty(config.Server))
             {
                 _builder.Append('[');
-                if (config.DirTreeFiled.IsValidity())
-                {
-                    _builder.Append(config.DirTreeFiled.GetFullPath()).Append(" -> ");
-                }
+                if (config.DirTreeFiled.IsValidity()) _builder.Append(config.DirTreeFiled.GetFullPath()).Append(" -> ");
 
-                _builder.Append(config.Server).Append(':')
-                    .Append(config.Port);
+                _builder.Append(config.Server).Append(':').Append(config.Port);
                 if (string.IsNullOrEmpty(config.RemotePath))
-                {
                     _builder.Append(']');
-                }
                 else
-                {
                     _builder.Append('/').Append(config.RemotePath).Append(']');
-                }
             }
 
             if (_builder.Length == 0) _builder.Append($"NO.{i}");
@@ -49,20 +41,19 @@ namespace AIO.UEditor
             {
                 OnDrawConfigFTPScroll = scope.scrollPosition;
                 for (var i = BuildConfig.FTPConfigs.Length - 1; i >= 0; i--)
-                {
                     using (GELayout.Vertical(GEStyle.INThumbnailShadow))
                     {
                         using (GELayout.VHorizontal(GEStyle.Toolbar))
                         {
                             if (GELayout.Button(BuildConfig.FTPConfigs[i].Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
-                                    GEStyle.TEtoolbarbutton, GP_Width_30))
+                                                GEStyle.TEtoolbarbutton, GP_Width_30))
                             {
                                 BuildConfig.FTPConfigs[i].Folded = !BuildConfig.FTPConfigs[i].Folded;
                                 GUI.FocusControl(null);
                             }
 
                             GELayout.Label(GetFTPItemDes(BuildConfig.FTPConfigs[i], i), GEStyle.HeaderLabel,
-                                GP_Width_EXPAND);
+                                           GP_Width_EXPAND);
 
                             if (!string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].Server) &&
                                 !string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].User) &&
@@ -75,13 +66,11 @@ namespace AIO.UEditor
                                 }
 
                                 if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
-                                {
                                     if (GUILayout.Button("更新首包配置", GEStyle.toolbarbutton, GP_Width_100))
                                     {
                                         UpdateUploadFirstPack(BuildConfig.FTPConfigs[i]);
                                         GUI.FocusControl(null);
                                     }
-                                }
 
                                 if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20))
                                 {
@@ -104,7 +93,6 @@ namespace AIO.UEditor
 
                         OnDrawBuildFTP(BuildConfig.FTPConfigs[i]);
                     }
-                }
             }
         }
 
@@ -117,7 +105,7 @@ namespace AIO.UEditor
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
                 EditorGUILayout.LabelField("名称:描述", GP_Width_100);
-                config.Name = GELayout.FieldDelayed(config.Name);
+                config.Name        = GELayout.FieldDelayed(config.Name);
                 config.Description = GELayout.FieldDelayed(config.Description);
             }
 
@@ -125,7 +113,7 @@ namespace AIO.UEditor
             {
                 EditorGUILayout.LabelField("地址:端口", GP_Width_100);
                 config.Server = GELayout.FieldDelayed(config.Server);
-                config.Port = GELayout.FieldDelayed(config.Port, GP_Width_50);
+                config.Port   = GELayout.FieldDelayed(config.Port, GP_Width_50);
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
@@ -140,14 +128,12 @@ namespace AIO.UEditor
                 EditorGUILayout.LabelField("远程路径", GP_Width_100);
                 config.RemotePath = GELayout.FieldDelayed(config.RemotePath);
                 if (!string.IsNullOrEmpty(config.RemotePath))
-                {
                     if (GUILayout.Button("创建", GEStyle.toolbarbutton, GP_Width_50))
                     {
                         GUI.FocusControl(null);
                         CreateFTP(config);
                         return;
                     }
-                }
             }
 
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
@@ -155,7 +141,7 @@ namespace AIO.UEditor
                 if (config.isUploading)
                 {
                     EditorGUILayout.LabelField($"上传进度... {config.UploadProgress}",
-                        GEStyle.CenteredLabel, GP_Width_EXPAND);
+                                               GEStyle.CenteredLabel, GP_Width_EXPAND);
 
                     if (GUILayout.Button("取消", GEStyle.toolbarbutton, GP_Width_50))
                     {
@@ -172,13 +158,11 @@ namespace AIO.UEditor
                         !string.IsNullOrEmpty(config.Pass) &&
                         !string.IsNullOrEmpty(config.DirTreeFiled.DirPath)
                        )
-                    {
                         if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
                         {
                             GUI.FocusControl(null);
                             config.Upload();
                         }
-                    }
                 }
             }
 

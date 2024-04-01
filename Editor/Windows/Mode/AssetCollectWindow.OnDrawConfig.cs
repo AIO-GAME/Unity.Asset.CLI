@@ -9,7 +9,7 @@ namespace AIO.UEditor
     public partial class AssetCollectWindow
     {
         /// <summary>
-        /// 绘制 资源设置模式 导航栏
+        ///     绘制 资源设置模式 导航栏
         /// </summary>
         private void OnDrawHeaderConfigMode()
         {
@@ -29,59 +29,54 @@ namespace AIO.UEditor
 #else
                 AssetDatabase.SaveAssets();
 #endif
-                if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
-                {
-                    AssetDatabase.Refresh();
-                }
+                if (EditorUtility.DisplayDialog("保存", "保存成功", "确定")) AssetDatabase.Refresh();
             }
         }
 
         /// <summary>
-        /// 更新数据 资源设置模式
+        ///     更新数据 资源设置模式
         /// </summary>
         private void UpdateDataConfigMode()
         {
             AssetProxyEditor.ConvertConfig(Data);
             Config.Packages = new AssetsPackageConfig[Data.Packages.Length];
             for (var index = 0; index < Data.Packages.Length; index++)
-            {
                 Config.Packages[index] = new AssetsPackageConfig
                 {
-                    Name = Data.Packages[index].Name,
-                    Version = "-.-.-",
+                    Name    = Data.Packages[index].Name,
+                    Version = "-.-.-"
                 };
-            }
 
             if (Config.Packages.Length == 0) return;
             Config.Packages[0].IsDefault = true;
         }
 
         /// <summary>
-        /// 绘制 资源设置模式
+        ///     绘制 资源设置模式
         /// </summary>
         partial void OnDrawConfigMode()
         {
-            DoConfigDrawRect.x = 5;
+            DoConfigDrawRect.x      = 5;
             DoConfigDrawRect.height = CurrentHeight - DrawHeaderHeight;
-            DoConfigDrawRect.width = ViewConfig.width;
+            DoConfigDrawRect.width  = ViewConfig.width;
             ViewConfig.Draw(DoConfigDrawRect,
-                () =>
-                {
-                    ViewConfig.MaxWidth = CurrentWidth - ViewSetting.MinWidth;
-                    OnDrawConfigScroll = GELayout.VScrollView(OnDrawASConfig, OnDrawConfigScroll);
-                },
-                GEStyle.INThumbnailShadow);
+                            () =>
+                            {
+                                ViewConfig.MaxWidth = CurrentWidth - ViewSetting.MinWidth;
+                                OnDrawConfigScroll  = GELayout.VScrollView(OnDrawASConfig, OnDrawConfigScroll);
+                            },
+                            GEStyle.INThumbnailShadow);
 
-            DoConfigDrawRect.x += ViewConfig.width;
-            DoConfigDrawRect.width = CurrentWidth - ViewConfig.width;
-            ViewSetting.width = DoConfigDrawRect.width;
+            DoConfigDrawRect.x     += ViewConfig.width;
+            DoConfigDrawRect.width =  CurrentWidth - ViewConfig.width;
+            ViewSetting.width      =  DoConfigDrawRect.width;
             ViewSetting.Draw(DoConfigDrawRect,
-                () => { OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll); },
-                GEStyle.INThumbnailShadow);
+                             () => { OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll); },
+                             GEStyle.INThumbnailShadow);
         }
 
         /// <summary>
-        /// 绘制资源设置
+        ///     绘制资源设置
         /// </summary>
         partial void OnDrawSetting()
         {
@@ -152,7 +147,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 绘制资源配置
+        ///     绘制资源配置
         /// </summary>
         partial void OnDrawASConfig()
         {
@@ -275,15 +270,16 @@ namespace AIO.UEditor
                     default:
                         GUI.enabled = false;
                         GELayout.List("资源包配置",
-                            Config.Packages,
-                            config =>
-                            {
-                                config.Name = GELayout.Field(config.Name);
-                                config.IsDefault = GELayout.Toggle(config.IsDefault, GUILayout.Width(20));
-                                if (!config.IsDefault) return;
-                                foreach (var package in Config.Packages.Where(package => config.Name != package.Name))
-                                    package.IsDefault = false;
-                            });
+                                      Config.Packages,
+                                      config =>
+                                      {
+                                          config.Name      = GELayout.Field(config.Name);
+                                          config.IsDefault = GELayout.Toggle(config.IsDefault, GUILayout.Width(20));
+                                          if (!config.IsDefault) return;
+                                          foreach (var package in Config.Packages.Where(package => config.Name !=
+                                                       package.Name))
+                                              package.IsDefault = false;
+                                      });
                         GUI.enabled = true;
                         break;
                 }

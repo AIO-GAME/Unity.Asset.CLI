@@ -12,7 +12,7 @@ namespace AIO.UEditor.CLI
     internal partial class AssetProxyEditor_Yoo_157
     {
         /// <summary>
-        /// 上传到GCloud 对比清单文件上传
+        ///     上传到GCloud 对比清单文件上传
         /// </summary>
         private static async Task<bool> UploadGCloudExist(AsUploadGCloudParameter parameter)
         {
@@ -88,7 +88,7 @@ namespace AIO.UEditor.CLI
 
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "上传新增修改文件", 0.7f);
             var succeed = await PrGCloud.UploadDirAsync(remotePath.PathGetLastFloder(), location,
-                parameter.MetaDataKey, parameter.MetaDataValue);
+                                                        parameter.MetaDataKey, parameter.MetaDataValue);
             if (!succeed)
             {
                 Debug.LogError("上传新增修改文件失败");
@@ -107,7 +107,7 @@ namespace AIO.UEditor.CLI
 
             EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "更新资源清单配置", 0.83f);
             succeed = await PrGCloud.UploadFileAsync(remoteManifest, temp, parameter.MetaDataKey,
-                parameter.MetaDataValue);
+                                                     parameter.MetaDataValue);
             if (!succeed)
             {
                 Debug.LogError("上传远端资源清单配置失败");
@@ -122,15 +122,14 @@ namespace AIO.UEditor.CLI
         private static async Task<bool> UploadGCloudAsync(IEnumerable<AsUploadGCloudParameter> parameters)
         {
             foreach (var parameter in parameters)
-            {
-                if (!await UploadGCloudAsync(parameter)) return false;
-            }
+                if (!await UploadGCloudAsync(parameter))
+                    return false;
 
             return true;
         }
 
         /// <summary>
-        /// 上传到GCloud
+        ///     上传到GCloud
         /// </summary>
         private static async Task<bool> UploadGCloudAsync(AsUploadGCloudParameter parameter)
         {
@@ -149,7 +148,7 @@ namespace AIO.UEditor.CLI
             {
                 EHelper.DisplayProgressBar("[Google Cloud] 上传进度", "上传资源", 0.2f);
                 succeed = await PrGCloud.UploadDirAsync(remotePath.PathGetLastFloder(), localFull,
-                    parameter.MetaDataKey, parameter.MetaDataValue);
+                                                        parameter.MetaDataKey, parameter.MetaDataValue);
             }
 
             if (succeed)
@@ -164,7 +163,7 @@ namespace AIO.UEditor.CLI
                     try
                     {
                         data = AHelper.Json.Deserialize<List<AssetsPackageConfig>>(
-                            await PrGCloud.ReadTextAsync(versionPath));
+                             await PrGCloud.ReadTextAsync(versionPath));
                     }
                     catch (Exception)
                     {
@@ -173,13 +172,11 @@ namespace AIO.UEditor.CLI
 
                     var data2 = data.Find(item => item.Name == parameter.PackageName);
                     if (data2 is null)
-                    {
                         data.Add(new AssetsPackageConfig
                         {
-                            Name = parameter.PackageName,
+                            Name    = parameter.PackageName,
                             Version = parameter.IsUploadLatest ? "Latest" : parameter.Version
                         });
-                    }
                     else data2.Version = parameter.IsUploadLatest ? "Latest" : parameter.Version;
 
                     versionContent = AHelper.Json.Serialize(data);
@@ -190,7 +187,7 @@ namespace AIO.UEditor.CLI
                     {
                         new AssetsPackageConfig
                         {
-                            Name = parameter.PackageName,
+                            Name    = parameter.PackageName,
                             Version = parameter.IsUploadLatest ? "Latest" : parameter.Version
                         }
                     });
@@ -199,7 +196,7 @@ namespace AIO.UEditor.CLI
                 var versionTemp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 await AHelper.IO.WriteUTF8Async(versionTemp, versionContent);
                 succeed = await PrGCloud.UploadFileAsync(versionPath, versionTemp,
-                    parameter.MetaDataKey, parameter.MetaDataValue);
+                                                         parameter.MetaDataKey, parameter.MetaDataValue);
                 AHelper.IO.DeleteFile(versionTemp);
             }
 

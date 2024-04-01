@@ -48,7 +48,7 @@ namespace AIO.UEngine.YooAsset
                     if (operation.Status != EOperationStatus.Succeed)
                     {
                         AssetSystem.LogException(
-                            $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                                                 $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                         return null;
                     }
                 }
@@ -73,10 +73,7 @@ namespace AIO.UEngine.YooAsset
                 return null;
             }
 
-            if (AssetSystem.IsWhite(location))
-            {
-                return package;
-            }
+            if (AssetSystem.IsWhite(location)) return package;
 
             if (package.IsNeedDownloadFromRemote(location))
             {
@@ -92,17 +89,14 @@ namespace AIO.UEngine.YooAsset
                 if (operation.Status != EOperationStatus.Succeed)
                 {
                     AssetSystem.LogException(
-                        $"资源获取失败 [{packageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                                             $"资源获取失败 [{packageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                     return null;
                 }
             }
 #if UNITY_EDITOR
             AddSequenceRecord(package, package.GetAssetInfo(location));
 #endif
-            if (package.CheckLocationValid(location))
-            {
-                return package;
-            }
+            if (package.CheckLocationValid(location)) return package;
 
             AssetSystem.LogException($"[{packageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
             return null;

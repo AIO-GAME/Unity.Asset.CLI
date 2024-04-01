@@ -9,17 +9,17 @@ namespace AIO.UEditor
     public static class DefaultPackRule
     {
         /// <summary>
-        /// AssetBundle文件的后缀名
+        ///     AssetBundle文件的后缀名
         /// </summary>
         public const string AssetBundleFileExtension = "bundle";
 
         /// <summary>
-        /// 原生文件的后缀名
+        ///     原生文件的后缀名
         /// </summary>
         public const string RawFileExtension = "rawfile";
 
         /// <summary>
-        /// Unity着色器资源包名称
+        ///     Unity着色器资源包名称
         /// </summary>
         public const string ShadersBundleName = "unityshaders";
 
@@ -30,15 +30,17 @@ namespace AIO.UEditor
     }
 
     /// <summary>
-    /// 以文件路径作为资源包名
+    ///     以文件路径作为资源包名
     /// </summary>
     /// <remarks>
-    /// 注意：每个文件独自打资源包
-    /// 例如："Assets/UIPanel/Shop/Image/background.png" --> "assets_uipanel_shop_image_background.bundle"
-    /// 例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view_main.bundle"
+    ///     注意：每个文件独自打资源包
+    ///     例如："Assets/UIPanel/Shop/Image/background.png" --> "assets_uipanel_shop_image_background.bundle"
+    ///     例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view_main.bundle"
     /// </remarks>
     public class PackSeparately : IAssetRulePack
     {
+        #region IAssetRulePack Members
+
         public int Priority => 0;
 
         public string DisplayPackName => "资源打包规则 = 文件路径";
@@ -50,17 +52,24 @@ namespace AIO.UEditor
             return result;
         }
 
-        bool IAssetRulePack.IsRawFilePackRule() => false;
+        bool IAssetRulePack.IsRawFilePackRule()
+        {
+            return false;
+        }
+
+        #endregion
     }
 
     /// <summary>
-    /// 以父类文件夹路径作为资源包名
-    /// 注意：文件夹下所有文件打进一个资源包
-    /// 例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop_image.bundle"
-    /// 例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view.bundle"
+    ///     以父类文件夹路径作为资源包名
+    ///     注意：文件夹下所有文件打进一个资源包
+    ///     例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop_image.bundle"
+    ///     例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view.bundle"
     /// </summary>
     public class PackDirectory : IAssetRulePack
     {
+        #region IAssetRulePack Members
+
         public string DisplayPackName => "资源打包规则 = 父类文件夹路径";
 
         public int Priority => 1;
@@ -72,18 +81,25 @@ namespace AIO.UEditor
             return result;
         }
 
-        bool IAssetRulePack.IsRawFilePackRule() => false;
+        bool IAssetRulePack.IsRawFilePackRule()
+        {
+            return false;
+        }
+
+        #endregion
     }
 
     /// <summary>
-    /// 以收集器路径下顶级文件夹为资源包名
-    /// 注意：文件夹下所有文件打进一个资源包
-    /// 例如：收集器路径为 "Assets/UIPanel"
-    /// 例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop.bundle"
-    /// 例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop.bundle"
+    ///     以收集器路径下顶级文件夹为资源包名
+    ///     注意：文件夹下所有文件打进一个资源包
+    ///     例如：收集器路径为 "Assets/UIPanel"
+    ///     例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop.bundle"
+    ///     例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop.bundle"
     /// </summary>
     public class PackTopDirectory : IAssetRulePack
     {
+        #region IAssetRulePack Members
+
         public string DisplayPackName => "资源打包规则 = 收集器下顶级文件夹路径";
 
         public int Priority => 2;
@@ -101,21 +117,26 @@ namespace AIO.UEditor
                 var result = new PackRuleResult(bundleName, DefaultPackRule.AssetBundleFileExtension);
                 return result;
             }
-            else
-            {
-                throw new Exception($"Not found root directory : {assetPath}");
-            }
+
+            throw new Exception($"Not found root directory : {assetPath}");
         }
 
-        bool IAssetRulePack.IsRawFilePackRule() => false;
+        bool IAssetRulePack.IsRawFilePackRule()
+        {
+            return false;
+        }
+
+        #endregion
     }
 
     /// <summary>
-    /// 以收集器路径作为资源包名
-    /// 注意：收集的所有文件打进一个资源包
+    ///     以收集器路径作为资源包名
+    ///     注意：收集的所有文件打进一个资源包
     /// </summary>
     public class PackCollector : IAssetRulePack
     {
+        #region IAssetRulePack Members
+
         public string DisplayPackName => "资源打包规则 = 收集器路径";
 
         public int Priority => 3;
@@ -130,15 +151,22 @@ namespace AIO.UEditor
             return result;
         }
 
-        bool IAssetRulePack.IsRawFilePackRule() => false;
+        bool IAssetRulePack.IsRawFilePackRule()
+        {
+            return false;
+        }
+
+        #endregion
     }
 
     /// <summary>
-    /// 以分组名称作为资源包名
-    /// 注意：收集的所有文件打进一个资源包
+    ///     以分组名称作为资源包名
+    ///     注意：收集的所有文件打进一个资源包
     /// </summary>
     public class PackGroup : IAssetRulePack
     {
+        #region IAssetRulePack Members
+
         public string DisplayPackName => "资源打包规则 = 分组名称";
 
         public int Priority => 4;
@@ -150,15 +178,22 @@ namespace AIO.UEditor
             return result;
         }
 
-        bool IAssetRulePack.IsRawFilePackRule() => false;
+        bool IAssetRulePack.IsRawFilePackRule()
+        {
+            return false;
+        }
+
+        #endregion
     }
 
     /// <summary>
-    /// 以整包名称作为资源包名
-    /// 注意：收集的所有文件打进一个资源包
+    ///     以整包名称作为资源包名
+    ///     注意：收集的所有文件打进一个资源包
     /// </summary>
     public class PackPackage : IAssetRulePack
     {
+        #region IAssetRulePack Members
+
         public string DisplayPackName => "资源打包规则 = 整包名称";
 
         public int Priority => 5;
@@ -170,14 +205,21 @@ namespace AIO.UEditor
             return result;
         }
 
-        bool IAssetRulePack.IsRawFilePackRule() => false;
+        bool IAssetRulePack.IsRawFilePackRule()
+        {
+            return false;
+        }
+
+        #endregion
     }
 
     /// <summary>
-    /// 打包原生文件
+    ///     打包原生文件
     /// </summary>
     public class PackRawFile : IAssetRulePack
     {
+        #region IAssetRulePack Members
+
         public string DisplayPackName => "资源打包规则 = 打包原生文件";
 
         public int Priority => 6;
@@ -189,14 +231,21 @@ namespace AIO.UEditor
             return result;
         }
 
-        bool IAssetRulePack.IsRawFilePackRule() => true;
+        bool IAssetRulePack.IsRawFilePackRule()
+        {
+            return true;
+        }
+
+        #endregion
     }
 
     /// <summary>
-    /// 打包着色器变种集合
+    ///     打包着色器变种集合
     /// </summary>
     public class PackShaderVariants : IAssetRulePack
     {
+        #region IAssetRulePack Members
+
         public string DisplayPackName => "资源打包规则 = 打包着色器变种集合文件";
 
         public int Priority => 7;
@@ -206,6 +255,11 @@ namespace AIO.UEditor
             return DefaultPackRule.CreateShadersPackRuleResult();
         }
 
-        bool IAssetRulePack.IsRawFilePackRule() => false;
+        bool IAssetRulePack.IsRawFilePackRule()
+        {
+            return false;
+        }
+
+        #endregion
     }
 }

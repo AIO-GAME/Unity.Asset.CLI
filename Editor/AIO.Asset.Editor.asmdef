@@ -1,32 +1,32 @@
 {
-    "name": "AIO.Asset.Editor",
-    "rootNamespace": "",
-    "references": [
-        "AIO.Asset.Runtime",
-        "AIO.Core.Runtime",
-        "AIO.Core.Editor",
-        "YooAsset.Editor"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": true,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.tuyoogame.yooasset",
-            "expression": "",
-            "define": "SUPPORT_YOOASSET"
-        },
-        {
-            "name": "com.cysharp.unitask",
-            "expression": "",
-            "define": "SUPPORT_UNITASK"
-        }
-    ],
-    "noEngineReferences": false
+  "name": "AIO.Asset.Editor",
+  "rootNamespace": "",
+  "references": [
+    "AIO.Asset.Runtime",
+    "AIO.Core.Runtime",
+    "AIO.Core.Editor",
+    "YooAsset.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.tuyoogame.yooasset",
+      "expression": "",
+      "define": "SUPPORT_YOOASSET"
+    },
+    {
+      "name": "com.cysharp.unitask",
+      "expression": "",
+      "define": "SUPPORT_UNITASK"
+    }
+  ],
+  "noEngineReferences": false
 }

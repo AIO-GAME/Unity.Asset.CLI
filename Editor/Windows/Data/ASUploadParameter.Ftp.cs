@@ -11,32 +11,32 @@ using UnityEngine;
 namespace AIO.UEditor
 {
     /// <summary>
-    /// 资源 上传 FTP 配置
+    ///     资源 上传 FTP 配置
     /// </summary>
     public class AsUploadFtpParameter : ASUploadParameter
     {
         /// <summary>
-        /// FTP 服务器地址
-        /// </summary>
-        public string Server;
-
-        /// <summary>
-        /// FTP 服务器端口
-        /// </summary>
-        public int Port = 21;
-
-        /// <summary>
-        /// FTP 用户名
-        /// </summary>
-        public string User;
-
-        /// <summary>
-        /// FTP 密码
+        ///     FTP 密码
         /// </summary>
         public string Pass;
 
         /// <summary>
-        /// 更目录
+        ///     FTP 服务器端口
+        /// </summary>
+        public int Port = 21;
+
+        /// <summary>
+        ///     FTP 服务器地址
+        /// </summary>
+        public string Server;
+
+        /// <summary>
+        ///     FTP 用户名
+        /// </summary>
+        public string User;
+
+        /// <summary>
+        ///     更目录
         /// </summary>
         /// <exception cref="ArgumentNullException">参数为空</exception>
         /// <exception cref="DirectoryNotFoundException">目录不存在</exception>
@@ -69,12 +69,12 @@ namespace AIO.UEditor
             {
                 DirTreeFiled = new DirTreeFiled(BuildOutputPath.Replace('\\', '/'), 3)
                 {
-                    OptionShowDepth = false,
-                    OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$",
+                    OptionShowDepth           = false,
+                    OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$"
                 }
             };
             FTPConfigs = FTPConfigs is null
-                ? new FTPConfig[] { temp }
+                ? new[] { temp }
                 : FTPConfigs.Add(temp);
         }
 
@@ -82,49 +82,67 @@ namespace AIO.UEditor
         public class FTPConfig
         {
             /// <summary>
-            /// 是否显示
+            ///     是否显示
             /// </summary>
             public bool Folded;
 
             /// <summary>
-            /// FTP 服务器名称
+            ///     FTP 服务器名称
             /// </summary>
             public string Name;
 
             /// <summary>
-            /// FTP 服务器描述
+            ///     FTP 服务器描述
             /// </summary>
             public string Description;
 
             /// <summary>
-            /// FTP 服务器地址
+            ///     FTP 服务器地址
             /// </summary>
             public string Server;
 
             /// <summary>
-            /// FTP 服务器端口
+            ///     FTP 服务器端口
             /// </summary>
             public int Port = 21;
 
             /// <summary>
-            /// FTP 用户名
+            ///     FTP 用户名
             /// </summary>
             public string User;
 
             /// <summary>
-            /// FTP 密码
+            ///     FTP 密码
             /// </summary>
             public string Pass;
 
             /// <summary>
-            /// FTP 远程路径
+            ///     FTP 远程路径
             /// </summary>
             public string RemotePath;
 
-            public string LocalFullPath => DirTreeFiled.GetFullPath();
+            /// <summary>
+            ///     目录
+            /// </summary>
+            public DirTreeFiled DirTreeFiled = new DirTreeFiled()
+            {
+                OptionShowDepth           = false,
+                OptionDirDepth            = 3,
+                OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$"
+            };
 
             /// <summary>
-            /// 是否存在远端首包配置
+            ///     上传状态 : true 正在上传
+            /// </summary>
+            [NonSerialized] public bool isUploading;
+
+            public string LocalFullPath => DirTreeFiled.GetFullPath();
+
+            public IProgressOperation UploadOperation { get; private set; }
+            public IProgressInfo      UploadProgress  { get; private set; }
+
+            /// <summary>
+            ///     是否存在远端首包配置
             /// </summary>
             public Task<bool> IsExistRemoteFirstPack()
             {
@@ -133,7 +151,7 @@ namespace AIO.UEditor
             }
 
             /// <summary>
-            /// 上传首包配置
+            ///     上传首包配置
             /// </summary>
             public async Task<bool> UploadFirstPack(string target)
             {
@@ -144,7 +162,7 @@ namespace AIO.UEditor
                         await AHelper.FTP.CreateDirAsync(versionDir, User, Pass);
 
                     var remote = AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Path.Combine(Server, RemotePath));
-                    var op = AHelper.FTP.UploadFile(remote, User, Pass, target);
+                    var op     = AHelper.FTP.UploadFile(remote, User, Pass, target);
                     op.Begin();
                     await op.WaitAsync();
                 }
@@ -158,7 +176,7 @@ namespace AIO.UEditor
             }
 
             /// <summary>
-            /// 合并首包配置
+            ///     合并首包配置
             /// </summary>
             public async Task<bool> MergeFirstPack(string target)
             {
@@ -166,27 +184,23 @@ namespace AIO.UEditor
                 var status = false;
                 try
                 {
-                    var dic = new Dictionary<string, AssetSystem.SequenceRecord>();
-                    var op = await AHelper.FTP.GetTextAsync(remote, User, Pass);
+                    var dic         = new Dictionary<string, AssetSystem.SequenceRecord>();
+                    var op          = await AHelper.FTP.GetTextAsync(remote, User, Pass);
                     var remote_data = AHelper.Json.Deserialize<AssetSystem.SequenceRecord[]>(op);
                     if (remote_data != null)
-                    {
                         foreach (var item in remote_data)
                         {
                             if (item.IsNull) continue;
                             dic[item.GUID] = item;
                         }
-                    }
 
                     var local_data = AHelper.IO.ReadJsonUTF8<AssetSystem.SequenceRecord[]>(target);
                     if (local_data != null)
-                    {
                         foreach (var item in local_data)
                         {
                             if (item.IsNull) continue;
                             dic[item.GUID] = item;
                         }
-                    }
 
 
                     var data = dic.Values.ToList();
@@ -209,7 +223,7 @@ namespace AIO.UEditor
             }
 
             /// <summary>
-            /// 更新配置版本
+            ///     更新配置版本
             /// </summary>
             public async void UploadVersion()
             {
@@ -238,27 +252,25 @@ namespace AIO.UEditor
                 if (!await AHelper.FTP.CheckDirAsync(versionDir, User, Pass))
                     await AHelper.FTP.CreateDirAsync(versionDir, User, Pass);
 
-                var version = Path.Combine(Server, RemotePath, "Version", string.Concat(one, ".json"));
+                var    version = Path.Combine(Server, RemotePath, "Version", string.Concat(one, ".json"));
                 string content;
                 if (await AHelper.FTP.CheckFileAsync(version, User, Pass))
                 {
-                    var text = await AHelper.FTP.GetTextAsync(version, User, Pass);
-                    var data = AHelper.Json.Deserialize<List<AssetsPackageConfig>>(text);
+                    var text   = await AHelper.FTP.GetTextAsync(version, User, Pass);
+                    var data   = AHelper.Json.Deserialize<List<AssetsPackageConfig>>(text);
                     var exists = false;
                     if (data.Exists(item => item.Name == two))
                     {
-                        exists = true;
+                        exists                                       = true;
                         data.First(item => item.Name == two).Version = three;
                     }
 
                     if (!exists)
-                    {
                         data.Add(new AssetsPackageConfig
                         {
-                            Name = two,
-                            Version = three,
+                            Name    = two,
+                            Version = three
                         });
-                    }
 
                     content = AHelper.Json.Serialize(data);
                 }
@@ -268,32 +280,17 @@ namespace AIO.UEditor
                     {
                         new AssetsPackageConfig
                         {
-                            Name = two,
-                            Version = three,
+                            Name    = two,
+                            Version = three
                         }
                     });
                 }
 
                 var bytes = Encoding.UTF8.GetBytes(content);
-                var op = AHelper.FTP.UploadFile(version, User, Pass, bytes);
+                var op    = AHelper.FTP.UploadFile(version, User, Pass, bytes);
                 op.Begin();
                 await op.WaitAsync();
             }
-
-            /// <summary>
-            /// 上传状态 : true 正在上传
-            /// </summary>
-            [NonSerialized] public bool isUploading;
-
-            /// <summary>
-            /// 目录
-            /// </summary>
-            public DirTreeFiled DirTreeFiled = new DirTreeFiled
-            {
-                OptionShowDepth = false,
-                OptionDirDepth = 3,
-                OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$",
-            };
 
             public Task<bool> Validate()
             {
@@ -306,9 +303,6 @@ namespace AIO.UEditor
             {
                 return string.IsNullOrEmpty(Name) ? Server : Name;
             }
-
-            public IProgressOperation UploadOperation { get; private set; }
-            public IProgressInfo UploadProgress { get; private set; }
 
             public async void Upload()
             {
@@ -346,7 +340,7 @@ namespace AIO.UEditor
                 }
 
                 using (var handle = AHandle.FTP.Create(Server, Port, User, Pass,
-                           string.Concat(RemotePath, '/', one, '/', two, '/', three)))
+                                                       string.Concat(RemotePath, '/', one, '/', two, '/', three)))
                 {
                     var result = await handle.InitAsync();
                     if (!result)
@@ -356,7 +350,7 @@ namespace AIO.UEditor
                     }
 
                     UploadOperation = AHelper.FTP.UploadDir(handle.URI, handle.User, handle.Pass,
-                        DirTreeFiled.GetFullPath());
+                                                            DirTreeFiled.GetFullPath());
                     isUploading = true;
                     var iEvent = new AProgressEvent
                     {
@@ -370,8 +364,8 @@ namespace AIO.UEditor
                         {
                             isUploading = false;
                             EditorUtility.DisplayDialog("Upload FTP", e.State == EProgressState.Finish
-                                ? $"上传完成 \n{UploadOperation.Report}"
-                                : $"上传失败 \n{UploadOperation.Report}", "OK");
+                                                            ? $"上传完成 \n{UploadOperation.Report}"
+                                                            : $"上传失败 \n{UploadOperation.Report}", "OK");
                         }
                     };
                     UploadOperation.Event = iEvent;

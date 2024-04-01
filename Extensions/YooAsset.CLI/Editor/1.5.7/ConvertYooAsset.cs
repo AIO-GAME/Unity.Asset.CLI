@@ -15,6 +15,11 @@ namespace AIO.UEditor.CLI
 
         private static AssetCollectRoot _Instance;
 
+        static ConvertYooAsset()
+        {
+            Collectors = new Dictionary<AssetCollectItem, bool>();
+        }
+
         private static AssetCollectRoot Instance
         {
             get
@@ -24,65 +29,67 @@ namespace AIO.UEditor.CLI
             }
         }
 
-        static ConvertYooAsset()
+        private static IEnumerable<AssetBundleCollectorPackage> Convert(IEnumerable<AssetCollectPackage> packages)
         {
-            Collectors = new Dictionary<AssetCollectItem, bool>();
+            return packages is null
+                ? Array.Empty<AssetBundleCollectorPackage>()
+                : packages.Where(package => !package.Equals(null)).Where(package => !package.Groups.Equals(null)).
+                           Select(Convert);
         }
 
-        private static IEnumerable<AssetBundleCollectorPackage> Convert(IEnumerable<AssetCollectPackage> packages)
-            => packages is null
-                ? Array.Empty<AssetBundleCollectorPackage>()
-                : packages
-                    .Where(package => !package.Equals(null))
-                    .Where(package => !package.Groups.Equals(null))
-                    .Select(Convert);
-
         private static IEnumerable<AssetBundleCollectorGroup> Convert(IEnumerable<AssetCollectGroup> groups)
-            => groups is null
+        {
+            return groups is null
                 ? Array.Empty<AssetBundleCollectorGroup>()
-                : groups
-                    .Where(group => !group.Equals(null))
-                    .Where(group => !group.Collectors.Equals(null))
-                    .Select(Convert);
+                : groups.Where(group => !group.Equals(null)).Where(group => !group.Collectors.Equals(null)).
+                         Select(Convert);
+        }
 
         private static IEnumerable<AssetBundleCollector> Convert(IEnumerable<AssetCollectItem> collects)
-            => collects is null
+        {
+            return collects is null
                 ? Array.Empty<AssetBundleCollector>()
-                : collects
-                    .Where(collect => !collect.Equals(null))
-                    .Where(collect => !string.IsNullOrEmpty(collect.CollectPath))
-                    .Where(collect => File.Exists(collect.CollectPath) || Directory.Exists(collect.CollectPath))
-                    .Select(Convert);
+                : collects.Where(collect => !collect.Equals(null)).
+                           Where(collect => !string.IsNullOrEmpty(collect.CollectPath)).
+                           Where(collect => File.Exists(collect.CollectPath) || Directory.Exists(collect.CollectPath)).
+                           Select(Convert);
+        }
 
-        private static AssetBundleCollectorPackage Convert(AssetCollectPackage package) =>
-            new AssetBundleCollectorPackage
+        private static AssetBundleCollectorPackage Convert(AssetCollectPackage package)
+        {
+            return new AssetBundleCollectorPackage()
             {
                 PackageName = package.Name,
                 PackageDesc = package.Description,
-                Groups = Convert(package.Groups).ToList()
+                Groups      = Convert(package.Groups).ToList()
             };
+        }
 
         private static AssetBundleCollectorGroup Convert(AssetCollectGroup group)
-            => new AssetBundleCollectorGroup
+        {
+            return new AssetBundleCollectorGroup()
             {
-                AssetTags = group.Tags,
-                GroupDesc = group.Description,
-                GroupName = group.Name,
+                AssetTags  = group.Tags,
+                GroupDesc  = group.Description,
+                GroupName  = group.Name,
                 Collectors = Convert(group.Collectors).ToList()
             };
+        }
 
         private static AssetBundleCollector Convert(AssetCollectItem collect)
-            => new AssetBundleCollector
+        {
+            return new AssetBundleCollector()
             {
-                CollectorGUID = collect.GUID,
-                CollectPath = collect.CollectPath,
-                CollectorType = Convert(collect.Type),
-                AssetTags = collect.Tags,
+                CollectorGUID   = collect.GUID,
+                CollectPath     = collect.CollectPath,
+                CollectorType   = Convert(collect.Type),
+                AssetTags       = collect.Tags,
                 AddressRuleName = nameof(AIOAddressRule),
-                FilterRuleName = nameof(AIOFilterRule),
-                PackRuleName = nameof(AIOPackRule),
-                UserData = collect.UserData,
+                FilterRuleName  = nameof(AIOFilterRule),
+                PackRuleName    = nameof(AIOPackRule),
+                UserData        = collect.UserData
             };
+        }
 
         private static ECollectorType Convert(EAssetCollectItemType type)
         {
@@ -118,10 +125,10 @@ namespace AIO.UEditor.CLI
 
         private static void PackageUpdateSetting(AssetCollectRoot asset)
         {
-            AssetBundleCollectorSettingData.Setting.ShowPackageView = true;
-            AssetBundleCollectorSettingData.Setting.ShowEditorAlias = true;
-            AssetBundleCollectorSettingData.Setting.UniqueBundleName = asset.UniqueBundleName;
-            AssetBundleCollectorSettingData.Setting.IncludeAssetGUID = asset.IncludeAssetGUID;
+            AssetBundleCollectorSettingData.Setting.ShowPackageView   = true;
+            AssetBundleCollectorSettingData.Setting.ShowEditorAlias   = true;
+            AssetBundleCollectorSettingData.Setting.UniqueBundleName  = asset.UniqueBundleName;
+            AssetBundleCollectorSettingData.Setting.IncludeAssetGUID  = asset.IncludeAssetGUID;
             AssetBundleCollectorSettingData.Setting.EnableAddressable = asset.EnableAddressable;
         }
 
@@ -129,10 +136,7 @@ namespace AIO.UEditor.CLI
         {
             foreach (var package in Convert(asset.Packages))
             {
-                foreach (var group in package.Groups)
-                {
-                    group.GroupName = $"{package.PackageName}_{group.GroupName}";
-                }
+                foreach (var group in package.Groups) group.GroupName = $"{package.PackageName}_{group.GroupName}";
 
                 AssetBundleCollectorSettingData.Setting.Packages.Add(package);
             }
@@ -161,10 +165,7 @@ namespace AIO.UEditor.CLI
                     for (var k = package.Groups[j].Collectors.Count - 1; k >= 0; k--)
                     {
                         var collector = package.Groups[j].Collectors[k];
-                        if (!AHelper.IO.Exists(collector.CollectPath))
-                        {
-                            package.Groups[j].Collectors.RemoveAt(k);
-                        }
+                        if (!AHelper.IO.Exists(collector.CollectPath)) package.Groups[j].Collectors.RemoveAt(k);
                     }
 
                     if (package.Groups[j].Collectors.Count == 0) package.Groups.RemoveAt(j);
@@ -191,15 +192,15 @@ namespace AIO.UEditor.CLI
             {
                 PackageName = AssetSystem.TagsRecord,
                 PackageDesc = "序列记录包[首包专用](请勿删除)",
-                Groups = new List<AssetBundleCollectorGroup>()
+                Groups      = new List<AssetBundleCollectorGroup>()
             };
             foreach (var package in AssetBundleCollectorSettingData.Setting.Packages)
             {
                 if (package.Groups is null) continue;
                 var recordGroup = new AssetBundleCollectorGroup
                 {
-                    GroupName = package.PackageName,
-                    AssetTags = AssetSystem.TagsRecord,
+                    GroupName  = package.PackageName,
+                    AssetTags  = AssetSystem.TagsRecord,
                     Collectors = new List<AssetBundleCollector>()
                 };
 
@@ -208,22 +209,20 @@ namespace AIO.UEditor.CLI
                 {
                     if (group.Collectors is null) continue;
                     foreach (var collector in group.Collectors
-                                 // .Where(item => item.CollectorType == ECollectorType.MainAssetCollector)
-                                 .Where(item => !recordGroup.Collectors.Exists(match =>
-                                     match.CollectorGUID == item.CollectorGUID)))
-                    {
+                                                    // .Where(item => item.CollectorType == ECollectorType.MainAssetCollector)
+                                                   .Where(item => !recordGroup.Collectors.Exists(match =>
+                                                                       match.CollectorGUID == item.CollectorGUID)))
                         recordGroup.Collectors.Add(new AssetBundleCollector
                         {
-                            CollectorGUID = collector.CollectorGUID,
-                            CollectPath = collector.CollectPath,
-                            CollectorType = collector.CollectorType,
-                            AssetTags = string.Concat(group.AssetTags, ',', collector.AssetTags).Trim(','),
+                            CollectorGUID   = collector.CollectorGUID,
+                            CollectPath     = collector.CollectPath,
+                            CollectorType   = collector.CollectorType,
+                            AssetTags       = string.Concat(group.AssetTags, ',', collector.AssetTags).Trim(','),
                             AddressRuleName = nameof(AIOAddressRecordRule),
-                            FilterRuleName = nameof(AIOFilterRecordRule),
-                            PackRuleName = packRule,
-                            UserData = group.GroupName,
+                            FilterRuleName  = nameof(AIOFilterRecordRule),
+                            PackRuleName    = packRule,
+                            UserData        = group.GroupName
                         });
-                    }
                 }
 
                 bundle.Groups.Insert(0, recordGroup);

@@ -16,15 +16,15 @@ namespace AIO.UEditor
                     {
                         Data.Packages = Data.Packages.Add(new AssetCollectPackage
                         {
-                            Name = "Default Package",
+                            Name        = "Default Package",
                             Description = Data.Packages.Length.ToString(),
-                            Groups = Array.Empty<AssetCollectGroup>()
+                            Groups      = Array.Empty<AssetCollectGroup>()
                         });
 
                         if (Data.Packages.Length == 1)
                         {
                             Data.CurrentPackageIndex = 0;
-                            ViewGroupList.IsShow = true;
+                            ViewGroupList.IsShow     = true;
                         }
 
                         GUI.FocusControl(null);
@@ -38,16 +38,16 @@ namespace AIO.UEditor
                 }
 
                 for (var i = Data.Packages.Length - 1; i >= 0; i--)
-                {
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         if (GUILayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_20))
                         {
                             if (EditorUtility.DisplayDialog("Delete Package",
-                                    $"Are you sure you want to delete {Data.Packages[i].Name}?", "Yes", "No"))
+                                                            $"Are you sure you want to delete {Data.Packages[i].Name}?",
+                                                            "Yes", "No"))
                             {
                                 Data.Packages = Data.Packages.RemoveAt(i).Exclude();
-                                if (--Data.CurrentPackageIndex < 0) Data.CurrentPackageIndex = 0;
+                                if (--Data.CurrentPackageIndex < 0) Data.CurrentPackageIndex               = 0;
                                 if (Data.CurrentPackageIndex >= Data.Packages.Length) ViewGroupList.IsShow = false;
                             }
 
@@ -65,13 +65,13 @@ namespace AIO.UEditor
                         if (GUILayout.Button(label, style, GTOption.WidthMin(100)))
                         {
                             Data.CurrentPackageIndex = i;
-                            Data.CurrentGroupIndex = 0;
-                            ViewGroupList.IsShow = true;
+                            Data.CurrentGroupIndex   = 0;
+                            ViewGroupList.IsShow     = true;
                             if (Data.CurrentGroup.Length > 0)
                             {
                                 Data.CurrentGroup.Refresh();
                                 CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
-                                OnDrawItemListScroll.y = 0;
+                                OnDrawItemListScroll.y        = 0;
                             }
                             else
                             {
@@ -82,7 +82,6 @@ namespace AIO.UEditor
                             GUI.FocusControl(null);
                         }
                     }
-                }
             }
         }
     }

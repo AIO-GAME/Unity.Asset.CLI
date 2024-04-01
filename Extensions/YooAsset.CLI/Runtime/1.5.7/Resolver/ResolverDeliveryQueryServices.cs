@@ -4,10 +4,12 @@ using YooAsset;
 namespace AIO.UEngine
 {
     /// <summary>
-    /// nameof(DeliveryQueryServices)
+    ///     nameof(DeliveryQueryServices)
     /// </summary>
     public class ResolverDeliveryQueryServices : IDeliveryQueryServices
     {
+        #region IDeliveryQueryServices Members
+
         public bool QueryDeliveryFiles(string packageName, string fileName)
         {
             return false;
@@ -17,6 +19,8 @@ namespace AIO.UEngine
         {
             return new DeliveryFileInfo();
         }
+
+        #endregion
     }
 }
 #endif

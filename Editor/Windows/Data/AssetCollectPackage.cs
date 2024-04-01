@@ -5,28 +5,28 @@ using System.Linq;
 namespace AIO.UEditor
 {
     /// <summary>
-    /// 资源收集包
+    ///     资源收集包
     /// </summary>
     [Serializable]
     public sealed class AssetCollectPackage : IDisposable, IEqualityComparer<AssetCollectPackage>
     {
         /// <summary>
-        /// 包名
+        ///     包名
         /// </summary>
         public string Name;
 
         /// <summary>
-        /// 包描述
+        ///     包描述
         /// </summary>
         public string Description;
 
         /// <summary>
-        /// 资源组配置
+        ///     资源组配置
         /// </summary>
         public AssetCollectGroup[] Groups;
 
         /// <summary>
-        /// 获取组数量
+        ///     获取组数量
         /// </summary>
         public int Length
         {
@@ -43,22 +43,6 @@ namespace AIO.UEditor
             set => Groups[index] = value;
         }
 
-        /// <summary>
-        /// 获取资源收集组
-        /// </summary>
-        /// <param name="groupName">组名</param>
-        /// <returns>收集组</returns>
-        public AssetCollectGroup GetByGroupName(string groupName)
-        {
-            if (Groups is null)
-            {
-                Groups = Array.Empty<AssetCollectGroup>();
-                return null;
-            }
-
-            return Groups.Where(group => group != null).FirstOrDefault(group => group.Name == groupName);
-        }
-
         public string[] AllTags
         {
             get
@@ -72,9 +56,8 @@ namespace AIO.UEditor
                 var dictionary = new List<string>();
                 foreach (var group in Groups)
                 {
-                    dictionary.AddRange(group.Collectors
-                        .Where(collect => !string.IsNullOrEmpty(collect.Tags))
-                        .SelectMany(collect => collect.Tags.Split(';', ' ', ',')));
+                    dictionary.AddRange(group.Collectors.Where(collect => !string.IsNullOrEmpty(collect.Tags)).
+                                              SelectMany(collect => collect.Tags.Split(';', ' ', ',')));
 
                     if (string.IsNullOrEmpty(group.Tags)) continue;
                     dictionary.AddRange(group.Tags.Split(';', ' ', ','));
@@ -82,12 +65,6 @@ namespace AIO.UEditor
 
                 return dictionary.Distinct().ToArray();
             }
-        }
-
-        public void Save()
-        {
-            if (Groups is null) Groups = Array.Empty<AssetCollectGroup>();
-            foreach (var group in Groups) group.Save();
         }
 
         public void Dispose()
@@ -101,11 +78,6 @@ namespace AIO.UEditor
             if (x is null) return y is null;
             if (y is null) return false;
             return x.GetHashCode() == y.GetHashCode();
-        }
-
-        public override int GetHashCode()
-        {
-            return GetHashCode(this);
         }
 
         public int GetHashCode(AssetCollectPackage obj)
@@ -123,6 +95,33 @@ namespace AIO.UEditor
                     ? hashCode
                     : obj.Groups.Aggregate(hashCode, (current, item) => (current * 397) ^ item.GetHashCode());
             }
+        }
+
+        /// <summary>
+        ///     获取资源收集组
+        /// </summary>
+        /// <param name="groupName">组名</param>
+        /// <returns>收集组</returns>
+        public AssetCollectGroup GetByGroupName(string groupName)
+        {
+            if (Groups is null)
+            {
+                Groups = Array.Empty<AssetCollectGroup>();
+                return null;
+            }
+
+            return Groups.Where(group => group != null).FirstOrDefault(group => group.Name == groupName);
+        }
+
+        public void Save()
+        {
+            if (Groups is null) Groups = Array.Empty<AssetCollectGroup>();
+            foreach (var group in Groups) group.Save();
+        }
+
+        public override int GetHashCode()
+        {
+            return GetHashCode(this);
         }
     }
 }

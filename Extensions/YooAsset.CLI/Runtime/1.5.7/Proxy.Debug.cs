@@ -2,8 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Unity.Profiling;
-using UnityEngine;
 using ILogger = YooAsset.ILogger;
 
 namespace AIO.UEngine.YooAsset
@@ -66,7 +64,7 @@ namespace AIO.UEngine.YooAsset
             return (from asset in Dic.Values
                     where asset.CheckLocationValid(location)
                     select asset.GetAssetInfo(location)).
-                FirstOrDefault()?.AssetPath;
+                   FirstOrDefault()?.AssetPath;
         }
 
 #if UNITY_2022_1_OR_NEWER
@@ -89,7 +87,8 @@ namespace AIO.UEngine.YooAsset
 
 #endif
 
-        [Conditional("DEBUG"), IgnoreConsoleJump]
+        [Conditional("DEBUG")]
+        [IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
         [HideInCallstack]
@@ -103,7 +102,8 @@ namespace AIO.UEngine.YooAsset
 #endif
         }
 
-        [Conditional("DEBUG"), IgnoreConsoleJump]
+        [Conditional("DEBUG")]
+        [IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
         [HideInCallstack]

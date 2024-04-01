@@ -5,12 +5,14 @@ namespace AIO
 {
     internal class ASDownloaderEmpty : AOperation, IASDownloader
     {
-        public bool Flow => false;
-
         public ASDownloaderEmpty(DownlandAssetEvent dEvent)
         {
             Event = dEvent;
         }
+
+        #region IASDownloader Members
+
+        public bool Flow => false;
 
         public void CollectNeedAll()
         {
@@ -20,12 +22,6 @@ namespace AIO
         public void CollectNeedTag(params string[] tags)
         {
             AssetSystem.AddWhite(AssetSystem.GetAddressByTag(tags));
-        }
-
-        protected override IEnumerator OnWaitCo()
-        {
-            Event.OnComplete?.Invoke(Report);
-            yield break;
         }
 
         /// <summary>开始回调</summary>
@@ -40,13 +36,21 @@ namespace AIO
         /// <summary>取消</summary>
         public new Action OnCancel { get; set; }
 
-        public Action<Exception> OnError { get; set; }
-        public Action<IProgressInfo> OnProgress { get; set; }
-        public Action<IProgressReport> OnComplete { get; set; }
-        public Action<IProgressReport> OnNetReachableNot { get; set; }
+        public Action<Exception>               OnError               { get; set; }
+        public Action<IProgressInfo>           OnProgress            { get; set; }
+        public Action<IProgressReport>         OnComplete            { get; set; }
+        public Action<IProgressReport>         OnNetReachableNot     { get; set; }
         public Action<IProgressReport, Action> OnNetReachableCarrier { get; set; }
-        public Action<IProgressReport> OnDiskSpaceNotEnough { get; set; }
-        public Action<IProgressReport> OnWritePermissionNot { get; set; }
-        public Action<IProgressReport> OnReadPermissionNot { get; set; }
+        public Action<IProgressReport>         OnDiskSpaceNotEnough  { get; set; }
+        public Action<IProgressReport>         OnWritePermissionNot  { get; set; }
+        public Action<IProgressReport>         OnReadPermissionNot   { get; set; }
+
+        #endregion
+
+        protected override IEnumerator OnWaitCo()
+        {
+            Event.OnComplete?.Invoke(Report);
+            yield break;
+        }
     }
 }

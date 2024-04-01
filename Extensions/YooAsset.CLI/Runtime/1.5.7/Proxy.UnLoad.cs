@@ -42,7 +42,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 资源回收（卸载引用计数为零的资源）
+        ///     资源回收（卸载引用计数为零的资源）
         /// </summary>
         /// <param name="packageName">指定包名</param>
         /// <param name="isForce">是否强制回收</param>
@@ -51,17 +51,13 @@ namespace AIO.UEngine.YooAsset
             if (Dic.TryGetValue(packageName, out var value))
             {
                 if (isForce)
-                {
                     value.Package.ForceUnloadAllAssets();
-                }
                 else
-                {
                     Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
                     {
                         value.Package.UnloadUnusedAssets();
                         AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), packageName);
                     }));
-                }
             }
         }
 
@@ -134,7 +130,6 @@ namespace AIO.UEngine.YooAsset
         private static void ReleaseOperationHandle(OperationHandleBase operation)
         {
             if (operation.IsValid)
-            {
                 switch (operation)
                 {
                     case AllAssetsOperationHandle handle:
@@ -153,7 +148,6 @@ namespace AIO.UEngine.YooAsset
                         if (!handle.IsMainScene()) handle.UnloadAsync();
                         break;
                 }
-            }
 
             operation = null; // 释放引用
         }

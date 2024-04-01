@@ -9,25 +9,32 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        #region Nested type: LoadingInfo
+
         private class LoadingInfo : IASNetLoading, IDisposable
         {
-            private class Info
+            internal LoadingInfo()
             {
-                /// <summary>
-                /// 总下载大小
-                /// </summary>
-                public long Total;
+                Event     = new DownlandAssetEvent();
+                DicInfo   = new Dictionary<string, Info>();
+                _Progress = new AProgress();
 
-                /// <summary>
-                /// 当前下载大小
-                /// </summary>
-                public long Current;
-
-                /// <summary>
-                /// 下载操作句柄
-                /// </summary>
-                public DownloaderOperation Operation;
+                foreach (var operation in DownloaderOperations.Values) operation.CancelDownload();
+                DownloaderOperations.Clear();
+                AssetSystem.HandleReset = false;
             }
+
+            /// <summary>
+            ///     当前下载进度
+            /// </summary>
+            private AProgress _Progress { get; }
+
+            /// <summary>
+            ///     下载操作句柄
+            /// </summary>
+            private Dictionary<string, Info> DicInfo { get; set; }
+
+            #region IASNetLoading Members
 
             IProgressInfo IASNetLoading.Progress => _Progress;
 
@@ -42,42 +49,39 @@ namespace AIO.UEngine.YooAsset
 
             public void CleanEvent()
             {
-                Event.OnWritePermissionNot = null;
-                Event.OnReadPermissionNot = null;
+                Event.OnWritePermissionNot  = null;
+                Event.OnReadPermissionNot   = null;
                 Event.OnNetReachableCarrier = null;
-                Event.OnNetReachableNot = null;
-                Event.OnDiskSpaceNotEnough = null;
-                Event.OnError = null;
-                Event.OnProgress = null;
-                Event.OnComplete = null;
-                Event.OnCancel = null;
-                Event.OnPause = null;
-                Event.OnResume = null;
-                Event.OnBegin = null;
+                Event.OnNetReachableNot     = null;
+                Event.OnDiskSpaceNotEnough  = null;
+                Event.OnError               = null;
+                Event.OnProgress            = null;
+                Event.OnComplete            = null;
+                Event.OnCancel              = null;
+                Event.OnPause               = null;
+                Event.OnResume              = null;
+                Event.OnBegin               = null;
             }
 
             public IDownlandAssetEvent Event { get; }
 
-            /// <summary>
-            /// 当前下载进度
-            /// </summary>
-            private AProgress _Progress { get; }
+            #endregion
 
-            /// <summary>
-            /// 下载操作句柄
-            /// </summary>
-            private Dictionary<string, Info> DicInfo { get; set; }
+            #region IDisposable Members
 
-            internal LoadingInfo()
+            public void Dispose()
             {
-                Event = new DownlandAssetEvent();
-                DicInfo = new Dictionary<string, Info>();
-                _Progress = new AProgress();
+                foreach (var operation in DicInfo.Values)
+                {
+                    operation.Operation.CancelDownload();
+                    operation.Operation = null;
+                }
 
-                foreach (var operation in DownloaderOperations.Values) operation.CancelDownload();
-                DownloaderOperations.Clear();
-                AssetSystem.HandleReset = false;
+                DicInfo.Clear();
+                DicInfo = null;
             }
+
+            #endregion
 
             internal void RegisterEvent(AssetInfo info, DownloaderOperation operation)
             {
@@ -86,14 +90,14 @@ namespace AIO.UEngine.YooAsset
                 var local = info.AssetPath;
                 DicInfo[local] = new Info
                 {
-                    Current = operation.CurrentDownloadBytes,
-                    Total = operation.TotalDownloadBytes,
+                    Current   = operation.CurrentDownloadBytes,
+                    Total     = operation.TotalDownloadBytes,
                     Operation = operation
                 };
 
                 operation.OnDownloadProgressCallback += OnDownloadProgress;
-                operation.OnDownloadOverCallback += OnDownloadOver;
-                operation.OnDownloadErrorCallback += OnDownloadError;
+                operation.OnDownloadOverCallback     += OnDownloadOver;
+                operation.OnDownloadErrorCallback    += OnDownloadError;
 
                 if (_Progress.State == EProgressState.Pause)
                 {
@@ -135,7 +139,7 @@ namespace AIO.UEngine.YooAsset
                 void OnDownloadProgress(int _, int __, long total, long current)
                 {
                     if (_Progress.State != EProgressState.Running) return;
-                    DicInfo[local].Total = total;
+                    DicInfo[local].Total   = total;
                     DicInfo[local].Current = current;
                     Update();
                 }
@@ -143,23 +147,35 @@ namespace AIO.UEngine.YooAsset
 
             private void Update()
             {
-                _Progress.TotalValue = DicInfo.Values.Sum(v => v.Total);
+                _Progress.TotalValue   = DicInfo.Values.Sum(v => v.Total);
                 _Progress.CurrentValue = DicInfo.Values.Sum(v => v.Current);
                 AssetSystem.DownloadHandle.Event.OnProgress?.Invoke(_Progress);
             }
 
-            public void Dispose()
-            {
-                foreach (var operation in DicInfo.Values)
-                {
-                    operation.Operation.CancelDownload();
-                    operation.Operation = null;
-                }
+            #region Nested type: Info
 
-                DicInfo.Clear();
-                DicInfo = null;
+            private class Info
+            {
+                /// <summary>
+                ///     当前下载大小
+                /// </summary>
+                public long Current;
+
+                /// <summary>
+                ///     下载操作句柄
+                /// </summary>
+                public DownloaderOperation Operation;
+
+                /// <summary>
+                ///     总下载大小
+                /// </summary>
+                public long Total;
             }
+
+            #endregion
         }
+
+        #endregion
     }
 }
 #endif

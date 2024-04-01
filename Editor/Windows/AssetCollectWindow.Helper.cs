@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
 
 namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
         /// <summary>
-        /// 是否过滤 收集器
+        ///     是否过滤 收集器
         /// </summary>
         private static bool IsFilterCollectors(int index, string collectPath, IList<string> displays)
         {
@@ -48,7 +47,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 是否过滤 指定类型
+        ///     是否过滤 指定类型
         /// </summary>
         private static bool IsFilterTypes(int index, string assetPath, ICollection<string> displays)
         {
@@ -67,7 +66,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 是否过滤 搜索文本
+        ///     是否过滤 搜索文本
         /// </summary>
         private static bool IsFilterSearch(string searchText, AssetDataInfo data)
         {
@@ -85,7 +84,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 是否过滤 指定标签
+        ///     是否过滤 指定标签
         /// </summary>
         private static bool IsFilterTags(int index, ICollection<string> tags, ICollection<string> displays)
         {
@@ -104,7 +103,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 获取组显示名称
+        ///     获取组显示名称
         /// </summary>
         private static string[] GetGroupDisPlayNames(ICollection<AssetCollectGroup> groups)
         {
@@ -115,20 +114,18 @@ namespace AIO.UEditor
                     where !string.IsNullOrEmpty(groupName)
                     select page
                         ? string.Concat(char.ToUpper(groupName[0]), '/', groupName)
-                        : groupName)
-                .ToArray();
+                        : groupName).ToArray();
         }
 
         /// <summary>
-        /// 获取收集器显示名称
+        ///     获取收集器显示名称
         /// </summary>
         private static string[] GetCollectorDisPlayNames(IEnumerable<AssetCollectItem> collectors)
         {
             return (from item in collectors
                     where item.Type == EAssetCollectItemType.MainAssetCollector
                     where !string.IsNullOrEmpty(item.CollectPath)
-                    select item.CollectPath)
-                .ToArray();
+                    select item.CollectPath).ToArray();
         }
 
         private static string[] GetCollectorDisPlayNames(IList<string> collectors)
@@ -142,29 +139,21 @@ namespace AIO.UEditor
             }
 
             if (collectors.Count > 15)
-            {
                 for (var index = 0; index < collectors.Count; index++)
-                {
                     collectors[index] = string.Concat(char.ToUpper(collectors[index][0]), '/',
-                        collectors[index].Replace('/', '\\').TrimEnd('\\'));
-                }
-            }
+                                                      collectors[index].Replace('/', '\\').TrimEnd('\\'));
             else
-            {
                 for (var index = 0; index < collectors.Count; index++)
-                {
                     collectors[index] = collectors[index].Replace('/', '\\').TrimEnd('\\');
-                }
-            }
 
             return collectors.ToArray();
         }
 
         /// <summary>
-        /// 获取收集器显示名称
+        ///     获取收集器显示名称
         /// </summary>
         private static string[] GetCollectorDisPlayNames(ICollection<AssetCollectItem> collectors,
-            Func<AssetCollectItem, bool> condition)
+                                                         Func<AssetCollectItem, bool>  condition)
         {
             var page = collectors.Count > 15;
             return (from item in collectors
@@ -178,7 +167,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 上传首包 FTP
+        ///     上传首包 FTP
         /// </summary>
         private static async void UpdateUploadFirstPack(ASBuildConfig.FTPConfig config)
         {
@@ -226,7 +215,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 上传首包 Google Cloud
+        ///     上传首包 Google Cloud
         /// </summary>
         private static async void UpdateUploadFirstPack(ASBuildConfig.GCloudConfig config)
         {
@@ -234,25 +223,25 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 创建 FTP
+        ///     创建 FTP
         /// </summary>
         private static async void CreateFTP(ASBuildConfig.FTPConfig config)
         {
             using (var handle = AHandle.FTP.Create(
-                       config.Server,
-                       config.Port,
-                       config.User,
-                       config.Pass,
-                       config.RemotePath))
+                                                   config.Server,
+                                                   config.Port,
+                                                   config.User,
+                                                   config.Pass,
+                                                   config.RemotePath))
             {
                 EditorUtility.DisplayDialog("提示", await handle.InitAsync()
-                    ? $"创建成功 {handle.URI}"
-                    : $"创建失败 {handle.URI}", "确定");
+                                                ? $"创建成功 {handle.URI}"
+                                                : $"创建失败 {handle.URI}", "确定");
             }
         }
 
         /// <summary>
-        /// 验证 FTP 是否有效
+        ///     验证 FTP 是否有效
         /// </summary>
         private static async void ValidateFTP(ASBuildConfig.FTPConfig config)
         {

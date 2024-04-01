@@ -4,11 +4,12 @@ using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
     /// <summary>
-    /// 资源收集配置
+    ///     资源收集配置
     /// </summary>
     [Description("资源收集配置")]
     [Serializable]
@@ -24,7 +25,7 @@ namespace AIO.UEditor
         private static AssetCollectRoot _Instance;
 
         /// <summary>
-        /// 获取资源包数量
+        ///     获取资源包数量
         /// </summary>
         public int Length
         {
@@ -36,7 +37,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 资源收集器排序
+        ///     资源收集器排序
         /// </summary>
         public void Sort()
         {
@@ -50,7 +51,7 @@ namespace AIO.UEditor
             {
                 if (Packages[i] is null)
                 {
-                    Packages[i] = new AssetCollectPackage();
+                    Packages[i]        = new AssetCollectPackage();
                     Packages[i].Groups = Array.Empty<AssetCollectGroup>();
                     continue;
                 }
@@ -63,16 +64,14 @@ namespace AIO.UEditor
 
                 for (var j = 0; j < Packages[i].Groups.Length; j++)
                 {
-                    Packages[i].Groups = Packages[i].Groups
-                        .OrderByDescending(group => group.Name)
-                        .ToArray();
+                    Packages[i].Groups = Packages[i].Groups.OrderByDescending(group => group.Name).ToArray();
                     if (Packages[i].Groups[j].Collectors is null ||
                         Packages[i].Groups[j].Collectors.Length == 0)
                         continue;
 
-                    Packages[i].Groups[j].Collectors = Packages[i].Groups[j].Collectors
-                        .OrderByDescending(collect => collect.CollectPath)
-                        .ToArray();
+                    Packages[i].Groups[j].Collectors = Packages[i].Groups[j].Collectors.
+                                                                   OrderByDescending(collect => collect.CollectPath).
+                                                                   ToArray();
                 }
             }
 
@@ -80,34 +79,32 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 刷新资源收集配置
+        ///     刷新资源收集配置
         /// </summary>
         public void Refresh()
         {
             foreach (var package in Packages)
+            foreach (var group in package.Groups)
             {
-                foreach (var group in package.Groups)
-                {
-                    if (group.Collectors is null ||
-                        group.Collectors.Length == 0)
-                        continue;
+                if (group.Collectors is null ||
+                    group.Collectors.Length == 0)
+                    continue;
 
-                    foreach (var collect in group.Collectors)
-                    {
-                        if (!AHelper.IO.Exists(collect.CollectPath)) continue;
-                        collect.Path = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(collect.CollectPath);
-                    }
+                foreach (var collect in group.Collectors)
+                {
+                    if (!AHelper.IO.Exists(collect.CollectPath)) continue;
+                    collect.Path = AssetDatabase.LoadAssetAtPath<Object>(collect.CollectPath);
                 }
             }
         }
 
         /// <summary>
-        /// 合并所有收集器至主收集器
+        ///     合并所有收集器至主收集器
         /// </summary>
         public void MergeCollector(string packageName)
         {
             var collectors = new List<AssetCollectItem>();
-            var tags = new List<string>();
+            var tags       = new List<string>();
             foreach (var package in Packages)
             {
                 if (packageName != package.Name) continue;
@@ -126,23 +123,23 @@ namespace AIO.UEditor
 
             Packages = Packages.Add(new AssetCollectPackage
             {
-                Name = $"Merge_Package_{packageName}",
+                Name        = $"Merge_Package_{packageName}",
                 Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-                Groups = new AssetCollectGroup[]
+                Groups = new[]
                 {
-                    new AssetCollectGroup()
+                    new AssetCollectGroup
                     {
-                        Name = "Merge Group",
+                        Name        = "Merge Group",
                         Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-                        Collectors = collectors.ToArray(),
-                        Tags = string.Join(";", tags.Distinct().ToArray())
+                        Collectors  = collectors.ToArray(),
+                        Tags        = string.Join(";", tags.Distinct().ToArray())
                     }
                 }
             });
         }
 
         /// <summary>
-        /// 获取资源收集配置
+        ///     获取资源收集配置
         /// </summary>
         public static AssetCollectRoot GetOrCreate()
         {
@@ -150,25 +147,23 @@ namespace AIO.UEditor
             {
                 var objects = EHelper.IO.GetScriptableObjects<AssetCollectRoot>();
                 if (objects != null && objects.Length > 0)
-                {
                     foreach (var asset in objects)
                     {
                         if (asset is null) continue;
                         if (asset.Packages is null)
                         {
                             asset.Packages = Array.Empty<AssetCollectPackage>();
-                            _Instance = asset;
+                            _Instance      = asset;
                             return _Instance;
                         }
 
                         _Instance = asset;
                         break;
                     }
-                }
 
                 if (_Instance is null)
                 {
-                    _Instance = CreateInstance<AssetCollectRoot>();
+                    _Instance          = CreateInstance<AssetCollectRoot>();
                     _Instance.Packages = new AssetCollectPackage[] { };
                     AssetDatabase.CreateAsset(_Instance, "Assets/Editor/AssetCollectRoot.asset");
                     AssetDatabase.SaveAssets();
@@ -189,15 +184,15 @@ namespace AIO.UEditor
 
         public enum PackRule
         {
-            [InspectorName("文件路径")] PackSeparately,
-            [InspectorName("父类文件夹路径")] PackDirectory,
+            [InspectorName("文件路径")]        PackSeparately,
+            [InspectorName("父类文件夹路径")]     PackDirectory,
             [InspectorName("收集器下顶级文件夹路径")] PackTopDirectory,
-            [InspectorName("收集器路径")] PackCollector,
-            [InspectorName("分组名称")] PackGroup,
+            [InspectorName("收集器路径")]       PackCollector,
+            [InspectorName("分组名称")]        PackGroup
         }
 
         /// <summary>
-        /// 资源收集配置
+        ///     资源收集配置
         /// </summary>
         [InspectorName("收集包")] [SerializeField]
         public AssetCollectPackage[] Packages;
@@ -238,12 +233,12 @@ namespace AIO.UEditor
         #region OnGUI
 
         /// <summary>
-        /// 当前选择包下标
+        ///     当前选择包下标
         /// </summary>
         [HideInInspector] public int CurrentPackageIndex;
 
         /// <summary>
-        /// 当前选择组下标
+        ///     当前选择组下标
         /// </summary>
         [HideInInspector] public int CurrentGroupIndex;
 
@@ -255,10 +250,10 @@ namespace AIO.UEditor
                 {
                     Packages = new[]
                     {
-                        new AssetCollectPackage()
+                        new AssetCollectPackage
                         {
-                            Name = "Default Package",
-                            Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                            Name        = "Default Package",
+                            Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
                         }
                     };
                     CurrentPackageIndex = 0;
@@ -286,9 +281,9 @@ namespace AIO.UEditor
                     {
                         new AssetCollectGroup
                         {
-                            Name = "Default Group",
+                            Name        = "Default Group",
                             Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-                            Collectors = Array.Empty<AssetCollectItem>()
+                            Collectors  = Array.Empty<AssetCollectItem>()
                         }
                     };
                     CurrentGroupIndex = 0;
@@ -321,7 +316,7 @@ namespace AIO.UEditor
         {
             if (!IsPackageValid()) return false;
 
-            if (CurrentPackageIndex < 0) CurrentPackageIndex = 0;
+            if (CurrentPackageIndex < 0) CurrentPackageIndex                = 0;
             if (Packages.Length <= CurrentPackageIndex) CurrentPackageIndex = 0;
 
             if (Packages[CurrentPackageIndex].Groups is null)
@@ -337,7 +332,7 @@ namespace AIO.UEditor
         {
             if (!IsGroupValid()) return false;
 
-            if (CurrentGroupIndex < 0) CurrentGroupIndex = 0;
+            if (CurrentGroupIndex < 0) CurrentGroupIndex                                            = 0;
             if (Packages[CurrentPackageIndex].Groups.Length <= CurrentGroupIndex) CurrentGroupIndex = 0;
 
             if (Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors is null)
@@ -358,15 +353,13 @@ namespace AIO.UEditor
             if (Packages is null) return Array.Empty<string>();
             var list = new List<string>();
             foreach (var package in Packages)
+            foreach (var group in package.Groups)
             {
-                foreach (var group in package.Groups)
-                {
-                    list.AddRange(group.Collectors.Where(collect => !string.IsNullOrEmpty(collect.Tags))
-                        .SelectMany(collect => collect.Tags.Split(';')));
+                list.AddRange(group.Collectors.Where(collect => !string.IsNullOrEmpty(collect.Tags)).
+                                    SelectMany(collect => collect.Tags.Split(';')));
 
-                    if (string.IsNullOrEmpty(group.Tags)) continue;
-                    list.AddRange(group.Tags.Split(';'));
-                }
+                if (string.IsNullOrEmpty(group.Tags)) continue;
+                list.AddRange(group.Tags.Split(';'));
             }
 
             return list.Distinct().ToArray();
@@ -382,10 +375,10 @@ namespace AIO.UEditor
                 foreach (var group in package.Groups)
                 {
                     list.AddRange(from collect in @group.Collectors
-                        where collect.Type == EAssetCollectItemType.MainAssetCollector
-                        where !string.IsNullOrEmpty(collect.Tags)
-                        from tag in collect.Tags.Split(';')
-                        select tag);
+                                  where collect.Type == EAssetCollectItemType.MainAssetCollector
+                                  where !string.IsNullOrEmpty(collect.Tags)
+                                  from tag in collect.Tags.Split(';')
+                                  select tag);
 
                     if (string.IsNullOrEmpty(group.Tags)) continue;
                     list.AddRange(group.Tags.Split(';'));
@@ -406,10 +399,10 @@ namespace AIO.UEditor
                 {
                     if (group.Name != groupName) continue;
                     list.AddRange(from collect in @group.Collectors
-                        where collect.Type == EAssetCollectItemType.MainAssetCollector
-                        where !string.IsNullOrEmpty(collect.Tags)
-                        from tag in collect.Tags.Split(';')
-                        select tag);
+                                  where collect.Type == EAssetCollectItemType.MainAssetCollector
+                                  where !string.IsNullOrEmpty(collect.Tags)
+                                  from tag in collect.Tags.Split(';')
+                                  select tag);
 
                     if (string.IsNullOrEmpty(group.Tags)) continue;
                     list.AddRange(group.Tags.Split(';'));
@@ -430,11 +423,11 @@ namespace AIO.UEditor
                 {
                     if (group.Name != groupName) continue;
                     list.AddRange(from collect in @group.Collectors
-                        where collect.Type == EAssetCollectItemType.MainAssetCollector
-                        where collect.CollectPath == collectPath
-                        where !string.IsNullOrEmpty(collect.Tags)
-                        from tag in collect.Tags.Split(';')
-                        select tag);
+                                  where collect.Type == EAssetCollectItemType.MainAssetCollector
+                                  where collect.CollectPath == collectPath
+                                  where !string.IsNullOrEmpty(collect.Tags)
+                                  from tag in collect.Tags.Split(';')
+                                  select tag);
 
                     if (string.IsNullOrEmpty(group.Tags)) continue;
                     list.AddRange(group.Tags.Split(';'));
@@ -495,14 +488,14 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 根据资源路径查找资源可寻址路径
+        ///     根据资源路径查找资源可寻址路径
         /// </summary>
         /// <param name="assetPath">资源路径</param>
         /// <param name="limitPackage">限制包名 只查找指定包资源 空则忽略</param>
         /// <returns>
-        /// Item1 包名
-        /// Item2 组名
-        /// Item3 可寻址路径
+        ///     Item1 包名
+        ///     Item2 组名
+        ///     Item3 可寻址路径
         /// </returns>
         public static Tuple<string, string, string> AssetToAddress(string assetPath, string limitPackage = "")
         {
@@ -513,9 +506,8 @@ namespace AIO.UEditor
             {
                 if (package is null) continue;
                 if (!string.IsNullOrEmpty(limitPackage))
-                {
-                    if (limitPackage != package.Name) continue;
-                }
+                    if (limitPackage != package.Name)
+                        continue;
 
                 foreach (var group in package.Groups)
                 {
@@ -540,7 +532,7 @@ namespace AIO.UEditor
             if (string.IsNullOrEmpty(guid))
                 return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var root = GetOrCreate();
+            var root      = GetOrCreate();
             foreach (var package in root.Packages)
             {
                 if (package is null) continue;
@@ -564,32 +556,35 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 根据GUID查找资源可寻址路径
+        ///     根据GUID查找资源可寻址路径
         /// </summary>
         [MenuItem("Assets/获取资源可寻址路径", false, 1000)]
         private static void FindAssetLocal()
         {
-            var obj = Selection.activeObject;
+            var obj  = Selection.activeObject;
             var path = AssetDatabase.GetAssetPath(obj);
             var guid = AssetDatabase.AssetPathToGUID(path);
             if (string.IsNullOrEmpty(guid)) return;
             var list = (from package in GetOrCreate().Packages
-                where !(package is null)
-                from @group in package.Groups
-                where !(@group is null)
-                from item in @group.Collectors
-                where !(item is null)
-                where item.Type == EAssetCollectItemType.MainAssetCollector
-                where path.StartsWith(item.CollectPath)
-                let address = item.GetAddress(path)
-                where !string.IsNullOrEmpty(address)
-                select (package.Name, @group.Name, address)).ToList();
+                        where !(package is null)
+                        from @group in package.Groups
+                        where !(@group is null)
+                        from item in @group.Collectors
+                        where !(item is null)
+                        where item.Type == EAssetCollectItemType.MainAssetCollector
+                        where path.StartsWith(item.CollectPath)
+                        let address = item.GetAddress(path)
+                        where !string.IsNullOrEmpty(address)
+                        select (package.Name, @group.Name, address)).ToList();
 
-            if (list.Count == 0) Debug.Log($"未找到资源 [{path}] 的可寻址路径");
+            if (list.Count == 0)
+            {
+                Debug.Log($"未找到资源 [{path}] 的可寻址路径");
+            }
             else
             {
                 var str = string.Join("\n", list.Select(tuple =>
-                    $"\nPackage : {tuple.Item1}\nGroup   : {tuple.Item2}\nAddress : {tuple.Item3}\n"));
+                                                            $"\nPackage : {tuple.Item1}\nGroup   : {tuple.Item2}\nAddress : {tuple.Item3}\n"));
                 Debug.Log($"查找资源 [{path}] 的可寻址路径:\n{str}");
             }
         }

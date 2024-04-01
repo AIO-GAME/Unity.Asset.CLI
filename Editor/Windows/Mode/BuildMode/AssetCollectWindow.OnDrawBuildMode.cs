@@ -10,10 +10,10 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        private StringBuilder _builder = new StringBuilder();
+        private readonly StringBuilder _builder = new StringBuilder();
 
         /// <summary>
-        /// 更新数据 资源构建模式
+        ///     更新数据 资源构建模式
         /// </summary>
         private void UpdateDataBuildMode()
         {
@@ -27,17 +27,13 @@ namespace AIO.UEditor
                 // ignored
             }
 
-            LookModeDisplayPackages = Data.Packages.Select(x => x.Name).ToArray();
+            LookModeDisplayPackages  = Data.Packages.Select(x => x.Name).ToArray();
             BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-            Tags = Data.GetTags();
-            CurrentTagIndex = 0;
+            Tags                     = Data.GetTags();
+            CurrentTagIndex          = 0;
             foreach (var tag in Tags)
-            {
                 if (BuildConfig.FirstPackTag.Contains(tag))
-                {
                     CurrentTagIndex |= 1 << Array.IndexOf(Tags, tag);
-                }
-            }
 
             Data.CurrentPackageIndex = BuildConfig.PackageName == null
                 ? 0
@@ -49,15 +45,13 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 绘制 资源构建模式 导航栏
+        ///     绘制 资源构建模式 导航栏
         /// </summary>
         partial void OnDrawHeaderBuildMode()
         {
             if (Disk != null)
-            {
                 EditorGUILayout.LabelField($"     磁盘剩余空间:{Disk.AvailableFreeSpace.ToConverseStringFileSize()}",
-                    GEStyle.HeaderLabel, GP_Width_160);
-            }
+                                           GEStyle.HeaderLabel, GP_Width_160);
 
             EditorGUILayout.LabelField($"资源包数量:{Data.Packages.Length}", GEStyle.HeaderLabel, GP_Width_150);
             EditorGUILayout.Separator();
@@ -76,7 +70,6 @@ namespace AIO.UEditor
             }
 
             if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
-            {
                 try
                 {
                     GUI.FocusControl(null);
@@ -86,41 +79,39 @@ namespace AIO.UEditor
 #else
                     AssetDatabase.SaveAssets();
 #endif
-                    if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
-                    {
-                        AssetDatabase.Refresh();
-                    }
+                    if (EditorUtility.DisplayDialog("保存", "保存成功", "确定")) AssetDatabase.Refresh();
                 }
                 catch (Exception)
                 {
                     // ignored
                 }
-            }
         }
 
         /// <summary>
-        /// 绘制 打包配置模式
+        ///     绘制 打包配置模式
         /// </summary>
         partial void OnDrawBuildMode()
         {
             FoldoutBuildSetting = GELayout.VFoldoutHeaderGroupWithHelp(OnDrawBuildBuild,
-                "构建设置", FoldoutBuildSetting);
+                                                                       "构建设置", FoldoutBuildSetting);
 
             FoldoutUploadFTP = GELayout.VFoldoutHeaderGroupWithHelp(
-                OnDrawBuildFTP,
-                "FTP",
-                FoldoutUploadFTP,
-                () => { BuildConfig.AddOrNewFTP(); }, 0, null, new GUIContent("✚"));
+                                                                    OnDrawBuildFTP,
+                                                                    "FTP",
+                                                                    FoldoutUploadFTP,
+                                                                    () => { BuildConfig.AddOrNewFTP(); }, 0, null,
+                                                                    new GUIContent("✚"));
 
             FoldoutUploadGCloud = GELayout.VFoldoutHeaderGroupWithHelp(
-                OnDrawBuildGCloud,
-                "Google Cloud",
-                FoldoutUploadGCloud,
-                () => { BuildConfig.AddOrNewGCloud(); }, 0, null, new GUIContent("✚"));
+                                                                       OnDrawBuildGCloud,
+                                                                       "Google Cloud",
+                                                                       FoldoutUploadGCloud,
+                                                                       () => { BuildConfig.AddOrNewGCloud(); }, 0, null,
+                                                                       new GUIContent("✚"));
         }
 
         /// <summary>
-        /// 绘制 资源构建模式配置
+        ///     绘制 资源构建模式配置
         /// </summary>
         private void OnDrawBuildBuild()
         {
@@ -132,11 +123,9 @@ namespace AIO.UEditor
                     EditorGUILayout.Separator();
                     if (string.IsNullOrEmpty(BuildConfig.BuildOutputPath) ||
                         Directory.GetParent(BuildConfig.BuildOutputPath) == null)
-                    {
                         if (GUILayout.Button("选择目录", GEStyle.toolbarbutton, GP_Width_75))
                             BuildConfig.BuildOutputPath =
                                 EditorUtility.OpenFolderPanel("请选择导出路径", BuildConfig.BuildOutputPath, "");
-                    }
 
                     // BuildConfig.BuildFirstPackage =
                     //     GELayout.ToggleLeft("构建首包资源", BuildConfig.BuildFirstPackage, GP_Width_100);
@@ -145,7 +134,7 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         BuildConfig.BuildOutputPath = EditorUtility.OpenFolderPanel(
-                            "请选择导出路径", BuildConfig.BuildOutputPath, "");
+                         "请选择导出路径", BuildConfig.BuildOutputPath, "");
                     }
 
                     if (GUILayout.Button("打开目录", GEStyle.toolbarbutton, GP_Width_75))
@@ -160,19 +149,14 @@ namespace AIO.UEditor
                     {
                         var sandbox = Path.Combine(BuildConfig.BuildOutputPath);
                         if (Directory.Exists(sandbox))
-                        {
                             if (EditorUtility.DisplayDialog("清空缓存",
-                                    $"确定清空缓存?\n-----------------------\n清空缓存代表着\n之后每个资源包\n第一次构建必定是强制构建模式", "确定", "取消"))
-                            {
+                                                            "确定清空缓存?\n-----------------------\n清空缓存代表着\n之后每个资源包\n第一次构建必定是强制构建模式",
+                                                            "确定", "取消"))
                                 AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
-                            }
-                        }
                     }
 
                     if (GUILayout.Button("生成配置", GEStyle.toolbarbutton, GP_Width_75))
-                    {
                         AssetProxyEditor.CreateConfig(BuildConfig.BuildOutputPath, BuildConfig.MergeToLatest, true);
-                    }
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
@@ -185,10 +169,8 @@ namespace AIO.UEditor
 
                     if (Application.isPlaying) GUI.enabled = false;
                     if (GUILayout.Button("构建指定资源", GEStyle.toolbarbutton, GP_Width_100))
-                    {
                         if (EditorUtility.DisplayDialog($"构建指定{BuildConfig.PackageName}资源包",
-                                $"构建{BuildConfig.PackageName}资源包", "确定", "取消"))
-                        {
+                                                        $"构建{BuildConfig.PackageName}资源包", "确定", "取消"))
                             try
                             {
                                 AssetProxyEditor.ConvertConfig(Data, false);
@@ -201,13 +183,9 @@ namespace AIO.UEditor
                                 BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                                 Debug.LogError(e);
                             }
-                        }
-                    }
 
                     if (GUILayout.Button("构建首包资源", GEStyle.toolbarbutton, GP_Width_100))
-                    {
                         if (EditorUtility.DisplayDialog("构建首包资源包", "构建序列纪录资源包", "确定", "取消"))
-                        {
                             try
                             {
                                 AssetProxyEditor.ConvertConfig(Data, false);
@@ -220,16 +198,13 @@ namespace AIO.UEditor
                                 BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                                 Debug.LogError(e);
                             }
-                        }
-                    }
 
                     if (GUILayout.Button("构建全部资源包", GEStyle.toolbarbutton, GP_Width_100))
                     {
                         var temp = new List<string>(Data.GetPackageNames());
                         temp.Add(AssetSystem.TagsRecord);
                         if (EditorUtility.DisplayDialog("构建全部资源包", $"构建\n {string.Join(",", temp.ToArray())} 资源包?",
-                                "确定", "取消"))
-                        {
+                                                        "确定", "取消"))
                             try
                             {
                                 AssetProxyEditor.ConvertConfig(Data, false);
@@ -242,7 +217,6 @@ namespace AIO.UEditor
                                 BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                                 Debug.LogError(e);
                             }
-                        }
                     }
 
                     if (Application.isPlaying) GUI.enabled = true;
@@ -254,9 +228,9 @@ namespace AIO.UEditor
                     using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
                     {
                         BuildConfig.MergeToLatest = GELayout.ToggleLeft("生成Latest版本", BuildConfig.MergeToLatest,
-                            GP_Width_120);
+                                                                        GP_Width_120);
                         BuildConfig.ValidateBuild = GELayout.ToggleLeft("验证构建结果", BuildConfig.ValidateBuild,
-                            GP_Width_120);
+                                                                        GP_Width_120);
                     }
                 }
 
@@ -266,14 +240,12 @@ namespace AIO.UEditor
                     using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
                     {
                         BuildConfig.BuildVersion = GELayout.FieldDelayed(BuildConfig.BuildVersion,
-                            GEStyle.ToolbarBoldLabel,
-                            GP_Height_20);
+                                                                         GEStyle.ToolbarBoldLabel,
+                                                                         GP_Height_20);
                     }
 
                     if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20, GP_Height_20))
-                    {
                         BuildConfig.BuildVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
-                    }
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
@@ -281,9 +253,7 @@ namespace AIO.UEditor
                     EditorGUILayout.LabelField("构建平台", GP_Width_100);
                     BuildConfig.BuildTarget = GELayout.Popup(BuildConfig.BuildTarget, GEStyle.PreDropDown);
                     if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20, GP_Height_20))
-                    {
                         BuildConfig.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
-                    }
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
@@ -293,14 +263,13 @@ namespace AIO.UEditor
                         GUILayout.Label(AssetSystem.TagsRecord, GEStyle.PreDropDown);
                     else
                         Data.CurrentPackageIndex = EditorGUILayout.Popup(
-                            Data.CurrentPackageIndex, LookModeDisplayPackages, GEStyle.PreDropDown);
+                                                                         Data.CurrentPackageIndex,
+                                                                         LookModeDisplayPackages, GEStyle.PreDropDown);
 
                     if (GUI.changed)
                     {
                         if (Data.Packages.Length <= Data.CurrentPackageIndex || Data.CurrentPackageIndex < 0)
-                        {
                             Data.CurrentPackageIndex = 0;
-                        }
 
                         BuildConfig.PackageName = Data.Packages[Data.CurrentPackageIndex].Name;
                     }
@@ -316,7 +285,7 @@ namespace AIO.UEditor
                 {
                     EditorGUILayout.LabelField("压缩模式", GP_Width_100);
                     BuildConfig.CompressedMode = GELayout.Popup(BuildConfig.CompressedMode,
-                        GEStyle.PreDropDown);
+                                                                GEStyle.PreDropDown);
                 }
 
                 using (new EditorGUILayout.HorizontalScope(GEStyle.ToolbarBottom))
@@ -348,21 +317,15 @@ namespace AIO.UEditor
                         {
                             BuildConfig.FirstPackTag = string.Empty;
                             for (var i = 0; i < Tags.Length; i++)
-                            {
                                 if ((CurrentTagIndex & (1 << i)) != 0)
-                                {
                                     BuildConfig.FirstPackTag += string.Concat(Tags[i], ";");
-                                }
-                            }
                         }
 
                         if (CurrentTagIndex != 0)
-                        {
                             using (new EditorGUILayout.HorizontalScope(GEStyle.TEToolbar))
                             {
                                 GELayout.HelpBox(BuildConfig.FirstPackTag);
                             }
-                        }
                     }
                 }
 
@@ -372,7 +335,7 @@ namespace AIO.UEditor
                     using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
                     {
                         BuildConfig.AutoCleanCacheNum = EditorGUILayout.IntSlider(
-                            BuildConfig.AutoCleanCacheNum, 1, 20);
+                         BuildConfig.AutoCleanCacheNum, 1, 20);
                     }
                 }
             }

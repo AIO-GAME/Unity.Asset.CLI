@@ -8,7 +8,7 @@ namespace AIO.UEngine
     partial class ASProxy
     {
         /// <summary>
-        /// 同步加载资源对象
+        ///     同步加载资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
@@ -16,7 +16,7 @@ namespace AIO.UEngine
             (string location) where TObject : Object;
 
         /// <summary>
-        /// 协程加载资源对象
+        ///     协程加载资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
@@ -25,7 +25,7 @@ namespace AIO.UEngine
             (string location, Action<TObject> cb) where TObject : Object;
 
         /// <summary>
-        /// 异步加载资源对象
+        ///     异步加载资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
@@ -33,7 +33,7 @@ namespace AIO.UEngine
             (string location) where TObject : Object;
 
         /// <summary>
-        /// 异步加载资源对象
+        ///     异步加载资源对象
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
@@ -42,7 +42,7 @@ namespace AIO.UEngine
             (string location, Type type, Action<Object> cb);
 
         /// <summary>
-        /// 同步加载资源对象
+        ///     同步加载资源对象
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
@@ -50,7 +50,7 @@ namespace AIO.UEngine
             (string location, Type type);
 
         /// <summary>
-        /// 异步加载资源对象
+        ///     异步加载资源对象
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>

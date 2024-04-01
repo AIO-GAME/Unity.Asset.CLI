@@ -5,40 +5,40 @@ using UnityEditor;
 namespace AIO.UEditor
 {
     /// <summary>
-    /// 资源 上传 GCloud 配置
+    ///     资源 上传 GCloud 配置
     /// </summary>
     public class AsUploadGCloudParameter : ASUploadParameter
     {
         /// <summary>
-        /// Gcloud 路径
+        ///     Gcloud 路径
         /// </summary>
         public string GCLOUD_PATH;
 
         /// <summary>
-        /// Gsutil 路径
+        ///     Gsutil 路径
         /// </summary>
         public string GSUTIL_PATH;
 
         /// <summary>
-        /// 元数据 键
+        ///     元数据 键
         /// </summary>
         /// <remarks>
-        /// --content-type=image/png
-        /// --cache-control=public,max-age=3600
-        /// --content-language=unset
-        /// --content-encoding=unset
-        /// --content-disposition=disposition
+        ///     --content-type=image/png
+        ///     --cache-control=public,max-age=3600
+        ///     --content-language=unset
+        ///     --content-encoding=unset
+        ///     --content-disposition=disposition
         /// </remarks>
         public string MetaDataKey;
 
         /// <summary>
-        /// 元数据 值
+        ///     元数据 值
         /// </summary>
         public string MetaDataValue;
     }
 
     /// <summary>
-    /// nameof(ASBuildConfig_GCloud)
+    ///     nameof(ASBuildConfig_GCloud)
     /// </summary>
     public partial class ASBuildConfig
     {
@@ -48,8 +48,8 @@ namespace AIO.UEditor
             {
                 DirTreeFiled = new DirTreeFiled(BuildOutputPath.Replace('\\', '/'), 3)
                 {
-                    OptionShowDepth = false,
-                    OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$",
+                    OptionShowDepth           = false,
+                    OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$"
                 }
             };
             GCloudConfigs = GCloudConfigs is null
@@ -61,73 +61,74 @@ namespace AIO.UEditor
         public class GCloudConfig
         {
             /// <summary>
-            /// Gcloud 路径
+            ///     Gcloud 路径
             /// </summary>
             public string GCLOUD_PATH = "gcloud";
 
             /// <summary>
-            /// Gsutil 路径
+            ///     Gsutil 路径
             /// </summary>
             public string GSUTIL_PATH = "gsutil";
 
             /// <summary>
-            /// 是否显示
+            ///     是否显示
             /// </summary>
             public bool Folded;
 
             /// <summary>
-            /// 名称
+            ///     名称
             /// </summary>
             public string Name;
 
             /// <summary>
-            /// 描述
+            ///     描述
             /// </summary>
             public string Description;
 
             /// <summary>
-            /// 桶名称
+            ///     桶名称
             /// </summary>
             public string BUCKET_NAME;
 
             /// <summary>
-            /// 元数据Key
+            ///     元数据Key
             /// </summary>
             public string MetaDataKey;
 
             /// <summary>
-            /// 元数据Value
+            ///     元数据Value
             /// </summary>
             public string MetaDataValue;
 
             /// <summary>
-            /// 上传状态 : true 正在上传
+            ///     目录
+            /// </summary>
+            public DirTreeFiled DirTreeFiled = new DirTreeFiled
+            {
+                OptionShowDepth           = false,
+                OptionDirDepth            = 3,
+                OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$"
+            };
+
+            /// <summary>
+            ///     上传状态 : true 正在上传
             /// </summary>
             [NonSerialized] public bool isUploading;
 
             /// <summary>
-            /// 目录
-            /// </summary>
-            public DirTreeFiled DirTreeFiled = new DirTreeFiled
-            {
-                OptionShowDepth = false,
-                OptionDirDepth = 3,
-                OptionSearchPatternFolder = "(?i)^(?!.*\b(Version|OutputCache|Simulate)\b).*$",
-            };
-
-            /// <summary>
-            /// 上传首包配置
+            ///     上传首包配置
             /// </summary>
             public async Task UploadFirstPack(string location)
             {
                 PrGCloud.Gcloud = GCLOUD_PATH;
                 PrGCloud.Gsutil = GSUTIL_PATH;
                 var result = await PrGCloud.UploadFileAsync(
-                    AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(BUCKET_NAME),
+                    AssetSystem.SequenceRecordQueue.
+                                GET_REMOTE_PATH(BUCKET_NAME),
                     location, MetaDataKey, MetaDataValue);
                 EditorUtility.DisplayDialog("提示", result
-                    ? "上传成功 "
-                    : "上传失败", "确定");
+                                                ? "上传成功 "
+                                                : "上传失败", "确定");
             }
 
             public override string ToString()
@@ -173,15 +174,15 @@ namespace AIO.UEditor
                 isUploading = true;
                 var config = new AsUploadGCloudParameter
                 {
-                    RemotePath = BUCKET_NAME,
-                    PackageName = two,
-                    Version = three,
-                    BuildTarget = (BuildTarget)Enum.Parse(typeof(BuildTarget), one, false),
-                    MetaDataKey = MetaDataKey,
+                    RemotePath    = BUCKET_NAME,
+                    PackageName   = two,
+                    Version       = three,
+                    BuildTarget   = (BuildTarget)Enum.Parse(typeof(BuildTarget), one, false),
+                    MetaDataKey   = MetaDataKey,
                     MetaDataValue = MetaDataValue,
                     LocalFullPath = DirTreeFiled.DirPath.Replace("\\", "/"),
-                    GCLOUD_PATH = GCLOUD_PATH,
-                    GSUTIL_PATH = GSUTIL_PATH
+                    GCLOUD_PATH   = GCLOUD_PATH,
+                    GSUTIL_PATH   = GSUTIL_PATH
                 };
                 await AssetProxyEditor.UploadGCloud(config);
                 isUploading = false;

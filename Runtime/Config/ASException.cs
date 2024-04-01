@@ -3,12 +3,12 @@ using System.ComponentModel;
 namespace AIO
 {
     /// <summary>
-    /// 资源异常枚举
+    ///     资源异常枚举
     /// </summary>
     public enum ASException
     {
         /// <summary>
-        /// 无异常
+        ///     无异常
         /// </summary>
         None = 0,
 
@@ -77,6 +77,6 @@ ASConfig 为空！请检查实现或输入实例！
         [Description(@"
 [EN:Configuration initialization failed]
 [CN:配置初始化失败]")]
-        SettingConfigInitializeFailure,
+        SettingConfigInitializeFailure
     }
 }

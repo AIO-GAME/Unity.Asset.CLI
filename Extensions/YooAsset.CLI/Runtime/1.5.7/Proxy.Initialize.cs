@@ -11,28 +11,28 @@ using YooAsset;
 namespace AIO.UEngine.YooAsset
 {
     /// <summary>
-    /// 资源加载管理器
-    /// 该类只提供封装API函数
+    ///     资源加载管理器
+    ///     该类只提供封装API函数
     /// </summary>
     partial class Proxy
     {
         /// <summary>
-        /// 获取内置查询服务
+        ///     获取内置查询服务
         /// </summary>
         public static event Func<IBuildinQueryServices> EventQueryServices;
 
         /// <summary>
-        /// 获取内置查询服务
+        ///     获取内置查询服务
         /// </summary>
         public static event Func<IDeliveryQueryServices> EventDeliveryQueryServices;
 
         /// <summary>
-        /// 获取远程查询服务
+        ///     获取远程查询服务
         /// </summary>
         public static event Func<AssetsPackageConfig, IRemoteServices> EventRemoteServices;
 
         /// <summary>
-        /// 获取参数配置
+        ///     获取参数配置
         /// </summary>
         public static event Func<ResPackage, YAssetParameters> EventParameter;
 
@@ -59,7 +59,7 @@ namespace AIO.UEngine.YooAsset
 
                         RemoteServices = EventRemoteServices is null
                             ? new ResolverRemoteServices(package.Config)
-                            : EventRemoteServices.Invoke(package.Config),
+                            : EventRemoteServices.Invoke(package.Config)
                     };
 #endif
                     break;
@@ -100,17 +100,17 @@ namespace AIO.UEngine.YooAsset
 
             if (EventParameter is null) EventParameter = GetParameter;
             var capacity = AssetSystem.PackageConfigs.Count;
-            ReferenceOPHandle = new Dictionary<string, OperationHandleBase>();
+            ReferenceOPHandle        = new Dictionary<string, OperationHandleBase>();
             InitializationOperations = new List<InitializationOperation>(capacity);
-            DownloaderOperations = new Dictionary<string, DownloaderOperation>(64);
-            Dic = new Dictionary<string, ResPackage>(capacity);
+            DownloaderOperations     = new Dictionary<string, DownloaderOperation>(64);
+            Dic                      = new Dictionary<string, ResPackage>(capacity);
 
             foreach (var item in AssetSystem.PackageConfigs)
             {
                 var package = new ResPackage(item);
                 if (package.Config.IsDefault)
                 {
-                    DefaultPackage = package;
+                    DefaultPackage     = package;
                     DefaultPackageName = item.Name;
                 }
 
@@ -142,7 +142,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 更新资源包列表
+        ///     更新资源包列表
         /// </summary>
         public override IEnumerator UpdatePackagesCO(ASConfig config)
         {
@@ -198,7 +198,7 @@ namespace AIO.UEngine.YooAsset
                     if (config.Packages is null || config.Packages.Length == 0)
                     {
 #if UNITY_EDITOR
-                        throw new ArgumentNullException($"Please set the ASConfig Packages configuration");
+                        throw new ArgumentNullException("Please set the ASConfig Packages configuration");
 #else
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 yield break;
@@ -210,12 +210,12 @@ namespace AIO.UEngine.YooAsset
                         item.IsLatest = item.Version == "Latest"; // 如果使用Latest则认为是最新版本 同时需要获取最新版本号
                         if (!item.IsLatest) continue;
                         var url = string.Format("{0}/{1}/{2}/{3}/PackageManifest_{4}.version?t={5}",
-                            config.URL,
-                            AssetSystem.PlatformNameStr,
-                            item.Name,
-                            item.Version,
-                            item.Name,
-                            DateTime.Now.Ticks);
+                                                config.URL,
+                                                AssetSystem.PlatformNameStr,
+                                                item.Name,
+                                                item.Version,
+                                                item.Name,
+                                                DateTime.Now.Ticks);
                         using (var uwr = UnityWebRequest.Get(url))
                         {
                             yield return uwr.SendWebRequest();
@@ -255,7 +255,7 @@ namespace AIO.UEngine.YooAsset
         private static void UpdatePackagesLocal(ASConfig config)
         {
             config.Packages = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(
-                $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
+                                                                             $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
             if (config.Packages is null)
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
         }
@@ -274,7 +274,7 @@ namespace AIO.UEngine.YooAsset
             }
 
             var packages = type.GetField("Packages", BindingFlags.Instance | BindingFlags.Public)?.
-                GetValue(CollectRoot);
+                                GetValue(CollectRoot);
             if (!(packages is Array array))
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
@@ -282,7 +282,7 @@ namespace AIO.UEngine.YooAsset
             }
 
             var fieldInfo = assembly.GetType("AIO.UEditor.AssetCollectPackage", true).
-                GetField("Name", BindingFlags.Instance | BindingFlags.Public);
+                                     GetField("Name", BindingFlags.Instance | BindingFlags.Public);
             if (fieldInfo is null)
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
@@ -294,8 +294,8 @@ namespace AIO.UEngine.YooAsset
                 where item != null
                 select new AssetsPackageConfig
                 {
-                    Name = fieldInfo.GetValue(item) as string,
-                    Version = "-.-.-",
+                    Name    = fieldInfo.GetValue(item) as string,
+                    Version = "-.-.-"
                 }).ToArray();
 
             if (list.Length <= 0)
@@ -304,7 +304,7 @@ namespace AIO.UEngine.YooAsset
                 return;
             }
 
-            config.Packages = list;
+            config.Packages              = list;
             config.Packages[0].IsDefault = true;
         }
     }

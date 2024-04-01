@@ -10,27 +10,27 @@ namespace AIO.UEditor
     public sealed class AssetCollectGroup : IDisposable, IEqualityComparer<AssetCollectGroup>
     {
         /// <summary>
-        /// 组名
+        ///     组名
         /// </summary>
         public string Name;
 
         /// <summary>
-        /// 组描述
+        ///     组描述
         /// </summary>
         public string Description;
 
         /// <summary>
-        /// 资源标签 使用;分割
+        ///     资源标签 使用;分割
         /// </summary>
         public string Tags;
 
         /// <summary>
-        /// 资源收集配置
+        ///     资源收集配置
         /// </summary>
         public AssetCollectItem[] Collectors;
 
         /// <summary>
-        /// 获取资源收集器数量
+        ///     获取资源收集器数量
         /// </summary>
         public int Length
         {
@@ -47,8 +47,50 @@ namespace AIO.UEditor
             set => Collectors[index] = value;
         }
 
+        public string[] AllTags
+        {
+            get
+            {
+                var dictionary = new List<string>();
+                foreach (var collect in Collectors) dictionary.AddRange(collect.AllTags);
+                if (string.IsNullOrEmpty(Tags)) return dictionary.Distinct().ToArray();
+                dictionary.AddRange(Tags.Split(';', ' ', ','));
+                return dictionary.Distinct().ToArray();
+            }
+        }
+
+        public void Dispose()
+        {
+            if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
+            foreach (var collect in Collectors) collect.Dispose();
+        }
+
+        public bool Equals(AssetCollectGroup x, AssetCollectGroup y)
+        {
+            if (x is null) return y is null;
+            if (y is null) return false;
+            return x.GetHashCode() == y.GetHashCode();
+        }
+
+        public int GetHashCode(AssetCollectGroup obj)
+        {
+            if (obj.Equals(null)) return 0;
+            unchecked
+            {
+                var hashCode = (obj.Name.GetHashCode() * 397) ^
+                               (!string.IsNullOrEmpty(obj.Tags) ? obj.Tags.GetHashCode() : 0);
+
+                hashCode = (hashCode * 397) ^
+                           (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
+
+                return obj.Collectors is null
+                    ? hashCode
+                    : obj.Collectors.Aggregate(hashCode, (current, item) => (current * 397) ^ item.GetHashCode());
+            }
+        }
+
         /// <summary>
-        /// 刷新资源
+        ///     刷新资源
         /// </summary>
         public void Refresh()
         {
@@ -71,9 +113,8 @@ namespace AIO.UEditor
             }
 
             var guid = AssetDatabase.AssetPathToGUID(collectPath);
-            return Collectors
-                .Where(collectItem => collectItem != null)
-                .FirstOrDefault(collectItem => collectItem.GUID == guid);
+            return Collectors.Where(collectItem => collectItem != null).
+                              FirstOrDefault(collectItem => collectItem.GUID == guid);
         }
 
         /// <param name="guid">收集器资源路径GUID</param>
@@ -86,21 +127,8 @@ namespace AIO.UEditor
                 return null;
             }
 
-            return Collectors
-                .Where(collectItem => collectItem != null)
-                .FirstOrDefault(collectItem => collectItem.GUID == guid);
-        }
-
-        public string[] AllTags
-        {
-            get
-            {
-                var dictionary = new List<string>();
-                foreach (var collect in Collectors) dictionary.AddRange(collect.AllTags);
-                if (string.IsNullOrEmpty(Tags)) return dictionary.Distinct().ToArray();
-                dictionary.AddRange(Tags.Split(';', ' ', ','));
-                return dictionary.Distinct().ToArray();
-            }
+            return Collectors.Where(collectItem => collectItem != null).
+                              FirstOrDefault(collectItem => collectItem.GUID == guid);
         }
 
         public void Save()
@@ -109,39 +137,9 @@ namespace AIO.UEditor
             foreach (var collect in Collectors) collect.UpdateData();
         }
 
-        public void Dispose()
-        {
-            if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
-            foreach (var collect in Collectors) collect.Dispose();
-        }
-
-        public bool Equals(AssetCollectGroup x, AssetCollectGroup y)
-        {
-            if (x is null) return y is null;
-            if (y is null) return false;
-            return x.GetHashCode() == y.GetHashCode();
-        }
-
         public override int GetHashCode()
         {
             return GetHashCode(this);
-        }
-
-        public int GetHashCode(AssetCollectGroup obj)
-        {
-            if (obj.Equals(null)) return 0;
-            unchecked
-            {
-                var hashCode = (obj.Name.GetHashCode() * 397) ^
-                               (!string.IsNullOrEmpty(obj.Tags) ? obj.Tags.GetHashCode() : 0);
-
-                hashCode = (hashCode * 397) ^
-                           (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
-
-                return obj.Collectors is null
-                    ? hashCode
-                    : obj.Collectors.Aggregate(hashCode, (current, item) => (current * 397) ^ item.GetHashCode());
-            }
         }
     }
 }

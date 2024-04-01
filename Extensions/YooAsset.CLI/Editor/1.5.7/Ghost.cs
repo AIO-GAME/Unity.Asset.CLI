@@ -4,12 +4,16 @@ namespace AIO.UEditor.CLI
 {
     internal static partial class Ghost
     {
+        #region Nested type: YooAsset
+
         internal static partial class YooAsset
         {
             public const string Version = "1.5.7";
-            public const string Scopes = "com.tuyoogame.yooasset";
-            public const string Name = "YooAsset";
+            public const string Scopes  = "com.tuyoogame.yooasset";
+            public const string Name    = "YooAsset";
         }
+
+        #endregion
     }
 }
 
@@ -19,6 +23,8 @@ namespace AIO.UEditor.CLI
 {
     internal static partial class Ghost
     {
+        #region Nested type: YooAsset
+
         internal static partial class YooAsset
         {
             [MenuItem("AIO/CLI/UnInstall/YooAsset[" + Version + "](CN)", false, 0)]
@@ -33,6 +39,8 @@ namespace AIO.UEditor.CLI
                 EHelper.Ghost.UnInstallOpenUpm(Scopes);
             }
         }
+
+        #endregion
     }
 }
 #else

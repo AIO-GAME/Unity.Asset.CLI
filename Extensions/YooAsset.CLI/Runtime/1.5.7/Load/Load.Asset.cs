@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
-using UnityEngine.Profiling;
 using YooAsset;
 using Object = UnityEngine.Object;
 

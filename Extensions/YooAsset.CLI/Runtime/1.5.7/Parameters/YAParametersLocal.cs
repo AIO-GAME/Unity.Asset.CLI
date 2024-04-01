@@ -4,7 +4,7 @@ using YooAsset;
 namespace AIO.UEngine.YooAsset
 {
     /// <summary>
-    /// 离线模式
+    ///     离线模式
     /// </summary>
     internal class YAParametersLocal : YAssetParameters
     {
@@ -22,11 +22,11 @@ namespace AIO.UEngine.YooAsset
         {
             var initParameters = new OfflinePlayModeParameters
             {
-                DecryptionServices = DecryptionServices,
-                LoadingMaxTimeSlice = LoadingMaxTimeSlice,
+                DecryptionServices     = DecryptionServices,
+                LoadingMaxTimeSlice    = LoadingMaxTimeSlice,
                 DownloadFailedTryAgain = DownloadFailedTryAgain,
-                BuildinRootDirectory = BuildInRootDirectory,
-                SandboxRootDirectory = SandboxRootDirectory
+                BuildinRootDirectory   = BuildInRootDirectory,
+                SandboxRootDirectory   = SandboxRootDirectory
             };
             return initParameters;
         }

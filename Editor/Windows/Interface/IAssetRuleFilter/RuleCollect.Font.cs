@@ -4,35 +4,78 @@ namespace AIO.UEditor
 {
     partial class RuleCollect
     {
-        public class CollectFontOTF : IFilterRule
-        {
-            public string DisplayFilterName => "Font/*.otf";
-
-            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "otf";
-        }
-
-        public class CollectFontTTC : IFilterRule
-        {
-            public string DisplayFilterName => "Font/*.ttc";
-
-            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "ttc";
-        }
-
-        public class CollectFontTTF : IFilterRule
-        {
-            public string DisplayFilterName => "Font/*.ttf";
-
-            public bool IsCollectAsset(AssetRuleData data) => data.Extension == "ttf";
-        }
+        #region Nested type: CollectFont
 
         public class CollectFont : IFilterRule
         {
+            #region IFilterRule Members
+
             public string DisplayFilterName => "Font/ALL";
 
-            public bool IsCollectAsset(AssetRuleData data) =>
-                new CollectFontOTF().IsCollectAsset(data) ||
-                new CollectFontTTC().IsCollectAsset(data) ||
-                new CollectFontTTF().IsCollectAsset(data);
+            public bool IsCollectAsset(AssetRuleData data)
+            {
+                return new CollectFontOTF().IsCollectAsset(data) ||
+                       new CollectFontTTC().IsCollectAsset(data) ||
+                       new CollectFontTTF().IsCollectAsset(data);
+            }
+
+            #endregion
         }
+
+        #endregion
+
+        #region Nested type: CollectFontOTF
+
+        public class CollectFontOTF : IFilterRule
+        {
+            #region IFilterRule Members
+
+            public string DisplayFilterName => "Font/*.otf";
+
+            public bool IsCollectAsset(AssetRuleData data)
+            {
+                return data.Extension == "otf";
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: CollectFontTTC
+
+        public class CollectFontTTC : IFilterRule
+        {
+            #region IFilterRule Members
+
+            public string DisplayFilterName => "Font/*.ttc";
+
+            public bool IsCollectAsset(AssetRuleData data)
+            {
+                return data.Extension == "ttc";
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: CollectFontTTF
+
+        public class CollectFontTTF : IFilterRule
+        {
+            #region IFilterRule Members
+
+            public string DisplayFilterName => "Font/*.ttf";
+
+            public bool IsCollectAsset(AssetRuleData data)
+            {
+                return data.Extension == "ttf";
+            }
+
+            #endregion
+        }
+
+        #endregion
     }
 }

@@ -1,34 +1,34 @@
 {
-    "name": "AIO.CLI.YooAsset.Runtime",
-    "references": [
-        "YooAsset",
-        "UniTask.YooAsset",
-        "AIO.Core.Runtime",
-        "AIO.Asset.Runtime"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.tuyoogame.yooasset",
-            "expression": "",
-            "define": "SUPPORT_YOOASSET"
-        },
-        {
-            "name": "com.tuyoogame.yooasset",
-            "expression": "[1.5.7]",
-            "define": "SUPPORT_YOOASSET_157"
-        },
-        {
-            "name": "com.tuyoogame.yooasset",
-            "expression": "[2.1.0]",
-            "define": "SUPPORT_YOOASSET_210"
-        }
-    ],
-    "noEngineReferences": false
+  "name": "AIO.CLI.YooAsset.Runtime",
+  "references": [
+    "YooAsset",
+    "UniTask.YooAsset",
+    "AIO.Core.Runtime",
+    "AIO.Asset.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.tuyoogame.yooasset",
+      "expression": "",
+      "define": "SUPPORT_YOOASSET"
+    },
+    {
+      "name": "com.tuyoogame.yooasset",
+      "expression": "[1.5.7]",
+      "define": "SUPPORT_YOOASSET_157"
+    },
+    {
+      "name": "com.tuyoogame.yooasset",
+      "expression": "[2.1.0]",
+      "define": "SUPPORT_YOOASSET_210"
+    }
+  ],
+  "noEngineReferences": false
 }

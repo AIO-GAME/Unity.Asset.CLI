@@ -19,10 +19,7 @@ namespace AIO.UEditor
             if (!string.IsNullOrEmpty(config.BUCKET_NAME))
             {
                 _builder.Append('[');
-                if (config.DirTreeFiled.IsValidity())
-                {
-                    _builder.Append(config.DirTreeFiled.GetFullPath()).Append(" -> ");
-                }
+                if (config.DirTreeFiled.IsValidity()) _builder.Append(config.DirTreeFiled.GetFullPath()).Append(" -> ");
 
                 _builder.Append(config.BUCKET_NAME);
                 if (!string.IsNullOrEmpty(config.Description)) _builder.Append('/').Append(config.Description);
@@ -41,36 +38,31 @@ namespace AIO.UEditor
             {
                 OnDrawConfigGCScroll = scope.scrollPosition;
                 for (var i = BuildConfig.GCloudConfigs.Length - 1; i >= 0; i--)
-                {
                     using (GELayout.Vertical(GEStyle.INThumbnailShadow))
                     {
                         using (GELayout.VHorizontal(GEStyle.Toolbar))
                         {
                             if (GELayout.Button(BuildConfig.GCloudConfigs[i].Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
-                                    GEStyle.TEtoolbarbutton, GP_Width_30))
+                                                GEStyle.TEtoolbarbutton, GP_Width_30))
                             {
                                 BuildConfig.GCloudConfigs[i].Folded = !BuildConfig.GCloudConfigs[i].Folded;
                                 GUI.FocusControl(null);
                             }
 
                             GELayout.Label(GetGCItemDes(BuildConfig.GCloudConfigs[i], i),
-                                GEStyle.HeaderLabel, GP_Width_EXPAND);
+                                           GEStyle.HeaderLabel, GP_Width_EXPAND);
 
                             if (BuildConfig.GCloudConfigs[i].isUploading) GUI.enabled = false;
 
                             if (!string.IsNullOrEmpty(BuildConfig.GCloudConfigs[i].BUCKET_NAME))
                             {
                                 if (!string.IsNullOrEmpty(BuildConfig.GCloudConfigs[i].DirTreeFiled.DirPath))
-                                {
                                     if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
-                                    {
                                         if (GUILayout.Button("更新首包配置", GEStyle.toolbarbutton, GP_Width_100))
                                         {
                                             GUI.FocusControl(null);
                                             UpdateUploadFirstPack(BuildConfig.GCloudConfigs[i]);
                                         }
-                                    }
-                                }
 
                                 if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20))
                                 {
@@ -95,7 +87,6 @@ namespace AIO.UEditor
 
                         OnDrawBuildGC(BuildConfig.GCloudConfigs[i]);
                     }
-                }
             }
         }
 
@@ -107,7 +98,7 @@ namespace AIO.UEditor
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
                 EditorGUILayout.LabelField("名称:描述", GP_Width_100);
-                config.Name = GELayout.FieldDelayed(config.Name);
+                config.Name        = GELayout.FieldDelayed(config.Name);
                 config.Description = GELayout.FieldDelayed(config.Description);
             }
 
@@ -132,7 +123,7 @@ namespace AIO.UEditor
             using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
             {
                 EditorGUILayout.LabelField("元数据:[键:值]", GP_Width_100);
-                config.MetaDataKey = GELayout.FieldDelayed(config.MetaDataKey);
+                config.MetaDataKey   = GELayout.FieldDelayed(config.MetaDataKey);
                 config.MetaDataValue = GELayout.FieldDelayed(config.MetaDataValue);
             }
 
@@ -141,7 +132,10 @@ namespace AIO.UEditor
                 EditorGUILayout.LabelField("本地路径", GP_Width_100);
                 config.DirTreeFiled.OnDraw();
 
-                if (config.isUploading) GUILayout.Label("上传中", GEStyle.toolbarbutton, GP_Width_50);
+                if (config.isUploading)
+                {
+                    GUILayout.Label("上传中", GEStyle.toolbarbutton, GP_Width_50);
+                }
                 else if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
                 {
                     GUI.FocusControl(null);

@@ -21,14 +21,13 @@
 #>
 
 /*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> Automatic Generate
-|||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -47,7 +46,10 @@ namespace AIO
         /// 同步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
         public static <#= typeName #> Load<#= aliasName #>(string location)
         {
             return Proxy.LoadAssetSync<<#= typeName #>>(SettingToLocalPath(location));
@@ -58,20 +60,26 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
         public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> cb)
         {
-            cb.Invoke(await Proxy.LoadAssetTask<<#= typeName #>>(SettingToLocalPath(location)));
+            await CreateLoadAssetHandle(location, cb);
         }
 
         /// <summary>
         /// 异步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static Task<<#= typeName #>> Load<#= aliasName #>Task(string location)
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
+        public static IHandle<<#= typeName #>> Load<#= aliasName #>Task(string location)
         {
-            return Proxy.LoadAssetTask<<#= typeName #>>(SettingToLocalPath(location));
+            return CreateLoadAssetHandle<<#= typeName #>>(location);
         }
 
         /// <summary>
@@ -79,10 +87,13 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Load<#= aliasName #>CO(string location, Action<<#= typeName #>> cb)
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
+        public static IHandle<<#= typeName #>> Load<#= aliasName #>Task(string location, Action<<#= typeName #>> cb)
         {
-            return Proxy.LoadAssetCO(SettingToLocalPath(location), cb);
+            return CreateLoadAssetHandle<<#= typeName #>>(location, cb);
         }
 
        #endregion

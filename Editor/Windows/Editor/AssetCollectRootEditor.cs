@@ -4,7 +4,7 @@ using UnityEngine;
 namespace AIO.UEditor
 {
     /// <summary>
-    /// AssetCollectRoot
+    ///     AssetCollectRoot
     /// </summary>
     [CustomEditor(typeof(AssetCollectRoot))]
     public class AssetCollectRootEditor : AFInspector<AssetCollectRoot>
@@ -25,10 +25,7 @@ namespace AIO.UEditor
 #else
                         AssetDatabase.SaveAssets();
 #endif
-                        if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
-                        {
-                            AssetDatabase.Refresh();
-                        }
+                        if (EditorUtility.DisplayDialog("保存", "保存成功", "确定")) AssetDatabase.Refresh();
                     }
 
                     if (GUILayout.Button("打开", GEStyle.toolbarbuttonRight))

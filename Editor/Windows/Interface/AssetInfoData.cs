@@ -5,47 +5,47 @@ using UnityEditor;
 namespace AIO
 {
     /// <summary>
-    /// 资源数据信息
+    ///     资源数据信息
     /// </summary>
     public struct AssetDataInfo
     {
         /// <summary>
-        /// Asset Path
+        ///     Asset Path
         /// </summary>
         public string AssetPath;
 
         /// <summary>
-        /// Asset Address
+        ///     Asset Address
         /// </summary>
         public string Address;
 
         /// <summary>
-        /// Asset Extension
+        ///     Asset Extension
         /// </summary>
         public string Extension;
 
         /// <summary>
-        /// Asset Tags
+        ///     Asset Tags
         /// </summary>
         public string Tags;
 
         /// <summary>
-        /// Asset Collect Path
+        ///     Asset Collect Path
         /// </summary>
         public string CollectPath;
 
         /// <summary>
-        /// 组名
+        ///     组名
         /// </summary>
         public string Group;
 
         /// <summary>
-        /// 包名
+        ///     包名
         /// </summary>
         public string Package;
 
         /// <summary>
-        /// Asset Size
+        ///     Asset Size
         /// </summary>
         public long Size
         {
@@ -54,13 +54,9 @@ namespace AIO
                 if (_size == default)
                 {
                     if (File.Exists(AssetPath))
-                    {
                         _size = AHelper.IO.GetFileLength(AssetPath);
-                    }
                     else if (Directory.Exists(AssetPath))
-                    {
-                        _size = AHelper.IO.GetDirLength(AssetPath);
-                    }
+                        _size  = AHelper.IO.GetDirLength(AssetPath);
                     else _size = -1;
                 }
 
@@ -78,23 +74,20 @@ namespace AIO
         }
 
         /// <summary>
-        /// Asset GUID
+        ///     Asset GUID
         /// </summary>
         public string GUID
         {
             get
             {
-                if (string.IsNullOrEmpty(_guid))
-                {
-                    _guid = AssetDatabase.AssetPathToGUID(AssetPath);
-                }
+                if (string.IsNullOrEmpty(_guid)) _guid = AssetDatabase.AssetPathToGUID(AssetPath);
 
                 return _guid;
             }
         }
 
         /// <summary>
-        /// Asset Last Imported
+        ///     Asset Last Imported
         /// </summary>
         public DateTime LastWriteTime
         {
@@ -105,7 +98,7 @@ namespace AIO
                     if (File.Exists(AssetPath))
                         _lastWriteTime = File.GetLastWriteTime(AssetPath);
                     else if (Directory.Exists(AssetPath))
-                        _lastWriteTime = Directory.GetLastWriteTime(AssetPath);
+                        _lastWriteTime  = Directory.GetLastWriteTime(AssetPath);
                     else _lastWriteTime = DateTime.MinValue;
                 }
 
@@ -114,23 +107,20 @@ namespace AIO
         }
 
         /// <summary>
-        /// Asset Name
+        ///     Asset Name
         /// </summary>
         public string Name
         {
             get
             {
-                if (string.IsNullOrEmpty(_name))
-                {
-                    _name = Path.GetFileNameWithoutExtension(AssetPath);
-                }
+                if (string.IsNullOrEmpty(_name)) _name = Path.GetFileNameWithoutExtension(AssetPath);
 
                 return _name;
             }
         }
 
         /// <summary>
-        /// Asset Type
+        ///     Asset Type
         /// </summary>
         public string Type
         {
@@ -146,12 +136,12 @@ namespace AIO
             }
         }
 
-        [NonSerialized] private string _sizeStr;
-        [NonSerialized] private string _name;
+        [NonSerialized] private string   _sizeStr;
+        [NonSerialized] private string   _name;
         [NonSerialized] private DateTime _lastWriteTime;
-        [NonSerialized] private long _size;
-        [NonSerialized] private string _type;
-        [NonSerialized] private string _guid;
+        [NonSerialized] private long     _size;
+        [NonSerialized] private string   _type;
+        [NonSerialized] private string   _guid;
     }
 
     public static class ExtensionAssetDataInfo

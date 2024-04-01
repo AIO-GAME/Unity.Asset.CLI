@@ -6,7 +6,7 @@ namespace AIO.UEditor
     public static partial class RuleCollect
     {
         /// <summary>
-        /// 判断是否为自定义收集规则
+        ///     判断是否为自定义收集规则
         /// </summary>
         internal static bool IsCollectAssetCustom(ICollection<string> filterCollect, string extension)
         {
@@ -42,54 +42,94 @@ namespace AIO.UEditor
             return false;
         }
 
+        #region Nested type: CollectFBX
+
         public class CollectFBX : IFilterRule
         {
+            #region IFilterRule Members
+
             public string DisplayFilterName => "*.fbx";
 
             public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "fbx";
             }
+
+            #endregion
         }
+
+        #endregion
+
+        #region Nested type: CollectMaterial
 
         public class CollectMaterial : IFilterRule
         {
+            #region IFilterRule Members
+
             public string DisplayFilterName => "*.material";
 
             public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "mat";
             }
+
+            #endregion
         }
 
-        public class CollectShader : IFilterRule
-        {
-            public string DisplayFilterName => "*.shader";
+        #endregion
 
-            public bool IsCollectAsset(AssetRuleData data)
-            {
-                return data.Extension == "shader";
-            }
-        }
+        #region Nested type: CollectPrefab
 
         public class CollectPrefab : IFilterRule
         {
+            #region IFilterRule Members
+
             public string DisplayFilterName => "*.prefab";
 
             public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "prefab";
             }
+
+            #endregion
         }
+
+        #endregion
+
+        #region Nested type: CollectShader
+
+        public class CollectShader : IFilterRule
+        {
+            #region IFilterRule Members
+
+            public string DisplayFilterName => "*.shader";
+
+            public bool IsCollectAsset(AssetRuleData data)
+            {
+                return data.Extension == "shader";
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: CollectUnity
 
         public class CollectUnity : IFilterRule
         {
+            #region IFilterRule Members
+
             public string DisplayFilterName => "*.unity";
 
             public bool IsCollectAsset(AssetRuleData data)
             {
                 return data.Extension == "unity";
             }
+
+            #endregion
         }
+
+        #endregion
     }
 }

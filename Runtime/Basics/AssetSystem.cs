@@ -10,16 +10,16 @@ using UnityEngine;
 namespace AIO
 {
     /// <summary>
-    /// 资源管理系统
+    ///     资源管理系统
     /// </summary>
     public static partial class AssetSystem
     {
+        private static ASException _Exception;
+
         /// <summary>
-        /// 系统初始化异常
+        ///     系统初始化异常
         /// </summary>
         public static event Action<ASException> OnException;
-
-        private static ASException _Exception;
 
         internal static void ExceptionEvent(ASException ex)
         {
@@ -32,31 +32,37 @@ namespace AIO
                 throw new Exception($"Asset System Exception : {ex}");
 #endif
             }
-            else OnException.Invoke(ex);
+            else
+            {
+                OnException.Invoke(ex);
+            }
         }
 
         /// <summary>
-        /// 系统初始化
+        ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static IEnumerator Initialize<T>(ASConfig config) where T : ASProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), config);
         }
 
         /// <summary>
-        /// 系统初始化
+        ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static IEnumerator Initialize()
         {
             return Initialize(ASConfig.GetOrCreate());
         }
 
         /// <summary>
-        /// 系统初始化
+        ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static IEnumerator Initialize(ASConfig config)
         {
             var proxyType = typeof(ASProxy);
@@ -78,27 +84,30 @@ namespace AIO
         }
 
         /// <summary>
-        /// 系统初始化
+        ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static IEnumerator Initialize<T>(T proxy) where T : ASProxy
         {
             return Initialize(proxy, ASConfig.GetOrCreate());
         }
 
         /// <summary>
-        /// 系统初始化
+        ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static IEnumerator Initialize<T>() where T : ASProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), ASConfig.GetOrCreate());
         }
 
         /// <summary>
-        /// 系统初始化
+        ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : ASProxy
         {
             if (IsInitialized) yield break;
@@ -121,12 +130,12 @@ namespace AIO
             SandboxRootDirectory =
 #if UNITY_EDITOR
                 Path.Combine(Directory.GetParent(Application.dataPath).FullName,
-                    config.RuntimeRootDirectory, EditorUserBuildSettings.activeBuildTarget.ToString());
+                             config.RuntimeRootDirectory, EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
                 Path.Combine(Application.persistentDataPath, config.RuntimeRootDirectory);
 #endif
             Parameter = config;
-            Proxy = proxy;
+            Proxy     = proxy;
 
             yield return Proxy.UpdatePackagesCO(Parameter);
             try
@@ -154,10 +163,11 @@ namespace AIO
         }
 
         /// <summary>
-        /// 销毁资源管理系统
+        ///     销毁资源管理系统
         /// </summary>
         /// <returns></returns>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static Task DestroyTask()
         {
             Destroy();
@@ -165,10 +175,11 @@ namespace AIO
         }
 
         /// <summary>
-        /// 销毁资源管理系统
+        ///     销毁资源管理系统
         /// </summary>
         /// <returns></returns>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static IEnumerator DestroyCO()
         {
             Destroy();
@@ -176,10 +187,11 @@ namespace AIO
         }
 
         /// <summary>
-        /// 销毁资源管理系统
+        ///     销毁资源管理系统
         /// </summary>
         /// <returns></returns>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerHidden]
         public static void Destroy()
         {
 #if UNITY_EDITOR
@@ -189,7 +201,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static async void ClearUnusedCache(Action<bool> cb)
         {
@@ -198,7 +210,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static async void ClearUnusedCache()
         {
@@ -206,7 +218,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static Task<bool> CleanUnusedCacheTask()
         {
@@ -214,7 +226,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static IEnumerator CleanUnusedCacheCO(Action<bool> cb)
         {
@@ -222,7 +234,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static IEnumerator CleanUnusedCacheCO()
         {
@@ -230,7 +242,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static async void ClearAllCache(Action<bool> cb)
         {
@@ -239,7 +251,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static async void ClearAllCache()
         {
@@ -247,7 +259,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static Task<bool> CleanAllCacheTask()
         {
@@ -255,7 +267,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static IEnumerator CleanAllCacheCO(Action<bool> cb)
         {
@@ -263,7 +275,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
+        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
         public static IEnumerator CleanAllCacheCO()
         {

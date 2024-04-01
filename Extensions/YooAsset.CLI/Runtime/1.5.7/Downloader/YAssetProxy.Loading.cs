@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Unity.Profiling;
 using UnityEngine;
 using YooAsset;
 
@@ -16,13 +15,15 @@ namespace AIO.UEngine.YooAsset
 
     partial class Proxy
     {
+        private static readonly AProgress Progress = new AProgress();
+
         private static void WaitNotReachable(AssetInfo location)
         {
             if (AssetSystem.DownloadEvent.OnNetReachableNot is null)
                 throw new Exception("NetReachableNot is null");
 
-            Progress.State = EProgressState.Fail;
-            Progress.TotalValue = DownloaderOperations[location.AssetPath].TotalDownloadBytes;
+            Progress.State        = EProgressState.Fail;
+            Progress.TotalValue   = DownloaderOperations[location.AssetPath].TotalDownloadBytes;
             Progress.CurrentValue = DownloaderOperations[location.AssetPath].CurrentDownloadBytes;
             AssetSystem.DownloadEvent.OnNetReachableNot.Invoke(Progress);
         }
@@ -33,9 +34,9 @@ namespace AIO.UEngine.YooAsset
                 throw new Exception($"OnNetReachableCarrier is null => {location.AssetPath} loading fail");
 
             AssetSystem.StatusStop = true;
-            Progress.State = EProgressState.Pause;
-            Progress.TotalValue = DownloaderOperations[location.AssetPath].TotalDownloadBytes;
-            Progress.CurrentValue = DownloaderOperations[location.AssetPath].CurrentDownloadBytes;
+            Progress.State         = EProgressState.Pause;
+            Progress.TotalValue    = DownloaderOperations[location.AssetPath].TotalDownloadBytes;
+            Progress.CurrentValue  = DownloaderOperations[location.AssetPath].CurrentDownloadBytes;
             AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(Progress, AllowReachableCarrier);
         }
 
@@ -78,13 +79,11 @@ namespace AIO.UEngine.YooAsset
             DownloaderOperations.Remove(location.AssetPath);
         }
 
-        private static AProgress Progress = new AProgress();
-
         private static void AllowReachableCarrier()
         {
             AssetSystem.AllowReachableCarrier = true;
-            AssetSystem.StatusStop = false;
-            AssetSystem.HandleReset = false;
+            AssetSystem.StatusStop            = false;
+            AssetSystem.HandleReset           = false;
         }
 
         private static IEnumerator WaitCO(DownloaderOperation operation, AssetInfo location)
@@ -145,8 +144,8 @@ namespace AIO.UEngine.YooAsset
             var record = new AssetSystem.SequenceRecord
             {
                 PackageName = package.PackageName,
-                Location = location.Address,
-                AssetPath = location.AssetPath,
+                Location    = location.Address,
+                AssetPath   = location.AssetPath
             };
             record.SetGUID(AssetDatabase.AssetPathToGUID(location.AssetPath));
             AssetSystem.AddSequenceRecord(record);

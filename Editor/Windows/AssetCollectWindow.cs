@@ -5,22 +5,22 @@ using UnityEngine;
 namespace AIO.UEditor
 {
     /// <summary>
-    /// 资源管理窗口
+    ///     资源管理窗口
     /// </summary>
     [GWindow("资源管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
-        IconResource = "Editor/Icon/Asset",
-        Group = "Tools",
-        Menu = "AIO/Window/Asset",
-        MinSizeHeight = 650,
-        MinSizeWidth = 1200
-    )]
+             IconResource = "Editor/Icon/Asset",
+             Group = "Tools",
+             Menu = "AIO/Window/Asset",
+             MinSizeHeight = 650,
+             MinSizeWidth = 1200
+            )]
     public partial class AssetCollectWindow : GraphicWindow
     {
         [LnkTools(
-            Tooltip = "AIO 资源管理工具",
-            IconResource = "Editor/Icon/Asset",
-            ShowMode = ELnkShowMode.Toolbar
-        )]
+                     Tooltip = "AIO 资源管理工具",
+                     IconResource = "Editor/Icon/Asset",
+                     ShowMode = ELnkShowMode.Toolbar
+                 )]
         public static void OpenWindow()
         {
             EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
@@ -67,7 +67,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 更新数据
+        ///     更新数据
         /// </summary>
         private void UpdateData()
         {
@@ -80,8 +80,8 @@ namespace AIO.UEditor
                     UpdateDataEditorMode();
                     break;
                 case Mode.Look:
-                    LookModeDisplayTypeIndex = 0;
-                    LookModeDisplayTagsIndex = 0;
+                    LookModeDisplayTypeIndex       = 0;
+                    LookModeDisplayTagsIndex       = 0;
                     LookModeDisplayCollectorsIndex = 0;
                     UpdateDataLookMode();
                     break;
@@ -103,7 +103,7 @@ namespace AIO.UEditor
 
         protected override void OnAwake()
         {
-            Data = AssetCollectRoot.GetOrCreate();
+            Data                   = AssetCollectRoot.GetOrCreate();
             Selection.activeObject = Data;
         }
 
@@ -113,7 +113,7 @@ namespace AIO.UEditor
             Data.Refresh();
             Selection.activeObject = Data;
 
-            Config = ASConfig.GetOrCreate();
+            Config      = ASConfig.GetOrCreate();
             BuildConfig = ASBuildConfig.GetOrCreate();
 
             GCInit();
@@ -124,7 +124,7 @@ namespace AIO.UEditor
         protected override void OnDraw()
         {
             using (new GUILayout.HorizontalScope(
-                       GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
+                                                 GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
             {
                 OnDrawHeader();
             }
@@ -223,7 +223,7 @@ namespace AIO.UEditor
                             if (CurrentPageValues.PageIndex > 0)
                             {
                                 GUI.FocusControl(null);
-                                CurrentSelectAssetIndex = 0;
+                                CurrentSelectAssetIndex     =  0;
                                 CurrentPageValues.PageIndex -= 1;
                                 eventData.Use();
                             }
@@ -234,7 +234,7 @@ namespace AIO.UEditor
                             if (CurrentPageValues.PageIndex < CurrentPageValues.PageCount - 1)
                             {
                                 GUI.FocusControl(null);
-                                CurrentSelectAssetIndex = 0;
+                                CurrentSelectAssetIndex     =  0;
                                 CurrentPageValues.PageIndex += 1;
                                 eventData.Use();
                             }
@@ -249,9 +249,7 @@ namespace AIO.UEditor
                                 if (CurrentSelectAssetIndex < 0)
                                 {
                                     if (CurrentPageValues.CurrentPageValues.Length > 0)
-                                    {
-                                        CurrentSelectAssetIndex = CurrentPageValues.CurrentPageValues.Length - 1;
-                                    }
+                                        CurrentSelectAssetIndex  = CurrentPageValues.CurrentPageValues.Length - 1;
                                     else CurrentSelectAssetIndex = 0;
                                 }
 
@@ -301,9 +299,12 @@ namespace AIO.UEditor
                                     if (CurrentCurrentCollectorsIndex < 0)
                                     {
                                         CurrentCurrentCollectorsIndex = ItemCollectorsSearchResult.Count - 1;
-                                        OnDrawItemListScroll.y = 0;
+                                        OnDrawItemListScroll.y        = 0;
                                     }
-                                    else OnDrawItemListScroll.y -= 27;
+                                    else
+                                    {
+                                        OnDrawItemListScroll.y -= 27;
+                                    }
 
                                     GUI.FocusControl(null);
                                     eventData.Use();
@@ -318,9 +319,12 @@ namespace AIO.UEditor
                                     if (CurrentCurrentCollectorsIndex >= Data.CurrentGroup.Length)
                                     {
                                         CurrentCurrentCollectorsIndex = 0;
-                                        OnDrawItemListScroll.y = 27 * Data.CurrentGroup.Length - 1;
+                                        OnDrawItemListScroll.y        = 27 * Data.CurrentGroup.Length - 1;
                                     }
-                                    else OnDrawItemListScroll.y -= 27;
+                                    else
+                                    {
+                                        OnDrawItemListScroll.y -= 27;
+                                    }
 
                                     GUI.FocusControl(null);
                                     eventData.Use();
@@ -339,9 +343,12 @@ namespace AIO.UEditor
                                     if (CurrentCurrentCollectorsIndex < 0)
                                     {
                                         CurrentCurrentCollectorsIndex = ItemCollectorsSearchResult.Count - 1;
-                                        OnDrawItemListScroll.y = 0;
+                                        OnDrawItemListScroll.y        = 0;
                                     }
-                                    else OnDrawItemListScroll.y += 27;
+                                    else
+                                    {
+                                        OnDrawItemListScroll.y += 27;
+                                    }
 
                                     GUI.FocusControl(null);
                                     eventData.Use();
@@ -356,9 +363,12 @@ namespace AIO.UEditor
                                     if (CurrentCurrentCollectorsIndex < 0)
                                     {
                                         CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
-                                        OnDrawItemListScroll.y = 0;
+                                        OnDrawItemListScroll.y        = 0;
                                     }
-                                    else OnDrawItemListScroll.y += 27;
+                                    else
+                                    {
+                                        OnDrawItemListScroll.y += 27;
+                                    }
 
                                     GUI.FocusControl(null);
                                     eventData.Use();
@@ -415,7 +425,6 @@ namespace AIO.UEditor
             }
 
             if (eventData.control)
-            {
                 switch (keyCode)
                 {
                     case KeyCode.Keypad1:
@@ -461,7 +470,6 @@ namespace AIO.UEditor
                         eventData.Use();
                         break;
                 }
-            }
         }
 
         public override void EventMouseUp(in Event eventData)
@@ -488,15 +496,15 @@ namespace AIO.UEditor
         partial void OnDrawASConfig();
 
         /// <summary>
-        /// 绘制资源 阴影
+        ///     绘制资源 阴影
         /// </summary>
         private static void OnDrawShading(Rect rect)
         {
-            if (Mathf.FloorToInt(((rect.y - 4f) / rect.height) % 2f) != 0) return;
+            if (Mathf.FloorToInt((rect.y - 4f) / rect.height % 2f) != 0) return;
             var rect2 = new Rect(rect);
-            rect2.width += rect.x + rect.height;
+            rect2.width  += rect.x + rect.height;
             rect2.height += 1f;
-            rect2.x = 0f;
+            rect2.x      =  0f;
             EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);
             rect2.height = 1f;
             EditorGUI.DrawRect(rect2, ROW_SHADING_COLOR);

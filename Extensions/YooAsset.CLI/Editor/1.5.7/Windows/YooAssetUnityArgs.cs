@@ -11,19 +11,17 @@ namespace AIO.UEditor.CLI
     [Serializable]
     public class YooAssetUnityArgs
     {
-        public static readonly int[] Versions = new int[] { 2017, 2018, 2019, 2020, 2021, 2022, 2023 };
+        public static readonly int[] Versions = { 2017, 2018, 2019, 2020, 2021, 2022, 2023 };
 
         /// <summary>
-        /// Unity版本 2018 2019 2020 2021 2022 2023
+        ///     Unity版本 2018 2019 2020 2021 2022 2023
         /// </summary>
         public int VersionIndex;
 
         /// <summary>
-        /// 工程导出路径
+        ///     工程导出路径
         /// </summary>
         public string OutputRoot;
-
-        public BuildTarget BuildTarget { get; private set; }
 
         public YooAssetUnityArgs(BuildTarget target)
         {
@@ -37,7 +35,7 @@ namespace AIO.UEditor.CLI
 #elif UNITY_2020
                 VersionIndex = 3;
 #elif UNITY_2021
-                VersionIndex = 4;
+            VersionIndex = 4;
 #elif UNITY_2022
                 VersionIndex = 5;
 #elif UNITY_2023
@@ -45,14 +43,16 @@ namespace AIO.UEditor.CLI
 #endif
         }
 
+        public BuildTarget BuildTarget { get; private set; }
+
         public int GetVersion()
         {
             return Versions.Get(VersionIndex);
         }
 
         public async void BuiltUpToStreamingAssets(
-            BuildTarget buildTarget,
-            string packageRoot,
+            BuildTarget                 buildTarget,
+            string                      packageRoot,
             IDictionary<string, string> packages
         )
         {
@@ -122,15 +122,11 @@ namespace AIO.UEditor.CLI
                 case BuildTarget.Android:
 
                     if (GetVersion() >= 2020)
-                    {
                         output = Path.Combine(OutputRoot, "unityLibrary", "src", "main", "assets",
-                            ASConfig.GetOrCreate().RuntimeRootDirectory);
-                    }
+                                              ASConfig.GetOrCreate().RuntimeRootDirectory);
                     else
-                    {
                         output = Path.Combine(OutputRoot, "src", "main", "assets",
-                            ASConfig.GetOrCreate().RuntimeRootDirectory);
-                    }
+                                              ASConfig.GetOrCreate().RuntimeRootDirectory);
 
                     break;
                 case BuildTarget.iOS:

@@ -5,16 +5,18 @@ using YooAsset;
 namespace AIO.UEngine.YooAsset
 {
     /// <summary>
-    /// 内置文件远程服务类
+    ///     内置文件远程服务类
     /// </summary>
     public class ResolverRemoteServices : IRemoteServices
     {
-        private AssetsPackageConfig Config { get; set; }
-
         public ResolverRemoteServices(AssetsPackageConfig config)
         {
             Config = config;
         }
+
+        private AssetsPackageConfig Config { get; }
+
+        #region IRemoteServices Members
 
         public string GetRemoteMainURL(string fileName)
         {
@@ -25,6 +27,8 @@ namespace AIO.UEngine.YooAsset
         {
             return AssetSystem.Parameter.GetRemoteURL(fileName, Config.Name, Config.CurrentVersion);
         }
+
+        #endregion
     }
 }
 #endif

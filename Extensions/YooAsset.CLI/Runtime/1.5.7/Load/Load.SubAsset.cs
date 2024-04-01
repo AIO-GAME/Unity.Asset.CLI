@@ -69,7 +69,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 同步加载子资源对象
+        ///     同步加载子资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
@@ -89,7 +89,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 同步加载子资源对象
+        ///     同步加载子资源对象
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>

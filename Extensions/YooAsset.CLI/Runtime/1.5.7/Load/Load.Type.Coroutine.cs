@@ -62,7 +62,8 @@ namespace AIO.UEngine.YooAsset
                     if (operation.Status != EOperationStatus.Succeed)
                     {
                         AssetSystem.LogExceptionFormat("获取远端资源失败 [{0} : {1}] {2} -> {3}",
-                            package.PackageName, package.GetPackageVersion(), location, operation.Error);
+                                                       package.PackageName, package.GetPackageVersion(), location,
+                                                       operation.Error);
                         cb.Invoke(null);
                         yield break;
                     }
@@ -115,7 +116,8 @@ namespace AIO.UEngine.YooAsset
                 if (operation.Status != EOperationStatus.Succeed)
                 {
                     AssetSystem.LogExceptionFormat("资源获取失败 [{0} : {1}] {2} -> {3}",
-                        package.PackageName, package.GetPackageVersion(), location, operation.Error);
+                                                   package.PackageName, package.GetPackageVersion(), location,
+                                                   operation.Error);
                     cb.Invoke(null);
                     yield break;
                 }
@@ -124,11 +126,14 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_EDITOR
             AddSequenceRecord(package, package.GetAssetInfo(location));
 #endif
-            if (package.CheckLocationValid(location)) cb.Invoke(package);
+            if (package.CheckLocationValid(location))
+            {
+                cb.Invoke(package);
+            }
             else
             {
                 AssetSystem.LogException(
-                    $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+                                         $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
                 cb.Invoke(null);
             }
         }

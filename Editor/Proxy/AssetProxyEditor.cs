@@ -11,13 +11,13 @@ using UnityEngine.SceneManagement;
 namespace AIO.UEditor
 {
     /// <summary>
-    /// 资源 代理 编辑器
+    ///     资源 代理 编辑器
     /// </summary>
     public static class AssetProxyEditor
     {
         private static IAssetProxyEditor Editor;
 
-        [AInit(mode: EInitAttrMode.Both, int.MaxValue)]
+        [AInit(EInitAttrMode.Both, int.MaxValue)]
         public static void Initialize()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -34,7 +34,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 创建配置
+        ///     创建配置
         /// </summary>
         /// <param name="BundlesDir">资源构建目录</param>
         /// <param name="MergeToLatest">是否合并为latest版本</param>
@@ -51,7 +51,7 @@ namespace AIO.UEditor
         }
 
         public static async Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters,
-            bool isTips = false)
+                                                    bool                                 isTips = false)
         {
             if (Editor is null)
             {
@@ -76,7 +76,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 上传到GCloud
+        ///     上传到GCloud
         /// </summary>
         public static async Task<bool> UploadGCloud(AsUploadGCloudParameter parameter, bool isTips = false)
         {
@@ -101,7 +101,7 @@ namespace AIO.UEditor
 
 
         /// <summary>
-        /// 上传到Ftp
+        ///     上传到Ftp
         /// </summary>
         public static async Task<bool> UploadFtp(AsUploadFtpParameter parameter, bool isTips = false)
         {
@@ -122,15 +122,15 @@ namespace AIO.UEditor
         {
             var command = new AssetBuildCommand
             {
-                PackageVersion = config.BuildVersion,
-                BuildPackage = config.PackageName,
-                CompressOption = config.CompressedMode,
-                ActiveTarget = config.BuildTarget,
-                BuildPipeline = config.BuildPipeline,
-                OutputRoot = config.BuildOutputPath,
-                BuildMode = config.BuildMode,
+                PackageVersion      = config.BuildVersion,
+                BuildPackage        = config.PackageName,
+                CompressOption      = config.CompressedMode,
+                ActiveTarget        = config.BuildTarget,
+                BuildPipeline       = config.BuildPipeline,
+                OutputRoot          = config.BuildOutputPath,
+                BuildMode           = config.BuildMode,
                 CopyBuildInFileTags = config.FirstPackTag,
-                MergeToLatest = config.MergeToLatest,
+                MergeToLatest       = config.MergeToLatest
             };
             var array = AssetCollectRoot.GetOrCreate().GetPackageNames();
             if (config.BuildFirstPackage) array = array.Add(AssetSystem.TagsRecord);
@@ -138,7 +138,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 构建资源
+        ///     构建资源
         /// </summary>
         /// <param name="config"></param>
         /// <param name="isTips"></param>
@@ -146,25 +146,25 @@ namespace AIO.UEditor
         {
             var command = new AssetBuildCommand
             {
-                PackageVersion = config.BuildVersion,
-                BuildPackage = config.PackageName,
-                CompressOption = config.CompressedMode,
-                ActiveTarget = config.BuildTarget,
-                BuildPipeline = config.BuildPipeline,
-                OutputRoot = config.BuildOutputPath,
-                BuildMode = config.BuildMode,
+                PackageVersion      = config.BuildVersion,
+                BuildPackage        = config.PackageName,
+                CompressOption      = config.CompressedMode,
+                ActiveTarget        = config.BuildTarget,
+                BuildPipeline       = config.BuildPipeline,
+                OutputRoot          = config.BuildOutputPath,
+                BuildMode           = config.BuildMode,
                 CopyBuildInFileTags = config.FirstPackTag,
-                MergeToLatest = config.MergeToLatest,
+                MergeToLatest       = config.MergeToLatest
             };
             if (config.BuildFirstPackage) command.BuildPackage = AssetSystem.TagsRecord;
             return BuildArt(command, isTips);
         }
 
         /// <summary>
-        /// 构建所有资源
+        ///     构建所有资源
         /// </summary>
         public static bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command,
-            bool isTips = false)
+                                        bool                isTips = false)
         {
             if (Editor is null)
             {
@@ -199,7 +199,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 转换配置
+        ///     转换配置
         /// </summary>
         /// <param name="config">配饰文件</param>
         /// <param name="ignoreTips">忽略提示</param>
@@ -227,14 +227,19 @@ namespace AIO.UEditor
                 EditorSceneManager.SaveScene(scene);
         }
 
+        private static void TipsInstall()
+        {
+            var window = ScriptableObject.CreateInstance<InstallPopup>();
+            window.titleContent = new GUIContent("提示");
+            window.ShowUtility();
+            window.Focus();
+        }
+
+        #region Nested type: InstallPopup
+
         private class InstallPopup : EditorWindow
         {
-            private enum Types
-            {
-                [InspectorName("YooAsset [Latest]")] YooAsset,
-            }
-
-            private bool isCN;
+            private bool  isCN;
             private Types type;
 
             private void Awake()
@@ -242,10 +247,10 @@ namespace AIO.UEditor
                 // 位置显示在屏幕中间
                 var temp = Screen.currentResolution;
                 position = new Rect(
-                    temp.width / 2f,
-                    temp.height / 2f,
-                    300,
-                    50);
+                                    temp.width / 2f,
+                                    temp.height / 2f,
+                                    300,
+                                    50);
             }
 
             private void OnGUI()
@@ -270,14 +275,13 @@ namespace AIO.UEditor
                     Close();
                 }
             }
+
+            private enum Types
+            {
+                [InspectorName("YooAsset [Latest]")] YooAsset
+            }
         }
 
-        private static void TipsInstall()
-        {
-            var window = ScriptableObject.CreateInstance<InstallPopup>();
-            window.titleContent = new GUIContent("提示");
-            window.ShowUtility();
-            window.Focus();
-        }
+        #endregion
     }
 }

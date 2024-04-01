@@ -4,8 +4,13 @@ namespace AIO.UEditor
 {
     public static class AssetCollectSetting
     {
+        private static DisplayList<IAssetRuleAddress> _MapAddress;
+        private static DisplayList<IAssetRuleFilter>  _MapCollect;
+        private static DisplayList<IAssetRuleFilter>  _MapFilter;
+        private static DisplayList<IAssetRulePack>    _MapPacks;
+
         /// <summary>
-        /// 资源可寻址类型列表
+        ///     资源可寻址类型列表
         /// </summary>
         public static DisplayList<IAssetRuleAddress> MapAddress
         {
@@ -17,7 +22,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 资源收集类型列表
+        ///     资源收集类型列表
         /// </summary>
         public static DisplayList<IAssetRuleFilter> MapCollect
         {
@@ -29,7 +34,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 资源过滤类型列表
+        ///     资源过滤类型列表
         /// </summary>
         public static DisplayList<IAssetRuleFilter> MapFilter
         {
@@ -42,7 +47,7 @@ namespace AIO.UEditor
 
 
         /// <summary>
-        /// 资源打包类型列表
+        ///     资源打包类型列表
         /// </summary>
         public static DisplayList<IAssetRulePack> MapPacks
         {
@@ -52,11 +57,6 @@ namespace AIO.UEditor
                 return _MapPacks;
             }
         }
-
-        private static DisplayList<IAssetRuleAddress> _MapAddress;
-        private static DisplayList<IAssetRuleFilter> _MapCollect;
-        private static DisplayList<IAssetRuleFilter> _MapFilter;
-        private static DisplayList<IAssetRulePack> _MapPacks;
 
         private static void Initialize()
         {
@@ -77,33 +77,27 @@ namespace AIO.UEditor
             else _MapPacks.Clear();
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var type in assembly.GetTypes())
             {
-                foreach (var type in assembly.GetTypes())
+                if (type.IsAbstract || type.IsInterface || type.IsEnum) continue;
+                var iAssetAddress = type.GetInterface(assetAddress);
+                var iAssetFilter = type.GetInterface(assetFilter);
+                var iAssetPack = type.GetInterface(assetPack);
+                if (iAssetAddress == null && iAssetFilter == null && iAssetPack == null) continue;
+
+                var instance = Activator.CreateInstance(type);
+                var key = type.FullName ?? type.Name;
+                if (iAssetAddress != null && instance is IAssetRuleAddress InstanceAddress)
+                    _MapAddress.Add(key, InstanceAddress.DisplayAddressName, InstanceAddress);
+
+                if (iAssetPack != null && instance is IAssetRulePack InstancePack)
+                    _MapPacks.Add(key, InstancePack.DisplayPackName, InstancePack);
+
+                if (iAssetFilter != null && instance is IAssetRuleFilter InstanceFilter)
                 {
-                    if (type.IsAbstract || type.IsInterface || type.IsEnum) continue;
-                    var iAssetAddress = type.GetInterface(assetAddress);
-                    var iAssetFilter = type.GetInterface(assetFilter);
-                    var iAssetPack = type.GetInterface(assetPack);
-                    if (iAssetAddress == null && iAssetFilter == null && iAssetPack == null) continue;
-
-                    var instance = Activator.CreateInstance(type);
-                    var key = type.FullName ?? type.Name;
-                    if (iAssetAddress != null && instance is IAssetRuleAddress InstanceAddress)
-                    {
-                        _MapAddress.Add(key, InstanceAddress.DisplayAddressName, InstanceAddress);
-                    }
-
-                    if (iAssetPack != null && instance is IAssetRulePack InstancePack)
-                    {
-                        _MapPacks.Add(key, InstancePack.DisplayPackName, InstancePack);
-                    }
-
-                    if (iAssetFilter != null && instance is IAssetRuleFilter InstanceFilter)
-                    {
-                        var keyFilter = InstanceFilter.DisplayFilterName;
-                        _MapCollect.Add(key, keyFilter, InstanceFilter);
-                        _MapFilter.Add(key, keyFilter, InstanceFilter);
-                    }
+                    var keyFilter = InstanceFilter.DisplayFilterName;
+                    _MapCollect.Add(key, keyFilter, InstanceFilter);
+                    _MapFilter.Add(key, keyFilter, InstanceFilter);
                 }
             }
         }

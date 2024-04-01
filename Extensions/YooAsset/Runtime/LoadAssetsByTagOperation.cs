@@ -4,27 +4,19 @@ using YooAsset;
 
 public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObject : Object
 {
-    private enum ESteps
-    {
-        None,
-        LoadAssets,
-        CheckResult,
-        Done,
-    }
-
-    private readonly string _tag;
-    private ESteps _steps = ESteps.None;
-    private List<AssetOperationHandle> _handles;
-
-    /// <summary>
-    /// 资源对象集合
-    /// </summary>
-    public List<TObject> AssetObjects { private set; get; }
+    private readonly string                     _tag;
+    private          List<AssetOperationHandle> _handles;
+    private          ESteps                     _steps = ESteps.None;
 
     public LoadAssetsByTagOperation(string tag)
     {
         _tag = tag;
     }
+
+    /// <summary>
+    ///     资源对象集合
+    /// </summary>
+    public List<TObject> AssetObjects { private set; get; }
 
     protected override void OnStart()
     {
@@ -38,7 +30,7 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
 
         if (_steps == ESteps.LoadAssets)
         {
-            AssetInfo[] assetInfos = YooAssets.GetAssetInfos(_tag);
+            var assetInfos = YooAssets.GetAssetInfos(_tag);
             _handles = new List<AssetOperationHandle>(assetInfos.Length);
             foreach (var assetInfo in assetInfos)
             {
@@ -51,7 +43,7 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
 
         if (_steps == ESteps.CheckResult)
         {
-            int index = 0;
+            var index = 0;
             foreach (var handle in _handles)
             {
                 if (handle.IsDone == false)
@@ -65,7 +57,6 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
 
             AssetObjects = new List<TObject>(_handles.Count);
             foreach (var handle in _handles)
-            {
                 if (handle.Status == EOperationStatus.Succeed)
                 {
                     var assetObject = handle.AssetObject as TObject;
@@ -75,7 +66,7 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
                     }
                     else
                     {
-                        string error = $"资源类型转换失败：{handle.AssetObject.name}";
+                        var error = $"资源类型转换失败：{handle.AssetObject.name}";
                         Debug.LogError($"{error}");
                         AssetObjects.Clear();
                         SetFinish(false, error);
@@ -89,7 +80,6 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
                     SetFinish(false, handle.LastError);
                     return;
                 }
-            }
 
             SetFinish(true);
         }
@@ -97,21 +87,30 @@ public class LoadAssetsByTagOperation<TObject> : GameAsyncOperation where TObjec
 
     private void SetFinish(bool succeed, string error = "")
     {
-        Error = error;
+        Error  = error;
         Status = succeed ? EOperationStatus.Succeed : EOperationStatus.Failed;
         _steps = ESteps.Done;
     }
 
     /// <summary>
-    /// 释放资源句柄
+    ///     释放资源句柄
     /// </summary>
     public void ReleaseHandle()
     {
-        foreach (var handle in _handles)
-        {
-            handle.Release();
-        }
+        foreach (var handle in _handles) handle.Release();
 
         _handles.Clear();
     }
+
+    #region Nested type: ESteps
+
+    private enum ESteps
+    {
+        None,
+        LoadAssets,
+        CheckResult,
+        Done
+    }
+
+    #endregion
 }

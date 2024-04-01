@@ -1,5 +1,4 @@
 ﻿using System;
-using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
@@ -54,7 +53,6 @@ namespace AIO.UEditor
             GUILayout.Label(TempBuilder.ToString(), GEStyle.toolbarbuttonRight, GP_Height_20, GP_Width_EXPAND);
 
             if (GUILayout.Button(GC_ToConvert, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
-            {
                 try
                 {
                     GUI.FocusControl(null);
@@ -65,25 +63,14 @@ namespace AIO.UEditor
                 {
                     // ignored
                 }
-            }
 
-            if (GUILayout.Button(GC_SORT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
-            {
-                Data.Sort();
-            }
+            if (GUILayout.Button(GC_SORT, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20)) Data.Sort();
 
             if (GUILayout.Button(GC_MERGE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
-            {
                 if (EditorUtility.DisplayDialog("合并", "确定合并当前资源包的所有组和收集器?", "确定", "取消"))
-                {
                     Data.MergeCollector(Data.CurrentPackage.Name);
-                }
-            }
 
-            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
-            {
-                Data.Refresh();
-            }
+            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20)) Data.Refresh();
 
             if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
             {
@@ -92,7 +79,6 @@ namespace AIO.UEditor
             }
 
             if (GUILayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
-            {
                 try
                 {
                     GUI.FocusControl(null);
@@ -102,16 +88,12 @@ namespace AIO.UEditor
 #else
                     AssetDatabase.SaveAssets();
 #endif
-                    if (EditorUtility.DisplayDialog("保存", "保存成功", "确定"))
-                    {
-                        AssetDatabase.Refresh();
-                    }
+                    if (EditorUtility.DisplayDialog("保存", "保存成功", "确定")) AssetDatabase.Refresh();
                 }
                 catch (Exception)
                 {
                     // ignored
                 }
-            }
         }
 
         partial void OnDrawHeaderBuildMode();

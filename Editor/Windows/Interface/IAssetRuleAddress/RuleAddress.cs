@@ -8,35 +8,55 @@ namespace AIO.UEditor
 {
     public class RuleAddress
     {
-        public class AddressRuleGroupRelative : IAddressRule
+        #region Nested type: AddressRuleCollectFileName
+
+        public class AddressRuleCollectFileName : IAddressRule
         {
+            #region IAddressRule Members
+
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "寻址路径 = 组名 + 资源文件相对收集器路径";
+            public string DisplayAddressName => "寻址路径 = 收集器文件名 + 资源文件名";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return data.AssetPath.Replace(data.CollectPath, data.GroupName).Replace('\\', '/');
+                return string.Concat(
+                                     Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath)).
+                              Replace('\\', '/');
             }
+
+            #endregion
         }
 
-        public class AddressRuleGroupFileName : IAddressRule
+        #endregion
+
+        #region Nested type: AddressRuleCollectRelative
+
+        public class AddressRuleCollectRelative : IAddressRule
         {
+            #region IAddressRule Members
+
             public bool AllowThread => true;
 
-            public string DisplayAddressName => "寻址路径 = 组名 + 资源文件名";
+            public string DisplayAddressName => "寻址路径 = 收集器文件名 + 资源文件相对收集器路径";
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                if (string.IsNullOrEmpty(data.AssetPath)) throw new ArgumentNullException(nameof(data.AssetPath));
-                if (string.IsNullOrEmpty(data.GroupName)) throw new ArgumentNullException(nameof(data.GroupName));
-                return Path.Combine(Path.GetFileName(data.GroupName), Path.GetFileName(data.AssetPath))
-                    .Replace('\\', '/');
+                return data.AssetPath.Substring(data.CollectPath.Replace('\\', '/').LastIndexOf('/') + 1).
+                            Replace('\\', '/');
             }
+
+            #endregion
         }
+
+        #endregion
+
+        #region Nested type: AddressRuleFileName
 
         public class AddressRuleFileName : IAddressRule
         {
+            #region IAddressRule Members
+
             public bool AllowThread => true;
 
             public string DisplayAddressName => "寻址路径 = 资源文件名";
@@ -45,10 +65,61 @@ namespace AIO.UEditor
             {
                 return Path.GetFileName(data.AssetPath).Replace('\\', '/');
             }
+
+            #endregion
         }
+
+        #endregion
+
+        #region Nested type: AddressRuleGroupFileName
+
+        public class AddressRuleGroupFileName : IAddressRule
+        {
+            #region IAddressRule Members
+
+            public bool AllowThread => true;
+
+            public string DisplayAddressName => "寻址路径 = 组名 + 资源文件名";
+
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
+            {
+                if (string.IsNullOrEmpty(data.AssetPath)) throw new ArgumentNullException(nameof(data.AssetPath));
+                if (string.IsNullOrEmpty(data.GroupName)) throw new ArgumentNullException(nameof(data.GroupName));
+                return Path.Combine(Path.GetFileName(data.GroupName), Path.GetFileName(data.AssetPath)).
+                            Replace('\\', '/');
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: AddressRuleGroupRelative
+
+        public class AddressRuleGroupRelative : IAddressRule
+        {
+            #region IAddressRule Members
+
+            public bool AllowThread => true;
+
+            public string DisplayAddressName => "寻址路径 = 组名 + 资源文件相对收集器路径";
+
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
+            {
+                return data.AssetPath.Replace(data.CollectPath, data.GroupName).Replace('\\', '/');
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: AddressRuleInstanceID
 
         public class AddressRuleInstanceID : IAddressRule
         {
+            #region IAddressRule Members
+
             public bool AllowThread => false;
 
             public string DisplayAddressName => "寻址路径 = 资源 实例ID";
@@ -58,37 +129,18 @@ namespace AIO.UEditor
                 var obj = AssetDatabase.LoadAssetAtPath<Object>(string.Concat(data.AssetPath, '.', data.Extension));
                 return obj.GetInstanceID().ToString();
             }
+
+            #endregion
         }
 
-        public class AddressRuleCollectRelative : IAddressRule
-        {
-            public bool AllowThread => true;
+        #endregion
 
-            public string DisplayAddressName => "寻址路径 = 收集器文件名 + 资源文件相对收集器路径";
-
-            string IAddressRule.GetAssetAddress(AssetRuleData data)
-            {
-                return data.AssetPath.Substring(data.CollectPath.Replace('\\', '/').LastIndexOf('/') + 1)
-                    .Replace('\\', '/');
-            }
-        }
-
-        public class AddressRuleCollectFileName : IAddressRule
-        {
-            public bool AllowThread => true;
-
-            public string DisplayAddressName => "寻址路径 = 收集器文件名 + 资源文件名";
-
-            string IAddressRule.GetAssetAddress(AssetRuleData data)
-            {
-                return string.Concat(
-                        Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath))
-                    .Replace('\\', '/');
-            }
-        }
+        #region Nested type: AddressRuleRootRelative
 
         public class AddressRuleRootRelative : IAddressRule
         {
+            #region IAddressRule Members
+
             public bool AllowThread => true;
 
             public string DisplayAddressName => "寻址路径 = 资源文件相对Asset路径";
@@ -97,10 +149,40 @@ namespace AIO.UEditor
             {
                 return data.AssetPath.Replace('\\', '/');
             }
+
+            #endregion
         }
+
+        #endregion
+
+        #region Nested type: AddressRuleUserDataFileName
+
+        public class AddressRuleUserDataFileName : IAddressRule
+        {
+            #region IAddressRule Members
+
+            public bool AllowThread => true;
+
+            public string DisplayAddressName => "寻址路径 = 自定义根路径 + 资源文件名";
+
+            string IAddressRule.GetAssetAddress(AssetRuleData data)
+            {
+                return string.IsNullOrEmpty(data.UserData)
+                    ? Path.GetFileName(data.AssetPath)
+                    : string.Concat(data.UserData, '/', Path.GetFileName(data.AssetPath)).Replace('\\', '/');
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: AddressRuleUserDataRelative
 
         public class AddressRuleUserDataRelative : IAddressRule
         {
+            #region IAddressRule Members
+
             public bool AllowThread => true;
 
             public string DisplayAddressName => "寻址路径 = 自定义根路径 + 资源文件相对收集器路径";
@@ -112,20 +194,10 @@ namespace AIO.UEditor
                     ? temp.Replace('\\', '/')
                     : string.Concat(data.UserData, '/', temp).Replace('\\', '/');
             }
+
+            #endregion
         }
 
-        public class AddressRuleUserDataFileName : IAddressRule
-        {
-            public bool AllowThread => true;
-
-            public string DisplayAddressName => "寻址路径 = 自定义根路径 + 资源文件名";
-
-            string IAddressRule.GetAssetAddress(AssetRuleData data)
-            {
-                return string.IsNullOrEmpty(data.UserData)
-                    ? Path.GetFileName(data.AssetPath)
-                    : string.Concat(data.UserData, '/', Path.GetFileName(data.AssetPath)).Replace('\\', '/');
-            }
-        }
+        #endregion
     }
 }

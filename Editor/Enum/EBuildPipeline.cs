@@ -5,7 +5,7 @@ namespace AIO.UEditor
     public enum EBuildPipeline
     {
         /// <summary>
-        /// 内置打包管线
+        ///     内置打包管线
         /// </summary>
         [InspectorName("内置打包管线")] BuiltinBuildPipeline,
 
@@ -45,7 +45,7 @@ namespace AIO.UEditor
          */
 
         /// <summary>
-        /// 自定义打包管线
+        ///     自定义打包管线
         /// </summary>
         [InspectorName("自定义打包管线(需安装)")] ScriptableBuildPipeline,
 #endif

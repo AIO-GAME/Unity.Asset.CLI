@@ -1,22 +1,23 @@
+using UnityEngine;
 using YooAsset;
 
 public static class AssetOperationHandleExtension
 {
     /// <summary>
-    /// 获取资源对象
+    ///     获取资源对象
     /// </summary>
     /// <typeparam name="TAsset"></typeparam>
     /// <param name="asset"></param>
     public static AssetOperationHandle GetAssetObject<TAsset>(
         this AssetOperationHandle thisHandle,
-        out TAsset asset
-    ) where TAsset : UnityEngine.Object
+        out  TAsset               asset
+    ) where TAsset : Object
     {
         if (thisHandle.Status != EOperationStatus.Succeed)
         {
             var assetInfo = thisHandle.GetAssetInfo();
-            UnityEngine.Debug.LogWarning(
-                $"The {assetInfo.AssetPath}[{assetInfo.AssetType}] is not success. Error[{thisHandle.LastError}]");
+            Debug.LogWarning(
+                             $"The {assetInfo.AssetPath}[{assetInfo.AssetType}] is not success. Error[{thisHandle.LastError}]");
         }
 
         asset = thisHandle.AssetObject as TAsset;
@@ -24,7 +25,7 @@ public static class AssetOperationHandleExtension
     }
 
     /// <summary>
-    /// 等待异步执行完毕
+    ///     等待异步执行完毕
     /// </summary>
     public static AssetOperationHandle WaitForAsyncOperationComplete(this AssetOperationHandle thisHandle)
     {
