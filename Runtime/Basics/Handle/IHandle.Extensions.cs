@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Object = UnityEngine.Object;
+﻿using Object = UnityEngine.Object;
 
 namespace AIO
 {
@@ -12,7 +8,7 @@ namespace AIO
         /// 安全转换
         /// </summary>
         /// <returns> 转换后的对象 </returns>
-        public static Object SafeCast(this AssetSystem.IHandle handle)
+        public static Object SafeCast(this AssetSystem.IHandle<Object> handle)
         {
             return handle.Result;
         }
@@ -21,7 +17,8 @@ namespace AIO
         /// 安全转换
         /// </summary>
         /// <returns> 转换后的对象 </returns>
-        public static TObject SafeCast<TObject>(this AssetSystem.IHandle<TObject> handle) where TObject : Object
+        public static TObject SafeCast<TObject>(this AssetSystem.IHandle<TObject> handle)
+        where TObject : Object
         {
             return handle.Result;
         }

@@ -18,9 +18,7 @@ namespace AIO
         ///     获取序列记录
         /// </summary>
         /// <param name="record">记录</param>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
-        [Conditional("UNITY_EDITOR")]
+        [DebuggerNonUserCode, DebuggerHidden, Conditional("UNITY_EDITOR")]
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
 #endif

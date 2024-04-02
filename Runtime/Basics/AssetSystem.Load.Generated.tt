@@ -66,7 +66,7 @@ namespace AIO
 #endif
         public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<<#= typeName #>>.Create(location, cb);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace AIO
 #endif
         public static IHandle<<#= typeName #>> Load<#= aliasName #>Task(string location)
         {
-            return CreateLoadAssetHandle<<#= typeName #>>(location);
+            return ASHandleLoadAsset<<#= typeName #>>.Create(location);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace AIO
 #endif
         public static IHandle<<#= typeName #>> Load<#= aliasName #>Task(string location, Action<<#= typeName #>> cb)
         {
-            return CreateLoadAssetHandle<<#= typeName #>>(location, cb);
+            return ASHandleLoadAsset<<#= typeName #>>.Create(location, cb);
         }
 
        #endregion

@@ -41,7 +41,7 @@ namespace AIO
 #endif
         public static async void LoadShader(string location, Action<UnityEngine.Shader> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.Shader>.Create(location, cb);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Shader> LoadShaderTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.Shader>(location);
+            return ASHandleLoadAsset<UnityEngine.Shader>.Create(location);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Shader> LoadShaderTask(string location, Action<UnityEngine.Shader> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.Shader>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.Shader>.Create(location, cb);
         }
 
        #endregion
@@ -99,7 +99,7 @@ namespace AIO
 #endif
         public static async void LoadAudioClip(string location, Action<UnityEngine.AudioClip> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.AudioClip>.Create(location, cb);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.AudioClip> LoadAudioClipTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.AudioClip>(location);
+            return ASHandleLoadAsset<UnityEngine.AudioClip>.Create(location);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.AudioClip> LoadAudioClipTask(string location, Action<UnityEngine.AudioClip> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.AudioClip>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.AudioClip>.Create(location, cb);
         }
 
        #endregion
@@ -157,7 +157,7 @@ namespace AIO
 #endif
         public static async void LoadTextAsset(string location, Action<UnityEngine.TextAsset> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.TextAsset>.Create(location, cb);
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.TextAsset> LoadTextAssetTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.TextAsset>(location);
+            return ASHandleLoadAsset<UnityEngine.TextAsset>.Create(location);
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.TextAsset> LoadTextAssetTask(string location, Action<UnityEngine.TextAsset> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.TextAsset>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.TextAsset>.Create(location, cb);
         }
 
        #endregion
@@ -215,7 +215,7 @@ namespace AIO
 #endif
         public static async void LoadMaterial(string location, Action<UnityEngine.Material> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.Material>.Create(location, cb);
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Material> LoadMaterialTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.Material>(location);
+            return ASHandleLoadAsset<UnityEngine.Material>.Create(location);
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Material> LoadMaterialTask(string location, Action<UnityEngine.Material> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.Material>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.Material>.Create(location, cb);
         }
 
        #endregion
@@ -273,7 +273,7 @@ namespace AIO
 #endif
         public static async void LoadAssetBundle(string location, Action<UnityEngine.AssetBundle> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.AssetBundle>.Create(location, cb);
         }
 
         /// <summary>
@@ -286,7 +286,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.AssetBundle> LoadAssetBundleTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.AssetBundle>(location);
+            return ASHandleLoadAsset<UnityEngine.AssetBundle>.Create(location);
         }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.AssetBundle> LoadAssetBundleTask(string location, Action<UnityEngine.AssetBundle> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.AssetBundle>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.AssetBundle>.Create(location, cb);
         }
 
        #endregion
@@ -331,7 +331,7 @@ namespace AIO
 #endif
         public static async void LoadAnimation(string location, Action<UnityEngine.Animation> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.Animation>.Create(location, cb);
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Animation> LoadAnimationTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.Animation>(location);
+            return ASHandleLoadAsset<UnityEngine.Animation>.Create(location);
         }
 
         /// <summary>
@@ -358,7 +358,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Animation> LoadAnimationTask(string location, Action<UnityEngine.Animation> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.Animation>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.Animation>.Create(location, cb);
         }
 
        #endregion
@@ -389,7 +389,7 @@ namespace AIO
 #endif
         public static async void LoadTexture(string location, Action<UnityEngine.Texture> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.Texture>.Create(location, cb);
         }
 
         /// <summary>
@@ -402,7 +402,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Texture> LoadTextureTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.Texture>(location);
+            return ASHandleLoadAsset<UnityEngine.Texture>.Create(location);
         }
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Texture> LoadTextureTask(string location, Action<UnityEngine.Texture> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.Texture>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.Texture>.Create(location, cb);
         }
 
        #endregion
@@ -447,7 +447,7 @@ namespace AIO
 #endif
         public static async void LoadTexture2D(string location, Action<UnityEngine.Texture2D> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.Texture2D>.Create(location, cb);
         }
 
         /// <summary>
@@ -460,7 +460,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Texture2D> LoadTexture2DTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.Texture2D>(location);
+            return ASHandleLoadAsset<UnityEngine.Texture2D>.Create(location);
         }
 
         /// <summary>
@@ -474,7 +474,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Texture2D> LoadTexture2DTask(string location, Action<UnityEngine.Texture2D> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.Texture2D>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.Texture2D>.Create(location, cb);
         }
 
        #endregion
@@ -505,7 +505,7 @@ namespace AIO
 #endif
         public static async void LoadFont(string location, Action<UnityEngine.Font> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.Font>.Create(location, cb);
         }
 
         /// <summary>
@@ -518,7 +518,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Font> LoadFontTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.Font>(location);
+            return ASHandleLoadAsset<UnityEngine.Font>.Create(location);
         }
 
         /// <summary>
@@ -532,7 +532,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Font> LoadFontTask(string location, Action<UnityEngine.Font> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.Font>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.Font>.Create(location, cb);
         }
 
        #endregion
@@ -563,7 +563,7 @@ namespace AIO
 #endif
         public static async void LoadMesh(string location, Action<UnityEngine.Mesh> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.Mesh>.Create(location, cb);
         }
 
         /// <summary>
@@ -576,7 +576,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Mesh> LoadMeshTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.Mesh>(location);
+            return ASHandleLoadAsset<UnityEngine.Mesh>.Create(location);
         }
 
         /// <summary>
@@ -590,7 +590,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.Mesh> LoadMeshTask(string location, Action<UnityEngine.Mesh> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.Mesh>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.Mesh>.Create(location, cb);
         }
 
        #endregion
@@ -621,7 +621,7 @@ namespace AIO
 #endif
         public static async void LoadGameObject(string location, Action<UnityEngine.GameObject> cb)
         {
-            await CreateLoadAssetHandle(location, cb);
+            await ASHandleLoadAsset<UnityEngine.GameObject>.Create(location, cb);
         }
 
         /// <summary>
@@ -634,7 +634,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.GameObject> LoadGameObjectTask(string location)
         {
-            return CreateLoadAssetHandle<UnityEngine.GameObject>(location);
+            return ASHandleLoadAsset<UnityEngine.GameObject>.Create(location);
         }
 
         /// <summary>
@@ -648,7 +648,7 @@ namespace AIO
 #endif
         public static IHandle<UnityEngine.GameObject> LoadGameObjectTask(string location, Action<UnityEngine.GameObject> cb)
         {
-            return CreateLoadAssetHandle<UnityEngine.GameObject>(location, cb);
+            return ASHandleLoadAsset<UnityEngine.GameObject>.Create(location, cb);
         }
 
        #endregion

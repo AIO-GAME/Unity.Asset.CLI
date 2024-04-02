@@ -41,9 +41,9 @@ namespace AIO
         /// <summary>
         ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
-        public static IEnumerator Initialize<T>(ASConfig config) where T : ASProxy, new()
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IEnumerator Initialize<T>(ASConfig config)
+        where T : ASProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), config);
         }
@@ -51,8 +51,7 @@ namespace AIO
         /// <summary>
         ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize()
         {
             return Initialize(ASConfig.GetOrCreate());
@@ -61,8 +60,7 @@ namespace AIO
         /// <summary>
         ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator Initialize(ASConfig config)
         {
             var proxyType = typeof(ASProxy);
@@ -86,9 +84,9 @@ namespace AIO
         /// <summary>
         ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy) where T : ASProxy
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IEnumerator Initialize<T>(T proxy)
+        where T : ASProxy
         {
             return Initialize(proxy, ASConfig.GetOrCreate());
         }
@@ -96,9 +94,9 @@ namespace AIO
         /// <summary>
         ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
-        public static IEnumerator Initialize<T>() where T : ASProxy, new()
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IEnumerator Initialize<T>()
+        where T : ASProxy, new()
         {
             return Initialize(Activator.CreateInstance<T>(), ASConfig.GetOrCreate());
         }
@@ -106,9 +104,9 @@ namespace AIO
         /// <summary>
         ///     系统初始化
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy, ASConfig config) where T : ASProxy
+        [DebuggerNonUserCode, DebuggerHidden]
+        public static IEnumerator Initialize<T>(T proxy, ASConfig config)
+        where T : ASProxy
         {
             if (IsInitialized) yield break;
             _Exception = ASException.None;
@@ -166,8 +164,7 @@ namespace AIO
         ///     销毁资源管理系统
         /// </summary>
         /// <returns></returns>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static Task DestroyTask()
         {
             Destroy();
@@ -178,8 +175,7 @@ namespace AIO
         ///     销毁资源管理系统
         /// </summary>
         /// <returns></returns>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static IEnumerator DestroyCO()
         {
             Destroy();
@@ -190,8 +186,7 @@ namespace AIO
         ///     销毁资源管理系统
         /// </summary>
         /// <returns></returns>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static void Destroy()
         {
 #if UNITY_EDITOR

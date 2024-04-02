@@ -6,12 +6,12 @@ namespace AIO
 {
     partial class AssetSystem
     {
-        private static ASProxy Proxy;
+        internal static ASProxy Proxy;
 
         /// <summary>
         ///     白名单 - 定位指定白名单 - 允许同步加载
         /// </summary>
-        private static List<string> WhiteListLocal { get; } = new List<string>();
+        internal static List<string> WhiteListLocal { get; } = new List<string>();
 
         /// <summary>
         ///     白名单 - 全部白名单 - 允许同步加载
@@ -26,15 +26,13 @@ namespace AIO
         /// <summary>
         ///     资源热更新配置
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static ASConfig Parameter { get; private set; }
 
         /// <summary>
         ///     是否已经初始化
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public static bool IsInitialized => Proxy?.IsInitialize ?? false;
 
         /// <summary>

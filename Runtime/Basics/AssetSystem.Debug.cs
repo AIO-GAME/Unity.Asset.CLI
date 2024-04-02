@@ -28,11 +28,8 @@ namespace AIO
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -50,11 +47,8 @@ namespace AIO
         ///     <para>A variant of Debug.Log that logs a warning message to the console.</para>
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
         public static void LogWarning(string message)
         {
 #if UNITY_EDITOR
@@ -69,11 +63,8 @@ namespace AIO
         ///     <para>A variant of Debug.Log that logs an error message to the console.</para>
         /// </summary>
         /// <param name="exception">Runtime Exception.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -95,11 +86,8 @@ namespace AIO
         ///     <para>A variant of Debug.Log that logs an error message to the console.</para>
         /// </summary>
         /// <param name="exception">Runtime Exception.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -118,11 +106,8 @@ namespace AIO
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -140,11 +125,8 @@ namespace AIO
         ///     <para>Logs a message to the Unity Console.</para>
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -163,11 +145,8 @@ namespace AIO
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -185,11 +164,8 @@ namespace AIO
         ///     <para>A variant of Debug.Log that logs an error message to the console.</para>
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -208,11 +184,8 @@ namespace AIO
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
-        [DebuggerHidden]
-        [DebuggerNonUserCode]
-        [IgnoreConsoleJump]
-        [Conditional("DEBUG")]
-        [ProfilerScope]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
+        [ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
