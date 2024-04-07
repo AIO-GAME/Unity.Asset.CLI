@@ -45,6 +45,12 @@ namespace AIO.UEngine
         ///     更新资源包
         /// </summary>
         /// <returns></returns>
+        public abstract void UpdatePackages(ASConfig config);
+
+        /// <summary>
+        ///     更新资源包
+        /// </summary>
+        /// <returns></returns>
         public abstract Task UpdatePackagesTask(ASConfig config);
 
         /// <summary>

@@ -84,7 +84,34 @@ namespace AIO
 
         protected override void CreateSync()
         {
-            throw new NotImplementedException();
+            if (!IsValidate) throw new Exception("Initialize Error");
+            Proxy.UpdatePackages(Config);
+            if (AssetSystem._Exception != ASException.None)
+            {
+                IsValidate = false;
+                return;
+            }
+
+            try
+            {
+                Config.Check();
+            }
+            catch (Exception)
+            {
+                AssetSystem.ExceptionEvent(ASException.ASConfigCheckError);
+            }
+
+            if (AssetSystem._Exception != ASException.None)
+            {
+                IsValidate = false;
+                return;
+            }
+
+            Proxy.InitializeTask().RunSynchronously();
+            if (AssetSystem._Exception != ASException.None)
+            {
+                IsValidate = false;
+            }
         }
 
         #endregion
