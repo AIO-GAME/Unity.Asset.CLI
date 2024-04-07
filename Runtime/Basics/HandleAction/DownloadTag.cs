@@ -32,55 +32,65 @@ namespace AIO
         /// </summary>
         private IASDownloader downloader;
 
-        /// <inheritdoc />
-        protected override IEnumerator CO
-        {
-            get
-            {
-                if (AssetSystem.Parameter.ASMode == EASMode.Remote)
-                {
-                    if (downloader is null)
-                    {
-                        downloader = AssetSystem.Proxy.GetDownloader(assetEvent);
-                        downloader.Begin();
-                        if (DownlandAll) downloader.CollectNeedAll();
-                        else if (tags != null) downloader.CollectNeedTag(tags);
-                        yield return downloader;
-                    }
-                    else yield return downloader;
-                }
-                else
-                {
-                    assetEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
-                }
-
-                AssetSystem.WhiteListLocal.AddRange(AssetSystem.GetAddressByTag(tags));
-            }
-        }
-
-        protected override void Reset()
-        {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
-        }
 
         protected override void OnDispose()
         {
             downloader = null;
         }
 
-
-        #region Task
-
-        private void OnCompletedTaskObject()
+        protected override void OnInvoke()
         {
-            Progress = 100;
-            IsDone   = true;
+            if (AssetSystem.Parameter.ASMode == EASMode.Remote)
+            {
+                if (downloader is null)
+                {
+                    downloader = AssetSystem.Proxy.GetDownloader(assetEvent);
+                    downloader.Begin();
+                    if (DownlandAll) downloader.CollectNeedAll();
+                    else if (tags != null) downloader.CollectNeedTag(tags);
+                    downloader.Wait();
+                }
+                else downloader.Wait();
+            }
+            else
+            {
+                assetEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
+            }
+
+            AssetSystem.WhiteListLocal.AddRange(AssetSystem.GetAddressByTag(tags));
             InvokeOnCompleted();
         }
 
-        protected override TaskAwaiter GetAwaiter()
+        #region CO
+
+        protected override IEnumerator OnCreateCO()
+        {
+            if (AssetSystem.Parameter.ASMode == EASMode.Remote)
+            {
+                if (downloader is null)
+                {
+                    downloader = AssetSystem.Proxy.GetDownloader(assetEvent);
+                    downloader.Begin();
+                    if (DownlandAll) downloader.CollectNeedAll();
+                    else if (tags != null) downloader.CollectNeedTag(tags);
+                    yield return downloader;
+                }
+                else yield return downloader;
+            }
+            else
+            {
+                assetEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
+            }
+
+            AssetSystem.WhiteListLocal.AddRange(AssetSystem.GetAddressByTag(tags));
+            InvokeOnCompleted();
+        }
+
+        #endregion
+
+        #region Task
+
+        protected override TaskAwaiter OnAwaiter()
         {
             if (AssetSystem.Parameter.ASMode == EASMode.Remote)
             {
@@ -89,12 +99,12 @@ namespace AIO
                 if (DownlandAll) downloader.CollectNeedAll();
                 else if (tags != null) downloader.CollectNeedTag(tags);
                 var awaiter = downloader.WaitAsync().GetAwaiter();
-                awaiter.OnCompleted(OnCompletedTaskObject);
+                awaiter.OnCompleted(InvokeOnCompleted);
                 return awaiter;
             }
 
             assetEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
-            OnCompletedTaskObject();
+            InvokeOnCompleted();
             return Task.CompletedTask.GetAwaiter();
         }
 

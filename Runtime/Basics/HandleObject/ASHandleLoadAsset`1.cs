@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 
 namespace AIO
 {
-    internal partial class ASHandleLoadAsset<TObject>
+    partial class ASHandleLoadAsset<TObject>
     {
         [DebuggerNonUserCode, DebuggerHidden]
         public static AssetSystem.IHandle<TObject> Create(string location)
@@ -36,44 +36,22 @@ namespace AIO
     internal partial class ASHandleLoadAsset<TObject> : ASHandle<TObject>
     where TObject : Object
     {
-        protected override void OnDispose()
+        protected override void OnInvoke()
         {
-            _CO = null;
+            Result = AssetSystem.Proxy.LoadAssetSync<TObject>(Address);
         }
 
         #region CO
 
-        private IEnumerator _CO { get; set; }
-
-        protected override IEnumerator CO
+        protected override IEnumerator OnCreateCO()
         {
-            get
-            {
-                if (_CO is null) _CO = AssetSystem.Proxy.LoadAssetCO<TObject>(Address, OnCompletedCO);
-                return _CO;
-            }
+            return AssetSystem.Proxy.LoadAssetCO<TObject>(Address, OnCompletedCO);
         }
 
         private void OnCompletedCO(TObject asset)
         {
-            Progress = 100;
-            Result   = asset;
-            IsDone   = true;
+            Result = asset;
             InvokeOnCompleted();
-        }
-
-        /// <inheritdoc />
-        protected override bool MoveNext()
-        {
-            return CO.MoveNext();
-        }
-
-        /// <inheritdoc />
-        protected override void Reset()
-        {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
         }
 
         #endregion
@@ -82,15 +60,13 @@ namespace AIO
 
         private void OnCompletedTaskGeneric()
         {
-            Progress = 100;
-            Result   = AwaiterGeneric.GetResult();
-            IsDone   = true;
+            Result = AwaiterGeneric.GetResult();
             InvokeOnCompleted();
         }
 
         private TaskAwaiter<TObject> AwaiterGeneric;
 
-        protected override TaskAwaiter<TObject> GetAwaiterObject()
+        protected override TaskAwaiter<TObject> OnAwaiterObject()
         {
             AwaiterGeneric = AssetSystem.Proxy.LoadAssetTask<TObject>(Address).GetAwaiter();
             AwaiterGeneric.OnCompleted(OnCompletedTaskGeneric);

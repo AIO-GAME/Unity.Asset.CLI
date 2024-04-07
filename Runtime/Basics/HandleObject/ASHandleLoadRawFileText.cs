@@ -32,36 +32,25 @@ namespace AIO
 
     internal partial class ASHandleLoadRawFileText : ASHandle<string>
     {
-        private IEnumerator _CO;
+        #region Sync
 
-        protected override IEnumerator CO
+        protected override void OnInvoke()
         {
-            get
-            {
-                if (_CO is null) _CO = AssetSystem.Proxy.LoadRawFileTextCO(Address, OnCompletedCO);
-                return _CO;
-            }
+            Result = AssetSystem.Proxy.LoadRawFileTextSync(Address);
         }
 
-        protected override void Reset()
-        {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
-        }
-
-        protected override void OnDispose()
-        {
-            _CO = null;
-        }
+        #endregion
 
         #region CO
 
+        protected override IEnumerator OnCreateCO()
+        {
+            return AssetSystem.Proxy.LoadRawFileTextCO(Address, OnCompletedCO);
+        }
+
         private void OnCompletedCO(string asset)
         {
-            Progress = 100;
-            Result   = asset;
-            IsDone   = true;
+            Result = asset;
             InvokeOnCompleted();
         }
 
@@ -71,15 +60,13 @@ namespace AIO
 
         private void OnCompletedTaskObject()
         {
-            Progress = 100;
-            Result   = AwaiterObject.GetResult();
-            IsDone   = true;
+            Result = AwaiterObject.GetResult();
             InvokeOnCompleted();
         }
 
         private TaskAwaiter<string> AwaiterObject;
 
-        protected override TaskAwaiter<string> GetAwaiterObject()
+        protected override TaskAwaiter<string> OnAwaiterObject()
         {
             AwaiterObject = AssetSystem.Proxy.LoadRawFileTextTask(Address).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);

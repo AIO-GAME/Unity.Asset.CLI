@@ -18,6 +18,11 @@ namespace AIO
             /// 索引器
             /// </summary>
             TObject this[int index] { get; }
+
+            /// <summary>
+            /// 获取结果
+            /// </summary>
+            new TObject[] Invoke();
         }
     }
 }

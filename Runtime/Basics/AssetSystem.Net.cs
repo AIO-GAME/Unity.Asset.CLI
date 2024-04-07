@@ -68,8 +68,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerTexture.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerTexture.GetContent(uwr)
+                               : null);
             }
         }
 
@@ -86,8 +86,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
-                    : null);
+                               ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
+                               : null);
             }
         }
 
@@ -102,8 +102,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? uwr.downloadHandler.text
-                    : string.Empty);
+                               ? uwr.downloadHandler.text
+                               : string.Empty);
             }
         }
 
@@ -118,8 +118,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? uwr.downloadHandler.data
-                    : Array.Empty<byte>());
+                               ? uwr.downloadHandler.data
+                               : Array.Empty<byte>());
             }
         }
 
@@ -135,8 +135,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerAudioClip.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerAudioClip.GetContent(uwr)
+                               : null);
             }
         }
 
@@ -151,8 +151,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerAssetBundle.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerAssetBundle.GetContent(uwr)
+                               : null);
             }
         }
 

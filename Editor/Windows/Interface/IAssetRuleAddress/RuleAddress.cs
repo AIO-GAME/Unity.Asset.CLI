@@ -21,7 +21,7 @@ namespace AIO.UEditor
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return string.Concat(
-                                     Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath)).
+                                  Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath)).
                               Replace('\\', '/');
             }
 

@@ -39,37 +39,27 @@ namespace AIO
     [StructLayout(LayoutKind.Auto)]
     internal partial class ASHandleInstGameObject : ASHandle<GameObject>
     {
-        private IEnumerator _CO;
-        private Transform   parent;
+        private Transform parent;
 
-        protected override IEnumerator CO
+        #region Sync
+
+        protected override void OnInvoke()
         {
-            get
-            {
-                if (_CO is null) _CO = AssetSystem.Proxy.InstGameObjectCO(Address, OnCompletedCO, parent);
-                return _CO;
-            }
+            Result = AssetSystem.Proxy.InstGameObject(Address, parent);
         }
 
-        protected override void Reset()
-        {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
-        }
-
-        protected override void OnDispose()
-        {
-            _CO = null;
-        }
+        #endregion
 
         #region CO
 
+        protected override IEnumerator OnCreateCO()
+        {
+            return AssetSystem.Proxy.InstGameObjectCO(Address, OnCompletedCO, parent);
+        }
+
         private void OnCompletedCO(GameObject asset)
         {
-            Progress = 100;
-            Result   = asset;
-            IsDone   = true;
+            Result = asset;
             InvokeOnCompleted();
             Dispose();
         }
@@ -78,22 +68,20 @@ namespace AIO
 
         #region Task
 
-        private void OnCompletedTaskObject()
-        {
-            Progress = 100;
-            Result   = AwaiterObject.GetResult();
-            IsDone   = true;
-            InvokeOnCompleted();
-            Dispose();
-        }
-
         private TaskAwaiter<GameObject> AwaiterObject;
 
-        protected override TaskAwaiter<GameObject> GetAwaiterObject()
+        protected override TaskAwaiter<GameObject> OnAwaiterObject()
         {
             AwaiterObject = AssetSystem.Proxy.InstGameObjectTask(Address, parent).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);
             return AwaiterObject;
+        }
+
+        private void OnCompletedTaskObject()
+        {
+            Result = AwaiterObject.GetResult();
+            InvokeOnCompleted();
+            Dispose();
         }
 
         #endregion

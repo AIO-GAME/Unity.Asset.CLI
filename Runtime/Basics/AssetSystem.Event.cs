@@ -1,7 +1,16 @@
-﻿namespace AIO
+﻿using System;
+
+namespace AIO
 {
     partial class AssetSystem
     {
+        internal static ASException _Exception;
+
+        /// <summary>
+        ///     系统初始化异常
+        /// </summary>
+        public static event Action<ASException> OnException;
+
         /// <summary>
         ///     重置下载器
         /// </summary>

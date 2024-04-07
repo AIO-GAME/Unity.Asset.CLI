@@ -23,7 +23,7 @@ namespace AIO
         public static TObject[] LoadSubAssets<TObject>(string location)
         where TObject : Object
         {
-            return Proxy.LoadSubAssetsSync<TObject>(SettingToLocalPath(location));
+            return ASHandleLoadSubAsset<TObject>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Object[] LoadSubAssets(string location, Type type)
         {
-            return Proxy.LoadSubAssetsSync(SettingToLocalPath(location), type);
+            return ASHandleLoadSubAsset.Create(location, type).Invoke();
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Object[] LoadSubAssets(string location)
         {
-            return Proxy.LoadSubAssetsSync(SettingToLocalPath(location), typeof(Object));
+            return ASHandleLoadSubAsset.Create(location).Invoke();
         }
 
         #endregion
@@ -324,7 +324,7 @@ namespace AIO
         public static TObject LoadAsset<TObject>(string location)
         where TObject : Object
         {
-            return Proxy.LoadAssetSync<TObject>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<TObject>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -335,7 +335,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Object LoadAsset(string location, Type type)
         {
-            return Proxy.LoadAssetSync(SettingToLocalPath(location), type);
+            return ASHandleLoadAsset.Create(location, type).Invoke();
         }
 
         /// <summary>
@@ -345,7 +345,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static Object LoadAsset(string location)
         {
-            return Proxy.LoadAssetSync(SettingToLocalPath(location), typeof(Object));
+            return ASHandleLoadAsset.Create(location).Invoke();
         }
 
         #endregion
@@ -391,7 +391,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static string LoadRawFileText(string location)
         {
-            return Proxy.LoadRawFileTextSync(SettingToLocalPath(location));
+            return ASHandleLoadRawFileText.Create(location).Invoke();
         }
 
         #endregion
@@ -412,7 +412,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static byte[] LoadRawFileData(string location)
         {
-            return Proxy.LoadRawFileDataSync(SettingToLocalPath(location));
+            return ASHandleLoadRawFileData.Create(location).Invoke();
         }
 
         #endregion
@@ -462,7 +462,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static GameObject InstGameObject(string location, Transform parent)
         {
-            return Proxy.InstGameObject(SettingToLocalPath(location), parent);
+            return ASHandleInstGameObject.Create(location, parent).Invoke();
         }
 
         /// <summary>
@@ -475,7 +475,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static GameObject InstGameObject(string location)
         {
-            return Proxy.InstGameObject(SettingToLocalPath(location));
+            return ASHandleInstGameObject.Create(location).Invoke();
         }
 
         #endregion

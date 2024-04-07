@@ -14,18 +14,18 @@ namespace AIO
         public TObject this[int index] => IsValidate && IsDone && Result != null &&
                                           index >= 0 && index < Result.Length
             ? Result[index]
-            : default;
+            : default(TObject);
+
+        TObject[] AssetSystem.IHandleList<TObject>.Invoke() => Invoke();
 
         #region IEnumerator<TObject>
 
-        /// <inheritdoc />
         IEnumerator<TObject> IEnumerable<TObject>.GetEnumerator()
         {
             if (!IsValidate || !IsDone || Result is null || Result.Length == 0) yield break;
             foreach (var obj in Result) yield return obj;
         }
 
-        /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator()
         {
             if (!IsValidate || !IsDone || Result is null || Result.Length == 0) yield break;
@@ -39,11 +39,9 @@ namespace AIO
         protected ASHandleList(string location)
             : base(location) { }
 
-        /// <inheritdoc />
         protected ASHandleList(string location, Action<TObject[]> onCompleted)
             : base(location, onCompleted) { }
 
-        /// <inheritdoc />
         protected ASHandleList(string location, Type type, Action<TObject[]> onCompleted)
             : base(location, type, onCompleted) { }
 

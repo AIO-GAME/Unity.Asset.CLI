@@ -32,36 +32,25 @@ namespace AIO
 
     internal partial class ASHandleLoadRawFileData : ASHandle<byte[]>
     {
-        private IEnumerator _CO;
+        #region Sync
 
-        protected override IEnumerator CO
+        protected override void OnInvoke()
         {
-            get
-            {
-                if (_CO is null) _CO = AssetSystem.Proxy.LoadRawFileDataCO(Address, OnCompletedCO);
-                return _CO;
-            }
+            Result = AssetSystem.Proxy.LoadRawFileDataSync(Address);
         }
 
-        protected override void Reset()
-        {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
-        }
-
-        protected override void OnDispose()
-        {
-            _CO = null;
-        }
+        #endregion Task
 
         #region CO
 
+        protected override IEnumerator OnCreateCO()
+        {
+            return AssetSystem.Proxy.LoadRawFileDataCO(Address, OnCompletedCO);
+        }
+
         private void OnCompletedCO(byte[] asset)
         {
-            Progress = 100;
-            Result   = asset;
-            IsDone   = true;
+            Result = asset;
             InvokeOnCompleted();
         }
 
@@ -71,15 +60,13 @@ namespace AIO
 
         private void OnCompletedTaskObject()
         {
-            Progress = 100;
-            Result   = AwaiterObject.GetResult();
-            IsDone   = true;
+            Result = AwaiterObject.GetResult();
             InvokeOnCompleted();
         }
 
         private TaskAwaiter<byte[]> AwaiterObject;
 
-        protected override TaskAwaiter<byte[]> GetAwaiterObject()
+        protected override TaskAwaiter<byte[]> OnAwaiterObject()
         {
             AwaiterObject = AssetSystem.Proxy.LoadRawFileDataTask(Address).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);
@@ -90,13 +77,8 @@ namespace AIO
 
         #region Constructor
 
-        /// <inheritdoc />
-        public ASHandleLoadRawFileData(string location)
-            : base(location) { }
-
-        /// <inheritdoc />
-        public ASHandleLoadRawFileData(string location, Action<byte[]> onCompleted)
-            : base(location, onCompleted) { }
+        public ASHandleLoadRawFileData(string location) : base(location) { }
+        public ASHandleLoadRawFileData(string location, Action<byte[]> onCompleted) : base(location, onCompleted) { }
 
         #endregion
     }

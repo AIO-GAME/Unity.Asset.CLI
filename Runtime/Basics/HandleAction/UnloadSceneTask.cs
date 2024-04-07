@@ -23,26 +23,17 @@ namespace AIO
     {
         private string Address;
 
-        private IEnumerator _CO;
-
-        private TaskAwaiter _Awaiter;
-
-        /// <inheritdoc />
-        protected override IEnumerator CO
+        protected override void OnInvoke()
         {
-            get
-            {
-                if (_CO is null) _CO = AssetSystem.Proxy.UnloadSceneCO(Address, OnCompletedTaskObject);
-                return _CO;
-            }
+            var temp = AssetSystem.Proxy.UnloadSceneTask(Address);
+            while (temp.IsCompleted == false) temp.Wait();
         }
 
-        protected override void Reset()
+        protected override IEnumerator OnCreateCO()
         {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
+            return AssetSystem.Proxy.UnloadSceneCO(Address, InvokeOnCompleted);
         }
+
 
         protected override void OnDispose()
         {
@@ -52,18 +43,12 @@ namespace AIO
 
         #region Task
 
-        private void OnCompletedTaskObject()
-        {
-            _CO      = null;
-            Progress = 100;
-            IsDone   = true;
-            InvokeOnCompleted();
-        }
+        private TaskAwaiter _Awaiter;
 
-        protected override TaskAwaiter GetAwaiter()
+        protected override TaskAwaiter OnAwaiter()
         {
             _Awaiter = AssetSystem.Proxy.UnloadSceneTask(Address).GetAwaiter();
-            _Awaiter.OnCompleted(OnCompletedTaskObject);
+            _Awaiter.OnCompleted(InvokeOnCompleted);
             return _Awaiter;
         }
 

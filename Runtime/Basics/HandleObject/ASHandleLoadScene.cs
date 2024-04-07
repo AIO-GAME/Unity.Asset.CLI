@@ -3,6 +3,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
 namespace AIO
@@ -13,37 +14,29 @@ namespace AIO
         private readonly LoadSceneMode _SceneMode;
         private readonly bool          _SuspendLoad;
         private readonly int           _Priority;
-        private          IEnumerator   _CO;
 
-        protected override IEnumerator CO
+
+        #region Sync
+
+        protected override void OnInvoke()
         {
-            get
-            {
-                if (_CO is null)
-                    _CO = AssetSystem.Proxy.LoadSceneCO(Address, OnCompletedCO, _SceneMode, _SuspendLoad, _Priority);
-                return _CO;
-            }
+            var task = AssetSystem.Proxy.LoadSceneTask(Address, _SceneMode, _SuspendLoad, _Priority);
+            while (!task.IsCompleted) task.Wait();
+            Result = task.Result;
         }
 
-        protected override void Reset()
-        {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
-        }
-
-        protected override void OnDispose()
-        {
-            _CO = null;
-        }
+        #endregion
 
         #region CO
 
+        protected override IEnumerator OnCreateCO()
+        {
+            return AssetSystem.Proxy.LoadSceneCO(Address, OnCompletedCO, _SceneMode, _SuspendLoad, _Priority);
+        }
+
         private void OnCompletedCO(Scene asset)
         {
-            Progress = 100;
-            Result   = asset;
-            IsDone   = true;
+            Result = asset;
             InvokeOnCompleted();
         }
 
@@ -53,15 +46,13 @@ namespace AIO
 
         private void OnCompletedTaskObject()
         {
-            Progress = 100;
-            Result   = AwaiterObject.GetResult();
-            IsDone   = true;
+            Result = AwaiterObject.GetResult();
             InvokeOnCompleted();
         }
 
         private TaskAwaiter<Scene> AwaiterObject;
 
-        protected override TaskAwaiter<Scene> GetAwaiterObject()
+        protected override TaskAwaiter<Scene> OnAwaiterObject()
         {
             AwaiterObject = AssetSystem.Proxy.LoadSceneTask(Address, _SceneMode, _SuspendLoad, _Priority).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);

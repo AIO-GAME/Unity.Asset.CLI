@@ -42,6 +42,12 @@ namespace AIO.UEngine
         public abstract IEnumerator UpdatePackagesCO(ASConfig config);
 
         /// <summary>
+        ///     更新资源包
+        /// </summary>
+        /// <returns></returns>
+        public abstract Task UpdatePackagesTask(ASConfig config);
+
+        /// <summary>
         ///     是否已经加载
         /// </summary>
         /// <param name="location">寻址地址</param>

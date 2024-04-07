@@ -27,7 +27,7 @@ namespace AIO
         ///     资源热更新配置
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static ASConfig Parameter { get; private set; }
+        public static ASConfig Parameter { get; internal set; }
 
         /// <summary>
         ///     是否已经初始化

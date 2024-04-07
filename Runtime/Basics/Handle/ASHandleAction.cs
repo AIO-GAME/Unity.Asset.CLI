@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace AIO
 {
@@ -13,11 +14,53 @@ namespace AIO
         public bool         IsRunning => !IsDone;
         public event Action Completed;
 
-        protected abstract IEnumerator CO { get; }
-        protected abstract TaskAwaiter GetAwaiter();
-        protected abstract void        Reset();
-        protected abstract void        OnDispose();
-        protected virtual  bool        MoveNext() => CO.MoveNext();
+        protected abstract IEnumerator OnCreateCO();
+        protected abstract void        OnInvoke();
+        protected virtual  void        OnReset()   { }
+        protected virtual  void        OnDispose() { }
+
+        public TaskAwaiter GetAwaiter()
+        {
+            if (IsDone) return Task.CompletedTask.GetAwaiter();
+            return OnAwaiter();
+        }
+
+        protected abstract TaskAwaiter OnAwaiter();
+
+        public void Invoke()
+        {
+            if (IsDone) return;
+            OnInvoke();
+            IsDone = true;
+            InvokeOnCompleted();
+        }
+
+
+        private IEnumerator _CO;
+
+        protected IEnumerator CO
+        {
+            get
+            {
+                if (_CO is null) _CO = OnCreateCO();
+                return _CO;
+            }
+        }
+
+        protected void Reset()
+        {
+            OnReset();
+            Progress  = 0;
+            IsDone    = false;
+            Completed = null;
+            CO.Reset();
+        }
+
+        protected bool MoveNext()
+        {
+            if (IsDone) return false;
+            return CO.MoveNext();
+        }
 
         public void Dispose()
         {
@@ -25,13 +68,17 @@ namespace AIO
             OnDispose();
         }
 
-
-        protected virtual void InvokeOnCompleted()
+        protected void InvokeOnCompleted()
         {
+            Progress = 100;
+            IsDone   = true;
+            OnCompleted();
             if (Completed == null) return;
             Completed.Invoke();
             Completed = null;
         }
+
+        protected virtual void OnCompleted() { }
 
         #region Constructor
 
@@ -120,5 +167,9 @@ namespace AIO
         }
 
         #endregion
+
+        public sealed override string ToString()         => string.Empty;
+        public sealed override bool   Equals(object obj) => false;
+        public sealed override int    GetHashCode()      => 0;
     }
 }

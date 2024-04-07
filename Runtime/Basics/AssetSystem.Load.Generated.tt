@@ -52,7 +52,7 @@ namespace AIO
 #endif
         public static <#= typeName #> Load<#= aliasName #>(string location)
         {
-            return Proxy.LoadAssetSync<<#= typeName #>>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<<#= typeName #>>.Create(location).Invoke();
         }
 
         /// <summary>

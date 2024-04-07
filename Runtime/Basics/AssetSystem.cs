@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 using AIO.UEngine;
-using UnityEditor;
-using UnityEngine;
 
 namespace AIO
 {
@@ -14,13 +11,6 @@ namespace AIO
     /// </summary>
     public static partial class AssetSystem
     {
-        private static ASException _Exception;
-
-        /// <summary>
-        ///     系统初始化异常
-        /// </summary>
-        public static event Action<ASException> OnException;
-
         internal static void ExceptionEvent(ASException ex)
         {
             _Exception = ex;
@@ -42,17 +32,17 @@ namespace AIO
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(ASConfig config)
+        public static IHandleAction Initialize<T>(ASConfig config)
         where T : ASProxy, new()
         {
-            return Initialize(Activator.CreateInstance<T>(), config);
+            return ASHandleActionInitializeTask.Create(Activator.CreateInstance<T>(), config);
         }
 
         /// <summary>
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize()
+        public static IHandleAction Initialize()
         {
             return Initialize(ASConfig.GetOrCreate());
         }
@@ -61,103 +51,39 @@ namespace AIO
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize(ASConfig config)
+        public static IHandleAction Initialize(ASConfig config)
         {
-            var proxyType = typeof(ASProxy);
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-#if UNITY_EDITOR
-                if (assembly.FullName.Contains("Editor")) continue;
-#endif
-                foreach (var type in assembly.GetTypes())
-                {
-                    if (type.IsAbstract) continue;
-                    if (proxyType.IsAssignableFrom(type) == false) continue;
-                    Proxy = (ASProxy)Activator.CreateInstance(type);
-                    break;
-                }
-            }
-
-            return Initialize(Proxy, config);
+            return ASHandleActionInitializeTask.Create(config);
         }
 
         /// <summary>
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy)
+        public static IHandleAction Initialize<T>(T proxy)
         where T : ASProxy
         {
-            return Initialize(proxy, ASConfig.GetOrCreate());
+            return ASHandleActionInitializeTask.Create(proxy, ASConfig.GetOrCreate());
         }
 
         /// <summary>
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>()
+        public static IHandleAction Initialize<T>()
         where T : ASProxy, new()
         {
-            return Initialize(Activator.CreateInstance<T>(), ASConfig.GetOrCreate());
+            return ASHandleActionInitializeTask.Create(Activator.CreateInstance<T>(), ASConfig.GetOrCreate());
         }
 
         /// <summary>
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Initialize<T>(T proxy, ASConfig config)
+        public static IHandleAction Initialize<T>(T proxy, ASConfig config)
         where T : ASProxy
         {
-            if (IsInitialized) yield break;
-            _Exception = ASException.None;
-
-            if (proxy is null)
-            {
-                ExceptionEvent(ASException.AssetProxyIsNull);
-                yield break;
-            }
-
-            if (config is null)
-            {
-                ExceptionEvent(ASException.ASConfigIsNull);
-                yield break;
-            }
-
-            if (string.IsNullOrEmpty(config.RuntimeRootDirectory)) config.RuntimeRootDirectory = "BuiltinFiles";
-            BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, config.RuntimeRootDirectory);
-            SandboxRootDirectory =
-#if UNITY_EDITOR
-                Path.Combine(Directory.GetParent(Application.dataPath).FullName,
-                             config.RuntimeRootDirectory, EditorUserBuildSettings.activeBuildTarget.ToString());
-#else
-                Path.Combine(Application.persistentDataPath, config.RuntimeRootDirectory);
-#endif
-            Parameter = config;
-            Proxy     = proxy;
-
-            yield return Proxy.UpdatePackagesCO(Parameter);
-            try
-            {
-                Parameter.Check();
-            }
-#if UNITY_EDITOR
-            catch (Exception e)
-            {
-                throw new Exception($"ASConfig Check Error : {e.Message}");
-            }
-#else
-            catch (Exception)
-            {
-                ExceptionEvent(ASException.ASConfigCheckError);
-                yield break;
-            }
-#endif
-
-
-            if (_Exception != ASException.None) yield break;
-            yield return Proxy.InitializeCO();
-            if (_Exception != ASException.None) yield break;
-            DownloadHandle = Proxy.GetLoadingHandle();
+            return ASHandleActionInitializeTask.Create(proxy, config);
         }
 
         /// <summary>

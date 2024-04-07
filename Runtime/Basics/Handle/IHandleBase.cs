@@ -39,6 +39,7 @@ namespace AIO
             /// 是否正在运行
             /// </summary>
             bool IsRunning { get; }
+            
         }
     }
 }

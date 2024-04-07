@@ -15,7 +15,7 @@ namespace AIO
         /// <summary>
         ///     主下载器
         /// </summary>
-        public static IASNetLoading DownloadHandle { get; private set; }
+        public static IASNetLoading DownloadHandle { get; internal set; }
 
         /// <summary>
         ///     当前主下载器事件
@@ -52,7 +52,7 @@ namespace AIO
         /// <remarks>
         ///     (Application.streamingAssetsPath)/RuntimeRootDirectory
         /// </remarks>
-        public static string BuildInRootDirectory { get; private set; }
+        public static string BuildInRootDirectory { get; internal set; }
 
         /// <summary>
         ///     运行时 缓存文件目录
@@ -60,7 +60,7 @@ namespace AIO
         /// <remarks>
         ///     (Application.persistentDataPath)/RuntimeRootDirectory
         /// </remarks>
-        public static string SandboxRootDirectory { get; private set; }
+        public static string SandboxRootDirectory { get; internal set; }
 
         /// <summary>
         ///     运行平台

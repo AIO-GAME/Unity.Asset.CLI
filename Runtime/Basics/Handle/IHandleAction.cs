@@ -35,6 +35,11 @@ namespace AIO
             /// 获取异步等待器
             /// </summary>
             TaskAwaiter GetAwaiter();
+
+            /// <summary>
+            /// 执行
+            /// </summary>
+            void Invoke();
         }
     }
 }

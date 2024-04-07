@@ -8,36 +8,25 @@ namespace AIO
 {
     internal partial class ASHandleLoadSubAsset : ASHandleList<Object>
     {
-        private IEnumerator _CO;
+        #region Sync
 
-        protected override IEnumerator CO
+        protected override void OnInvoke()
         {
-            get
-            {
-                if (_CO is null) _CO = AssetSystem.Proxy.LoadSubAssetsCO(Address, AssetType, OnCompletedCO);
-                return _CO;
-            }
+            Result = AssetSystem.Proxy.LoadSubAssetsSync(Address, AssetType);
         }
 
-        protected override void Reset()
-        {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
-        }
-
-        protected override void OnDispose()
-        {
-            _CO = null;
-        }
+        #endregion
 
         #region CO
 
+        protected override IEnumerator OnCreateCO()
+        {
+            return AssetSystem.Proxy.LoadSubAssetsCO(Address, AssetType, OnCompletedCO);
+        }
+
         private void OnCompletedCO(Object[] asset)
         {
-            Progress = 100;
-            Result   = asset;
-            IsDone   = true;
+            Result = asset;
             InvokeOnCompleted();
         }
 
@@ -47,15 +36,13 @@ namespace AIO
 
         private void OnCompletedTaskObject()
         {
-            Progress = 100;
-            Result   = AwaiterObject.GetResult();
-            IsDone   = true;
+            Result = AwaiterObject.GetResult();
             InvokeOnCompleted();
         }
 
         private TaskAwaiter<Object[]> AwaiterObject;
 
-        protected override TaskAwaiter<Object[]> GetAwaiterObject()
+        protected override TaskAwaiter<Object[]> OnAwaiterObject()
         {
             AwaiterObject = AssetSystem.Proxy.LoadSubAssetsTask(Address, AssetType).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);
@@ -127,5 +114,4 @@ namespace AIO
             return new ASHandleLoadSubAsset(location, type, cb);
         }
     }
-
 }

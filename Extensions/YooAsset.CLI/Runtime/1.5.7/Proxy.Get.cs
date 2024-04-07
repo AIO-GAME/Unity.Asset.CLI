@@ -8,7 +8,7 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        public override ICollection<string> GetAddressByTag(IEnumerable<string> tags)
+        public override string[] GetAddressByTag(IEnumerable<string> tags)
         {
             return GetAssetInfosByTag(tags).Select(info => info.Address).ToArray();
         }

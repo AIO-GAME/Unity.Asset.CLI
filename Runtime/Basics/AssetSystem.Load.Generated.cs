@@ -27,7 +27,7 @@ namespace AIO
 #endif
         public static UnityEngine.Shader LoadShader(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.Shader>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.Shader>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace AIO
 #endif
         public static UnityEngine.AudioClip LoadAudioClip(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.AudioClip>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.AudioClip>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace AIO
 #endif
         public static UnityEngine.TextAsset LoadTextAsset(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.TextAsset>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.TextAsset>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace AIO
 #endif
         public static UnityEngine.Material LoadMaterial(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.Material>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.Material>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace AIO
 #endif
         public static UnityEngine.AssetBundle LoadAssetBundle(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.AssetBundle>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.AssetBundle>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -317,7 +317,7 @@ namespace AIO
 #endif
         public static UnityEngine.Animation LoadAnimation(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.Animation>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.Animation>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace AIO
 #endif
         public static UnityEngine.Texture LoadTexture(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.Texture>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.Texture>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -433,7 +433,7 @@ namespace AIO
 #endif
         public static UnityEngine.Texture2D LoadTexture2D(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.Texture2D>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.Texture2D>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -491,7 +491,7 @@ namespace AIO
 #endif
         public static UnityEngine.Font LoadFont(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.Font>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.Font>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -549,7 +549,7 @@ namespace AIO
 #endif
         public static UnityEngine.Mesh LoadMesh(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.Mesh>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.Mesh>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -607,7 +607,7 @@ namespace AIO
 #endif
         public static UnityEngine.GameObject LoadGameObject(string location)
         {
-            return Proxy.LoadAssetSync<UnityEngine.GameObject>(SettingToLocalPath(location));
+            return ASHandleLoadAsset<UnityEngine.GameObject>.Create(location).Invoke();
         }
 
         /// <summary>

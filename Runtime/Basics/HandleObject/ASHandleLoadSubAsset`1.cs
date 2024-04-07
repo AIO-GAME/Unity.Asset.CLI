@@ -9,36 +9,25 @@ namespace AIO
     internal partial class ASHandleLoadSubAsset<TObject> : ASHandleList<TObject>
     where TObject : Object
     {
-        private IEnumerator _CO;
+        #region Sync
 
-        protected override IEnumerator CO
+        protected override void OnInvoke()
         {
-            get
-            {
-                if (_CO is null) _CO = AssetSystem.Proxy.LoadSubAssetsCO<TObject>(Address, OnCompletedCO);
-                return _CO;
-            }
+            Result = AssetSystem.Proxy.LoadSubAssetsSync<TObject>(Address);
         }
 
-        protected override void Reset()
-        {
-            Progress = 0;
-            IsDone   = false;
-            CO.Reset();
-        }
-
-        protected override void OnDispose()
-        {
-            _CO = null;
-        }
+        #endregion
 
         #region CO
 
+        protected override IEnumerator OnCreateCO()
+        {
+            return AssetSystem.Proxy.LoadSubAssetsCO<TObject>(Address, OnCompletedCO);
+        }
+
         private void OnCompletedCO(TObject[] asset)
         {
-            Progress = 100;
-            Result   = asset;
-            IsDone   = true;
+            Result = asset;
             InvokeOnCompleted();
         }
 
@@ -48,15 +37,13 @@ namespace AIO
 
         private void OnCompletedTaskObject()
         {
-            Progress = 100;
-            Result   = AwaiterObject.GetResult();
-            IsDone   = true;
+            Result = AwaiterObject.GetResult();
             InvokeOnCompleted();
         }
 
         private TaskAwaiter<TObject[]> AwaiterObject;
 
-        protected override TaskAwaiter<TObject[]> GetAwaiterObject()
+        protected override TaskAwaiter<TObject[]> OnAwaiterObject()
         {
             AwaiterObject = AssetSystem.Proxy.LoadSubAssetsTask<TObject>(Address).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);
@@ -67,13 +54,8 @@ namespace AIO
 
         #region Constructor
 
-        /// <inheritdoc />
-        private ASHandleLoadSubAsset(string location)
-            : base(location) { }
-
-        /// <inheritdoc />
-        private ASHandleLoadSubAsset(string location, Action<TObject[]> onCompleted)
-            : base(location, onCompleted) { }
+        private ASHandleLoadSubAsset(string location) : base(location) { }
+        private ASHandleLoadSubAsset(string location, Action<TObject[]> onCompleted) : base(location, onCompleted) { }
 
         #endregion
     }
@@ -102,5 +84,4 @@ namespace AIO
             return new ASHandleLoadSubAsset<TObject>(location, completed);
         }
     }
-
 }
