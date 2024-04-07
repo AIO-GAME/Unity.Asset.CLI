@@ -6,9 +6,6 @@ using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
-    /// <summary>
-    ///     YAssetProxy_Field
-    /// </summary>
     partial class Proxy
     {
         private static MethodInfo _ReleaseInternal;

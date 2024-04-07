@@ -211,7 +211,7 @@ namespace AIO.UEditor.CLI
                     foreach (var collector in group.Collectors
                                                     // .Where(item => item.CollectorType == ECollectorType.MainAssetCollector)
                                                    .Where(item => !recordGroup.Collectors.Exists(match =>
-                                                                       match.CollectorGUID == item.CollectorGUID)))
+                                                                                                     match.CollectorGUID == item.CollectorGUID)))
                         recordGroup.Collectors.Add(new AssetBundleCollector
                         {
                             CollectorGUID   = collector.CollectorGUID,

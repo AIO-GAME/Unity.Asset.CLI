@@ -5,9 +5,6 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEngine
 {
-    /// <summary>
-    ///     AssetProxy_LoadSubAssets
-    /// </summary>
     partial class ASProxy
     {
         #region 子资源加载
@@ -43,21 +40,24 @@ namespace AIO.UEngine
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         /// <param name="cb">回调</param>
-        public abstract IEnumerator LoadSubAssetsCO(string location, Type type, Action<Object[]> cb);
+        public abstract IEnumerator LoadSubAssetsCO
+            (string location, Type type, Action<Object[]> cb);
 
         /// <summary>
         ///     同步加载子资源对象
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
-        public abstract Object[] LoadSubAssetsSync(string location, Type type);
+        public abstract Object[] LoadSubAssetsSync
+            (string location, Type type);
 
         /// <summary>
         ///     异步加载子资源对象
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
-        public abstract Task<Object[]> LoadSubAssetsTask(string location, Type type);
+        public abstract Task<Object[]> LoadSubAssetsTask
+            (string location, Type type);
 
         #endregion
     }

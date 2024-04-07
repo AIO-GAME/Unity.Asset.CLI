@@ -50,8 +50,10 @@ namespace AIO.UEditor
             Editor.CreateConfig(BundlesDir, MergeToLatest);
         }
 
-        public static async Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters,
-                                                    bool                                 isTips = false)
+        /// <summary>
+        ///     上传到GCloud
+        /// </summary>
+        public static async Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -98,7 +100,6 @@ namespace AIO.UEditor
             EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
-
 
         /// <summary>
         ///     上传到Ftp
@@ -163,8 +164,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     构建所有资源
         /// </summary>
-        public static bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command,
-                                        bool                isTips = false)
+        public static bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -182,6 +182,9 @@ namespace AIO.UEditor
             return succeed;
         }
 
+        /// <summary>
+        ///    构建资源
+        /// </summary>
         public static bool BuildArt(AssetBuildCommand command, bool isTips = false)
         {
             if (Editor is null)
@@ -216,6 +219,9 @@ namespace AIO.UEditor
             Editor.ConvertConfig(config);
         }
 
+        /// <summary>
+        ///    保存场景
+        /// </summary>
         private static void SaveScene()
         {
             var currentScene = SceneManager.GetSceneAt(0);
@@ -247,10 +253,10 @@ namespace AIO.UEditor
                 // 位置显示在屏幕中间
                 var temp = Screen.currentResolution;
                 position = new Rect(
-                                    temp.width / 2f,
-                                    temp.height / 2f,
-                                    300,
-                                    50);
+                    temp.width / 2f,
+                    temp.height / 2f,
+                    300,
+                    50);
             }
 
             private void OnGUI()

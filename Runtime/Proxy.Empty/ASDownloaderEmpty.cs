@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace AIO
 {
@@ -24,28 +25,31 @@ namespace AIO
             AssetSystem.AddWhite(AssetSystem.GetAddressByTag(tags));
         }
 
-        /// <summary>开始回调</summary>
-        public new Action OnBegin { get; set; }
-
-        /// <summary>恢复</summary>
-        public new Action OnResume { get; set; }
-
-        /// <summary>暂停</summary>
-        public new Action OnPause { get; set; }
-
-        /// <summary>取消</summary>
-        public new Action OnCancel { get; set; }
-
-        public Action<Exception>               OnError               { get; set; }
-        public Action<IProgressInfo>           OnProgress            { get; set; }
-        public Action<IProgressReport>         OnComplete            { get; set; }
-        public Action<IProgressReport>         OnNetReachableNot     { get; set; }
-        public Action<IProgressReport, Action> OnNetReachableCarrier { get; set; }
-        public Action<IProgressReport>         OnDiskSpaceNotEnough  { get; set; }
-        public Action<IProgressReport>         OnWritePermissionNot  { get; set; }
-        public Action<IProgressReport>         OnReadPermissionNot   { get; set; }
+        Action IProgressEvent.                              OnBegin               { get; set; }
+        Action<Exception> IProgressEvent.                   OnError               { get; set; }
+        Action IProgressEvent.                              OnResume              { get; set; }
+        Action IProgressEvent.                              OnPause               { get; set; }
+        Action IProgressEvent.                              OnCancel              { get; set; }
+        Action<IProgressInfo> IProgressEvent.               OnProgress            { get; set; }
+        Action<IProgressReport> IProgressEvent.             OnComplete            { get; set; }
+        Action<IProgressReport> IDownlandAssetEvent.        OnNetReachableNot     { get; set; }
+        Action<IProgressReport, Action> IDownlandAssetEvent.OnNetReachableCarrier { get; set; }
+        Action<IProgressReport> IDownlandAssetEvent.        OnDiskSpaceNotEnough  { get; set; }
+        Action<IProgressReport> IDownlandAssetEvent.        OnWritePermissionNot  { get; set; }
+        Action<IProgressReport> IDownlandAssetEvent.        OnReadPermissionNot   { get; set; }
 
         #endregion
+
+        protected override void OnWait()
+        {
+            Event.OnComplete?.Invoke(Report);
+        }
+
+        protected override Task OnWaitAsync()
+        {
+            Event.OnComplete?.Invoke(Report);
+            return base.OnWaitAsync();
+        }
 
         protected override IEnumerator OnWaitCo()
         {

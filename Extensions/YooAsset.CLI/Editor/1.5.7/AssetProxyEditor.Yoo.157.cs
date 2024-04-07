@@ -141,7 +141,7 @@ namespace AIO.UEditor.CLI
 
 
                 foreach (var PackageInfo in new DirectoryInfo(PlatformInfo.FullName).GetDirectories("*",
-                             SearchOption.TopDirectoryOnly))
+                                                                                                    SearchOption.TopDirectoryOnly))
                 {
                     Versions.Clear();
                     Versions.AddRange(PackageInfo.GetDirectories("*", SearchOption.TopDirectoryOnly).
@@ -161,7 +161,7 @@ namespace AIO.UEditor.CLI
                         TableDic[enums][PackageInfo.Name].Version = MergeToLatest ? "Latest" : last.Name;
                         TableDic[enums][PackageInfo.Name].Name    = PackageInfo.Name;
                         var table = AHelper.IO.ReadJson<Hashtable>(Path.Combine(last.FullName,
-                                                                                    $"BuildReport_{PackageInfo.Name}_{last.Name}.json"));
+                                                                                $"BuildReport_{PackageInfo.Name}_{last.Name}.json"));
                         if (table is null) continue;
 
                         switch (table.Cast<DictionaryEntry>().
@@ -189,9 +189,9 @@ namespace AIO.UEditor.CLI
 
             foreach (var pair in TableDic.Where(hashtable => hashtable.Value.Count > 0))
                 AHelper.IO.WriteJsonUTF8(
-                                         Path.Combine(BundlesConfigDir, string.Concat(pair.Key.ToString(), ".json")),
-                                         pair.Value.Values.ToArray()
-                                        );
+                    Path.Combine(BundlesConfigDir, string.Concat(pair.Key.ToString(), ".json")),
+                    pair.Value.Values.ToArray()
+                );
 
             return true;
         }

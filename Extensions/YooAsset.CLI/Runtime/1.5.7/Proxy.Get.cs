@@ -6,9 +6,6 @@ using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
-    /// <summary>
-    ///     YAssetProxy_Get
-    /// </summary>
     partial class Proxy
     {
         public override ICollection<string> GetAddressByTag(IEnumerable<string> tags)

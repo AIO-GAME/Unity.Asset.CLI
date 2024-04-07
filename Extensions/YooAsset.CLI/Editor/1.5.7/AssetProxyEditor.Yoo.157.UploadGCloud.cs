@@ -163,7 +163,7 @@ namespace AIO.UEditor.CLI
                     try
                     {
                         data = AHelper.Json.Deserialize<List<AssetsPackageConfig>>(
-                             await PrGCloud.ReadTextAsync(versionPath));
+                            await PrGCloud.ReadTextAsync(versionPath));
                     }
                     catch (Exception)
                     {

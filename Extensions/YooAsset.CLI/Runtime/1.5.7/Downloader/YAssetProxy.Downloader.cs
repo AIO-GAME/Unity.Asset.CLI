@@ -34,18 +34,18 @@ namespace AIO.UEngine.YooAsset
             /// <summary>
             ///     是否允许使用流量下载
             /// </summary>
-            private bool AllowReachableCarrier;
+            private bool IsAllowReachableCarrier;
 
             private readonly Dictionary<string, long> CurrentValueDict = new Dictionary<string, long>();
 
             private long FirstValue = -1;
 
             private          Dictionary<string, UpdatePackageManifestOperation> ManifestOperations;
-            private          IDictionary<string, ResPackage> Packages;
-            private          Dictionary<string, PreDownloadContentOperation> PreDownloadContentOperations;
-            private          Dictionary<string, ResourceDownloaderOperation> ResourceDownloaderOperations;
-            private readonly Dictionary<string, long> TotalValueDict = new Dictionary<string, long>();
-            private          Dictionary<string, UpdatePackageVersionOperation> VersionOperations;
+            private          IDictionary<string, ResPackage>                    Packages;
+            private          Dictionary<string, PreDownloadContentOperation>    PreDownloadContentOperations;
+            private          Dictionary<string, ResourceDownloaderOperation>    ResourceDownloaderOperations;
+            private readonly Dictionary<string, long>                           TotalValueDict = new Dictionary<string, long>();
+            private          Dictionary<string, UpdatePackageVersionOperation>  VersionOperations;
 
             public YASDownloader(IDictionary<string, ResPackage> packages, IDownlandAssetEvent iEvent)
             {
@@ -116,7 +116,7 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
-                var endValue  = TotalValue - CurrentValue;
+                var endValue = TotalValue - CurrentValue;
                 var diskSpace = AssetSystem.GetAvailableDiskSpace();
                 if (diskSpace < endValue) // 检查磁盘空间是否足够
                 {
@@ -151,11 +151,11 @@ namespace AIO.UEngine.YooAsset
                                 OnNetReachableNot?.Invoke(Report);
                                 return;
                             case NetworkReachability.ReachableViaCarrierDataNetwork:
-                                if (AllowReachableCarrier) break;
+                                if (IsAllowReachableCarrier) break;
                                 Pause();
                                 OnNetReachableCarrier?.Invoke(Report, () =>
                                 {
-                                    AllowReachableCarrier = true;
+                                    IsAllowReachableCarrier = true;
                                     Resume();
                                 });
                                 break;

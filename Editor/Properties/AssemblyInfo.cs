@@ -1,5 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 using UnityEditor.PackageManager;
+
+[assembly: InternalsVisibleTo("AIO.CLI.YooAsset.Editor")]
+
 
 namespace AIO.UEditor
 {

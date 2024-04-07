@@ -40,8 +40,8 @@ namespace AIO.UEditor.CLI
                 infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
                 var rule = collector.GetPackRule(infoData);
                 return new PackRuleResult(
-                                          rule.BundleName.Replace("#", "_"),
-                                          rule.BundleExtension);
+                    rule.BundleName.Replace("#", "_"),
+                    rule.BundleExtension);
             }
 
             public bool IsRawFilePackRule()

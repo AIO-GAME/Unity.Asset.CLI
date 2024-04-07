@@ -15,11 +15,12 @@ namespace AIO.UEngine
         /// <param name="sceneMode">场景加载模式</param>
         /// <param name="suspendLoad">场景加载到90%自动挂起</param>
         /// <param name="priority">优先级</param>
-        public abstract IEnumerator LoadSceneCO(string        location,
-                                                Action<Scene> cb,
-                                                LoadSceneMode sceneMode   = LoadSceneMode.Single,
-                                                bool          suspendLoad = false,
-                                                int           priority    = 100);
+        public abstract IEnumerator LoadSceneCO(
+            string        location,
+            Action<Scene> cb,
+            LoadSceneMode sceneMode   = LoadSceneMode.Single,
+            bool          suspendLoad = false,
+            int           priority    = 100);
 
         /// <summary>
         ///     异步加载场景

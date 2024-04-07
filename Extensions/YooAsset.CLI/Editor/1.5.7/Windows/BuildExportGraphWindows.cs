@@ -26,32 +26,19 @@ namespace AIO.UEditor.CLI
         /// </summary>
         private readonly Dictionary<BuildTarget, YooAssetUnityArgs> EngineeringPathPath;
 
-        protected bool FoldoutBuildInFile;
-
+        protected bool   FoldoutBuildInFile;
         protected bool   FoldoutYooAsset;
         private   string LocalStoragePath;
         private   string Password;
+        private   string ServerIP;
+        private   string User;
 
-        private string ServerIP;
-        private string User;
-
-        /// <summary>
-        ///     YooAsset的加密列表
-        /// </summary>
-        private readonly List<Type> YooAssetEncryptions;
-
-        private int YooAssetEncryptionsIndex;
-
-        private readonly string[] YooAssetEncryptionsName;
-        private          int      YooAssetPackageIndex;
-
-        private List<string> YooAssetPackageNames;
-
-        /// <summary>
-        ///     YooAsset的资源包列表
-        /// </summary>
-        private readonly string[] YooAssetPackages;
-
+        private readonly List<Type>                       YooAssetEncryptions;
+        private          int                              YooAssetEncryptionsIndex;
+        private readonly string[]                         YooAssetEncryptionsName;
+        private          int                              YooAssetPackageIndex;
+        private          List<string>                     YooAssetPackageNames;
+        private readonly string[]                         YooAssetPackages;
         private          int                              YooAssetPackagesIndex;
         private readonly List<string>                     YooAssetPackageTarget;
         private readonly Dictionary<string, int>          YooAssetPackageTargetIndex;
@@ -179,15 +166,15 @@ namespace AIO.UEditor.CLI
                 GELayout.Label("项目导出工程路径", GTOption.Width(true));
 
                 EngineeringPathPath[BuildTarget].VersionIndex = GELayout.Popup(
-                                                                               EngineeringPathPath[BuildTarget].
-                                                                                   VersionIndex,
-                                                                               YooAssetUnityArgs.Versions,
-                                                                               GTOption.Width(50));
+                    EngineeringPathPath[BuildTarget].
+                        VersionIndex,
+                    YooAssetUnityArgs.Versions,
+                    GTOption.Width(50));
 
                 if (GELayout.Button("Select", GTOption.Width(50)))
                 {
                     EngineeringPathPath[BuildTarget].OutputRoot = EditorUtility.OpenFolderPanel("项目导出工程路径",
-                        EngineeringPathPath[BuildTarget].OutputRoot, "");
+                                                                                                EngineeringPathPath[BuildTarget].OutputRoot, "");
                     return;
                 }
 
@@ -201,8 +188,8 @@ namespace AIO.UEditor.CLI
             using (GELayout.VHorizontal())
             {
                 EngineeringPathPath[BuildTarget].OutputRoot = GELayout.Field(
-                                                                             EngineeringPathPath[BuildTarget].
-                                                                                 OutputRoot);
+                    EngineeringPathPath[BuildTarget].
+                        OutputRoot);
             }
         }
 
@@ -267,10 +254,10 @@ namespace AIO.UEditor.CLI
                         if (GELayout.Button("组合资源包\n目标工程", 100, 25))
                         {
                             var dic = YooAssetPackageTarget.ToDictionary(
-                                                                         target => target,
-                                                                         target =>
-                                                                             YooAssetPackageVersionTarget[target]
-                                                                                 [YooAssetPackageTargetIndex[target]]);
+                                target => target,
+                                target =>
+                                    YooAssetPackageVersionTarget[target]
+                                        [YooAssetPackageTargetIndex[target]]);
                             EngineeringPathPath[BuildTarget].BuiltUp(BuildTarget, BuildInFilePlatform, dic);
                             Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                         }
@@ -379,10 +366,10 @@ namespace AIO.UEditor.CLI
                 if (GELayout.Button("Pack", GTOption.Width(50), GTOption.Height(25)))
                 {
                     var dic = YooAssetPackageTarget.ToDictionary(
-                                                                 target => target,
-                                                                 target =>
-                                                                     YooAssetPackageVersionTarget[target]
-                                                                         [YooAssetPackageTargetIndex[target]]);
+                        target => target,
+                        target =>
+                            YooAssetPackageVersionTarget[target]
+                                [YooAssetPackageTargetIndex[target]]);
                     EngineeringPathPath[BuildTarget].BuiltUpToStreamingAssets(BuildTarget, BuildInFilePlatform, dic);
                     Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                     return;

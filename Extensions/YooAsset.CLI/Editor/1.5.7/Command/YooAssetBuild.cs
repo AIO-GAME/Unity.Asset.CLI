@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using YooAsset;
 using YooAsset.Editor;
+using YBuildResult = YooAsset.Editor.BuildResult;
 
 namespace AIO.UEditor.CLI
 {
@@ -24,9 +25,11 @@ namespace AIO.UEditor.CLI
             var cmd = Argument.ResolverCustomCur<UnityArgsCommand>();
             var args = cmd.executeMethod;
             var buildArgs = Argument.ResolverCustom<AssetBuildCommand>(args);
-
-            if (string.IsNullOrEmpty(buildArgs.BuildPackage)) throw new ArgumentNullException("构建包: 名称不能为 NULL");
-            if (string.IsNullOrEmpty(buildArgs.PackageVersion)) throw new ArgumentNullException("构建包: 版本不能为 NULL");
+            Lang.Tr.Current = Application.systemLanguage;
+            if (string.IsNullOrEmpty(buildArgs.BuildPackage))
+                throw new ArgumentNullException(Lang.Tr.Get("Build package: The name cannot be NULL"));
+            if (string.IsNullOrEmpty(buildArgs.PackageVersion))
+                throw new ArgumentNullException(Lang.Tr.Get("Build package: The version cannot be NULL"));
 
             if (string.IsNullOrEmpty(buildArgs.OutputRoot))
                 buildArgs.OutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
@@ -67,7 +70,7 @@ namespace AIO.UEditor.CLI
                     select (IEncryptionServices)Activator.CreateInstance(item)).FirstOrDefault();
         }
 
-        public static BuildResult ArtBuild(AssetBuildCommand command)
+        public static YBuildResult ArtBuild(AssetBuildCommand command)
         {
             YooAsset.Editor.EBuildPipeline buildPipeline;
             switch (command.BuildPipeline)
@@ -90,9 +93,9 @@ namespace AIO.UEditor.CLI
                     break;
                 case EBuildMode.IncrementalBuild:
                     var target = Path.Combine(
-                                              command.OutputRoot,
-                                              command.ActiveTarget.ToString(),
-                                              command.BuildPackage);
+                        command.OutputRoot,
+                        command.ActiveTarget.ToString(),
+                        command.BuildPackage);
                     if (Directory.Exists(target))
                     {
                         var dirs = Directory.GetDirectories(target).
@@ -114,9 +117,9 @@ namespace AIO.UEditor.CLI
                                     var result = tt.CompareTo(st);
                                     if (result == 0) // 如果时间相同 则比较名称
                                         result = string.Compare(
-                                                                Path.GetFileName(s),
-                                                                Path.GetFileName(t),
-                                                                StringComparison.CurrentCulture);
+                                            Path.GetFileName(s),
+                                            Path.GetFileName(t),
+                                            StringComparison.CurrentCulture);
 
                                     return result;
                                 });
@@ -157,8 +160,8 @@ namespace AIO.UEditor.CLI
                 PackageVersion       = command.PackageVersion,
                 BuildOutputRoot      = command.OutputRoot,
                 StreamingAssetsRoot = Path.Combine(
-                                                   Application.streamingAssetsPath,
-                                                   ASConfig.GetOrCreate().RuntimeRootDirectory),
+                    Application.streamingAssetsPath,
+                    ASConfig.GetOrCreate().RuntimeRootDirectory),
                 DisableWriteTypeTree = false
             };
             switch (command.OutputNameStyle)
@@ -207,9 +210,9 @@ namespace AIO.UEditor.CLI
             if (buildResult.Success)
             {
                 var output = Path.Combine(
-                                          buildParameters.BuildOutputRoot,
-                                          buildParameters.BuildTarget.ToString(),
-                                          buildParameters.PackageName);
+                    buildParameters.BuildOutputRoot,
+                    buildParameters.BuildTarget.ToString(),
+                    buildParameters.PackageName);
 
                 if (command.MergeToLatest) MergeToLatest(output, buildParameters.PackageVersion);
                 else ManifestGenerate(Path.Combine(output, buildParameters.PackageVersion));
@@ -236,7 +239,7 @@ namespace AIO.UEditor.CLI
 
             var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories).
                                     Where(filePath => filePath != Manifest).ToDictionary(filePath => filePath,
-                                        filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
+                                                                                         filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
             hashtable.Remove("OutputCache");
             hashtable.Remove("OutputCache.manifest");
 

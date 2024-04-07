@@ -39,7 +39,7 @@ namespace AIO.UEngine
         /// </summary>
         [DebuggerNonUserCode]
         [DebuggerHidden]
-        public virtual void FreeHandle(string[] locations)
+        public virtual void FreeHandle(IEnumerable<string> locations)
         {
             foreach (var location in locations) HandleFree(location);
         }

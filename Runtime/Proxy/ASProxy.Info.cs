@@ -33,6 +33,7 @@ namespace AIO.UEngine
         ///     检查资源定位地址是否有效
         /// </summary>
         /// <param name="location">资源的定位地址</param>
+        /// <returns>Ture:有效</returns>
         [DebuggerNonUserCode]
         [DebuggerHidden]
         public abstract bool CheckLocationValid(string location);

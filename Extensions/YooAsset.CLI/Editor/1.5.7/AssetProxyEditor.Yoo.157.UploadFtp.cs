@@ -103,11 +103,8 @@ namespace AIO.UEditor.CLI
                 var progress = new AProgressEvent
                 {
                     // OnComplete = report => { EHelper.DisplayDialog("结束", report.ToString(), "确定"); },
-                    OnError = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); },
-                    OnProgress = current =>
-                    {
-                        EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f);
-                    }
+                    OnError    = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); },
+                    OnProgress = current => { EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f); }
                 };
                 EHelper.DisplayProgressBar("上传", $"[FTP] 远端版本清单不存在 : 准备开始上传资源 : {localFull} -> {handle.Absolute}",
                                            0.2f);
@@ -125,7 +122,7 @@ namespace AIO.UEditor.CLI
                     try
                     {
                         data = AHelper.Json.Deserialize<List<AssetsPackageConfig>>(
-                         await handle.GetTextAsync(versionPath));
+                            await handle.GetTextAsync(versionPath));
                     }
                     catch (Exception)
                     {

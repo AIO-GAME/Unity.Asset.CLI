@@ -188,20 +188,20 @@ namespace AIO.UEngine.YooAsset
                         throw new Exception($"ASConfig Remote Version Parsing Json Failure : {e}");
                     }
 #else
-            catch (Exception)
-            {
-                AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionParsingJsonFailure);
-                yield break;
-            }
+                    catch (Exception)
+                    {
+                        AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionParsingJsonFailure);
+                        yield break;
+                    }
 #endif
 
                     if (config.Packages is null || config.Packages.Length == 0)
                     {
 #if UNITY_EDITOR
-                        throw new ArgumentNullException("Please set the ASConfig Packages configuration");
+                        throw new ArgumentNullException($"Please set the ASConfig Packages configuration");
 #else
-                AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
-                yield break;
+                        AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
+                        yield break;
 #endif
                     }
 
@@ -255,7 +255,7 @@ namespace AIO.UEngine.YooAsset
         private static void UpdatePackagesLocal(ASConfig config)
         {
             config.Packages = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(
-                                                                             $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
+                $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
             if (config.Packages is null)
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
         }

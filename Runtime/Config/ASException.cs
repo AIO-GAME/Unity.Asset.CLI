@@ -43,7 +43,6 @@ ASConfig 为空！请检查实现或输入实例！
 [CN:不支持的资源模式！]")]
         NoSupportEASMode,
 
-
         [Description(@"
 [EN:No found asset collect root!]
 [CN:未找到资源收集根节点！]")]

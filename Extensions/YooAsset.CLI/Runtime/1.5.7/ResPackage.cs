@@ -120,8 +120,8 @@ namespace AIO.UEngine.YooAsset
         public UpdatePackageVersionOperation UpdatePackageVersionAsync()
         {
             return Package.UpdatePackageVersionAsync(
-                                                     AssetSystem.Parameter.AppendTimeTicks,
-                                                     AssetSystem.Parameter.Timeout);
+                AssetSystem.Parameter.AppendTimeTicks,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
@@ -131,9 +131,9 @@ namespace AIO.UEngine.YooAsset
         public UpdatePackageManifestOperation UpdatePackageManifestAsync(string version)
         {
             return Package.UpdatePackageManifestAsync(
-                                                      version,
-                                                      AssetSystem.Parameter.AutoSaveVersion,
-                                                      AssetSystem.Parameter.Timeout);
+                version,
+                AssetSystem.Parameter.AutoSaveVersion,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
@@ -478,9 +478,9 @@ namespace AIO.UEngine.YooAsset
         public ResourceDownloaderOperation CreateResourceDownloader()
         {
             return Package.CreateResourceDownloader(
-                                                    AssetSystem.Parameter.LoadingMaxTimeSlice,
-                                                    AssetSystem.Parameter.DownloadFailedTryAgain,
-                                                    AssetSystem.Parameter.Timeout);
+                AssetSystem.Parameter.LoadingMaxTimeSlice,
+                AssetSystem.Parameter.DownloadFailedTryAgain,
+                AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
