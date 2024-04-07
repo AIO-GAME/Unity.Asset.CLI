@@ -43,7 +43,7 @@ namespace AIO
 
         #region Sync
 
-        protected override void OnInvoke()
+        protected override void CreateSync()
         {
             Result = AssetSystem.Proxy.InstGameObject(Address, parent);
         }
@@ -52,7 +52,7 @@ namespace AIO
 
         #region CO
 
-        protected override IEnumerator OnCreateCO()
+        protected override IEnumerator CreateCoroutine()
         {
             return AssetSystem.Proxy.InstGameObjectCO(Address, OnCompletedCO, parent);
         }
@@ -70,7 +70,7 @@ namespace AIO
 
         private TaskAwaiter<GameObject> AwaiterObject;
 
-        protected override TaskAwaiter<GameObject> OnAwaiterObject()
+        protected override TaskAwaiter<GameObject> CreateAsync()
         {
             AwaiterObject = AssetSystem.Proxy.InstGameObjectTask(Address, parent).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);

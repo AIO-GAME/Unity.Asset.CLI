@@ -38,7 +38,7 @@ namespace AIO
             downloader = null;
         }
 
-        protected override void OnInvoke()
+        protected override void CreateSync()
         {
             if (AssetSystem.Parameter.ASMode == EASMode.Remote)
             {
@@ -63,7 +63,7 @@ namespace AIO
 
         #region CO
 
-        protected override IEnumerator OnCreateCO()
+        protected override IEnumerator CreateCoroutine()
         {
             if (AssetSystem.Parameter.ASMode == EASMode.Remote)
             {
@@ -90,7 +90,7 @@ namespace AIO
 
         #region Task
 
-        protected override TaskAwaiter OnAwaiter()
+        protected override TaskAwaiter CreateAsync()
         {
             if (AssetSystem.Parameter.ASMode == EASMode.Remote)
             {

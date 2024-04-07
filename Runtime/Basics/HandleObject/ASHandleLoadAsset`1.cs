@@ -36,14 +36,14 @@ namespace AIO
     internal partial class ASHandleLoadAsset<TObject> : ASHandle<TObject>
     where TObject : Object
     {
-        protected override void OnInvoke()
+        protected override void CreateSync()
         {
             Result = AssetSystem.Proxy.LoadAssetSync<TObject>(Address);
         }
 
         #region CO
 
-        protected override IEnumerator OnCreateCO()
+        protected override IEnumerator CreateCoroutine()
         {
             return AssetSystem.Proxy.LoadAssetCO<TObject>(Address, OnCompletedCO);
         }
@@ -66,7 +66,7 @@ namespace AIO
 
         private TaskAwaiter<TObject> AwaiterGeneric;
 
-        protected override TaskAwaiter<TObject> OnAwaiterObject()
+        protected override TaskAwaiter<TObject> CreateAsync()
         {
             AwaiterGeneric = AssetSystem.Proxy.LoadAssetTask<TObject>(Address).GetAwaiter();
             AwaiterGeneric.OnCompleted(OnCompletedTaskGeneric);

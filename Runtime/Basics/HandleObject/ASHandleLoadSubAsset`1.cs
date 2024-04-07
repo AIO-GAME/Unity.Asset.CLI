@@ -11,7 +11,7 @@ namespace AIO
     {
         #region Sync
 
-        protected override void OnInvoke()
+        protected override void CreateSync()
         {
             Result = AssetSystem.Proxy.LoadSubAssetsSync<TObject>(Address);
         }
@@ -20,7 +20,7 @@ namespace AIO
 
         #region CO
 
-        protected override IEnumerator OnCreateCO()
+        protected override IEnumerator CreateCoroutine()
         {
             return AssetSystem.Proxy.LoadSubAssetsCO<TObject>(Address, OnCompletedCO);
         }
@@ -43,7 +43,7 @@ namespace AIO
 
         private TaskAwaiter<TObject[]> AwaiterObject;
 
-        protected override TaskAwaiter<TObject[]> OnAwaiterObject()
+        protected override TaskAwaiter<TObject[]> CreateAsync()
         {
             AwaiterObject = AssetSystem.Proxy.LoadSubAssetsTask<TObject>(Address).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);

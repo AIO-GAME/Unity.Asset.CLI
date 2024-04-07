@@ -14,23 +14,23 @@ namespace AIO
         public bool         IsRunning => !IsDone;
         public event Action Completed;
 
-        protected abstract IEnumerator OnCreateCO();
-        protected abstract void        OnInvoke();
+        protected abstract TaskAwaiter CreateAsync();
+        protected abstract IEnumerator CreateCoroutine();
+        protected abstract void        CreateSync();
         protected virtual  void        OnReset()   { }
         protected virtual  void        OnDispose() { }
 
         public TaskAwaiter GetAwaiter()
         {
             if (IsDone) return Task.CompletedTask.GetAwaiter();
-            return OnAwaiter();
+            return CreateAsync();
         }
 
-        protected abstract TaskAwaiter OnAwaiter();
 
         public void Invoke()
         {
             if (IsDone) return;
-            OnInvoke();
+            CreateSync();
             IsDone = true;
             InvokeOnCompleted();
         }
@@ -42,7 +42,7 @@ namespace AIO
         {
             get
             {
-                if (_CO is null) _CO = OnCreateCO();
+                if (_CO is null) _CO = CreateCoroutine();
                 return _CO;
             }
         }

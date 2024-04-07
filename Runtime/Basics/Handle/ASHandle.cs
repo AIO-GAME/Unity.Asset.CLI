@@ -23,7 +23,7 @@ namespace AIO
         {
             if (!IsDone)
             {
-                OnInvoke();
+                CreateSync();
                 IsDone = true;
                 InvokeOnCompleted();
             }
@@ -33,9 +33,9 @@ namespace AIO
 
         public event Action<TObject> Completed;
 
-        protected abstract IEnumerator          OnCreateCO();
-        protected abstract TaskAwaiter<TObject> OnAwaiterObject();
-        protected abstract void                 OnInvoke();
+        protected abstract IEnumerator          CreateCoroutine();
+        protected abstract TaskAwaiter<TObject> CreateAsync();
+        protected abstract void                 CreateSync();
         protected virtual  void                 OnReset()   { }
         protected virtual  void                 OnDispose() { }
 
@@ -45,7 +45,7 @@ namespace AIO
         {
             get
             {
-                if (_CO is null) _CO = OnCreateCO();
+                if (_CO is null) _CO = CreateCoroutine();
                 return _CO;
             }
         }
@@ -61,7 +61,7 @@ namespace AIO
 
         public TaskAwaiter<TObject> GetAwaiter()
         {
-            return IsDone || !IsValidate ? Task.FromResult(default(TObject)).GetAwaiter() : OnAwaiterObject();
+            return IsDone || !IsValidate ? Task.FromResult(default(TObject)).GetAwaiter() : CreateAsync();
         }
 
         public void Dispose()
@@ -201,7 +201,7 @@ namespace AIO
         TaskAwaiter<object> AssetSystem.IHandle.GetAwaiter()
         {
             return IsValidate
-                ? OnAwaiterObject().To<TaskAwaiter<object>>()
+                ? CreateAsync().To<TaskAwaiter<object>>()
                 : Task.FromResult<object>(null).GetAwaiter();
         }
 

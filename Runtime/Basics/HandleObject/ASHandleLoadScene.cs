@@ -18,7 +18,7 @@ namespace AIO
 
         #region Sync
 
-        protected override void OnInvoke()
+        protected override void CreateSync()
         {
             var task = AssetSystem.Proxy.LoadSceneTask(Address, _SceneMode, _SuspendLoad, _Priority);
             while (!task.IsCompleted) task.Wait();
@@ -29,7 +29,7 @@ namespace AIO
 
         #region CO
 
-        protected override IEnumerator OnCreateCO()
+        protected override IEnumerator CreateCoroutine()
         {
             return AssetSystem.Proxy.LoadSceneCO(Address, OnCompletedCO, _SceneMode, _SuspendLoad, _Priority);
         }
@@ -52,7 +52,7 @@ namespace AIO
 
         private TaskAwaiter<Scene> AwaiterObject;
 
-        protected override TaskAwaiter<Scene> OnAwaiterObject()
+        protected override TaskAwaiter<Scene> CreateAsync()
         {
             AwaiterObject = AssetSystem.Proxy.LoadSceneTask(Address, _SceneMode, _SuspendLoad, _Priority).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);

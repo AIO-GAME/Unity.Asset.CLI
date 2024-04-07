@@ -34,7 +34,7 @@ namespace AIO
     {
         #region Sync
 
-        protected override void OnInvoke()
+        protected override void CreateSync()
         {
             Result = AssetSystem.Proxy.LoadRawFileTextSync(Address);
         }
@@ -43,7 +43,7 @@ namespace AIO
 
         #region CO
 
-        protected override IEnumerator OnCreateCO()
+        protected override IEnumerator CreateCoroutine()
         {
             return AssetSystem.Proxy.LoadRawFileTextCO(Address, OnCompletedCO);
         }
@@ -66,7 +66,7 @@ namespace AIO
 
         private TaskAwaiter<string> AwaiterObject;
 
-        protected override TaskAwaiter<string> OnAwaiterObject()
+        protected override TaskAwaiter<string> CreateAsync()
         {
             AwaiterObject = AssetSystem.Proxy.LoadRawFileTextTask(Address).GetAwaiter();
             AwaiterObject.OnCompleted(OnCompletedTaskObject);

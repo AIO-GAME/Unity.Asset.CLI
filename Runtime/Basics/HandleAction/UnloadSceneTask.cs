@@ -23,13 +23,13 @@ namespace AIO
     {
         private string Address;
 
-        protected override void OnInvoke()
+        protected override void CreateSync()
         {
             var temp = AssetSystem.Proxy.UnloadSceneTask(Address);
             while (temp.IsCompleted == false) temp.Wait();
         }
 
-        protected override IEnumerator OnCreateCO()
+        protected override IEnumerator CreateCoroutine()
         {
             return AssetSystem.Proxy.UnloadSceneCO(Address, InvokeOnCompleted);
         }
@@ -45,7 +45,7 @@ namespace AIO
 
         private TaskAwaiter _Awaiter;
 
-        protected override TaskAwaiter OnAwaiter()
+        protected override TaskAwaiter CreateAsync()
         {
             _Awaiter = AssetSystem.Proxy.UnloadSceneTask(Address).GetAwaiter();
             _Awaiter.OnCompleted(InvokeOnCompleted);

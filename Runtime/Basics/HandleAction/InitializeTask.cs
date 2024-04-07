@@ -46,7 +46,7 @@ namespace AIO
     {
         #region CO
 
-        protected override IEnumerator OnCreateCO()
+        protected override IEnumerator CreateCoroutine()
         {
             if (!IsValidate) throw new Exception("Initialize Error");
             yield return Proxy.UpdatePackagesCO(Config);
@@ -82,7 +82,7 @@ namespace AIO
 
         #region Sync
 
-        protected override void OnInvoke()
+        protected override void CreateSync()
         {
             throw new NotImplementedException();
         }
@@ -94,7 +94,7 @@ namespace AIO
         private TaskAwaiter _Awaiter1;
         private TaskAwaiter _Awaiter2;
 
-        protected override TaskAwaiter OnAwaiter()
+        protected override TaskAwaiter CreateAsync()
         {
             if (!IsValidate) throw new Exception("Initialize Error");
             _Awaiter1 = OnAwaiter2().GetAwaiter();
