@@ -159,7 +159,7 @@ namespace AIO.UEngine.YooAsset
                         yield break;
                     }
 
-                    var remote = $"{config.URL}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
+                    var remote = $"{config.URL.Trim('/')}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
                     var content = string.Empty;
                     using (var uwr = UnityWebRequest.Get(remote))
                     {
