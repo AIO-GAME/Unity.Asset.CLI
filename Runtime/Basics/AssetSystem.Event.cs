@@ -19,20 +19,25 @@ namespace AIO
             HandleReset = true;
             if (DownloadHandle != null) DownloadHandle.Cancel();
             var temp = Proxy.GetLoadingHandle();
-            temp.Event.OnNetReachableCarrier = DownloadEvent.OnNetReachableCarrier;
-            temp.Event.OnWritePermissionNot  = DownloadEvent.OnWritePermissionNot;
-            temp.Event.OnReadPermissionNot   = DownloadEvent.OnReadPermissionNot;
-            temp.Event.OnDiskSpaceNotEnough  = DownloadEvent.OnDiskSpaceNotEnough;
-            temp.Event.OnNetReachableNot     = DownloadEvent.OnNetReachableNot;
-            temp.Event.OnProgress            = DownloadEvent.OnProgress;
-            temp.Event.OnError               = DownloadEvent.OnError;
-            temp.Event.OnComplete            = DownloadEvent.OnComplete;
-            temp.Event.OnCancel              = DownloadEvent.OnCancel;
-            temp.Event.OnBegin               = DownloadEvent.OnBegin;
-            temp.Event.OnResume              = DownloadEvent.OnResume;
-            temp.Event.OnPause               = DownloadEvent.OnPause;
-            DownloadHandle                   = temp;
-            StatusStop                       = false;
+            var dEvent = DownloadEvent;
+            if (dEvent != null)
+            {
+                temp.Event.OnNetReachableCarrier = dEvent.OnNetReachableCarrier;
+                temp.Event.OnWritePermissionNot  = dEvent.OnWritePermissionNot;
+                temp.Event.OnReadPermissionNot   = dEvent.OnReadPermissionNot;
+                temp.Event.OnDiskSpaceNotEnough  = dEvent.OnDiskSpaceNotEnough;
+                temp.Event.OnNetReachableNot     = dEvent.OnNetReachableNot;
+                temp.Event.OnProgress            = dEvent.OnProgress;
+                temp.Event.OnError               = dEvent.OnError;
+                temp.Event.OnComplete            = dEvent.OnComplete;
+                temp.Event.OnCancel              = dEvent.OnCancel;
+                temp.Event.OnBegin               = dEvent.OnBegin;
+                temp.Event.OnResume              = dEvent.OnResume;
+                temp.Event.OnPause               = dEvent.OnPause;
+            }
+
+            DownloadHandle = temp;
+            StatusStop     = false;
         }
     }
 }

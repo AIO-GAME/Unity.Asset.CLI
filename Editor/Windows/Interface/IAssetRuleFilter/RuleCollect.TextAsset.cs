@@ -6,7 +6,7 @@ namespace AIO.UEditor
     {
         #region Nested type: CollectTextAsset
 
-        public class CollectTextAsset : IFilterRule
+        private class CollectTextAsset : IFilterRule
         {
             #region IFilterRule Members
 
@@ -30,7 +30,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextAssetAsset
 
-        public class CollectTextAssetAsset : IFilterRule
+        private class CollectTextAssetAsset : IFilterRule
         {
             #region IFilterRule Members
 
@@ -48,7 +48,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextAssetBytes
 
-        public class CollectTextAssetBytes : IFilterRule
+        private class CollectTextAssetBytes : IFilterRule
         {
             #region IFilterRule Members
 
@@ -66,7 +66,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextAssetJson
 
-        public class CollectTextAssetJson : IFilterRule
+        private class CollectTextAssetJson : IFilterRule
         {
             #region IFilterRule Members
 
@@ -84,7 +84,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextAssetLua
 
-        public class CollectTextAssetLua : IFilterRule
+        private class CollectTextAssetLua : IFilterRule
         {
             #region IFilterRule Members
 
@@ -102,7 +102,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextAssetTxt
 
-        public class CollectTextAssetTxt : IFilterRule
+        private class CollectTextAssetTxt : IFilterRule
         {
             #region IFilterRule Members
 
@@ -120,7 +120,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextAssetXml
 
-        public class CollectTextAssetXml : IFilterRule
+        private class CollectTextAssetXml : IFilterRule
         {
             #region IFilterRule Members
 
@@ -138,7 +138,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextAssetYaml
 
-        public class CollectTextAssetYaml : IFilterRule
+        private class CollectTextAssetYaml : IFilterRule
         {
             #region IFilterRule Members
 

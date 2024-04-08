@@ -6,7 +6,7 @@ namespace AIO.UEditor
     {
         #region Nested type: CollectAudioClip
 
-        public class CollectAudioClip : IFilterRule
+        private class CollectAudioClip : IFilterRule
         {
             #region IFilterRule Members
 
@@ -14,13 +14,13 @@ namespace AIO.UEditor
 
             public bool IsCollectAsset(AssetRuleData data)
             {
-                return new CollectAudioClipMP3().IsCollectAsset(data) ||
-                       new CollectAudioClipOGG().IsCollectAsset(data) ||
-                       new CollectAudioClipFLAC().IsCollectAsset(data) ||
-                       data.Extension == "mpeg" ||
+                return data.Extension == "mpeg" ||
                        data.Extension == "aac" ||
                        data.Extension == "wmv" ||
                        data.Extension == "wma" ||
+                       new CollectAudioClipMP3().IsCollectAsset(data) ||
+                       new CollectAudioClipOGG().IsCollectAsset(data) ||
+                       new CollectAudioClipFLAC().IsCollectAsset(data) ||
                        new CollectAudioClipMIXER().IsCollectAsset(data);
             }
 
@@ -31,7 +31,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectAudioClipFLAC
 
-        public class CollectAudioClipFLAC : IFilterRule
+        private class CollectAudioClipFLAC : IFilterRule
         {
             #region IFilterRule Members
 
@@ -49,7 +49,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectAudioClipMIXER
 
-        public class CollectAudioClipMIXER : IFilterRule
+        private class CollectAudioClipMIXER : IFilterRule
         {
             #region IFilterRule Members
 
@@ -67,7 +67,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectAudioClipMP3
 
-        public class CollectAudioClipMP3 : IFilterRule
+        private class CollectAudioClipMP3 : IFilterRule
         {
             #region IFilterRule Members
 
@@ -85,7 +85,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectAudioClipOGG
 
-        public class CollectAudioClipOGG : IFilterRule
+        private class CollectAudioClipOGG : IFilterRule
         {
             #region IFilterRule Members
 

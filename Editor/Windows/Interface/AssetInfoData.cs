@@ -136,12 +136,23 @@ namespace AIO
             }
         }
 
-        [NonSerialized] private string   _sizeStr;
-        [NonSerialized] private string   _name;
-        [NonSerialized] private DateTime _lastWriteTime;
-        [NonSerialized] private long     _size;
-        [NonSerialized] private string   _type;
-        [NonSerialized] private string   _guid;
+        [NonSerialized]
+        private string _sizeStr;
+
+        [NonSerialized]
+        private string _name;
+
+        [NonSerialized]
+        private DateTime _lastWriteTime;
+
+        [NonSerialized]
+        private long _size;
+
+        [NonSerialized]
+        private string _type;
+
+        [NonSerialized]
+        private string _guid;
     }
 
     public static class ExtensionAssetDataInfo

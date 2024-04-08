@@ -284,7 +284,8 @@ namespace AIO.UEditor
 
             private enum Types
             {
-                [InspectorName("YooAsset [Latest]")] YooAsset
+                [InspectorName("YooAsset [Latest]")]
+                YooAsset
             }
         }
 

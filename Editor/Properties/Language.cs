@@ -1,9 +1,3 @@
-/*|============|*|
-|*|Author:     |*| xinan                
-|*|Date:       |*| 2024-04-06               
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
 using System;
 using System.Collections.Generic;
 using System.Linq;

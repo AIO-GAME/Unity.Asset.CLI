@@ -4,7 +4,6 @@ using UnityEditor.PackageManager;
 
 [assembly: InternalsVisibleTo("AIO.CLI.YooAsset.Editor")]
 
-
 namespace AIO.UEditor
 {
     internal static class Setting

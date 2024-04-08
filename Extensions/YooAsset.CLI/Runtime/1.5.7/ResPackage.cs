@@ -73,7 +73,6 @@ namespace AIO.UEngine.YooAsset
                 {
                     if (parameters.Parameters is EditorSimulateModeParameters parameter)
                         parameter.SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(Config.Name);
-
                     break;
                 }
 #endif
@@ -336,7 +335,8 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public AssetOperationHandle LoadAssetSync<TObject>(string location) where TObject : Object
+        public AssetOperationHandle LoadAssetSync<TObject>(string location)
+        where TObject : Object
         {
             return Package.LoadAssetSync<TObject>(location);
         }
@@ -366,7 +366,8 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public AssetOperationHandle LoadAssetAsync<TObject>(string location) where TObject : Object
+        public AssetOperationHandle LoadAssetAsync<TObject>(string location)
+        where TObject : Object
         {
             return Package.LoadAssetAsync<TObject>(location);
         }
@@ -399,7 +400,8 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location) where TObject : Object
+        public SubAssetsOperationHandle LoadSubAssetsSync<TObject>(string location)
+        where TObject : Object
         {
             return Package.LoadSubAssetsSync<TObject>(location);
         }
@@ -429,7 +431,8 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">资源的定位地址</param>
-        public SubAssetsOperationHandle LoadSubAssetsAsync<TObject>(string location) where TObject : Object
+        public SubAssetsOperationHandle LoadSubAssetsAsync<TObject>(string location)
+        where TObject : Object
         {
             return Package.LoadSubAssetsAsync<TObject>(location);
         }

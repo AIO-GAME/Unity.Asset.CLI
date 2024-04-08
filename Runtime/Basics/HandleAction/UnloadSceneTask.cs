@@ -5,21 +5,21 @@ using System.Runtime.InteropServices;
 
 namespace AIO
 {
-    internal partial class ASHandleActionUnloadSceneTask
+    internal partial class OperationActionUnloadSceneTask
     {
-        public static AssetSystem.IHandleAction Create(string location, Action complete)
+        public static IOperationAction Create(string location, Action complete)
         {
-            return new ASHandleActionUnloadSceneTask(location, complete);
+            return new OperationActionUnloadSceneTask(location, complete);
         }
 
-        public static AssetSystem.IHandleAction Create(string location)
+        public static IOperationAction Create(string location)
         {
-            return new ASHandleActionUnloadSceneTask(location);
+            return new OperationActionUnloadSceneTask(location);
         }
     }
 
     [StructLayout(LayoutKind.Auto)]
-    internal partial class ASHandleActionUnloadSceneTask : ASHandleAction
+    internal partial class OperationActionUnloadSceneTask : OperationAction
     {
         private string Address;
 
@@ -43,28 +43,30 @@ namespace AIO
 
         #region Task
 
-        private TaskAwaiter _Awaiter;
+        private TaskAwaiter Awaiter;
 
         protected override TaskAwaiter CreateAsync()
         {
-            _Awaiter = AssetSystem.Proxy.UnloadSceneTask(Address).GetAwaiter();
-            _Awaiter.OnCompleted(InvokeOnCompleted);
-            return _Awaiter;
+            Awaiter = AssetSystem.Proxy.UnloadSceneTask(Address).GetAwaiter();
+            Awaiter.OnCompleted(InvokeOnCompleted);
+            return Awaiter;
         }
 
         #endregion
 
         #region Constructor
 
-        public ASHandleActionUnloadSceneTask(string location)
+        public OperationActionUnloadSceneTask(string location)
         {
-            Address = AssetSystem.SettingToLocalPath(location);
+            Address    = AssetSystem.SettingToLocalPath(location);
+            IsValidate = AssetSystem.Proxy.CheckLocationValid(Address);
         }
 
-        public ASHandleActionUnloadSceneTask(string location, Action complete)
+        public OperationActionUnloadSceneTask(string location, Action complete)
         {
-            Address   =  AssetSystem.SettingToLocalPath(location);
-            Completed += complete;
+            Address    =  AssetSystem.SettingToLocalPath(location);
+            IsValidate =  AssetSystem.Proxy.CheckLocationValid(Address);
+            Completed  += complete;
         }
 
         #endregion

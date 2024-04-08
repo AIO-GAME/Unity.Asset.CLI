@@ -52,7 +52,7 @@ namespace AIO
 #endif
         public static <#= typeName #> Load<#= aliasName #>(string location)
         {
-            return ASHandleLoadAsset<<#= typeName #>>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<<#= typeName #>>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace AIO
 #endif
         public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> cb)
         {
-            await ASHandleLoadAsset<<#= typeName #>>.Create(location, cb);
+            await LoaderHandleLoadAsset<<#= typeName #>>.Create(location, cb);
         }
 
         /// <summary>
@@ -77,23 +77,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<<#= typeName #>> Load<#= aliasName #>Task(string location)
+        public static ILoaderHandle<<#= typeName #>> Load<#= aliasName #>Task(string location)
         {
-            return ASHandleLoadAsset<<#= typeName #>>.Create(location);
+            return LoaderHandleLoadAsset<<#= typeName #>>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="<#= typeName #>"/>
+        /// 异步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<<#= typeName #>> Load<#= aliasName #>Task(string location, Action<<#= typeName #>> cb)
+        public static ILoaderHandle<<#= typeName #>> Load<#= aliasName #>Task(string location, Action<<#= typeName #>> cb)
         {
-            return ASHandleLoadAsset<<#= typeName #>>.Create(location, cb);
+            return LoaderHandleLoadAsset<<#= typeName #>>.Create(location, cb);
         }
 
        #endregion

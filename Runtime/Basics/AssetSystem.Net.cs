@@ -23,16 +23,16 @@ namespace AIO
             switch (operation.result)
             {
                 case UnityWebRequest.Result.InProgress:
-                    LogException($"{ERROR_NET}请求正在进行中 -> {operation.url} {operation.error}");
+                    LogException($"请求正在进行中 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.ConnectionError:
-                    LogException($"{ERROR_NET}无法连接到服务器 -> {operation.url} {operation.error}");
+                    LogException($"无法连接到服务器 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.ProtocolError:
-                    LogException($"{ERROR_NET}服务器返回响应错误 -> {operation.url} {operation.error}");
+                    LogException($"服务器返回响应错误 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.DataProcessingError:
-                    LogException($"{ERROR_NET}数据处理异常 -> {operation.url} {operation.error}");
+                    LogException($"数据处理异常 -> {operation.url} {operation.error}");
                     return false;
             }
 

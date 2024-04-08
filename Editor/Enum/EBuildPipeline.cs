@@ -7,7 +7,8 @@ namespace AIO.UEditor
         /// <summary>
         ///     内置打包管线
         /// </summary>
-        [InspectorName("内置打包管线")] BuiltinBuildPipeline,
+        [InspectorName("内置打包管线")]
+        BuiltinBuildPipeline,
 
 #if UNITY_2018_1_OR_NEWER
 
@@ -47,7 +48,8 @@ namespace AIO.UEditor
         /// <summary>
         ///     自定义打包管线
         /// </summary>
-        [InspectorName("自定义打包管线(需安装)")] ScriptableBuildPipeline,
+        [InspectorName("自定义打包管线(需安装)")]
+        ScriptableBuildPipeline,
 #endif
     }
 }

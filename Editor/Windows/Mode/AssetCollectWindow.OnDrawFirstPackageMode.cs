@@ -148,7 +148,7 @@ namespace AIO.UEditor
             {
                 if (asset.ContainsKey(Config.SequenceRecord[i].AssetPath)) continue;
                 var temp = AssetCollectRoot.AssetToAddress(
-                                                           Config.SequenceRecord[i].AssetPath);
+                    Config.SequenceRecord[i].AssetPath);
                 Config.SequenceRecord[i].SetPackageName(temp.Item1);
                 var info = new AssetDataInfo
                 {
@@ -194,9 +194,9 @@ namespace AIO.UEditor
                     using (new EditorGUILayout.VerticalScope())
                     {
                         GELayout.Label(
-                                       $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
+                            $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
                         GELayout.HelpBox(
-                                         $"{record.Time:yyyy-MM-dd HH:mm:ss} [Num : {record.Count}] [Size : {record.Bytes.ToConverseStringFileSize()}] ");
+                            $"{record.Time:yyyy-MM-dd HH:mm:ss} [Num : {record.Count}] [Size : {record.Bytes.ToConverseStringFileSize()}] ");
                     }
             }
             else

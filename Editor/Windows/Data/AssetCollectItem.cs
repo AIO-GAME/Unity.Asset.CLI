@@ -266,7 +266,8 @@ namespace AIO.UEditor
         /// <summary>
         ///     设置可寻址规则
         /// </summary>
-        public void SetAddress<T>() where T : IAssetRuleAddress
+        public void SetAddress<T>()
+        where T : IAssetRuleAddress
         {
             Address = AssetCollectSetting.MapAddress.Values.FindIndex(address => address is T);
         }
@@ -387,9 +388,9 @@ namespace AIO.UEditor
 
         public string GetAssetAddress(AssetRuleData data, bool pathToLower = false)
         {
-            var rule    = AssetCollectSetting.MapAddress.GetValue(Address);
+            var rule = AssetCollectSetting.MapAddress.GetValue(Address);
             var address = rule.GetAssetAddress(data);
-
+            if (string.IsNullOrEmpty(address)) return string.Empty;
             if (HasExtension) address = string.Concat(address, ".", data.Extension);
             if (pathToLower) return address.ToLower();
             switch (LocationFormat)
@@ -498,9 +499,10 @@ namespace AIO.UEditor
                     else
                     {
                         if (!IsCollectAsset(data)) continue;
-                        info.AssetPath                 = string.Concat(data.AssetPath, '.', data.Extension);
-                        info.Extension                 = data.Extension;
-                        info.Address                   = GetAssetAddress(data, pathToLower);
+                        info.AssetPath = string.Concat(data.AssetPath, '.', data.Extension);
+                        info.Extension = data.Extension;
+                        info.Address   = GetAssetAddress(data, pathToLower);
+                        if (string.IsNullOrEmpty(info.Address)) continue;
                         AssetDataInfos[data.AssetPath] = info;
                     }
                 }
@@ -516,16 +518,19 @@ namespace AIO.UEditor
                     data.Extension = System.IO.Path.GetExtension(data.CollectPath).Replace(".", "").ToLower();
                     data.AssetPath = data.CollectPath.Substring(0, data.CollectPath.Length - data.Extension.Length - 1);
                     if (!IsCollectAsset(data)) return;
-                    info.AssetPath                   = data.CollectPath;
-                    info.Extension                   = data.Extension;
-                    info.Address                     = GetAssetAddress(data, pathToLower);
+                    info.AssetPath = data.CollectPath;
+                    info.Extension = data.Extension;
+                    info.Address   = GetAssetAddress(data, pathToLower);
+                    if (string.IsNullOrEmpty(info.Address)) return;
                     AssetDataInfos[data.CollectPath] = info;
                 }
             }
         }
 
-        public void CollectAssetAsync(string                                    package, string group,
-                                      Action<Dictionary<string, AssetDataInfo>> cb = null)
+        public void CollectAssetAsync(
+            string                                    package,
+            string                                    group,
+            Action<Dictionary<string, AssetDataInfo>> cb = null)
         {
             AssetDataInfos.Clear();
             if (!IsValidate) return;
@@ -534,13 +539,13 @@ namespace AIO.UEditor
             PackageName = package;
             GroupName   = group;
 
-            var tags        = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
+            var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
             var pathToLower = ASConfig.GetOrCreate().LoadPathToLower;
 
             UpdateCollect();
             UpdateFilter();
 
-            if (AllowThread) Runner.StartTask(Action);
+            if (AllowThread) Runner.StartCoroutine(Action);
             else Action();
 
             return;

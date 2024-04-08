@@ -7,66 +7,74 @@ using Object = UnityEngine.Object;
 
 namespace AIO
 {
-    internal partial class ASHandleLoadAsset
+    internal partial class LoaderHandleLoadAsset
     {
         [DebuggerNonUserCode, DebuggerHidden]
-        public static AssetSystem.IHandle<Object> Create(string location, Type type)
+        public static ILoaderHandle<Object> Create(string location, Type type)
         {
-            if (AssetSystem.HandleDic.TryGetValue(location, out var handle) && handle is AssetSystem.IHandle<Object> assetHandle)
+            var key = AssetSystem.SettingToLocalPath(location);
+            if (AssetSystem.HandleDic.TryGetValue(key, out var handle) && handle is ILoaderHandle<Object> assetHandle)
                 return assetHandle;
-            return new ASHandleLoadAsset(location, type);
+            return new LoaderHandleLoadAsset(key, type);
         }
 
         [DebuggerNonUserCode, DebuggerHidden]
-        public static AssetSystem.IHandle<Object> Create(string location)
+        public static ILoaderHandle<Object> Create(string location)
         {
-            if (AssetSystem.HandleDic.TryGetValue(location, out var handle) && handle is AssetSystem.IHandle<Object> assetHandle)
+            var key = AssetSystem.SettingToLocalPath(location);
+            if (AssetSystem.HandleDic.TryGetValue(key, out var handle) && handle is ILoaderHandle<Object> assetHandle)
                 return assetHandle;
-            return new ASHandleLoadAsset(location);
+            return new LoaderHandleLoadAsset(key);
         }
 
         [DebuggerNonUserCode, DebuggerHidden]
-        public static AssetSystem.IHandle<Object> Create(string location, Type type, Action<Object> completed)
+        public static ILoaderHandle<Object> Create(string location, Type type, Action<Object> completed)
         {
             if (completed is null) return Create(location, type);
-            if (AssetSystem.HandleDic.TryGetValue(location, out var handle) && handle is AssetSystem.IHandle<Object> assetHandle)
+            var key = AssetSystem.SettingToLocalPath(location);
+            if (AssetSystem.HandleDic.TryGetValue(key, out var handle) && handle is ILoaderHandle<Object> assetHandle)
             {
                 if (assetHandle.IsDone) completed.Invoke(assetHandle.Result);
                 else assetHandle.Completed += completed;
                 return assetHandle;
             }
 
-            return new ASHandleLoadAsset(location, type, completed);
+            return new LoaderHandleLoadAsset(key, type, completed);
         }
 
         [DebuggerNonUserCode, DebuggerHidden]
-        public static AssetSystem.IHandle<Object> Create(string location, Action<Object> completed)
+        public static ILoaderHandle<Object> Create(string location, Action<Object> completed)
         {
             if (completed is null) return Create(location);
-            if (AssetSystem.HandleDic.TryGetValue(location, out var handle) && handle is AssetSystem.IHandle<Object> assetHandle)
+            var key = AssetSystem.SettingToLocalPath(location);
+            if (AssetSystem.HandleDic.TryGetValue(key, out var handle) && handle is ILoaderHandle<Object> assetHandle)
             {
                 if (assetHandle.IsDone) completed.Invoke(assetHandle.Result);
                 else assetHandle.Completed += completed;
                 return assetHandle;
             }
 
-            return new ASHandleLoadAsset(location, completed);
+            return new LoaderHandleLoadAsset(key, completed);
         }
     }
 
     [StructLayout(LayoutKind.Auto)]
-    internal partial class ASHandleLoadAsset : ASHandle<Object>
+    internal partial class LoaderHandleLoadAsset : LoaderHandle<Object>
     {
+        #region Sync
+
         protected override void CreateSync()
         {
             Result = AssetSystem.Proxy.LoadAssetSync(Address, AssetType);
         }
 
+        #endregion
+
         #region CO
 
         protected override IEnumerator CreateCoroutine()
         {
-            return AssetSystem.Proxy.LoadAssetCO<Object>(Address, OnCompletedCO);
+            return AssetSystem.Proxy.LoadAssetCO(Address, AssetType, OnCompletedCO);
         }
 
         private void OnCompletedCO(Object asset)
@@ -98,18 +106,58 @@ namespace AIO
 
         #region Constructor
 
-        private ASHandleLoadAsset(string location)
-            : base(location) { }
+        private LoaderHandleLoadAsset(string location, Action<Object> onCompleted) : this(location)
+        {
+            AssetType =  typeof(Object);
+            Completed += onCompleted;
+        }
 
-        private ASHandleLoadAsset(string location, Action<Object> onCompleted)
-            : base(location, onCompleted) { }
+        private LoaderHandleLoadAsset(string location, Type type, Action<Object> onCompleted) : this(location)
+        {
+            AssetType =  type;
+            Completed += onCompleted;
+        }
 
-        private ASHandleLoadAsset(string location, Type type, Action<Object> onCompleted)
-            : base(location, type, onCompleted) { }
-
-        private ASHandleLoadAsset(string location, Type type)
-            : base(location, type) { }
+        private LoaderHandleLoadAsset(string location, Type type) : this(location)
+        {
+            AssetType = type;
+        }
 
         #endregion
+
+        private LoaderHandleLoadAsset(string location)
+        {
+            Address    = location;
+            IsValidate = AssetSystem.CheckLocationValid(Address);
+            if (IsValidate)
+            {
+                if (AssetSystem.ReferenceHandleCount.Increment(Address) == 1)
+                {
+                    AssetSystem.HandleDic[Address] = this;
+                }
+            }
+            else AssetSystem.LogWarningFormat("资源地址无效: {0}", location);
+
+            IsDone   = !IsValidate;
+            Progress = 0;
+        }
+
+        protected override void OnDispose()
+        {
+            if (IsValidate)
+            {
+                var count = AssetSystem.ReferenceHandleCount.Decrement(Address);
+                if (count <= 0)
+                {
+                    AssetSystem.HandleDic.Remove(Address);
+                    AssetSystem.UnloadAsset(Address);
+                    Result = default;
+                }
+
+                IsValidate = false;
+            }
+
+            Address = null;
+        }
     }
 }

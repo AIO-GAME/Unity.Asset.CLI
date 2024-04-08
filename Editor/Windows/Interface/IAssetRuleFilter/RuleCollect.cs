@@ -3,7 +3,7 @@ using IFilterRule = AIO.UEditor.IAssetRuleFilter;
 
 namespace AIO.UEditor
 {
-    public static partial class RuleCollect
+    internal static partial class RuleCollect
     {
         /// <summary>
         ///     判断是否为自定义收集规则
@@ -44,7 +44,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectFBX
 
-        public class CollectFBX : IFilterRule
+        private class CollectFBX : IFilterRule
         {
             #region IFilterRule Members
 
@@ -62,7 +62,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectMaterial
 
-        public class CollectMaterial : IFilterRule
+        private class CollectMaterial : IFilterRule
         {
             #region IFilterRule Members
 
@@ -80,7 +80,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectPrefab
 
-        public class CollectPrefab : IFilterRule
+        private class CollectPrefab : IFilterRule
         {
             #region IFilterRule Members
 
@@ -98,7 +98,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectShader
 
-        public class CollectShader : IFilterRule
+        private class CollectShader : IFilterRule
         {
             #region IFilterRule Members
 
@@ -116,7 +116,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectUnity
 
-        public class CollectUnity : IFilterRule
+        private class CollectUnity : IFilterRule
         {
             #region IFilterRule Members
 

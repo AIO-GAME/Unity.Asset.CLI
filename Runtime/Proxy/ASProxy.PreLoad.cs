@@ -31,7 +31,8 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <typeparam name="TObject">资源类型</typeparam>
-        public Task PreLoadSubAssetsTask<TObject>(string location) where TObject : Object
+        public Task PreLoadSubAssetsTask<TObject>(string location)
+        where TObject : Object
         {
             return PreLoadSubAssetsTask(location, typeof(TObject));
         }
@@ -41,7 +42,8 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <typeparam name="TObject">资源类型</typeparam>
-        public Task PreLoadAssetTask<TObject>(string location) where TObject : Object
+        public Task PreLoadAssetTask<TObject>(string location)
+        where TObject : Object
         {
             return PreLoadAssetTask(location, typeof(TObject));
         }

@@ -1,5 +1,6 @@
 ﻿#if SUPPORT_YOOASSET
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using YooAsset;
@@ -32,6 +33,7 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tag">资源标签</param>
         private IEnumerable<AssetInfo> GetAssetInfosByTag(IEnumerable<string> tag)
         {
+            if (tag is null) return Array.Empty<AssetInfo>();
             var list = new List<AssetInfo>();
             var tags = tag.ToArray();
             foreach (var asset in Dic.Values) list.AddRange(asset.GetAssetInfos(tags));

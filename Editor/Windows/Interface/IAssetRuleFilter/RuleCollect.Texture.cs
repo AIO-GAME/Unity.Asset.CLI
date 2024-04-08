@@ -6,7 +6,7 @@ namespace AIO.UEditor
     {
         #region Nested type: CollectTexture
 
-        public class CollectTexture : IFilterRule
+        private class CollectTexture : IFilterRule
         {
             #region IFilterRule Members
 
@@ -34,7 +34,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextureBMP
 
-        public class CollectTextureBMP : IFilterRule
+        private class CollectTextureBMP : IFilterRule
         {
             #region IFilterRule Members
 
@@ -52,7 +52,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextureEXR
 
-        public class CollectTextureEXR : IFilterRule
+        private class CollectTextureEXR : IFilterRule
         {
             #region IFilterRule Members
 
@@ -70,7 +70,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextureHDR
 
-        public class CollectTextureHDR : IFilterRule
+        private class CollectTextureHDR : IFilterRule
         {
             #region IFilterRule Members
 
@@ -88,7 +88,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextureJPG
 
-        public class CollectTextureJPG : IFilterRule
+        private class CollectTextureJPG : IFilterRule
         {
             #region IFilterRule Members
 
@@ -106,7 +106,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTexturePNG
 
-        public class CollectTexturePNG : IFilterRule
+        private class CollectTexturePNG : IFilterRule
         {
             #region IFilterRule Members
 
@@ -124,7 +124,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTexturePSD
 
-        public class CollectTexturePSD : IFilterRule
+        private class CollectTexturePSD : IFilterRule
         {
             #region IFilterRule Members
 
@@ -142,7 +142,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextureSpriteAtlas
 
-        public class CollectTextureSpriteAtlas : IFilterRule
+        private class CollectTextureSpriteAtlas : IFilterRule
         {
             #region IFilterRule Members
 
@@ -160,7 +160,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectTextureTGA
 
-        public class CollectTextureTGA : IFilterRule
+        private class CollectTextureTGA : IFilterRule
         {
             #region IFilterRule Members
 

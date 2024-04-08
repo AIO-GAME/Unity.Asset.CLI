@@ -10,16 +10,19 @@ namespace AIO.UEditor
         /// <summary>
         ///     默认
         /// </summary>
-        [InspectorName("默认")] None,
+        [InspectorName("默认")]
+        None,
 
         /// <summary>
         ///     全部 小写
         /// </summary>
-        [InspectorName("小写")] ToLower,
+        [InspectorName("小写")]
+        ToLower,
 
         /// <summary>
         ///     全部 大写
         /// </summary>
-        [InspectorName("大写")] ToUpper
+        [InspectorName("大写")]
+        ToUpper
     }
 }

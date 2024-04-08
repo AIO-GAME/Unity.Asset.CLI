@@ -96,18 +96,18 @@ namespace AIO.UEditor
                                                                        "构建设置", FoldoutBuildSetting);
 
             FoldoutUploadFTP = GELayout.VFoldoutHeaderGroupWithHelp(
-                                                                    OnDrawBuildFTP,
-                                                                    "FTP",
-                                                                    FoldoutUploadFTP,
-                                                                    () => { BuildConfig.AddOrNewFTP(); }, 0, null,
-                                                                    new GUIContent("✚"));
+                OnDrawBuildFTP,
+                "FTP",
+                FoldoutUploadFTP,
+                () => { BuildConfig.AddOrNewFTP(); }, 0, null,
+                new GUIContent("✚"));
 
             FoldoutUploadGCloud = GELayout.VFoldoutHeaderGroupWithHelp(
-                                                                       OnDrawBuildGCloud,
-                                                                       "Google Cloud",
-                                                                       FoldoutUploadGCloud,
-                                                                       () => { BuildConfig.AddOrNewGCloud(); }, 0, null,
-                                                                       new GUIContent("✚"));
+                OnDrawBuildGCloud,
+                "Google Cloud",
+                FoldoutUploadGCloud,
+                () => { BuildConfig.AddOrNewGCloud(); }, 0, null,
+                new GUIContent("✚"));
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace AIO.UEditor
                     {
                         GUI.FocusControl(null);
                         BuildConfig.BuildOutputPath = EditorUtility.OpenFolderPanel(
-                         "请选择导出路径", BuildConfig.BuildOutputPath, "");
+                            "请选择导出路径", BuildConfig.BuildOutputPath, "");
                     }
 
                     if (GUILayout.Button("打开目录", GEStyle.toolbarbutton, GP_Width_75))
@@ -263,8 +263,8 @@ namespace AIO.UEditor
                         GUILayout.Label(AssetSystem.TagsRecord, GEStyle.PreDropDown);
                     else
                         Data.CurrentPackageIndex = EditorGUILayout.Popup(
-                                                                         Data.CurrentPackageIndex,
-                                                                         LookModeDisplayPackages, GEStyle.PreDropDown);
+                            Data.CurrentPackageIndex,
+                            LookModeDisplayPackages, GEStyle.PreDropDown);
 
                     if (GUI.changed)
                     {
@@ -335,7 +335,7 @@ namespace AIO.UEditor
                     using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
                     {
                         BuildConfig.AutoCleanCacheNum = EditorGUILayout.IntSlider(
-                         BuildConfig.AutoCleanCacheNum, 1, 20);
+                            BuildConfig.AutoCleanCacheNum, 1, 20);
                     }
                 }
             }

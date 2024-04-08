@@ -88,7 +88,7 @@ namespace AIO
 #endif
         public static async void UnloadScene(string location, Action complete)
         {
-            await ASHandleActionUnloadSceneTask.Create(location, complete);
+            await OperationActionUnloadSceneTask.Create(location, complete);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace AIO
 #endif
         public static async void UnloadScene(string location)
         {
-            await ASHandleActionUnloadSceneTask.Create(location);
+            await OperationActionUnloadSceneTask.Create(location);
         }
 
         /// <summary>
@@ -113,9 +113,9 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandleAction UnloadSceneTask(string location, Action complete)
+        public static IOperationAction UnloadSceneTask(string location, Action complete)
         {
-            return ASHandleActionUnloadSceneTask.Create(location, complete);
+            return OperationActionUnloadSceneTask.Create(location, complete);
         }
 
         /// <summary>
@@ -126,9 +126,9 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandleAction UnloadSceneTask(string location)
+        public static IOperationAction UnloadSceneTask(string location)
         {
-            return ASHandleActionUnloadSceneTask.Create(location);
+            return OperationActionUnloadSceneTask.Create(location);
         }
 
         #endregion

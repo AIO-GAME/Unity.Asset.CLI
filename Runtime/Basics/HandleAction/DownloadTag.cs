@@ -10,7 +10,7 @@ using AIO.UEngine;
 namespace AIO
 {
     [StructLayout(LayoutKind.Auto)]
-    internal sealed class ASHandleDownloadTag : ASHandleAction
+    internal sealed class OperationDownloadTag : OperationAction
     {
         /// <summary>
         /// 是否下载全部
@@ -31,7 +31,6 @@ namespace AIO
         /// 下载器
         /// </summary>
         private IASDownloader downloader;
-
 
         protected override void OnDispose()
         {
@@ -73,9 +72,9 @@ namespace AIO
                     downloader.Begin();
                     if (DownlandAll) downloader.CollectNeedAll();
                     else if (tags != null) downloader.CollectNeedTag(tags);
-                    yield return downloader;
+                    yield return downloader.WaitCo();
                 }
-                else yield return downloader;
+                else yield return downloader.WaitCo();
             }
             else
             {
@@ -102,23 +101,25 @@ namespace AIO
                 awaiter.OnCompleted(InvokeOnCompleted);
                 return awaiter;
             }
-
-            assetEvent.OnComplete?.Invoke(new AProgress { State = EProgressState.Finish });
-            InvokeOnCompleted();
-            return Task.CompletedTask.GetAwaiter();
+            else
+            {
+                var awaiter = Task.CompletedTask.GetAwaiter();
+                awaiter.OnCompleted(InvokeOnCompleted);
+                return awaiter;
+            }
         }
 
         #endregion
 
         #region Constructor
 
-        public ASHandleDownloadTag(bool isAll, DownlandAssetEvent assetEvent)
+        public OperationDownloadTag(bool isAll, DownlandAssetEvent assetEvent)
         {
             DownlandAll     = isAll;
             this.assetEvent = assetEvent;
         }
 
-        public ASHandleDownloadTag(string[] tags, DownlandAssetEvent assetEvent)
+        public OperationDownloadTag(string[] tags, DownlandAssetEvent assetEvent)
         {
             DownlandAll     = false;
             this.tags       = tags;
@@ -145,63 +146,63 @@ namespace AIO
         ///     预下载指定标签资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction DownloadTag(string tag, DownlandAssetEvent assetEvent = default)
+        public static IOperationAction DownloadTag(string tag, DownlandAssetEvent assetEvent = default)
         {
-            return new ASHandleDownloadTag(new[] { tag }, assetEvent);
+            return new OperationDownloadTag(new[] { tag }, assetEvent);
         }
 
         /// <summary>
         ///     预下载指定标签资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction DownloadTagWithRecord(string tag, DownlandAssetEvent assetEvent = default)
+        public static IOperationAction DownloadTagWithRecord(string tag, DownlandAssetEvent assetEvent = default)
         {
-            return new ASHandleDownloadTag(new[] { TagsRecord, tag }, assetEvent);
+            return new OperationDownloadTag(new[] { TagsRecord, tag }, assetEvent);
         }
 
         /// <summary>
         ///     预下载指定标签资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction DownloadTag(IEnumerable<string> tag, DownlandAssetEvent assetEvent = default)
+        public static IOperationAction DownloadTag(IEnumerable<string> tag, DownlandAssetEvent assetEvent = default)
         {
-            return new ASHandleDownloadTag(tag.ToArray(), assetEvent);
+            return new OperationDownloadTag(tag.ToArray(), assetEvent);
         }
 
         /// <summary>
         ///     预下载指定标签资源 + 记录序列资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction DownloadTagWithRecord(IEnumerable<string> tag, DownlandAssetEvent assetEvent = default)
+        public static IOperationAction DownloadTagWithRecord(IEnumerable<string> tag, DownlandAssetEvent assetEvent = default)
         {
-            return new ASHandleDownloadTag(new[] { TagsRecord }.Concat(tag).ToArray(), assetEvent);
+            return new OperationDownloadTag(new[] { TagsRecord }.Concat(tag).ToArray(), assetEvent);
         }
 
         /// <summary>
         ///     预下载记录序列资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction DownloadRecord(DownlandAssetEvent assetEvent = default)
+        public static IOperationAction DownloadRecord(DownlandAssetEvent assetEvent = default)
         {
-            return new ASHandleDownloadTag(new[] { TagsRecord }, assetEvent);
+            return new OperationDownloadTag(new[] { TagsRecord }, assetEvent);
         }
 
         /// <summary>
         ///     预下载全部远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction DownloadAll(DownlandAssetEvent assetEvent = default)
+        public static IOperationAction DownloadAll(DownlandAssetEvent assetEvent = default)
         {
-            return new ASHandleDownloadTag(true, assetEvent);
+            return new OperationDownloadTag(true, assetEvent);
         }
 
         /// <summary>
         ///     动态下载远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction DownloadHeader(DownlandAssetEvent assetEvent = default)
+        public static IOperationAction DownloadHeader(DownlandAssetEvent assetEvent = default)
         {
-            return new ASHandleDownloadTag(false, assetEvent);
+            return new OperationDownloadTag(false, assetEvent);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace AIO
 #endif
         public static UnityEngine.Shader LoadShader(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Shader>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.Shader>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace AIO
 #endif
         public static async void LoadShader(string location, Action<UnityEngine.Shader> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.Shader>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.Shader>.Create(location, cb);
         }
 
         /// <summary>
@@ -52,23 +52,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Shader> LoadShaderTask(string location)
+        public static ILoaderHandle<UnityEngine.Shader> LoadShaderTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Shader>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.Shader>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.Shader"/>
+        /// 异步加载 <see cref="UnityEngine.Shader"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Shader> LoadShaderTask(string location, Action<UnityEngine.Shader> cb)
+        public static ILoaderHandle<UnityEngine.Shader> LoadShaderTask(string location, Action<UnityEngine.Shader> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.Shader>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.Shader>.Create(location, cb);
         }
 
        #endregion
@@ -85,7 +84,7 @@ namespace AIO
 #endif
         public static UnityEngine.AudioClip LoadAudioClip(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.AudioClip>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.AudioClip>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -99,7 +98,7 @@ namespace AIO
 #endif
         public static async void LoadAudioClip(string location, Action<UnityEngine.AudioClip> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.AudioClip>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.AudioClip>.Create(location, cb);
         }
 
         /// <summary>
@@ -110,23 +109,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.AudioClip> LoadAudioClipTask(string location)
+        public static ILoaderHandle<UnityEngine.AudioClip> LoadAudioClipTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.AudioClip>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.AudioClip>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.AudioClip"/>
+        /// 异步加载 <see cref="UnityEngine.AudioClip"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.AudioClip> LoadAudioClipTask(string location, Action<UnityEngine.AudioClip> cb)
+        public static ILoaderHandle<UnityEngine.AudioClip> LoadAudioClipTask(string location, Action<UnityEngine.AudioClip> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.AudioClip>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.AudioClip>.Create(location, cb);
         }
 
        #endregion
@@ -143,7 +141,7 @@ namespace AIO
 #endif
         public static UnityEngine.TextAsset LoadTextAsset(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.TextAsset>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.TextAsset>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -157,7 +155,7 @@ namespace AIO
 #endif
         public static async void LoadTextAsset(string location, Action<UnityEngine.TextAsset> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.TextAsset>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.TextAsset>.Create(location, cb);
         }
 
         /// <summary>
@@ -168,23 +166,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.TextAsset> LoadTextAssetTask(string location)
+        public static ILoaderHandle<UnityEngine.TextAsset> LoadTextAssetTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.TextAsset>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.TextAsset>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.TextAsset"/>
+        /// 异步加载 <see cref="UnityEngine.TextAsset"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.TextAsset> LoadTextAssetTask(string location, Action<UnityEngine.TextAsset> cb)
+        public static ILoaderHandle<UnityEngine.TextAsset> LoadTextAssetTask(string location, Action<UnityEngine.TextAsset> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.TextAsset>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.TextAsset>.Create(location, cb);
         }
 
        #endregion
@@ -201,7 +198,7 @@ namespace AIO
 #endif
         public static UnityEngine.Material LoadMaterial(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Material>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.Material>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -215,7 +212,7 @@ namespace AIO
 #endif
         public static async void LoadMaterial(string location, Action<UnityEngine.Material> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.Material>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.Material>.Create(location, cb);
         }
 
         /// <summary>
@@ -226,23 +223,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Material> LoadMaterialTask(string location)
+        public static ILoaderHandle<UnityEngine.Material> LoadMaterialTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Material>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.Material>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.Material"/>
+        /// 异步加载 <see cref="UnityEngine.Material"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Material> LoadMaterialTask(string location, Action<UnityEngine.Material> cb)
+        public static ILoaderHandle<UnityEngine.Material> LoadMaterialTask(string location, Action<UnityEngine.Material> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.Material>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.Material>.Create(location, cb);
         }
 
        #endregion
@@ -259,7 +255,7 @@ namespace AIO
 #endif
         public static UnityEngine.AssetBundle LoadAssetBundle(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.AssetBundle>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.AssetBundle>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -273,7 +269,7 @@ namespace AIO
 #endif
         public static async void LoadAssetBundle(string location, Action<UnityEngine.AssetBundle> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.AssetBundle>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.AssetBundle>.Create(location, cb);
         }
 
         /// <summary>
@@ -284,23 +280,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.AssetBundle> LoadAssetBundleTask(string location)
+        public static ILoaderHandle<UnityEngine.AssetBundle> LoadAssetBundleTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.AssetBundle>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.AssetBundle>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.AssetBundle"/>
+        /// 异步加载 <see cref="UnityEngine.AssetBundle"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.AssetBundle> LoadAssetBundleTask(string location, Action<UnityEngine.AssetBundle> cb)
+        public static ILoaderHandle<UnityEngine.AssetBundle> LoadAssetBundleTask(string location, Action<UnityEngine.AssetBundle> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.AssetBundle>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.AssetBundle>.Create(location, cb);
         }
 
        #endregion
@@ -317,7 +312,7 @@ namespace AIO
 #endif
         public static UnityEngine.Animation LoadAnimation(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Animation>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.Animation>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -331,7 +326,7 @@ namespace AIO
 #endif
         public static async void LoadAnimation(string location, Action<UnityEngine.Animation> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.Animation>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.Animation>.Create(location, cb);
         }
 
         /// <summary>
@@ -342,23 +337,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Animation> LoadAnimationTask(string location)
+        public static ILoaderHandle<UnityEngine.Animation> LoadAnimationTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Animation>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.Animation>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.Animation"/>
+        /// 异步加载 <see cref="UnityEngine.Animation"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Animation> LoadAnimationTask(string location, Action<UnityEngine.Animation> cb)
+        public static ILoaderHandle<UnityEngine.Animation> LoadAnimationTask(string location, Action<UnityEngine.Animation> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.Animation>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.Animation>.Create(location, cb);
         }
 
        #endregion
@@ -375,7 +369,7 @@ namespace AIO
 #endif
         public static UnityEngine.Texture LoadTexture(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Texture>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.Texture>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -389,7 +383,7 @@ namespace AIO
 #endif
         public static async void LoadTexture(string location, Action<UnityEngine.Texture> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.Texture>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.Texture>.Create(location, cb);
         }
 
         /// <summary>
@@ -400,23 +394,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Texture> LoadTextureTask(string location)
+        public static ILoaderHandle<UnityEngine.Texture> LoadTextureTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Texture>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.Texture>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.Texture"/>
+        /// 异步加载 <see cref="UnityEngine.Texture"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Texture> LoadTextureTask(string location, Action<UnityEngine.Texture> cb)
+        public static ILoaderHandle<UnityEngine.Texture> LoadTextureTask(string location, Action<UnityEngine.Texture> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.Texture>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.Texture>.Create(location, cb);
         }
 
        #endregion
@@ -433,7 +426,7 @@ namespace AIO
 #endif
         public static UnityEngine.Texture2D LoadTexture2D(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Texture2D>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.Texture2D>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -447,7 +440,7 @@ namespace AIO
 #endif
         public static async void LoadTexture2D(string location, Action<UnityEngine.Texture2D> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.Texture2D>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.Texture2D>.Create(location, cb);
         }
 
         /// <summary>
@@ -458,23 +451,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Texture2D> LoadTexture2DTask(string location)
+        public static ILoaderHandle<UnityEngine.Texture2D> LoadTexture2DTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Texture2D>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.Texture2D>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.Texture2D"/>
+        /// 异步加载 <see cref="UnityEngine.Texture2D"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Texture2D> LoadTexture2DTask(string location, Action<UnityEngine.Texture2D> cb)
+        public static ILoaderHandle<UnityEngine.Texture2D> LoadTexture2DTask(string location, Action<UnityEngine.Texture2D> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.Texture2D>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.Texture2D>.Create(location, cb);
         }
 
        #endregion
@@ -491,7 +483,7 @@ namespace AIO
 #endif
         public static UnityEngine.Font LoadFont(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Font>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.Font>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -505,7 +497,7 @@ namespace AIO
 #endif
         public static async void LoadFont(string location, Action<UnityEngine.Font> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.Font>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.Font>.Create(location, cb);
         }
 
         /// <summary>
@@ -516,23 +508,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Font> LoadFontTask(string location)
+        public static ILoaderHandle<UnityEngine.Font> LoadFontTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Font>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.Font>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.Font"/>
+        /// 异步加载 <see cref="UnityEngine.Font"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Font> LoadFontTask(string location, Action<UnityEngine.Font> cb)
+        public static ILoaderHandle<UnityEngine.Font> LoadFontTask(string location, Action<UnityEngine.Font> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.Font>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.Font>.Create(location, cb);
         }
 
        #endregion
@@ -549,7 +540,7 @@ namespace AIO
 #endif
         public static UnityEngine.Mesh LoadMesh(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Mesh>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.Mesh>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -563,7 +554,7 @@ namespace AIO
 #endif
         public static async void LoadMesh(string location, Action<UnityEngine.Mesh> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.Mesh>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.Mesh>.Create(location, cb);
         }
 
         /// <summary>
@@ -574,23 +565,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Mesh> LoadMeshTask(string location)
+        public static ILoaderHandle<UnityEngine.Mesh> LoadMeshTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.Mesh>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.Mesh>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.Mesh"/>
+        /// 异步加载 <see cref="UnityEngine.Mesh"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.Mesh> LoadMeshTask(string location, Action<UnityEngine.Mesh> cb)
+        public static ILoaderHandle<UnityEngine.Mesh> LoadMeshTask(string location, Action<UnityEngine.Mesh> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.Mesh>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.Mesh>.Create(location, cb);
         }
 
        #endregion
@@ -607,7 +597,7 @@ namespace AIO
 #endif
         public static UnityEngine.GameObject LoadGameObject(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.GameObject>.Create(location).Invoke();
+            return LoaderHandleLoadAsset<UnityEngine.GameObject>.Create(location).Invoke();
         }
 
         /// <summary>
@@ -621,7 +611,7 @@ namespace AIO
 #endif
         public static async void LoadGameObject(string location, Action<UnityEngine.GameObject> cb)
         {
-            await ASHandleLoadAsset<UnityEngine.GameObject>.Create(location, cb);
+            await LoaderHandleLoadAsset<UnityEngine.GameObject>.Create(location, cb);
         }
 
         /// <summary>
@@ -632,23 +622,22 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.GameObject> LoadGameObjectTask(string location)
+        public static ILoaderHandle<UnityEngine.GameObject> LoadGameObjectTask(string location)
         {
-            return ASHandleLoadAsset<UnityEngine.GameObject>.Create(location);
+            return LoaderHandleLoadAsset<UnityEngine.GameObject>.Create(location);
         }
 
         /// <summary>
-        /// 异步回调加载 <see cref="UnityEngine.GameObject"/>
+        /// 异步加载 <see cref="UnityEngine.GameObject"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static IHandle<UnityEngine.GameObject> LoadGameObjectTask(string location, Action<UnityEngine.GameObject> cb)
+        public static ILoaderHandle<UnityEngine.GameObject> LoadGameObjectTask(string location, Action<UnityEngine.GameObject> cb)
         {
-            return ASHandleLoadAsset<UnityEngine.GameObject>.Create(location, cb);
+            return LoaderHandleLoadAsset<UnityEngine.GameObject>.Create(location, cb);
         }
 
        #endregion

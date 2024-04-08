@@ -3,25 +3,23 @@ using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
 namespace AIO
 {
     [StructLayout(LayoutKind.Auto)]
-    internal partial class ASHandleLoadScene : ASHandle<Scene>
+    internal partial class LoaderHandleLoadScene : LoaderHandle<Scene>
     {
         private readonly LoadSceneMode _SceneMode;
         private readonly bool          _SuspendLoad;
         private readonly int           _Priority;
-
 
         #region Sync
 
         protected override void CreateSync()
         {
             var task = AssetSystem.Proxy.LoadSceneTask(Address, _SceneMode, _SuspendLoad, _Priority);
-            while (!task.IsCompleted) task.Wait();
+            task.RunSynchronously();
             Result = task.Result;
         }
 
@@ -64,26 +62,27 @@ namespace AIO
         #region Constructor
 
         /// <inheritdoc />
-        private ASHandleLoadScene(
+        private LoaderHandleLoadScene(
             string        location,
             LoadSceneMode sceneMode,
             bool          suspendLoad,
             int           priority,
             Action<Scene> onCompleted
-        ) : base(location, onCompleted)
+        ) : this(location)
         {
-            _SceneMode   = sceneMode;
-            _SuspendLoad = suspendLoad;
-            _Priority    = priority;
+            _SceneMode   =  sceneMode;
+            _SuspendLoad =  suspendLoad;
+            _Priority    =  priority;
+            Completed    += onCompleted;
         }
 
         /// <inheritdoc />
-        private ASHandleLoadScene(
+        private LoaderHandleLoadScene(
             string        location,
             LoadSceneMode sceneMode,
             bool          suspendLoad,
             int           priority
-        ) : base(location)
+        ) : this(location)
         {
             _SceneMode   = sceneMode;
             _SuspendLoad = suspendLoad;
@@ -91,39 +90,52 @@ namespace AIO
         }
 
         #endregion
+
+        private LoaderHandleLoadScene(string location)
+        {
+            Address    = location;
+            IsValidate = AssetSystem.CheckLocationValid(Address);
+            if (!IsValidate) AssetSystem.LogWarningFormat("资源地址无效: {0}", location);
+            IsDone   = !IsValidate;
+            Progress = 0;
+        }
+
+        protected override void OnDispose()
+        {
+            if (IsValidate)
+            {
+                Result     = default;
+                IsValidate = false;
+            }
+
+            Address = null;
+        }
     }
 
-    internal partial class ASHandleLoadScene
+    internal partial class LoaderHandleLoadScene
     {
         [DebuggerNonUserCode, DebuggerHidden]
-        public static AssetSystem.IHandle<Scene> Create(
+        public static ILoaderHandle<Scene> Create(
             string        location,
             LoadSceneMode sceneMode,
             bool          suspendLoad,
             int           priority,
             Action<Scene> completed)
         {
-            if (completed is null) return Create(location, sceneMode, suspendLoad, priority);
-            if (AssetSystem.HandleDic.TryGetValue(location, out var handle) && handle is AssetSystem.IHandle<Scene> assetHandle)
-            {
-                if (assetHandle.IsDone) completed.Invoke(assetHandle.Result);
-                else assetHandle.Completed += completed;
-                return assetHandle;
-            }
-
-            return new ASHandleLoadScene(location, sceneMode, suspendLoad, priority, completed);
+            var key = AssetSystem.SettingToLocalPath(location);
+            return completed is null
+                ? new LoaderHandleLoadScene(key, sceneMode, suspendLoad, priority)
+                : new LoaderHandleLoadScene(key, sceneMode, suspendLoad, priority, completed);
         }
 
         [DebuggerNonUserCode, DebuggerHidden]
-        public static AssetSystem.IHandle<Scene> Create(
+        public static ILoaderHandle<Scene> Create(
             string        location,
             LoadSceneMode sceneMode,
             bool          suspendLoad,
             int           priority)
         {
-            return AssetSystem.HandleDic.TryGetValue(location, out var handle) && handle is AssetSystem.IHandle<Scene> assetHandle
-                ? assetHandle
-                : new ASHandleLoadScene(location, sceneMode, suspendLoad, priority);
+            return new LoaderHandleLoadScene(AssetSystem.SettingToLocalPath(location), sceneMode, suspendLoad, priority);
         }
     }
 }

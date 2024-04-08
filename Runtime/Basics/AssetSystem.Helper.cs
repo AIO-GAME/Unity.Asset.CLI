@@ -57,23 +57,22 @@ namespace AIO
         ///     根据设置 获取资源定位地址
         /// </summary>
         /// <param name="location">资源定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
         internal static string SettingToLocalPath(in string location)
         {
-            if (string.IsNullOrEmpty(location)) // 为空不支持
-            {
-                LogException("AssetSystem SettingToLocalPath input location is null or empty");
+            if (string.IsNullOrEmpty(location))
+            { // 为空不支持
+                LogException("input location is null or empty");
                 return string.Empty;
             }
 
-            // 判断是否以 / 或者 \ 结尾
             if (location.EndsWith("/", StringComparison.CurrentCulture) ||
                 location.EndsWith("\\", StringComparison.CurrentCulture))
-            {
-                LogException($"AssetSystem SettingToLocalPath input location is end with / or \\ -> {location}");
+            { // 判断是否以 / 或者 \ 结尾
+                LogException($"input location is end with / or \\ -> {location}");
                 return string.Empty;
             }
 

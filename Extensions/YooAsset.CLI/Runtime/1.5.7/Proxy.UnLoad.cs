@@ -10,7 +10,8 @@ namespace AIO.UEngine.YooAsset
 {
     public partial class Proxy
     {
-        private T HandleGet<T>(in string location) where T : OperationHandleBase
+        private T HandleGet<T>(in string location)
+        where T : OperationHandleBase
         {
             return ReferenceOPHandle.TryGetValue(location, out var operation)
                 ? (T)operation
@@ -18,7 +19,8 @@ namespace AIO.UEngine.YooAsset
         }
 
 
-        private void HandleAdd<T>(in string location, T operation) where T : OperationHandleBase
+        private void HandleAdd<T>(in string location, T operation)
+        where T : OperationHandleBase
         {
             if (operation is null) return;
             if (ReferenceOPHandle.ContainsKey(location))
@@ -61,13 +63,14 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
-
         public override void UnloadUnusedAssets(bool isForce = false)
         {
             foreach (var key in ReferenceOPHandle.Keys.ToArray())
             {
-                if (ReferenceOPHandle[key].IsValid) continue;
-                if (ReferenceOPHandle[key].Status != EOperationStatus.Failed) continue;
+                var temp = ReferenceOPHandle[key];
+                if (temp.IsValid) continue;
+                var status = temp.Status;
+                if (status == EOperationStatus.Succeed || status == EOperationStatus.Processing) continue;
                 ReferenceOPHandle.Remove(key);
             }
 

@@ -6,7 +6,7 @@ using PackRuleData = AIO.UEditor.AssetRuleData;
 
 namespace AIO.UEditor
 {
-    public static class DefaultPackRule
+    internal static class DefaultPackRule
     {
         /// <summary>
         ///     AssetBundle文件的后缀名
@@ -37,7 +37,7 @@ namespace AIO.UEditor
     ///     例如："Assets/UIPanel/Shop/Image/background.png" --> "assets_uipanel_shop_image_background.bundle"
     ///     例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view_main.bundle"
     /// </remarks>
-    public class PackSeparately : IAssetRulePack
+    internal class PackSeparately : IAssetRulePack
     {
         #region IAssetRulePack Members
 
@@ -66,7 +66,7 @@ namespace AIO.UEditor
     ///     例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop_image.bundle"
     ///     例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop_view.bundle"
     /// </summary>
-    public class PackDirectory : IAssetRulePack
+    internal class PackDirectory : IAssetRulePack
     {
         #region IAssetRulePack Members
 
@@ -96,7 +96,7 @@ namespace AIO.UEditor
     ///     例如："Assets/UIPanel/Shop/Image/backgroud.png" --> "assets_uipanel_shop.bundle"
     ///     例如："Assets/UIPanel/Shop/View/main.prefab" --> "assets_uipanel_shop.bundle"
     /// </summary>
-    public class PackTopDirectory : IAssetRulePack
+    internal class PackTopDirectory : IAssetRulePack
     {
         #region IAssetRulePack Members
 
@@ -133,7 +133,7 @@ namespace AIO.UEditor
     ///     以收集器路径作为资源包名
     ///     注意：收集的所有文件打进一个资源包
     /// </summary>
-    public class PackCollector : IAssetRulePack
+    internal class PackCollector : IAssetRulePack
     {
         #region IAssetRulePack Members
 
@@ -163,7 +163,7 @@ namespace AIO.UEditor
     ///     以分组名称作为资源包名
     ///     注意：收集的所有文件打进一个资源包
     /// </summary>
-    public class PackGroup : IAssetRulePack
+    internal class PackGroup : IAssetRulePack
     {
         #region IAssetRulePack Members
 
@@ -190,7 +190,7 @@ namespace AIO.UEditor
     ///     以整包名称作为资源包名
     ///     注意：收集的所有文件打进一个资源包
     /// </summary>
-    public class PackPackage : IAssetRulePack
+    internal class PackPackage : IAssetRulePack
     {
         #region IAssetRulePack Members
 
@@ -216,7 +216,7 @@ namespace AIO.UEditor
     /// <summary>
     ///     打包原生文件
     /// </summary>
-    public class PackRawFile : IAssetRulePack
+    internal class PackRawFile : IAssetRulePack
     {
         #region IAssetRulePack Members
 
@@ -242,7 +242,7 @@ namespace AIO.UEditor
     /// <summary>
     ///     打包着色器变种集合
     /// </summary>
-    public class PackShaderVariants : IAssetRulePack
+    internal class PackShaderVariants : IAssetRulePack
     {
         #region IAssetRulePack Members
 

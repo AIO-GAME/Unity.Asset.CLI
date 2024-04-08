@@ -7,39 +7,46 @@ using Object = UnityEngine.Object;
 
 namespace AIO
 {
-    partial class ASHandleLoadAsset<TObject>
+    partial class LoaderHandleLoadAsset<TObject>
     {
         [DebuggerNonUserCode, DebuggerHidden]
-        public static AssetSystem.IHandle<TObject> Create(string location)
+        public static ILoaderHandle<TObject> Create(string location)
         {
-            return AssetSystem.HandleDic.TryGetValue(location, out var handle) && handle is AssetSystem.IHandle<TObject> assetHandle
+            var key = AssetSystem.SettingToLocalPath(location);
+            return AssetSystem.HandleDic.TryGetValue(key, out var handle) && handle is ILoaderHandle<TObject> assetHandle
                 ? assetHandle
-                : new ASHandleLoadAsset<TObject>(location);
+                : new LoaderHandleLoadAsset<TObject>(key);
         }
 
         [DebuggerNonUserCode, DebuggerHidden]
-        public static AssetSystem.IHandle<TObject> Create(string location, Action<TObject> completed)
+        public static ILoaderHandle<TObject> Create(string location, Action<TObject> completed)
         {
             if (completed is null) return Create(location);
-            if (AssetSystem.HandleDic.TryGetValue(location, out var handle) && handle is AssetSystem.IHandle<TObject> assetHandle)
+            var key = AssetSystem.SettingToLocalPath(location);
+            if (AssetSystem.HandleDic.TryGetValue(key, out var handle) && handle is ILoaderHandle<TObject> assetHandle)
             {
-                if (assetHandle.IsDone) completed.Invoke(assetHandle.Result);
+                if (!assetHandle.IsValidate) return assetHandle;
+                if (assetHandle.IsDone) Runner.Update(completed, assetHandle.Result);
                 else assetHandle.Completed += completed;
                 return assetHandle;
             }
 
-            return new ASHandleLoadAsset<TObject>(location, completed);
+            return new LoaderHandleLoadAsset<TObject>(key, completed);
         }
     }
 
     [StructLayout(LayoutKind.Auto)]
-    internal partial class ASHandleLoadAsset<TObject> : ASHandle<TObject>
+    internal partial class LoaderHandleLoadAsset<TObject> : LoaderHandle<TObject>
     where TObject : Object
     {
+        #region Sync
+
         protected override void CreateSync()
         {
             Result = AssetSystem.Proxy.LoadAssetSync<TObject>(Address);
         }
+
+        #endregion
 
         #region CO
 
@@ -77,12 +84,46 @@ namespace AIO
 
         #region Constructor
 
-        public ASHandleLoadAsset(string location)
-            : base(location) { }
-
-        public ASHandleLoadAsset(string location, Action<TObject> onCompleted)
-            : base(location, onCompleted) { }
+        private LoaderHandleLoadAsset(string location, Action<TObject> onCompleted) : this(location)
+        {
+            Completed += onCompleted;
+        }
 
         #endregion
+
+        private LoaderHandleLoadAsset(string location)
+        {
+            Address    = location;
+            IsValidate = AssetSystem.CheckLocationValid(Address);
+            if (IsValidate)
+            {
+                if (AssetSystem.ReferenceHandleCount.Increment(Address) == 1)
+                {
+                    AssetSystem.HandleDic[Address] = this;
+                }
+            }
+            else AssetSystem.LogWarningFormat("资源地址无效: {0}", location);
+
+            IsDone   = !IsValidate;
+            Progress = 0;
+        }
+
+        protected override void OnDispose()
+        {
+            if (IsValidate)
+            {
+                var count = AssetSystem.ReferenceHandleCount.Decrement(Address);
+                if (count <= 0)
+                {
+                    AssetSystem.HandleDic.Remove(Address);
+                    AssetSystem.UnloadAsset(Address);
+                    Result = default;
+                }
+
+                IsValidate = false;
+            }
+
+            Address = null;
+        }
     }
 }

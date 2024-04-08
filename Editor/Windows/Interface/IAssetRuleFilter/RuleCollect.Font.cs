@@ -6,7 +6,7 @@ namespace AIO.UEditor
     {
         #region Nested type: CollectFont
 
-        public class CollectFont : IFilterRule
+        private class CollectFont : IFilterRule
         {
             #region IFilterRule Members
 
@@ -26,7 +26,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectFontOTF
 
-        public class CollectFontOTF : IFilterRule
+        private class CollectFontOTF : IFilterRule
         {
             #region IFilterRule Members
 
@@ -44,7 +44,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectFontTTC
 
-        public class CollectFontTTC : IFilterRule
+        private class CollectFontTTC : IFilterRule
         {
             #region IFilterRule Members
 
@@ -62,7 +62,7 @@ namespace AIO.UEditor
 
         #region Nested type: CollectFontTTF
 
-        public class CollectFontTTF : IFilterRule
+        private class CollectFontTTF : IFilterRule
         {
             #region IFilterRule Members
 

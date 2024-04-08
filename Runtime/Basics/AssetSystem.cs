@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
 
@@ -32,7 +33,7 @@ namespace AIO
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction Initialize<T>(ASConfig config)
+        public static IOperationAction Initialize<T>(ASConfig config)
         where T : ASProxy, new()
         {
             return ASHandleActionInitializeTask.Create(Activator.CreateInstance<T>(), config);
@@ -42,7 +43,7 @@ namespace AIO
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction Initialize()
+        public static IOperationAction Initialize()
         {
             return Initialize(ASConfig.GetOrCreate());
         }
@@ -51,7 +52,7 @@ namespace AIO
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction Initialize(ASConfig config)
+        public static IOperationAction Initialize(ASConfig config)
         {
             return ASHandleActionInitializeTask.Create(config);
         }
@@ -60,7 +61,7 @@ namespace AIO
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction Initialize<T>(T proxy)
+        public static IOperationAction Initialize<T>(T proxy)
         where T : ASProxy
         {
             return ASHandleActionInitializeTask.Create(proxy, ASConfig.GetOrCreate());
@@ -70,7 +71,7 @@ namespace AIO
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction Initialize<T>()
+        public static IOperationAction Initialize<T>()
         where T : ASProxy, new()
         {
             return ASHandleActionInitializeTask.Create(Activator.CreateInstance<T>(), ASConfig.GetOrCreate());
@@ -80,7 +81,7 @@ namespace AIO
         ///     系统初始化
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IHandleAction Initialize<T>(T proxy, ASConfig config)
+        public static IOperationAction Initialize<T>(T proxy, ASConfig config)
         where T : ASProxy
         {
             return ASHandleActionInitializeTask.Create(proxy, config);
@@ -115,6 +116,9 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static void Destroy()
         {
+            foreach (var key in HandleDic.Keys.ToArray())
+                HandleDic[key].Dispose();
+            HandleDic.Clear();
 #if UNITY_EDITOR
             Parameter.SequenceRecord.Save();
 #endif

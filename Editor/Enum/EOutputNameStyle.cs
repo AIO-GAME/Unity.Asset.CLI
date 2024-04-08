@@ -10,11 +10,13 @@ namespace AIO.UEditor
         /// <summary>
         ///     哈希值名称
         /// </summary>
-        [InspectorName("哈希值名称")] HashName = 1,
+        [InspectorName("哈希值名称")]
+        HashName = 1,
 
         /// <summary>
         ///     资源包名称 + 哈希值名称
         /// </summary>
-        [InspectorName("资源包名称 + 哈希值名称")] BundleName_HashName = 4
+        [InspectorName("资源包名称 + 哈希值名称")]
+        BundleName_HashName = 4
     }
 }

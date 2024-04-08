@@ -13,14 +13,15 @@ namespace AIO
     using UnityEditor;
 #endif
 
-    partial class ASHandleActionInitializeTask
+    internal static class ASHandleActionInitializeTask
     {
-        public static AssetSystem.IHandleAction Create<T>(T proxy, ASConfig config) where T : ASProxy
+        public static IOperationAction Create<T>(T proxy, ASConfig config)
+        where T : ASProxy
         {
-            return new ASHandleActionInitializeTask<T>(proxy, config);
+            return new OperationActionInitializeTask<T>(proxy, config);
         }
 
-        public static AssetSystem.IHandleAction Create(ASConfig config)
+        public static IOperationAction Create(ASConfig config)
         {
             var proxyType = typeof(ASProxy);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -37,12 +38,13 @@ namespace AIO
                 }
             }
 
-            return new ASHandleActionInitializeTask<ASProxy>(AssetSystem.Proxy, config);
+            return new OperationActionInitializeTask<ASProxy>(AssetSystem.Proxy, config);
         }
     }
 
     [StructLayout(LayoutKind.Auto)]
-    internal partial class ASHandleActionInitializeTask<T> : ASHandleAction where T : ASProxy
+    internal partial class OperationActionInitializeTask<T> : OperationAction
+    where T : ASProxy
     {
         #region CO
 
@@ -118,15 +120,14 @@ namespace AIO
 
         #region Task
 
-        private TaskAwaiter _Awaiter1;
-        private TaskAwaiter _Awaiter2;
+        private TaskAwaiter Awaiter;
 
         protected override TaskAwaiter CreateAsync()
         {
             if (!IsValidate) throw new Exception("Initialize Error");
-            _Awaiter1 = OnAwaiter2().GetAwaiter();
-            _Awaiter1.OnCompleted(InvokeOnCompleted);
-            return _Awaiter1;
+            Awaiter = OnAwaiter2().GetAwaiter();
+            Awaiter.OnCompleted(InvokeOnCompleted);
+            return Awaiter;
         }
 
 
@@ -165,8 +166,6 @@ namespace AIO
         protected override void OnCompleted()
         {
             if (!IsValidate) throw new Exception("Initialize Error");
-            if (Config.ASMode == EASMode.Remote)
-                AssetSystem.DownloadHandle = Proxy.GetLoadingHandle();
         }
 
         protected override void OnReset()
@@ -176,9 +175,8 @@ namespace AIO
 
         private T        Proxy;
         private ASConfig Config;
-        private bool     IsValidate = true;
 
-        public ASHandleActionInitializeTask(T proxy, ASConfig config)
+        public OperationActionInitializeTask(T proxy, ASConfig config)
         {
             if (AssetSystem.IsInitialized)
             {
@@ -202,9 +200,11 @@ namespace AIO
 
             if (string.IsNullOrEmpty(config.RuntimeRootDirectory)) config.RuntimeRootDirectory = "BuiltinFiles";
             AssetSystem.BuildInRootDirectory = Path.Combine(Application.streamingAssetsPath, config.RuntimeRootDirectory);
+            AssetSystem.SandboxRootDirectory =
 #if UNITY_EDITOR
-            Path.Combine(Directory.GetParent(Application.dataPath).FullName,
-                         config.RuntimeRootDirectory, EditorUserBuildSettings.activeBuildTarget.ToString());
+                Path.Combine(Directory.GetParent(Application.dataPath).FullName,
+                             config.RuntimeRootDirectory,
+                             EditorUserBuildSettings.activeBuildTarget.ToString());
 #else
                 Path.Combine(Application.persistentDataPath, config.RuntimeRootDirectory);
 #endif

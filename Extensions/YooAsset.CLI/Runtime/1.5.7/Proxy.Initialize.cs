@@ -166,7 +166,7 @@ namespace AIO.UEngine.YooAsset
                         yield return uwr.SendWebRequest();
                         if (AssetSystem.LoadCheckNet(uwr)) content = uwr.downloadHandler.text;
                     }
-
+                   
                     // yield return AssetSystem.NetLoadStringCO(remote, data => content = data);
                     if (string.IsNullOrEmpty(content))
                     {
@@ -238,6 +238,113 @@ namespace AIO.UEngine.YooAsset
                                 item.Version = temp;
                             }
                         }
+                    }
+
+                    break;
+
+                case EASMode.Editor:
+#if UNITY_EDITOR
+                    UpdatePackagesEditor(config);
+                    break;
+#endif
+                default:
+                    AssetSystem.ExceptionEvent(ASException.NoSupportEASMode);
+                    break;
+            }
+        }
+
+        /// <summary>
+        ///     更新资源包列表
+        /// </summary>
+        public override void UpdatePackages(ASConfig config)
+        {
+            switch (config.ASMode)
+            {
+                case EASMode.Local:
+                    UpdatePackagesLocal(config);
+                    break;
+                case EASMode.Remote:
+                    if (string.IsNullOrEmpty(config.URL))
+                    {
+                        AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlIsNull);
+                        return;
+                    }
+
+                    var remote = $"{config.URL}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
+                    string content;
+                    try
+                    {
+                        content = AHelper.HTTP.Get(remote);
+                    }
+                    catch (Exception e)
+                    {
+                        AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
+                        throw;
+                    }
+
+                    if (string.IsNullOrEmpty(content))
+                    {
+#if UNITY_EDITOR
+                        throw new Exception($"{remote} Request failed");
+#else
+                        AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
+                        AssetSystem.LogError($"{remote} Request failed");
+                        yield break;
+#endif
+                    }
+
+                    try
+                    {
+                        config.Packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(content);
+                    }
+#if UNITY_EDITOR
+                    catch (Exception e)
+                    {
+                        throw new Exception($"ASConfig Remote Version Parsing Json Failure : {e}");
+                    }
+#else
+                    catch (Exception)
+                    {
+                        AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionParsingJsonFailure);
+                        yield break;
+                    }
+#endif
+
+                    if (config.Packages is null || config.Packages.Length == 0)
+                    {
+#if UNITY_EDITOR
+                        throw new ArgumentNullException($"Please set the ASConfig Packages configuration");
+#else
+                        AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
+                        yield break;
+#endif
+                    }
+
+                    foreach (var item in config.Packages)
+                    {
+                        item.IsLatest = item.Version == "Latest"; // 如果使用Latest则认为是最新版本 同时需要获取最新版本号
+                        if (!item.IsLatest) continue;
+                        var url = string.Format("{0}/{1}/{2}/{3}/PackageManifest_{4}.version?t={5}",
+                                                config.URL,
+                                                AssetSystem.PlatformNameStr,
+                                                item.Name,
+                                                item.Version,
+                                                item.Name,
+                                                DateTime.Now.Ticks);
+                        var temp = AHelper.HTTP.Get(url);
+                        if (string.IsNullOrEmpty(temp))
+                        {
+#if UNITY_EDITOR
+                            throw new Exception($"{url} Request failed");
+#else
+                                    AssetSystem.ExceptionEvent(ASException.
+                                        ASConfigRemoteUrlRemoteVersionRequestFailure);
+                                    AssetSystem.LogError($"{url} Request failed");
+                                    yield break;
+#endif
+                        }
+
+                        item.Version = temp;
                     }
 
                     break;

@@ -224,9 +224,8 @@ namespace AIO
                 if (temp == null) return;
                 if (temp.Count <= 0) return;
                 var dic = new Dictionary<string, SequenceRecord>();
-                foreach (var item in temp)
+                foreach (var item in temp.Where(item => !string.IsNullOrEmpty(item.GUID)))
                 {
-                    if (string.IsNullOrEmpty(item.GUID)) continue;
                     dic[item.GUID] = item;
                 }
 

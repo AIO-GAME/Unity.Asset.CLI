@@ -6,11 +6,11 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
-    public class RuleAddress
+    internal class RuleAddress
     {
         #region Nested type: AddressRuleCollectFileName
 
-        public class AddressRuleCollectFileName : IAddressRule
+        private class AddressRuleCollectFileName : IAddressRule
         {
             #region IAddressRule Members
 
@@ -32,7 +32,7 @@ namespace AIO.UEditor
 
         #region Nested type: AddressRuleCollectRelative
 
-        public class AddressRuleCollectRelative : IAddressRule
+        private class AddressRuleCollectRelative : IAddressRule
         {
             #region IAddressRule Members
 
@@ -53,7 +53,7 @@ namespace AIO.UEditor
 
         #region Nested type: AddressRuleFileName
 
-        public class AddressRuleFileName : IAddressRule
+        private class AddressRuleFileName : IAddressRule
         {
             #region IAddressRule Members
 
@@ -73,7 +73,7 @@ namespace AIO.UEditor
 
         #region Nested type: AddressRuleGroupFileName
 
-        public class AddressRuleGroupFileName : IAddressRule
+        private class AddressRuleGroupFileName : IAddressRule
         {
             #region IAddressRule Members
 
@@ -96,7 +96,7 @@ namespace AIO.UEditor
 
         #region Nested type: AddressRuleGroupRelative
 
-        public class AddressRuleGroupRelative : IAddressRule
+        private class AddressRuleGroupRelative : IAddressRule
         {
             #region IAddressRule Members
 
@@ -116,7 +116,7 @@ namespace AIO.UEditor
 
         #region Nested type: AddressRuleInstanceID
 
-        public class AddressRuleInstanceID : IAddressRule
+        private class AddressRuleInstanceID : IAddressRule
         {
             #region IAddressRule Members
 
@@ -126,7 +126,14 @@ namespace AIO.UEditor
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                var obj = AssetDatabase.LoadAssetAtPath<Object>(string.Concat(data.AssetPath, '.', data.Extension));
+                var path = string.Concat(data.AssetPath, '.', data.Extension);
+                var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
+                if (obj is null)
+                {
+                    AssetSystem.LogException($"异常资源: {path}");
+                    return string.Empty;
+                }
+
                 return obj.GetInstanceID().ToString();
             }
 
@@ -137,7 +144,7 @@ namespace AIO.UEditor
 
         #region Nested type: AddressRuleRootRelative
 
-        public class AddressRuleRootRelative : IAddressRule
+        private class AddressRuleRootRelative : IAddressRule
         {
             #region IAddressRule Members
 
@@ -157,7 +164,7 @@ namespace AIO.UEditor
 
         #region Nested type: AddressRuleUserDataFileName
 
-        public class AddressRuleUserDataFileName : IAddressRule
+        private class AddressRuleUserDataFileName : IAddressRule
         {
             #region IAddressRule Members
 
@@ -179,7 +186,7 @@ namespace AIO.UEditor
 
         #region Nested type: AddressRuleUserDataRelative
 
-        public class AddressRuleUserDataRelative : IAddressRule
+        private class AddressRuleUserDataRelative : IAddressRule
         {
             #region IAddressRule Members
 

@@ -15,7 +15,20 @@ namespace AIO
         /// <summary>
         ///     主下载器
         /// </summary>
-        public static IASNetLoading DownloadHandle { get; internal set; }
+        private static IASNetLoading _DownloadHandle { get; set; }
+
+        /// <summary>
+        ///     主下载器
+        /// </summary>
+        public static IASNetLoading DownloadHandle
+        {
+            get
+            {
+                if (_DownloadHandle is null) _DownloadHandle = Proxy.GetLoadingHandle();
+                return _DownloadHandle;
+            }
+            internal set => _DownloadHandle = value;
+        }
 
         /// <summary>
         ///     当前主下载器事件
