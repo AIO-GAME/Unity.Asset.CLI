@@ -1,4 +1,7 @@
 ﻿#if UNITY_EDITOR
+
+#region
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +12,8 @@ using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
+
+#endregion
 
 namespace AIO
 {
@@ -224,10 +229,7 @@ namespace AIO
                 if (temp == null) return;
                 if (temp.Count <= 0) return;
                 var dic = new Dictionary<string, SequenceRecord>();
-                foreach (var item in temp.Where(item => !string.IsNullOrEmpty(item.GUID)))
-                {
-                    dic[item.GUID] = item;
-                }
+                foreach (var item in temp.Where(item => !string.IsNullOrEmpty(item.GUID))) dic[item.GUID] = item;
 
                 Records.AddRange(dic.Values);
             }

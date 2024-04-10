@@ -1,7 +1,11 @@
+#region
+
 using System;
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+
+#endregion
 
 namespace AIO
 {
@@ -21,15 +25,14 @@ namespace AIO
         private const string BASE_ERROR_FORMAT = BASE_LOG_FORMAT + "[Error]";
 #endif
 
-        #region LOG
+        #region LogWarning
 
         /// <summary>
         ///     <para>Logs a formatted warning message to the Unity Console.</para>
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -47,8 +50,7 @@ namespace AIO
         ///     <para>A variant of Debug.Log that logs a warning message to the console.</para>
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
         public static void LogWarning(string message)
         {
 #if UNITY_EDITOR
@@ -59,12 +61,15 @@ namespace AIO
                 Debug.unityLogger.Log(LogType.Warning, $"{string.Intern(BASE_WARNING_FORMAT)} {message}");
         }
 
+        #endregion
+
+        #region LogException
+
         /// <summary>
         ///     <para>A variant of Debug.Log that logs an error message to the console.</para>
         /// </summary>
         /// <param name="exception">Runtime Exception.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -86,8 +91,7 @@ namespace AIO
         ///     <para>A variant of Debug.Log that logs an error message to the console.</para>
         /// </summary>
         /// <param name="exception">Runtime Exception.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -106,8 +110,7 @@ namespace AIO
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -121,12 +124,15 @@ namespace AIO
                 Debug.unityLogger.LogFormat(LogType.Error, $"{string.Intern(BASE_EXCEPTION_FORMAT)} {format}", args);
         }
 
+        #endregion
+
+        #region Log
+
         /// <summary>
         ///     <para>Logs a message to the Unity Console.</para>
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -145,8 +151,7 @@ namespace AIO
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -160,12 +165,15 @@ namespace AIO
                 Debug.unityLogger.LogFormat(LogType.Log, $"{string.Intern(BASE_LOG_FORMAT)} {format}", args);
         }
 
+        #endregion
+
+        #region LogError
+
         /// <summary>
         ///     <para>A variant of Debug.Log that logs an error message to the console.</para>
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -184,8 +192,7 @@ namespace AIO
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">Format arguments.</param>
-        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG")]
-        [ProfilerScope, IgnoreConsoleJump]
+        [DebuggerHidden, DebuggerNonUserCode, Conditional("DEBUG"), ProfilerScope, IgnoreConsoleJump]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif

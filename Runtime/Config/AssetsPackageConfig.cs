@@ -1,13 +1,22 @@
-﻿using System;
+﻿#region
+
+using System;
 using UnityEngine;
+
+#endregion
 
 namespace AIO.UEngine
 {
     public enum ECompressMode
     {
-        [InspectorName("Uncompressed")] None = 0,
-        [InspectorName("LZMA")]         LZMA,
-        [InspectorName("LZ4")]          LZ4
+        [InspectorName("Uncompressed")]
+        None = 0,
+
+        [InspectorName("LZMA")]
+        LZMA,
+
+        [InspectorName("LZ4")]
+        LZ4
     }
 
     [Serializable]

@@ -1,4 +1,8 @@
+#region
+
 using System.ComponentModel;
+
+#endregion
 
 namespace AIO
 {

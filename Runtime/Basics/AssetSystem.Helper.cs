@@ -1,8 +1,11 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using AIO.UEngine;
+
+#endregion
 
 namespace AIO
 {

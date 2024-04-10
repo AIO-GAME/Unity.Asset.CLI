@@ -16,6 +16,13 @@ namespace AIO.UEngine.YooAsset
     [IgnoreConsoleJump(true)]
     public partial class Proxy : ASProxy
     {
+        private static Proxy Instance;
+        
+        public Proxy()
+        {
+            Instance = this;
+        }
+        
         public override IEnumerator InitializeCO()
         {
             Initialize_Internal();

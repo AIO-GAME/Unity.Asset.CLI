@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿#region
+
+using System.Collections.Generic;
 using System.Diagnostics;
 using AIO.UEngine;
+
+#endregion
 
 namespace AIO
 {

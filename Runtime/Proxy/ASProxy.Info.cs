@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿#region
+
+using System.Collections.Generic;
 using System.Diagnostics;
+
+#endregion
 
 namespace AIO.UEngine
 {
@@ -17,16 +21,14 @@ namespace AIO.UEngine
         ///     是否需要从远端更新下载
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public abstract bool CheckNeedDownloadFromRemote(string location);
 
         /// <summary>
         ///     根据资源标签获取资源信息
         /// </summary>
         /// <param name="tags">资源标签</param>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public abstract string[] GetAddressByTag(IEnumerable<string> tags);
 
         /// <summary>
@@ -34,15 +36,13 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <returns>Ture:有效</returns>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public abstract bool CheckLocationValid(string location);
 
         /// <summary>
         ///     获取本地包裹的版本信息
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public abstract string GetPackageVersionDefault();
 
         #endregion

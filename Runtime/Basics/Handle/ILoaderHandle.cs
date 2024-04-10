@@ -7,13 +7,8 @@ namespace AIO
 {
     partial class AssetSystem
     {
-   
-        internal static readonly Dictionary<string, int> ReferenceHandleCount
-            = new Dictionary<string, int>();
-
         internal static readonly Dictionary<string, ILoaderHandle> HandleDic
             = new Dictionary<string, ILoaderHandle>();
-
     }
 
     public interface ILoaderHandle<TObject> : IOperation<TObject>, ILoaderHandle { }
@@ -54,8 +49,15 @@ namespace AIO
 
         protected override void OnDispose()
         {
-            IsValidate = false;
-            Address    = null;
+            if (IsValidate)
+            {
+                AssetSystem.HandleDic.Remove(Address);
+                AssetSystem.UnloadAsset(Address);
+                IsValidate = false;
+            }
+
+            if (IsDone) Result = default;
+            Address = null;
         }
 
         #region Constructor
@@ -64,8 +66,19 @@ namespace AIO
 
         protected LoaderHandle(string location)
         {
-            Address  = location;
-            IsDone   = false;
+            if (string.IsNullOrEmpty(location))
+            {
+                IsDone     = true;
+                IsValidate = false;
+                return;
+            }
+
+            Address    = location;
+            IsValidate = AssetSystem.Proxy.CheckLocationValid(Address);
+            if (IsValidate) AssetSystem.HandleDic[Address] = this;
+            else AssetSystem.LogWarningFormat("资源地址无效: {0}", location);
+
+            IsDone   = !IsValidate;
             Progress = 0;
         }
 

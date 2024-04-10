@@ -48,7 +48,7 @@ namespace AIO.UEngine.YooAsset
                     if (operation.Status != EOperationStatus.Succeed)
                     {
                         AssetSystem.LogException(
-                                                 $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                            $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                         return null;
                     }
                 }
@@ -89,7 +89,7 @@ namespace AIO.UEngine.YooAsset
                 if (operation.Status != EOperationStatus.Succeed)
                 {
                     AssetSystem.LogException(
-                                             $"资源获取失败 [{packageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                        $"资源获取失败 [{packageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                     return null;
                 }
             }

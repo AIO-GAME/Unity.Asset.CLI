@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+
+#endregion
 
 namespace AIO.UEngine
 {
@@ -30,15 +34,13 @@ namespace AIO.UEngine
         /// <summary>
         ///     释放资源句柄
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public abstract void HandleFree(string location);
 
         /// <summary>
         ///     释放资源句柄
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public virtual void FreeHandle(IEnumerable<string> locations)
         {
             foreach (var location in locations) HandleFree(location);
@@ -47,8 +49,7 @@ namespace AIO.UEngine
         /// <summary>
         ///     释放资源句柄
         /// </summary>
-        [DebuggerNonUserCode]
-        [DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden]
         public virtual void FreeHandle(IList<string> locations)
         {
             for (var index = 0; index < locations.Count; index++) HandleFree(locations[index]);

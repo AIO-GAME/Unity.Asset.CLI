@@ -6,17 +6,17 @@
 <#
     var types = new (string typeName, string aliasName)[]
     {
-        ("UnityEngine.Shader", "Shader"),
-        ("UnityEngine.AudioClip", "AudioClip"),
-        ("UnityEngine.TextAsset", "TextAsset"),
-        ("UnityEngine.Material", "Material"),
-        ("UnityEngine.AssetBundle", "AssetBundle"),
-        ("UnityEngine.Animation", "Animation"),
-        ("UnityEngine.Texture", "Texture"),
-        ("UnityEngine.Texture2D", "Texture2D"),
-        ("UnityEngine.Font", "Font"),
-        ("UnityEngine.Mesh", "Mesh"),
-        ("UnityEngine.GameObject", "GameObject"),
+        // ("UnityEngine.Shader", "Shader"),
+        // ("UnityEngine.AudioClip", "AudioClip"),
+        // ("UnityEngine.TextAsset", "TextAsset"),
+        // ("UnityEngine.Material", "Material"),
+        // ("UnityEngine.AssetBundle", "AssetBundle"),
+        // ("UnityEngine.Animation", "Animation"),
+        // ("UnityEngine.Texture", "Texture"),
+        // ("UnityEngine.Texture2D", "Texture2D"),
+        // ("UnityEngine.Font", "Font"),
+        // ("UnityEngine.Mesh", "Mesh"),
+        // ("UnityEngine.GameObject", "GameObject"),
     };
 #>
 

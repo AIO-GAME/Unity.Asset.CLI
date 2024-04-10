@@ -1,9 +1,13 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AIO.UEngine;
+
+#endregion
 
 namespace AIO
 {
@@ -116,8 +120,7 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static void Destroy()
         {
-            foreach (var key in HandleDic.Keys.ToArray())
-                HandleDic[key].Dispose();
+            foreach (var key in HandleDic.Keys.ToArray()) HandleDic[key].Dispose();
             HandleDic.Clear();
 #if UNITY_EDITOR
             Parameter.SequenceRecord.Save();

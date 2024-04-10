@@ -24,12 +24,9 @@ namespace AIO
             remove => Completed -= value as Action<object>;
         }
 
-        TaskAwaiter<object[]> IOperationList.GetAwaiter() => IsValidate
-            ? CreateAsync().To<TaskAwaiter<object[]>>()
-            : Task.FromResult<object[]>(null).GetAwaiter();
-
-        object[] IOperationList.Result   => Result.To<object[]>();
-        object[] IOperationList.Invoke() => Invoke().To<object[]>();
+        TaskAwaiter<object[]> ITaskObjectArray.GetAwaiter() => GetAwaiter().To<TaskAwaiter<object[]>>();
+        object[] IOperationList.               Result       => Result.To<object[]>();
+        object[] IOperationList.               Invoke()     => Invoke().To<object[]>();
 
         #endregion
 

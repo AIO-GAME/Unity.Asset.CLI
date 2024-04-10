@@ -1,7 +1,11 @@
-﻿using UnityEngine;
+﻿#region
+
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+
+#endregion
 
 namespace AIO
 {

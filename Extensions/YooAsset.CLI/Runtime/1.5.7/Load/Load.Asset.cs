@@ -1,134 +1,115 @@
 ﻿#if SUPPORT_YOOASSET
+
+#region
+
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using YooAsset;
 using Object = UnityEngine.Object;
+
+#endregion
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        public override IEnumerator LoadAssetCO<TObject>(string location, Action<TObject> cb)
+        private class LoaderHandleLoadAssetTask<TObject> : YLoaderHandle<TObject>
+        where TObject : Object
         {
-            var operation = HandleGet<AssetOperationHandle>(location);
-            if (operation is null)
+            public LoaderHandleLoadAssetTask(string location, Type type, Action<TObject> completed) : base(location, type, completed) { }
+
+            #region Sync
+
+            protected override void CreateSync()
             {
-                ResPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
+                var operation = Instance.HandleGet<AssetOperationHandle>(Address);
+                if (operation is null)
                 {
-                    cb?.Invoke(null);
-                    yield break;
+                    var package = Instance.GetAutoPackageSync(Address);
+                    if (package is null) return;
+                    operation = package.LoadAssetSync<TObject>(Address);
+                    if (!LoadCheckOPSync(operation)) return;
+                    Instance.HandleAdd(Address, operation);
                 }
 
-                operation = package.LoadAssetAsync<TObject>(location);
-                var check = false;
-                yield return LoadCheckOPCo(operation, ya => check = ya);
-                if (!check)
+                Result = operation?.GetAssetObject<TObject>();
+            }
+
+            #endregion
+
+            #region Coroutine
+
+            protected override IEnumerator CreateCoroutine()
+            {
+                var operation = Instance.HandleGet<AssetOperationHandle>(Address);
+                if (operation is null)
                 {
-                    cb?.Invoke(null);
-                    yield break;
+                    ResPackage package = null;
+                    yield return Instance.GetAutoPackageCO(Address, ya => package = ya);
+                    if (package is null)
+                    {
+                        InvokeOnCompleted();
+                        yield break;
+                    }
+
+                    operation = package.LoadAssetAsync(Address, AssetType);
+                    var check = false;
+                    yield return LoadCheckOPCo(operation, ya => check = ya);
+                    if (!check)
+                    {
+                        InvokeOnCompleted();
+                        yield break;
+                    }
+
+                    Instance.HandleAdd(Address, operation);
                 }
 
-                HandleAdd(location, operation);
+                Result = operation?.GetAssetObject<TObject>();
+                InvokeOnCompleted();
             }
 
-            cb?.Invoke(operation?.GetAssetObject<TObject>());
-        }
+            #endregion
 
-        public override IEnumerator LoadAssetCO(string location, Type type, Action<Object> cb)
-        {
-            var operation = HandleGet<AssetOperationHandle>(location);
-            if (operation is null)
+            #region Task
+
+            private void OnCompletedTaskGeneric()
             {
-                ResPackage package = null;
-                yield return GetAutoPackageCO(location, ya => package = ya);
-                if (package is null)
+                Result = AwaiterGeneric.GetResult();
+                InvokeOnCompleted();
+            }
+
+            private TaskAwaiter<TObject> AwaiterGeneric;
+
+            private async Task<TObject> GetTask()
+            {
+                var operation = Instance.HandleGet<AssetOperationHandle>(Address);
+                if (operation is null)
                 {
-                    cb?.Invoke(null);
-                    yield break;
+                    var package = await Instance.GetAutoPackageTask(Address);
+                    if (package is null) return null;
+                    operation = package.LoadAssetAsync(Address, AssetType);
+                    if (!await LoadCheckOPTask(operation)) return null;
+                    Instance.HandleAdd(Address, operation);
                 }
 
-                operation = package.LoadAssetAsync(location, type);
-                var check = false;
-                yield return LoadCheckOPCo(operation, ya => check = ya);
-                if (!check)
-                {
-                    cb?.Invoke(null);
-                    yield break;
-                }
-
-                HandleAdd(location, operation);
+                return operation?.GetAssetObject<TObject>();
             }
 
-            cb?.Invoke(operation?.AssetObject);
-        }
-
-
-        public override TObject LoadAssetSync<TObject>(string location)
-        {
-            var operation = HandleGet<AssetOperationHandle>(location);
-            if (operation is null)
+            protected override TaskAwaiter<TObject> CreateAsync()
             {
-                var package = GetAutoPackageSync(location);
-                if (package is null) return null;
-                operation = package.LoadAssetSync<TObject>(location);
-                if (!LoadCheckOPSync(operation)) return null;
-                HandleAdd(location, operation);
+                AwaiterGeneric = GetTask().GetAwaiter();
+                AwaiterGeneric.OnCompleted(OnCompletedTaskGeneric);
+                return AwaiterGeneric;
             }
 
-            return operation?.GetAssetObject<TObject>();
+            #endregion
         }
 
-
-        public override Object LoadAssetSync(string location, Type type)
-        {
-            var operation = HandleGet<AssetOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = GetAutoPackageSync(location);
-                if (package is null) return null;
-                operation = package.LoadAssetSync(location, type);
-                if (!LoadCheckOPSync(operation)) return null;
-                HandleAdd(location, operation);
-            }
-
-            return operation?.AssetObject;
-        }
-
-
-        public override async Task<TObject> LoadAssetTask<TObject>(string location)
-        {
-            var operation = HandleGet<AssetOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = await GetAutoPackageTask(location);
-                if (package is null) return null;
-                operation = package.LoadAssetAsync<TObject>(location);
-                if (!await LoadCheckOPTask(operation)) return null;
-
-                HandleAdd(location, operation);
-            }
-
-            return operation?.GetAssetObject<TObject>();
-        }
-
-
-        public override async Task<Object> LoadAssetTask(string location, Type type)
-        {
-            var operation = HandleGet<AssetOperationHandle>(location);
-            if (operation is null)
-            {
-                var package = await GetAutoPackageTask(location);
-                if (package is null) return null;
-                operation = package.LoadAssetAsync(location, type);
-                if (!await LoadCheckOPTask(operation)) return null;
-                HandleAdd(location, operation);
-            }
-
-            return operation?.AssetObject;
-        }
+        /// <inheritdoc />
+        public override ILoaderHandle<TObject> LoadAsset<TObject>(string location, Type type, Action<TObject> completed = null)
+            => new LoaderHandleLoadAssetTask<TObject>(location, type, completed);
     }
 }
 

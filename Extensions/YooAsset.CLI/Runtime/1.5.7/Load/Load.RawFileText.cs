@@ -4,38 +4,40 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using YooAsset;
-using Object = UnityEngine.Object;
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        /// <inheritdoc />
-        public override ILoaderHandle<TObject[]> LoadSubAssets<TObject>(string location, Type type, Action<TObject[]> completed = null)
+        private class LoaderHandleLoadRawFileTextTask : YLoaderHandle<string>
         {
-            return new LoaderHandleLoadSubAssetTask<TObject>(location, type, completed);
-        }
-
-        private class LoaderHandleLoadSubAssetTask<TObject> : YLoaderHandle<TObject[]>
-        where TObject : Object
-        {
-            public LoaderHandleLoadSubAssetTask(string location, Type type, Action<TObject[]> completed) : base(location, type, completed) { }
+            public LoaderHandleLoadRawFileTextTask(string location, Action<string> completed) : base(location, typeof(string), completed) { }
 
             #region Sync
 
             protected override void CreateSync()
             {
-                var operation = Instance.HandleGet<SubAssetsOperationHandle>(Address);
+                var operation = Instance.HandleGet<RawFileOperationHandle>(Address);
                 if (operation is null)
                 {
                     var package = Instance.GetAutoPackageSync(Address);
-                    if (package is null) return;
-                    operation = package.LoadSubAssetsSync(Address, AssetType);
-                    if (!LoadCheckOPSync(operation)) return;
+                    if (package is null)
+                    {
+                        Result = string.Empty;
+                        return;
+                    }
+
+                    operation = package.LoadRawFileSync(Address);
+                    if (!LoadCheckOPSync(operation))
+                    {
+                        Result = string.Empty;
+                        return;
+                    }
+
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation.GetSubAssetObjects<TObject>();
+                Result = operation?.GetRawFileText();
             }
 
             #endregion
@@ -44,22 +46,24 @@ namespace AIO.UEngine.YooAsset
 
             protected override IEnumerator CreateCoroutine()
             {
-                var operation = Instance.HandleGet<SubAssetsOperationHandle>(Address);
+                var operation = Instance.HandleGet<RawFileOperationHandle>(Address);
                 if (operation is null)
                 {
                     ResPackage package = null;
                     yield return Instance.GetAutoPackageCO(Address, ya => package = ya);
                     if (package is null)
                     {
+                        Result = string.Empty;
                         InvokeOnCompleted();
                         yield break;
                     }
 
-                    operation = package.LoadSubAssetsAsync(Address, AssetType);
+                    operation = package.LoadRawFileAsync(Address);
                     var check = false;
                     yield return LoadCheckOPCo(operation, ya => check = ya);
                     if (!check)
                     {
+                        Result = string.Empty;
                         InvokeOnCompleted();
                         yield break;
                     }
@@ -67,7 +71,7 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation?.GetSubAssetObjects<TObject>();
+                Result = operation?.GetRawFileText();
                 InvokeOnCompleted();
             }
 
@@ -81,24 +85,24 @@ namespace AIO.UEngine.YooAsset
                 InvokeOnCompleted();
             }
 
-            private TaskAwaiter<TObject[]> AwaiterGeneric;
+            private TaskAwaiter<string> AwaiterGeneric;
 
-            private async Task<TObject[]> GetTask()
+            private async Task<string> GetTask()
             {
-                var operation = Instance.HandleGet<SubAssetsOperationHandle>(Address);
+                var operation = Instance.HandleGet<RawFileOperationHandle>(Address);
                 if (operation is null)
                 {
                     var package = await Instance.GetAutoPackageTask(Address);
-                    if (package is null) return null;
-                    operation = package.LoadSubAssetsAsync(Address, AssetType);
-                    if (!await LoadCheckOPTask(operation)) return null;
+                    if (package is null) return string.Empty;
+                    operation = package.LoadRawFileAsync(Address);
+                    if (!await LoadCheckOPTask(operation)) return string.Empty;
                     Instance.HandleAdd(Address, operation);
                 }
 
-                return operation?.GetSubAssetObjects<TObject>();
+                return operation?.GetRawFileText();
             }
 
-            protected override TaskAwaiter<TObject[]> CreateAsync()
+            protected override TaskAwaiter<string> CreateAsync()
             {
                 AwaiterGeneric = GetTask().GetAwaiter();
                 AwaiterGeneric.OnCompleted(OnCompletedTaskGeneric);
@@ -107,6 +111,10 @@ namespace AIO.UEngine.YooAsset
 
             #endregion
         }
+
+        /// <inheritdoc />
+        public override ILoaderHandle<string> LoadRawFileText(string location, Action<string> cb = null)
+            => new LoaderHandleLoadRawFileTextTask(location, cb);
     }
 }
 #endif

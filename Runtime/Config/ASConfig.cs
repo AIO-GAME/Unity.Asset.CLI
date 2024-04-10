@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -6,15 +8,15 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace AIO.UEngine
-{
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
 #endif
 
-    [Description("资源系统配置")]
-    [Serializable]
-    [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
+#endregion
+
+namespace AIO.UEngine
+{
+    [Description("资源系统配置"), Serializable, HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
     public class ASConfig : ScriptableObject
     {
         /// <summary>

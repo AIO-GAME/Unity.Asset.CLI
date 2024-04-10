@@ -1,6 +1,10 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Threading.Tasks;
 using Object = UnityEngine.Object;
+
+#endregion
 
 namespace AIO.UEngine
 {
