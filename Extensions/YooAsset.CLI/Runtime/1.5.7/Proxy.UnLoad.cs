@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
 using YooAsset;
@@ -98,38 +99,6 @@ namespace AIO.UEngine.YooAsset
             yield return operation;
         }
 
-
-        public override async Task UnloadSceneTask(string location)
-        {
-            if (ReferenceOPHandle.TryGetValue(location, out var operation))
-            {
-                ReferenceOPHandle.Remove(location);
-                if (operation is SceneOperationHandle handle)
-                    await handle.UnloadAsync().Task;
-                Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
-                {
-                    ReleaseOperationHandle(operation);
-                    AssetSystem.LogFormat("Free Scene Handle Release : {0}", location);
-                }));
-            }
-        }
-
-
-        public override IEnumerator UnloadSceneCO(string location, Action cb)
-        {
-            if (ReferenceOPHandle.TryGetValue(location, out var operation))
-            {
-                ReferenceOPHandle.Remove(location);
-                if (operation is SceneOperationHandle handle)
-                    yield return handle.UnloadAsync();
-                yield return Resources.UnloadUnusedAssets();
-
-                ReleaseOperationHandle(operation);
-                AssetSystem.LogFormat("Free Scene Handle Release : {0}", location);
-            }
-        }
-
-
         private static void ReleaseOperationHandle(OperationHandleBase operation)
         {
             if (operation.IsValid)
@@ -156,61 +125,6 @@ namespace AIO.UEngine.YooAsset
         }
 
 
-        public override IEnumerator ClearUnusedCacheCO(Action<bool> cb)
-        {
-            var enumerable = Dic.Values.Select(package => package.ClearUnusedCacheFilesAsync());
-            foreach (var operation in enumerable) yield return operation;
-            cb?.Invoke(true);
-        }
-
-
-        public override async Task<bool> ClearUnusedCacheTask()
-        {
-            try
-            {
-                var enumerable = Dic.Values.Select(package => package.ClearUnusedCacheFilesAsync().Task);
-#if UNITY_WEBGL
-                foreach (var task in enumerable) await task;
-#else
-                await Task.WhenAll(enumerable);
-#endif
-            }
-            catch (Exception e)
-            {
-                AssetSystem.LogException(e);
-                return false;
-            }
-
-            return true;
-        }
-
-
-        public override IEnumerator ClearAllCacheCO(Action<bool> cb)
-        {
-            var enumerable = Dic.Values.Select(package => package.ClearAllCacheFilesAsync());
-            foreach (var operation in enumerable) yield return operation;
-            cb?.Invoke(true);
-        }
-
-
-        public override async Task<bool> ClearAllCacheTask()
-        {
-            try
-            {
-                var enumerable = Dic.Values.Select(package => package.ClearAllCacheFilesAsync().Task);
-#if UNITY_WEBGL
-                foreach (var task in enumerable) await task;
-#else
-                await Task.WhenAll(enumerable);
-#endif
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
-        }
     }
 }
 #endif

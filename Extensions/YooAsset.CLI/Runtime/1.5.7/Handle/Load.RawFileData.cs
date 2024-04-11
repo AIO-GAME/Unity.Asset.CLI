@@ -1,17 +1,22 @@
 ﻿#if SUPPORT_YOOASSET
+
+#region
+
 using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using YooAsset;
 
+#endregion
+
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        private class LoaderHandleLoadRawFileTextTask : YLoaderHandle<string>
+        private class LoadRawFileData : YLoaderHandle<byte[]>
         {
-            public LoaderHandleLoadRawFileTextTask(string location, Action<string> completed) : base(location, typeof(string), completed) { }
+            public LoadRawFileData(string location, Action<byte[]> completed) : base(location, typeof(byte[]), completed) { }
 
             #region Sync
 
@@ -20,24 +25,24 @@ namespace AIO.UEngine.YooAsset
                 var operation = Instance.HandleGet<RawFileOperationHandle>(Address);
                 if (operation is null)
                 {
-                    var package = Instance.GetAutoPackageSync(Address);
+                    var package = Instance.AutoGetPackageSync(Address);
                     if (package is null)
                     {
-                        Result = string.Empty;
+                        Result = Array.Empty<byte>();
                         return;
                     }
 
                     operation = package.LoadRawFileSync(Address);
-                    if (!LoadCheckOPSync(operation))
+                    if (!operation.CheckSync())
                     {
-                        Result = string.Empty;
+                        Result = Array.Empty<byte>();
                         return;
                     }
 
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation?.GetRawFileText();
+                Result = operation?.GetRawFileData();
             }
 
             #endregion
@@ -50,20 +55,20 @@ namespace AIO.UEngine.YooAsset
                 if (operation is null)
                 {
                     ResPackage package = null;
-                    yield return Instance.GetAutoPackageCO(Address, ya => package = ya);
+                    yield return Instance.AutoGetPackageCoroutine(Address, ya => package = ya);
                     if (package is null)
                     {
-                        Result = string.Empty;
+                        Result = Array.Empty<byte>();
                         InvokeOnCompleted();
                         yield break;
                     }
 
                     operation = package.LoadRawFileAsync(Address);
                     var check = false;
-                    yield return LoadCheckOPCo(operation, ya => check = ya);
+                    yield return operation.CheckCoroutine(ya => check = ya);
                     if (!check)
                     {
-                        Result = string.Empty;
+                        Result = Array.Empty<byte>();
                         InvokeOnCompleted();
                         yield break;
                     }
@@ -71,7 +76,7 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation?.GetRawFileText();
+                Result = operation?.GetRawFileData();
                 InvokeOnCompleted();
             }
 
@@ -82,27 +87,26 @@ namespace AIO.UEngine.YooAsset
             private void OnCompletedTaskGeneric()
             {
                 Result = AwaiterGeneric.GetResult();
-                InvokeOnCompleted();
             }
 
-            private TaskAwaiter<string> AwaiterGeneric;
+            private TaskAwaiter<byte[]> AwaiterGeneric;
 
-            private async Task<string> GetTask()
+            private async Task<byte[]> GetTask()
             {
                 var operation = Instance.HandleGet<RawFileOperationHandle>(Address);
                 if (operation is null)
                 {
-                    var package = await Instance.GetAutoPackageTask(Address);
-                    if (package is null) return string.Empty;
+                    var package = await Instance.AutoGetPackageTask(Address);
+                    if (package is null) return Array.Empty<byte>();
                     operation = package.LoadRawFileAsync(Address);
-                    if (!await LoadCheckOPTask(operation)) return string.Empty;
+                    if (!await operation.CheckTask()) return Array.Empty<byte>();
                     Instance.HandleAdd(Address, operation);
                 }
 
-                return operation?.GetRawFileText();
+                return operation?.GetRawFileData();
             }
 
-            protected override TaskAwaiter<string> CreateAsync()
+            protected override TaskAwaiter<byte[]> CreateAsync()
             {
                 AwaiterGeneric = GetTask().GetAwaiter();
                 AwaiterGeneric.OnCompleted(OnCompletedTaskGeneric);
@@ -113,8 +117,8 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
-        public override ILoaderHandle<string> LoadRawFileText(string location, Action<string> cb = null)
-            => new LoaderHandleLoadRawFileTextTask(location, cb);
+        public override ILoaderHandle<byte[]> LoadRawFileDataTask(string location, Action<byte[]> cb = null)
+            => new LoadRawFileData(location, cb);
     }
 }
 #endif

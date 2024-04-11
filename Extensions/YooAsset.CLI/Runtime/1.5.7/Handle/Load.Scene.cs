@@ -1,4 +1,7 @@
 ﻿#if SUPPORT_YOOASSET
+
+#region
+
 using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
@@ -6,26 +9,28 @@ using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using YooAsset;
 
+#endregion
+
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
         /// <inheritdoc />
-        public override ILoaderHandle<Scene> LoadScene(
+        public override ILoaderHandle<Scene> LoadSceneTask(
             string        location,
             Action<Scene> completed   = null,
             LoadSceneMode sceneMode   = LoadSceneMode.Single,
             bool          suspendLoad = false,
             int           priority    = 100
-        ) => new LoaderHandleLoadSceneTask(location, completed, sceneMode, suspendLoad, priority);
+        ) => new LoadScene(location, completed, sceneMode, suspendLoad, priority);
 
-        private class LoaderHandleLoadSceneTask : YLoaderHandle<Scene>
+        private class LoadScene : YLoaderHandle<Scene>
         {
             private LoadSceneMode sceneMode   { get; set; }
             private bool          suspendLoad { get; set; }
             private int           priority    { get; set; }
 
-            public LoaderHandleLoadSceneTask(
+            public LoadScene(
                 string        location,
                 Action<Scene> completed,
                 LoadSceneMode sceneMode   = LoadSceneMode.Single,
@@ -45,11 +50,11 @@ namespace AIO.UEngine.YooAsset
                 var operation = Instance.HandleGet<SceneOperationHandle>(Address);
                 if (operation != null) Instance.HandleFree(Address);
 
-                var package = Instance.GetAutoPackageSync(Address);
+                var package = Instance.AutoGetPackageSync(Address);
                 if (package is null) throw new Exception($"场景配置 异常错误 : {Address} {sceneMode}");
 
                 operation = package.LoadSceneAsync(Address, sceneMode, suspendLoad, priority);
-                var awaiter = LoadCheckOPTask(operation);
+                var awaiter = operation.CheckTask();
                 awaiter.RunSynchronously();
                 if (awaiter.Result)
                 {
@@ -74,11 +79,11 @@ namespace AIO.UEngine.YooAsset
                 if (operation != null) Instance.HandleFree(Address);
 
                 ResPackage package = null;
-                yield return Instance.GetAutoPackageCO(Address, resPackage => package = resPackage);
+                yield return Instance.AutoGetPackageCoroutine(Address, resPackage => package = resPackage);
                 if (package is null) throw new Exception($"场景配置 异常错误 : {Address} {sceneMode}");
 
                 operation = package.LoadSceneAsync(Address, sceneMode, suspendLoad, priority);
-                yield return LoadCheckOPCo(operation, succeed =>
+                yield return operation.CheckCoroutine(succeed =>
                 {
                     if (succeed)
                     {
@@ -103,7 +108,6 @@ namespace AIO.UEngine.YooAsset
             private void OnCompletedTaskGeneric()
             {
                 Result = AwaiterGeneric.GetResult();
-                InvokeOnCompleted();
             }
 
             private TaskAwaiter<Scene> AwaiterGeneric;
@@ -113,7 +117,7 @@ namespace AIO.UEngine.YooAsset
                 var operation = Instance.HandleGet<SceneOperationHandle>(Address);
                 if (operation != null) Instance.HandleFree(Address);
 
-                var package = await Instance.GetAutoPackageTask(Address);
+                var package = await Instance.AutoGetPackageTask(Address);
                 if (package is null)
                 {
                     AssetSystem.LogExceptionFormat("场景配置 异常错误:{0} {1}", Address, sceneMode);
@@ -121,7 +125,7 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 operation = package.LoadSceneAsync(Address, sceneMode, suspendLoad, priority);
-                if (await LoadCheckOPTask(operation))
+                if (await operation.CheckTask())
                 {
                     operation.ActivateScene();
                     Instance.HandleAdd(Address, operation);

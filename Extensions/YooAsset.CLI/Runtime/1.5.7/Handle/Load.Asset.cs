@@ -6,8 +6,8 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using UnityEngine;
 using YooAsset;
+using Object = UnityEngine.Object;
 
 #endregion
 
@@ -15,10 +15,10 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        private class LoaderHandleInstGameObjectTask : YLoaderHandle<GameObject>
+        private class LoadAsset<TObject> : YLoaderHandle<TObject>
+        where TObject : Object
         {
-            private Transform parent { get; set; }
-            public LoaderHandleInstGameObjectTask(string location, Action<GameObject> completed, Transform parent = null) : base(location, completed) => this.parent = parent;
+            public LoadAsset(string location, Type type, Action<TObject> completed) : base(location, type, completed) { }
 
             #region Sync
 
@@ -27,14 +27,14 @@ namespace AIO.UEngine.YooAsset
                 var operation = Instance.HandleGet<AssetOperationHandle>(Address);
                 if (operation is null)
                 {
-                    var package = Instance.GetAutoPackageSync(Address);
+                    var package = Instance.AutoGetPackageSync(Address);
                     if (package is null) return;
-                    operation = package.LoadAssetSync<GameObject>(Address);
-                    if (!LoadCheckOPSync(operation)) return;
+                    operation = package.LoadAssetSync<TObject>(Address);
+                    if (!operation.CheckSync()) return;
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation.InstantiateSync(parent);
+                Result = operation?.GetAssetObject<TObject>();
             }
 
             #endregion
@@ -47,16 +47,16 @@ namespace AIO.UEngine.YooAsset
                 if (operation is null)
                 {
                     ResPackage package = null;
-                    yield return Instance.GetAutoPackageCO(Address, ya => package = ya);
+                    yield return Instance.AutoGetPackageCoroutine(Address, ya => package = ya);
                     if (package is null)
                     {
                         InvokeOnCompleted();
                         yield break;
                     }
 
-                    operation = package.LoadAssetAsync<GameObject>(Address);
+                    operation = package.LoadAssetAsync(Address, AssetType);
                     var check = false;
-                    yield return LoadCheckOPCo(operation, ya => check = ya);
+                    yield return operation.CheckCoroutine(ya => check = ya);
                     if (!check)
                     {
                         InvokeOnCompleted();
@@ -66,7 +66,7 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation?.InstantiateSync(parent);
+                Result = operation?.GetAssetObject<TObject>();
                 InvokeOnCompleted();
             }
 
@@ -77,27 +77,26 @@ namespace AIO.UEngine.YooAsset
             private void OnCompletedTaskGeneric()
             {
                 Result = AwaiterGeneric.GetResult();
-                InvokeOnCompleted();
             }
 
-            private TaskAwaiter<GameObject> AwaiterGeneric;
+            private TaskAwaiter<TObject> AwaiterGeneric;
 
-            public async Task<GameObject> GetTask()
+            private async Task<TObject> GetTask()
             {
                 var operation = Instance.HandleGet<AssetOperationHandle>(Address);
                 if (operation is null)
                 {
-                    var package = await Instance.GetAutoPackageTask(Address);
+                    var package = await Instance.AutoGetPackageTask(Address);
                     if (package is null) return null;
-                    operation = package.LoadAssetAsync<GameObject>(Address);
-                    if (!await LoadCheckOPTask(operation)) return null;
+                    operation = package.LoadAssetAsync(Address, AssetType);
+                    if (!await operation.CheckTask()) return null;
                     Instance.HandleAdd(Address, operation);
                 }
 
-                return operation.InstantiateSync(parent);
+                return operation?.GetAssetObject<TObject>();
             }
 
-            protected override TaskAwaiter<GameObject> CreateAsync()
+            protected override TaskAwaiter<TObject> CreateAsync()
             {
                 AwaiterGeneric = GetTask().GetAwaiter();
                 AwaiterGeneric.OnCompleted(OnCompletedTaskGeneric);
@@ -108,10 +107,9 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
-        public override ILoaderHandle<GameObject> InstGameObject(string location, Action<GameObject> completed = null, Transform parent = null)
-        {
-            return new LoaderHandleInstGameObjectTask(location, completed, parent);
-        }
+        public override ILoaderHandle<TObject> LoadAssetTask<TObject>(string location, Type type, Action<TObject> completed = null)
+            => new LoadAsset<TObject>(location, type, completed);
     }
 }
+
 #endif

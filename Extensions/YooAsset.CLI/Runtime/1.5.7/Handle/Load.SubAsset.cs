@@ -1,4 +1,7 @@
 ﻿#if SUPPORT_YOOASSET
+
+#region
+
 using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
@@ -6,20 +9,22 @@ using System.Threading.Tasks;
 using YooAsset;
 using Object = UnityEngine.Object;
 
+#endregion
+
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
         /// <inheritdoc />
-        public override ILoaderHandle<TObject[]> LoadSubAssets<TObject>(string location, Type type, Action<TObject[]> completed = null)
+        public override ILoaderHandle<TObject[]> LoadSubAssetsTask<TObject>(string location, Type type, Action<TObject[]> completed = null)
         {
-            return new LoaderHandleLoadSubAssetTask<TObject>(location, type, completed);
+            return new LoadSubAsset<TObject>(location, type, completed);
         }
 
-        private class LoaderHandleLoadSubAssetTask<TObject> : YLoaderHandle<TObject[]>
+        private class LoadSubAsset<TObject> : YLoaderHandle<TObject[]>
         where TObject : Object
         {
-            public LoaderHandleLoadSubAssetTask(string location, Type type, Action<TObject[]> completed) : base(location, type, completed) { }
+            public LoadSubAsset(string location, Type type, Action<TObject[]> completed) : base(location, type, completed) { }
 
             #region Sync
 
@@ -28,10 +33,10 @@ namespace AIO.UEngine.YooAsset
                 var operation = Instance.HandleGet<SubAssetsOperationHandle>(Address);
                 if (operation is null)
                 {
-                    var package = Instance.GetAutoPackageSync(Address);
+                    var package = Instance.AutoGetPackageSync(Address);
                     if (package is null) return;
                     operation = package.LoadSubAssetsSync(Address, AssetType);
-                    if (!LoadCheckOPSync(operation)) return;
+                    if (!operation.CheckSync()) return;
                     Instance.HandleAdd(Address, operation);
                 }
 
@@ -48,7 +53,7 @@ namespace AIO.UEngine.YooAsset
                 if (operation is null)
                 {
                     ResPackage package = null;
-                    yield return Instance.GetAutoPackageCO(Address, ya => package = ya);
+                    yield return Instance.AutoGetPackageCoroutine(Address, resPackage => package = resPackage);
                     if (package is null)
                     {
                         InvokeOnCompleted();
@@ -57,7 +62,7 @@ namespace AIO.UEngine.YooAsset
 
                     operation = package.LoadSubAssetsAsync(Address, AssetType);
                     var check = false;
-                    yield return LoadCheckOPCo(operation, ya => check = ya);
+                    yield return operation.CheckCoroutine(ya => check = ya);
                     if (!check)
                     {
                         InvokeOnCompleted();
@@ -78,7 +83,6 @@ namespace AIO.UEngine.YooAsset
             private void OnCompletedTaskGeneric()
             {
                 Result = AwaiterGeneric.GetResult();
-                InvokeOnCompleted();
             }
 
             private TaskAwaiter<TObject[]> AwaiterGeneric;
@@ -88,10 +92,10 @@ namespace AIO.UEngine.YooAsset
                 var operation = Instance.HandleGet<SubAssetsOperationHandle>(Address);
                 if (operation is null)
                 {
-                    var package = await Instance.GetAutoPackageTask(Address);
+                    var package = await Instance.AutoGetPackageTask(Address);
                     if (package is null) return null;
                     operation = package.LoadSubAssetsAsync(Address, AssetType);
-                    if (!await LoadCheckOPTask(operation)) return null;
+                    if (!await operation.CheckTask()) return null;
                     Instance.HandleAdd(Address, operation);
                 }
 

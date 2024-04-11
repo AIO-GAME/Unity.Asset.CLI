@@ -51,7 +51,7 @@ namespace AIO
         protected override IEnumerator CreateCoroutine()
         {
             if (!IsValidate) throw new Exception("Initialize Error");
-            yield return Proxy.UpdatePackagesCO(Config);
+            yield return Proxy.UpdatePackagesTask(Config);
             if (AssetSystem._Exception != ASException.None)
             {
                 IsValidate = false;
@@ -73,7 +73,7 @@ namespace AIO
                 yield break;
             }
 
-            yield return Proxy.InitializeCO();
+            yield return Proxy.Initialize();
             if (AssetSystem._Exception != ASException.None)
             {
                 IsValidate = false;
@@ -87,7 +87,7 @@ namespace AIO
         protected override void CreateSync()
         {
             if (!IsValidate) throw new Exception("Initialize Error");
-            Proxy.UpdatePackages(Config);
+            Proxy.UpdatePackagesTask(Config).Invoke();
             if (AssetSystem._Exception != ASException.None)
             {
                 IsValidate = false;
@@ -109,7 +109,7 @@ namespace AIO
                 return;
             }
 
-            Proxy.InitializeTask().RunSynchronously();
+            Proxy.Initialize().Invoke();
             if (AssetSystem._Exception != ASException.None)
             {
                 IsValidate = false;
@@ -154,7 +154,7 @@ namespace AIO
                 IsValidate = false;
             }
 
-            await Proxy.InitializeTask();
+            await Proxy.Initialize();
             if (AssetSystem._Exception != ASException.None)
             {
                 IsValidate = false;

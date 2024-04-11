@@ -7,26 +7,7 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        private static async Task<bool> LoadCheckOPTask(OperationHandleBase operation)
-        {
-            if (!operation.IsValid)
-            {
-                AssetSystem.LogError(operation.LastError);
-                return false;
-            }
-
-            await operation.Task;
-            if (operation.Status != EOperationStatus.Succeed)
-            {
-                AssetSystem.LogError(operation.LastError);
-                return false;
-            }
-
-            return true;
-        }
-
-
-        private async Task<ResPackage> GetAutoPackageTask(string location)
+        private async Task<ResPackage> AutoGetPackageTask(string location)
         {
             PackageDebug(LoadType.Async, location);
             foreach (var package in Dic.Values)
@@ -64,7 +45,7 @@ namespace AIO.UEngine.YooAsset
         }
 
 
-        private async Task<ResPackage> GetAutoPackageTask(string packageName, string location)
+        private async Task<ResPackage> AutoGetPackageTask(string packageName, string location)
         {
             PackageDebug(LoadType.Async, packageName, location);
             if (!Dic.TryGetValue(packageName, out var package))

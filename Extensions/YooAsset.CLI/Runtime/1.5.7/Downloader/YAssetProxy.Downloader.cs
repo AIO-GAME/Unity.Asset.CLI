@@ -14,7 +14,7 @@ namespace AIO.UEngine.YooAsset
         public override IASDownloader GetDownloader(DownlandAssetEvent dEvent = default)
         {
             var packages = AssetSystem.PackageConfigs;
-            if (packages is null) return new YASDownloader(null, dEvent);
+            if (packages is null) return new AssetDownloader(null, dEvent);
             var dictionary = new Dictionary<string, ResPackage>(packages.Count);
             foreach (var config in packages)
             {
@@ -24,12 +24,12 @@ namespace AIO.UEngine.YooAsset
                     dictionary[config.Name] = package;
             }
 
-            return new YASDownloader(dictionary, dEvent);
+            return new AssetDownloader(dictionary, dEvent);
         }
 
         #region Nested type: YASDownloader
 
-        private class YASDownloader : AOperation, IASDownloader
+        private class AssetDownloader : AOperation, IASDownloader
         {
             /// <summary>
             ///     是否允许使用流量下载
@@ -47,7 +47,7 @@ namespace AIO.UEngine.YooAsset
             private readonly Dictionary<string, long>                           TotalValueDict = new Dictionary<string, long>();
             private          Dictionary<string, UpdatePackageVersionOperation>  VersionOperations;
 
-            public YASDownloader(IDictionary<string, ResPackage> packages, IDownlandAssetEvent iEvent)
+            public AssetDownloader(IDictionary<string, ResPackage> packages, IDownlandAssetEvent iEvent)
             {
                 Packages = packages;
 
@@ -256,7 +256,7 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 State = EProgressState.Finish;
-                yield return AssetSystem.CleanUnusedCacheCO();
+                yield return Instance.ClearUnusedCacheTask();
                 if (DownloadAll) AssetSystem.WhiteAll = true;
                 else if (DownloadTags.Count > 0) AssetSystem.AddWhite(AssetSystem.GetAddressByTag(DownloadTags));
             }

@@ -30,6 +30,11 @@ namespace AIO.UEngine
         public string URL;
 
         /// <summary>
+        ///    完整URL xxx/Version/Platform.json?t=timestamp
+        /// </summary>
+        public string FullURL => $"{URL.Trim('/')}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
+
+        /// <summary>
         ///     自动激活清单
         /// </summary>
         public bool AutoSaveVersion = true;

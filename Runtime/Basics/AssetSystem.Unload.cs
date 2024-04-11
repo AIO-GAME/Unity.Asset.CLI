@@ -91,9 +91,8 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void UnloadScene(string location, Action complete)
-        {
-            await OperationActionUnloadSceneTask.Create(location, complete);
-        }
+            => await Proxy.UnloadSceneTask(location, complete);
+
 
         /// <summary>
         ///     异步卸载场景资源
@@ -104,9 +103,8 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void UnloadScene(string location)
-        {
-            await OperationActionUnloadSceneTask.Create(location);
-        }
+            => await Proxy.UnloadSceneTask(location);
+
 
         /// <summary>
         ///     异步卸载场景资源
@@ -118,9 +116,8 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static IOperationAction UnloadSceneTask(string location, Action complete)
-        {
-            return OperationActionUnloadSceneTask.Create(location, complete);
-        }
+            => Proxy.UnloadSceneTask(location, complete);
+
 
         /// <summary>
         ///     异步卸载场景资源
@@ -131,9 +128,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static IOperationAction UnloadSceneTask(string location)
-        {
-            return OperationActionUnloadSceneTask.Create(location);
-        }
+            => Proxy.UnloadSceneTask(location);
 
         #endregion
     }

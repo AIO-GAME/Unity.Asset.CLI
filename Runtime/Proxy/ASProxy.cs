@@ -25,33 +25,14 @@ namespace AIO.UEngine
 
         #endregion
 
-        /// <summary>
-        ///     初始化协程
-        /// </summary>
-        public abstract IEnumerator InitializeCO();
-
-        /// <summary>
-        ///     初始化任务
-        /// </summary>
-        public abstract Task InitializeTask();
+        public abstract IOperationAction<bool> Initialize();
 
         /// <summary>
         ///     更新资源包
         /// </summary>
-        /// <returns></returns>
-        public abstract IEnumerator UpdatePackagesCO(ASConfig config);
-
-        /// <summary>
-        ///     更新资源包
-        /// </summary>
-        /// <returns></returns>
-        public abstract void UpdatePackages(ASConfig config);
-
-        /// <summary>
-        ///     更新资源包
-        /// </summary>
-        /// <returns></returns>
-        public abstract Task UpdatePackagesTask(ASConfig config);
+        /// <param name="config">配置文件</param>
+        /// <param name="completed">完成回调</param>
+        public abstract IOperationAction<bool> UpdatePackagesTask(ASConfig config, Action<bool> completed = null);
 
         /// <summary>
         ///     是否已经加载
@@ -68,22 +49,8 @@ namespace AIO.UEngine
         /// </summary>
         public abstract IASNetLoading GetLoadingHandle();
 
-        /// <inheritdoc />
-        public sealed override bool Equals(object obj)
-        {
-            return false;
-        }
-
-        /// <inheritdoc />
-        public sealed override string ToString()
-        {
-            return string.Empty;
-        }
-
-        /// <inheritdoc />
-        public sealed override int GetHashCode()
-        {
-            return 0;
-        }
+        public sealed override bool   Equals(object obj) => false;
+        public sealed override string ToString()         => string.Empty;
+        public sealed override int    GetHashCode()      => 0;
     }
 }

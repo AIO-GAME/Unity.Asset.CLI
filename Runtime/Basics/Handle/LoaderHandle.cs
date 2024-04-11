@@ -1,57 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+
 namespace AIO
 {
-    partial class AssetSystem
-    {
-        internal static readonly Dictionary<string, ILoaderHandle> HandleDic
-            = new Dictionary<string, ILoaderHandle>();
-    }
-
-    public interface ILoaderHandle<TObject> : IOperation<TObject>, ILoaderHandle { }
-
-    public interface ILoaderHandle : IOperation
-    {
-        /// <summary>
-        /// 资源类型
-        /// </summary>
-        Type AssetType { get; }
-
-        /// <summary>
-        /// 可寻址资源地址
-        /// </summary>
-        string Address { get; }
-    }
-
-    public interface ILoaderHandleList<TObject> : IOperationList<TObject>, ILoaderHandleList { }
-
-    public interface ILoaderHandleList : IOperationList
-    {
-        /// <summary>
-        /// 资源类型
-        /// </summary>
-        Type AssetType { get; }
-
-        /// <summary>
-        /// 可寻址资源地址
-        /// </summary>
-        string Address { get; }
-    }
-
     [StructLayout(LayoutKind.Auto)]
     internal abstract class LoaderHandle<TObject> : OperationGenerics<TObject>, ILoaderHandle<TObject>
     {
-        public string Address   { get; protected set; }
-        public Type   AssetType { get; protected set; }
+        private string Address   { get; set; }
+        private Type   AssetType { get; set; }
 
         protected override void OnDispose()
         {
             if (IsValidate)
             {
-                AssetSystem.HandleDic.Remove(Address);
                 AssetSystem.UnloadAsset(Address);
                 IsValidate = false;
             }
@@ -75,11 +38,17 @@ namespace AIO
 
             Address    = location;
             IsValidate = AssetSystem.Proxy.CheckLocationValid(Address);
-            if (IsValidate) AssetSystem.HandleDic[Address] = this;
-            else AssetSystem.LogWarningFormat("资源地址无效: {0}", location);
-
-            IsDone   = !IsValidate;
-            Progress = 0;
+            if (IsValidate)
+            {
+                IsDone   = false;
+                Progress = 0;
+            }
+            else
+            {
+                AssetSystem.LogWarningFormat("资源地址无效: {0}", location);
+                IsDone   = true;
+                Progress = 100;
+            }
         }
 
         protected LoaderHandle(string location, Action<TObject> onCompleted) : this(location)

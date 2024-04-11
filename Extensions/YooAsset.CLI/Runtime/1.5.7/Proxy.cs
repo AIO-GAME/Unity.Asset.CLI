@@ -17,26 +17,10 @@ namespace AIO.UEngine.YooAsset
     public partial class Proxy : ASProxy
     {
         private static Proxy Instance;
-        
+
         public Proxy()
         {
             Instance = this;
-        }
-        
-        public override IEnumerator InitializeCO()
-        {
-            Initialize_Internal();
-            foreach (var operation in InitializationOperations) yield return operation;
-        }
-
-        public override async Task InitializeTask()
-        {
-            Initialize_Internal();
-#if UNITY_WEBGL
-            foreach (var operation in InitializationOperations) await operation;
-#else
-            await Task.WhenAll(InitializationOperations.Select(operation => operation.Task));
-#endif
         }
 
         public override void Dispose()

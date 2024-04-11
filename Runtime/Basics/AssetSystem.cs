@@ -120,8 +120,6 @@ namespace AIO
         [DebuggerNonUserCode, DebuggerHidden]
         public static void Destroy()
         {
-            foreach (var key in HandleDic.Keys.ToArray()) HandleDic[key].Dispose();
-            HandleDic.Clear();
 #if UNITY_EDITOR
             Parameter.SequenceRecord.Save();
 #endif
@@ -131,83 +129,27 @@ namespace AIO
         /// <summary>
         ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
-        public static async void ClearUnusedCache(Action<bool> cb)
-        {
-            var result = await Proxy.ClearUnusedCacheTask();
-            cb?.Invoke(result);
-        }
+        public static async void ClearUnusedCache(Action<bool> completed = null)
+            => await Proxy.ClearUnusedCacheTask(completed);
 
         /// <summary>
         ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
-        public static async void ClearUnusedCache()
-        {
-            await Proxy.ClearUnusedCacheTask();
-        }
+        /// <param name="completed">回调</param>
+        public static IOperationAction<bool> CleanUnusedCacheTask(Action<bool> completed = null)
+            => Proxy.ClearUnusedCacheTask(completed);
+
+        /// <summary>
+        ///     清理包裹全部缓存文件 (清空之后需要重新下载资源)
+        /// </summary>
+        public static async void ClearAllCache(Action<bool> completed = null)
+            => await Proxy.ClearAllCacheTask(completed);
+
 
         /// <summary>
         ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
         /// </summary>
-        public static Task<bool> CleanUnusedCacheTask()
-        {
-            return Proxy.ClearUnusedCacheTask();
-        }
-
-        /// <summary>
-        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
-        /// </summary>
-        public static IEnumerator CleanUnusedCacheCO(Action<bool> cb)
-        {
-            return Proxy.ClearUnusedCacheCO(cb);
-        }
-
-        /// <summary>
-        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
-        /// </summary>
-        public static IEnumerator CleanUnusedCacheCO()
-        {
-            return Proxy.ClearUnusedCacheCO(null);
-        }
-
-        /// <summary>
-        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
-        /// </summary>
-        public static async void ClearAllCache(Action<bool> cb)
-        {
-            var result = await Proxy.ClearAllCacheTask();
-            cb?.Invoke(result);
-        }
-
-        /// <summary>
-        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
-        /// </summary>
-        public static async void ClearAllCache()
-        {
-            await Proxy.ClearAllCacheTask();
-        }
-
-        /// <summary>
-        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
-        /// </summary>
-        public static Task<bool> CleanAllCacheTask()
-        {
-            return Proxy.ClearAllCacheTask();
-        }
-
-        /// <summary>
-        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
-        /// </summary>
-        public static IEnumerator CleanAllCacheCO(Action<bool> cb)
-        {
-            return Proxy.ClearAllCacheCO(cb);
-        }
-
-        /// <summary>
-        ///     清理包裹未使用的缓存文件 (清空之后需要重新下载资源)
-        /// </summary>
-        public static IEnumerator CleanAllCacheCO()
-        {
-            return Proxy.ClearAllCacheCO(null);
-        }
+        public static IOperationAction<bool> CleanAllCacheTask(Action<bool> completed = null)
+            => Proxy.ClearAllCacheTask(completed);
     }
 }

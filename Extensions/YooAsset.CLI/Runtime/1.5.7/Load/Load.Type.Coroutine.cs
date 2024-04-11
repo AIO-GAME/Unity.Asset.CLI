@@ -9,35 +9,8 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        private static IEnumerator LoadCheckOPCo(OperationHandleBase operation, Action<bool> cb)
+        private IEnumerator AutoGetPackageCoroutine(string location, Action<ResPackage> cb)
         {
-            if (!operation.IsValid)
-            {
-                AssetSystem.LogError(operation.LastError);
-                cb?.Invoke(false);
-                yield break;
-            }
-
-            yield return operation;
-            if (operation.Status != EOperationStatus.Succeed)
-            {
-                AssetSystem.LogError(operation.LastError);
-                cb?.Invoke(false);
-                yield break;
-            }
-
-            cb?.Invoke(operation.Status == EOperationStatus.Succeed);
-        }
-
-        private IEnumerator GetAutoPackageCO(string location, Action<ResPackage> cb)
-        {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
-            {
-                cb.Invoke(null);
-                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
-                yield break;
-            }
-
             PackageDebug(LoadType.Coroutine, location);
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
@@ -78,15 +51,8 @@ namespace AIO.UEngine.YooAsset
             cb.Invoke(null);
         }
 
-        private IEnumerator GetAutoPackageCO(string packageName, string location, Action<ResPackage> cb)
+        private IEnumerator AutoGetPackageCoroutine(string packageName, string location, Action<ResPackage> cb)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
-            {
-                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
-                cb.Invoke(null);
-                yield break;
-            }
-
             PackageDebug(LoadType.Coroutine, packageName, location);
             if (!Dic.TryGetValue(packageName, out var package))
             {
@@ -133,7 +99,7 @@ namespace AIO.UEngine.YooAsset
             else
             {
                 AssetSystem.LogException(
-                                         $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+                    $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
                 cb.Invoke(null);
             }
         }
