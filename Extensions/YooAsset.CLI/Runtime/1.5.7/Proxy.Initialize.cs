@@ -101,8 +101,8 @@ namespace AIO.UEngine.YooAsset
 
             if (EventParameter is null) EventParameter = GetParameter;
             var capacity = AssetSystem.PackageConfigs.Count;
-            ReferenceOPHandle        = new Dictionary<string, OperationHandleBase>();
             InitializationOperations = new List<InitializationOperation>(capacity);
+            ReferenceOPHandle        = new Dictionary<string, OperationHandleBase>();
             DownloaderOperations     = new Dictionary<string, DownloaderOperation>(64);
             Dic                      = new Dictionary<string, ResPackage>(capacity);
 
@@ -141,8 +141,6 @@ namespace AIO.UEngine.YooAsset
                 InitializationOperations.Add(operation);
             }
         }
-
-
     }
 }
 #endif

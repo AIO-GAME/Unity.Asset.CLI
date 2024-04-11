@@ -78,15 +78,22 @@ namespace AIO.UEditor
                 using (GELayout.VHorizontal(GSBackground))
                 {
                     GELayout.Label("开启日志输出", OptionLabelWidth_100);
-                    if (GELayout.Button(Target.OutputLog ? "开启中" : "已关闭", GSValue))
+                    if (GELayout.Button(Target.OutputLog ? "已启用" : "已禁用", GSValue))
                         Target.OutputLog = !Target.OutputLog;
                 }
 
                 using (GELayout.VHorizontal(GSBackground))
                 {
                     GELayout.Label("定位地址小写", OptionLabelWidth_100);
-                    if (GELayout.Button(Target.LoadPathToLower ? "开启中" : "已关闭", GSValue))
+                    if (GELayout.Button(Target.LoadPathToLower ? "已启用" : "已禁用", GSValue))
                         Target.LoadPathToLower = !Target.LoadPathToLower;
+                }
+
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("可寻址包含扩展名", GUILayout.Width(100));
+                    if (GUILayout.Button(Target.HasExtension ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Target.HasExtension = !Target.HasExtension;
                 }
 
                 using (GELayout.VHorizontal(GSBackground))
@@ -291,7 +298,7 @@ namespace AIO.UEditor
 
         private void Update()
         {
-            var Data = AssetCollectRoot.GetOrCreate().GetPackageNames();
+            var Data = AssetCollectRoot.GetOrCreate().GetNames();
             if (Data.Length == 0) return;
             Target.Packages = new AssetsPackageConfig[Data.Length];
             for (var index = 0; index < Data.Length; index++)

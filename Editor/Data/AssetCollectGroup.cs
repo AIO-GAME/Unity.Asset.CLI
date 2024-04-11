@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -7,7 +8,7 @@ using Object = UnityEngine.Object;
 namespace AIO.UEditor
 {
     [Serializable]
-    public sealed class AssetCollectGroup : IDisposable, IEqualityComparer<AssetCollectGroup>
+    public sealed class AssetCollectGroup : IDisposable, IEqualityComparer<AssetCollectGroup>, IEnumerable
     {
         /// <summary>
         ///     组名
@@ -137,9 +138,21 @@ namespace AIO.UEditor
             foreach (var collect in Collectors) collect.UpdateData();
         }
 
+        public IEnumerator GetEnumerator()
+        {
+            if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
+            return Collectors.GetEnumerator();
+        }
+
         public override int GetHashCode()
         {
             return GetHashCode(this);
+        }
+
+        /// <inheritdoc />
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

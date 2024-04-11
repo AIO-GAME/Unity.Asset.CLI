@@ -40,12 +40,12 @@ namespace AIO.UEngine.YooAsset
 
             private long FirstValue = -1;
 
-            private          Dictionary<string, UpdatePackageManifestOperation> ManifestOperations;
-            private          IDictionary<string, ResPackage>                    Packages;
-            private          Dictionary<string, PreDownloadContentOperation>    PreDownloadContentOperations;
-            private          Dictionary<string, ResourceDownloaderOperation>    ResourceDownloaderOperations;
-            private readonly Dictionary<string, long>                           TotalValueDict = new Dictionary<string, long>();
-            private          Dictionary<string, UpdatePackageVersionOperation>  VersionOperations;
+            private          IDictionary<string, UpdatePackageManifestOperation> ManifestOperations;
+            private          IDictionary<string, ResPackage>                     Packages;
+            private          IDictionary<string, PreDownloadContentOperation>    PreDownloadContentOperations;
+            private          IDictionary<string, ResourceDownloaderOperation>    ResourceDownloaderOperations;
+            private readonly IDictionary<string, long>                           TotalValueDict = new Dictionary<string, long>();
+            private          IDictionary<string, UpdatePackageVersionOperation>  VersionOperations;
 
             public AssetDownloader(IDictionary<string, ResPackage> packages, IDownlandAssetEvent iEvent)
             {

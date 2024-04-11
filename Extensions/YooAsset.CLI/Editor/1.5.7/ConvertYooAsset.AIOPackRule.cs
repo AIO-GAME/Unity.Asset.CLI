@@ -18,7 +18,7 @@ namespace AIO.UEditor.CLI
             {
                 if (!data.GroupName.Contains('_')) throw new Exception("Error : Rule mismatch");
                 var info = data.GroupName.SplitOnce('_');
-                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2)?.
+                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.
                                          GetByPath(data.CollectPath);
                 if (collector is null) throw new Exception("Error : Not found collector");
                 if (!Collectors.ContainsKey(collector))

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AIO.UEditor;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -48,6 +49,13 @@ namespace AIO.UEngine
         ///     加载路径转小写
         /// </summary>
         public bool LoadPathToLower = true;
+
+#if UNITY_EDITOR
+        /// <summary>
+        ///    全局 可寻址路径全部包含扩展名
+        /// </summary>
+        public bool HasExtension = true;
+#endif
 
         /// <summary>
         ///     自动序列记录
@@ -97,9 +105,7 @@ namespace AIO.UEngine
         /// <param name="package">包名</param>
         /// <param name="version">版本</param>
         public string GetRemoteURL(string fileName, string package, string version)
-        {
-            return Path.Combine(URL, AssetSystem.PlatformNameStr, package, version, fileName);
-        }
+            => Path.Combine(URL, AssetSystem.PlatformNameStr, package, version, fileName);
 
         /// <summary>
         ///     检查配置
@@ -164,6 +170,31 @@ namespace AIO.UEngine
             return Resources.LoadAll<ASConfig>(nameof(ASConfig)).FirstOrDefault(item => !(item is null));
         }
 
+#if UNITY_EDITOR
+        [InitializeOnLoadMethod]
+        private static void Initialize()
+        {
+            EditorApplication.playModeStateChanged -= EditorQuit;
+            EditorApplication.playModeStateChanged += EditorQuit;
+        }
+
+        private static void EditorQuit(PlayModeStateChange value)
+        {
+            if (value != PlayModeStateChange.EnteredPlayMode) return;
+            var config = GetOrCreate();
+            if (!Application.isPlaying || config.ASMode != EASMode.Editor) return;
+
+            var root = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true).
+                            GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)?.
+                            Invoke(null, Array.Empty<object>());
+            if (root is null) throw new Exception("Not found AssetCollectRoot.asset ! Please create it !");
+
+            Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true).
+                 GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)?.
+                 Invoke(null, new[] { root, false });
+        }
+#endif
+
         /// <summary>
         ///     获取本地资源包地址
         /// </summary>
@@ -190,18 +221,6 @@ namespace AIO.UEngine
                     if (!Directory.Exists(resourcesDir)) Directory.CreateDirectory(resourcesDir);
                     AssetDatabase.CreateAsset(instance, "Assets/Resources/ASConfig.asset");
                     AssetDatabase.SaveAssets();
-                }
-
-                if (Application.isPlaying && instance.ASMode == EASMode.Editor)
-                {
-                    var temp = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true).
-                                    GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)?.
-                                    Invoke(null, Array.Empty<object>());
-                    if (temp is null) throw new Exception("Not found AssetCollectRoot.asset ! Please create it !");
-
-                    Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true).
-                         GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)?.
-                         Invoke(null, new[] { temp, false });
                 }
             }
 

@@ -13,7 +13,7 @@ namespace AIO.UEditor
         /// </summary>
         private void OnDrawHeaderTagsMode()
         {
-            if (!Data.IsCollectValid())
+            if (!Data.IsValidCollect())
             {
                 EditorGUILayout.Separator();
                 return;

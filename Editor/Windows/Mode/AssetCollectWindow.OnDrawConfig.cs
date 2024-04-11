@@ -120,6 +120,13 @@ namespace AIO.UEditor
                         Config.LoadPathToLower = !Config.LoadPathToLower;
                 }
 
+                using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                {
+                    EditorGUILayout.LabelField("可寻址包含扩展名", GUILayout.Width(100));
+                    if (GUILayout.Button(Config.HasExtension ? "已启用" : "已禁用", GEStyle.toolbarbuttonRight))
+                        Config.HasExtension = !Config.HasExtension;
+                }
+
                 if (Config.ASMode == EASMode.Remote)
                 {
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))

@@ -30,7 +30,7 @@ namespace AIO.UEditor
                                                                  Data.CurrentPackage.Description);
             }
 
-            if (!Data.IsGroupValid()) return;
+            if (!Data.IsValidGroup()) return;
 
             EditorGUILayout.Space();
             using (new EditorGUILayout.VerticalScope(GEStyle.INThumbnailShadow))
@@ -48,7 +48,7 @@ namespace AIO.UEditor
 
         private void OnDrawItem()
         {
-            if (!Data.IsCollectValid()) return;
+            if (!Data.IsValidCollect()) return;
 
             if (Data.CurrentGroup.Collectors.Length > 1)
             {
@@ -133,7 +133,7 @@ namespace AIO.UEditor
 
         partial void OnDrawGroupList()
         {
-            if (Data.Length <= 0) return;
+            if (Data.Count <= 0) return;
             using (new EditorGUILayout.VerticalScope(GEStyle.GridList))
             {
                 EditorGUILayout.Space();

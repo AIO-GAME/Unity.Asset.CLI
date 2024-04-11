@@ -162,8 +162,8 @@ namespace AIO.UEngine.YooAsset
             var assembly = Assembly.Load("AIO.Asset.Editor");
             var type = assembly.GetType("AIO.UEditor.AssetCollectRoot", true);
             var getOrCreate = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public);
-            var CollectRoot = getOrCreate?.Invoke(null, new object[] { });
-            if (CollectRoot is null)
+            var collectRoot = getOrCreate?.Invoke(null, new object[] { });
+            if (collectRoot is null)
             {
                 AssetSystem.ExceptionEvent(ASException.NoFoundAssetCollectRoot);
                 return false;
@@ -171,7 +171,7 @@ namespace AIO.UEngine.YooAsset
 
             var packages = type.
                            GetField("Packages", BindingFlags.Instance | BindingFlags.Public)?.
-                           GetValue(CollectRoot);
+                           GetValue(collectRoot);
             if (!(packages is Array array))
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);

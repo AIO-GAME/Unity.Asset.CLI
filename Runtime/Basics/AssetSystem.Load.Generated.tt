@@ -6,17 +6,17 @@
 <#
     var types = new (string typeName, string aliasName)[]
     {
-        // ("UnityEngine.Shader", "Shader"),
-        // ("UnityEngine.AudioClip", "AudioClip"),
-        // ("UnityEngine.TextAsset", "TextAsset"),
-        // ("UnityEngine.Material", "Material"),
-        // ("UnityEngine.AssetBundle", "AssetBundle"),
-        // ("UnityEngine.Animation", "Animation"),
-        // ("UnityEngine.Texture", "Texture"),
-        // ("UnityEngine.Texture2D", "Texture2D"),
-        // ("UnityEngine.Font", "Font"),
-        // ("UnityEngine.Mesh", "Mesh"),
-        // ("UnityEngine.GameObject", "GameObject"),
+        ("UnityEngine.Shader", "Shader"),
+        ("UnityEngine.AudioClip", "AudioClip"),
+        ("UnityEngine.TextAsset", "TextAsset"),
+        ("UnityEngine.Material", "Material"),
+        ("UnityEngine.AssetBundle", "AssetBundle"),
+        ("UnityEngine.Animation", "Animation"),
+        ("UnityEngine.Texture", "Texture"),
+        ("UnityEngine.Texture2D", "Texture2D"),
+        ("UnityEngine.Font", "Font"),
+        ("UnityEngine.Mesh", "Mesh"),
+        ("UnityEngine.GameObject", "GameObject"),
     };
 #>
 
@@ -51,23 +51,19 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static <#= typeName #> Load<#= aliasName #>(string location)
-        {
-            return LoaderHandleLoadAsset<<#= typeName #>>.Create(location).Invoke();
-        }
+            => Proxy.LoadAssetTask<<#= typeName #>>(location, typeof(<#= typeName #>)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
+        /// <param name="completed">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> cb)
-        {
-            await LoaderHandleLoadAsset<<#= typeName #>>.Create(location, cb);
-        }
+        public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> completed)
+            => await Proxy.LoadAssetTask<<#= typeName #>>(location, typeof(<#= typeName #>), completed);
 
         /// <summary>
         /// 异步加载 <see cref="<#= typeName #>"/>
@@ -78,22 +74,19 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<<#= typeName #>> Load<#= aliasName #>Task(string location)
-        {
-            return LoaderHandleLoadAsset<<#= typeName #>>.Create(location);
-        }
+            =>  Proxy.LoadAssetTask<<#= typeName #>>(location, typeof(<#= typeName #>));
 
         /// <summary>
         /// 异步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
+        /// <param name="completed">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<<#= typeName #>> Load<#= aliasName #>Task(string location, Action<<#= typeName #>> cb)
-        {
-            return LoaderHandleLoadAsset<<#= typeName #>>.Create(location, cb);
-        }
+        public static ILoaderHandle<<#= typeName #>> Load<#= aliasName #>Task(string location, Action<<#= typeName #>> completed)
+            =>  Proxy.LoadAssetTask<<#= typeName #>>(location, typeof(<#= typeName #>), completed);
 
        #endregion
 

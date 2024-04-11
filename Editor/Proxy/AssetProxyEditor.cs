@@ -133,7 +133,7 @@ namespace AIO.UEditor
                 CopyBuildInFileTags = config.FirstPackTag,
                 MergeToLatest       = config.MergeToLatest
             };
-            var array = AssetCollectRoot.GetOrCreate().GetPackageNames();
+            var array = AssetCollectRoot.GetOrCreate().GetNames();
             if (config.BuildFirstPackage) array = array.Add(AssetSystem.TagsRecord);
             return BuildArtList(array, command, isTips);
         }

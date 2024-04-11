@@ -72,12 +72,12 @@ namespace AIO.UEditor
         /// <summary>
         ///     资源包名称
         /// </summary>
-        public string PackageName { get; private set; }
+        public string PackageName { get; internal set; }
 
         /// <summary>
         ///     资源组名称
         /// </summary>
-        public string GroupName { get; private set; }
+        public string GroupName { get; internal set; }
 
         #region Collect
 
@@ -350,8 +350,9 @@ namespace AIO.UEditor
                 Extension   = System.IO.Path.GetExtension(assetPath).Replace(".", "").ToLower()
             };
             data.AssetPath = assetPath.Substring(0, assetPath.Length - data.Extension.Length - 1);
+            var config = ASConfig.GetOrCreate();
             return IsCollectAsset(data)
-                ? GetAssetAddress(data, ASConfig.GetOrCreate().LoadPathToLower)
+                ? GetAssetAddress(data, config.LoadPathToLower, config.HasExtension)
                 : string.Empty;
         }
 
@@ -386,12 +387,13 @@ namespace AIO.UEditor
             return IsCollectAsset(data);
         }
 
-        public string GetAssetAddress(AssetRuleData data, bool pathToLower = false)
+        public string GetAssetAddress(AssetRuleData data, bool pathToLower, bool hasExtension)
         {
             var rule = AssetCollectSetting.MapAddress.GetValue(Address);
             var address = rule.GetAssetAddress(data);
             if (string.IsNullOrEmpty(address)) return string.Empty;
-            if (HasExtension) address = string.Concat(address, ".", data.Extension);
+
+            if (HasExtension || hasExtension) address = string.Concat(address, ".", data.Extension);
             if (pathToLower) return address.ToLower();
             switch (LocationFormat)
             {
@@ -462,8 +464,9 @@ namespace AIO.UEditor
         ///     收集资源
         /// </summary>
         /// <param name="tags">标签列表</param>
-        /// <param name="pathToLower">路径是否小写</param>
-        private void CollectAsset(string[] tags, bool pathToLower)
+        /// <param name="toLower">路径是否小写</param>
+        /// <param name="hasExtension">路径是否包含后缀</param>
+        private void CollectAsset(string[] tags, bool toLower, bool hasExtension)
         {
             var data = new AssetRuleData
             {
@@ -489,40 +492,43 @@ namespace AIO.UEditor
                 {
                     if (fileInfo.FullName.EndsWith(".meta")) continue;
                     data.Extension = fileInfo.Extension.TrimStart('.', ' ').ToLower();
-                    data.AssetPath = fileInfo.FullName.Substring(len,
-                                                                 fileInfo.FullName.Length - len -
-                                                                 data.Extension.Length - 1).Replace("\\", "/");
-                    if (AssetDataInfos.ContainsKey(data.AssetPath))
+                    data.AssetPath = fileInfo.FullName.Substring(
+                        len,
+                        fileInfo.FullName.Length - len - data.Extension.Length - 1
+                    ).Replace("\\", "/");
+                    if (!IsCollectAsset(data)) continue;
+                    info.AssetPath = string.Concat(data.AssetPath, '.', data.Extension);
+                    info.Extension = data.Extension;
+                    info.Address   = GetAssetAddress(data, toLower, hasExtension);
+                    if (string.IsNullOrEmpty(info.Address)) continue;
+
+                    if (AssetDataInfos.ContainsKey(info.Address))
                     {
-                        AssetSystem.LogWarningFormat("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", fileInfo.FullName);
+                        AssetSystem.LogWarningFormat("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", data.AssetPath);
                     }
                     else
                     {
-                        if (!IsCollectAsset(data)) continue;
-                        info.AssetPath = string.Concat(data.AssetPath, '.', data.Extension);
-                        info.Extension = data.Extension;
-                        info.Address   = GetAssetAddress(data, pathToLower);
-                        if (string.IsNullOrEmpty(info.Address)) continue;
-                        AssetDataInfos[data.AssetPath] = info;
+                        AssetDataInfos[info.Address] = info;
                     }
                 }
             }
             else if (File.Exists(CollectPath)) // 判断Path是否为文件
             {
-                if (AssetDataInfos.ContainsKey(data.CollectPath))
+                data.Extension = System.IO.Path.GetExtension(data.CollectPath).Replace(".", "").ToLower();
+                data.AssetPath = data.CollectPath.Substring(0, data.CollectPath.Length - data.Extension.Length - 1);
+                if (!IsCollectAsset(data)) return;
+                info.AssetPath = data.CollectPath;
+                info.Extension = data.Extension;
+                info.Address   = GetAssetAddress(data, toLower, hasExtension);
+                if (string.IsNullOrEmpty(info.Address)) return;
+
+                if (AssetDataInfos.ContainsKey(info.Address))
                 {
                     AssetSystem.LogWarningFormat("[资源已存在 请检查 收集器不允许一个资源多个可寻址路径] !!! -> {0}", data.CollectPath);
                 }
                 else
                 {
-                    data.Extension = System.IO.Path.GetExtension(data.CollectPath).Replace(".", "").ToLower();
-                    data.AssetPath = data.CollectPath.Substring(0, data.CollectPath.Length - data.Extension.Length - 1);
-                    if (!IsCollectAsset(data)) return;
-                    info.AssetPath = data.CollectPath;
-                    info.Extension = data.Extension;
-                    info.Address   = GetAssetAddress(data, pathToLower);
-                    if (string.IsNullOrEmpty(info.Address)) return;
-                    AssetDataInfos[data.CollectPath] = info;
+                    AssetDataInfos[info.Address] = info;
                 }
             }
         }
@@ -540,8 +546,8 @@ namespace AIO.UEditor
             GroupName   = group;
 
             var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
-            var pathToLower = ASConfig.GetOrCreate().LoadPathToLower;
-
+            var toLower = ASConfig.GetOrCreate().LoadPathToLower;
+            var hasExtension = ASConfig.GetOrCreate().HasExtension;
             UpdateCollect();
             UpdateFilter();
 
@@ -552,7 +558,7 @@ namespace AIO.UEditor
 
             void Action()
             {
-                CollectAsset(tags, pathToLower);
+                CollectAsset(tags, toLower, hasExtension);
                 cb?.Invoke(AssetDataInfos);
             }
         }
@@ -573,16 +579,7 @@ namespace AIO.UEditor
             }
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is AssetCollectItem item)
-                return Equals(this, item);
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return GetHashCode(this);
-        }
+        public override bool Equals(object obj) => obj is AssetCollectItem item && Equals(this, item);
+        public override int  GetHashCode()      => GetHashCode(this);
     }
 }

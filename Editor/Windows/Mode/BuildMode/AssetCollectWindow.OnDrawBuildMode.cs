@@ -201,7 +201,7 @@ namespace AIO.UEditor
 
                     if (GUILayout.Button("构建全部资源包", GEStyle.toolbarbutton, GP_Width_100))
                     {
-                        var temp = new List<string>(Data.GetPackageNames());
+                        var temp = new List<string>(Data.GetNames());
                         temp.Add(AssetSystem.TagsRecord);
                         if (EditorUtility.DisplayDialog("构建全部资源包", $"构建\n {string.Join(",", temp.ToArray())} 资源包?",
                                                         "确定", "取消"))

@@ -18,77 +18,92 @@ namespace AIO.UEditor
         /// <summary>
         ///     自动清理缓存数量
         /// </summary>
-        [InspectorName("自动清理缓存数量")] public int AutoCleanCacheNum = 5;
+        [InspectorName("自动清理缓存数量")]
+        public int AutoCleanCacheNum = 5;
 
         /// <summary>
         ///     打包管线
         /// </summary>
-        [InspectorName("打包管线")] public EBuildPipeline BuildPipeline;
+        [InspectorName("打包管线")]
+        public EBuildPipeline BuildPipeline;
 
         /// <summary>
         ///     构建模式
         /// </summary>
-        [InspectorName("构建模式")] public EBuildMode BuildMode = EBuildMode.IncrementalBuild;
+        [InspectorName("构建模式")]
+        public EBuildMode BuildMode = EBuildMode.IncrementalBuild;
 
         /// <summary>
         ///     构建版本号
         /// </summary>
-        [InspectorName("版本号")] public string BuildVersion;
+        [InspectorName("版本号")]
+        public string BuildVersion;
 
         /// <summary>
         ///     资源包名称
         /// </summary>
-        [InspectorName("构建资源包名称")] public string PackageName;
+        [InspectorName("构建资源包名称")]
+        public string PackageName;
 
         /// <summary>
         ///     加密模式
         /// </summary>
-        [InspectorName("加密模式")] public string EncyptionClassName;
+        [InspectorName("加密模式")]
+        public string EncyptionClassName;
 
         /// <summary>
         ///     压缩模式
         /// </summary>
-        [InspectorName("压缩模式")] public ECompressMode CompressedMode;
+        [InspectorName("压缩模式")]
+        public ECompressMode CompressedMode;
 
         /// <summary>
         ///     首包标签集合
         /// </summary>
-        [InspectorName("首包标签集合")] public string FirstPackTag;
+        [InspectorName("首包标签集合")]
+        public string FirstPackTag;
 
         /// <summary>
         ///     验证构建结果
         /// </summary>
-        [InspectorName("验证构建结果")] public bool ValidateBuild;
+        [InspectorName("验证构建结果")]
+        public bool ValidateBuild;
 
         /// <summary>
         ///     构建结果输出路径
         /// </summary>
-        [InspectorName("构建结果输出路径")] public string BuildOutputPath;
+        [InspectorName("构建结果输出路径")]
+        public string BuildOutputPath;
 
         /// <summary>
         ///     构建平台
         /// </summary>
-        [InspectorName("构建平台")] public BuildTarget BuildTarget;
+        [InspectorName("构建平台")]
+        public BuildTarget BuildTarget;
 
         /// <summary>
         ///     将资源包合并对比至Latest 文件夹
         /// </summary>
-        [InspectorName("将资源包合并对比至Latest")] public bool MergeToLatest;
+        [InspectorName("将资源包合并对比至Latest")]
+        public bool MergeToLatest;
 
         /// <summary>
         ///     构建首包资源
         /// </summary>
-        [InspectorName("构建首包资源")] public bool BuildFirstPackage;
+        [InspectorName("构建首包资源")]
+        public bool BuildFirstPackage;
 
         /// <summary>
         ///     FTP上传配置
         /// </summary>
-        [InspectorName("FTP上传配置")] public FTPConfig[] FTPConfigs;
+        [InspectorName("FTP上传配置")]
+        public FTPConfig[] FTPConfigs;
 
         /// <summary>
         ///     GC上传配置
         /// </summary>
-        [SerializeField] [InspectorName("GC上传配置")]
+        [SerializeField]
+        [InspectorName("GC上传配置")]
         public GCloudConfig[] GCloudConfigs;
 
         /// <summary>

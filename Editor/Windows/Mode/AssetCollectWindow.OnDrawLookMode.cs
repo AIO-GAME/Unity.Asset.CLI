@@ -29,7 +29,7 @@ namespace AIO.UEditor
             Data.CurrentPackageIndex = EditorGUILayout.Popup(Data.CurrentPackageIndex, LookModeDisplayPackages,
                                                              GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
 
-            if (!Data.IsGroupValid())
+            if (!Data.IsValidGroup())
             {
                 EditorGUILayout.Separator();
                 return;
@@ -53,7 +53,7 @@ namespace AIO.UEditor
                 Data.CurrentGroupIndex, LookModeDisplayGroups[packageName],
                 GEStyle.PreDropDown, GP_MAX_Width_100, GP_MIN_Width_50);
 
-            if (!Data.IsCollectValid())
+            if (!Data.IsValidCollect())
             {
                 EditorGUILayout.Separator();
                 return;
@@ -308,7 +308,7 @@ namespace AIO.UEditor
         /// </summary>
         partial void OnDrawLookMode()
         {
-            if (Data.Length == 0)
+            if (Data.Count == 0)
             {
                 GELayout.HelpBox("当前无包资源数据");
                 return;
@@ -840,7 +840,7 @@ namespace AIO.UEditor
             var i   = packageIndex;
             var j   = groupIndex;
             var key = (i, j);
-            if (Data.Length <= i) return;
+            if (Data.Count <= i) return;
             if (Data.Packages[i] is null || Data.Packages[i].Groups is null || j < 0) return;
             if (Data.Packages[i].Length <= j) return;
             LookModeDisplayTags[key] = Data.Packages[i].Groups[j].AllTags;
@@ -853,7 +853,8 @@ namespace AIO.UEditor
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
                 Data.Packages[i].Groups[j].Collectors[k].CollectAssetAsync(
                     Data.Packages[i].Name,
-                    Data.Packages[i].Groups[j].Name, dic =>
+                    Data.Packages[i].Groups[j].Name, 
+                    dic =>
                     {
                         Runner.StartCoroutine(() =>
                         {
@@ -884,7 +885,7 @@ namespace AIO.UEditor
         private void UpdateDataLookMode()
         {
             GUI.FocusControl(null);
-            if (!Data.IsCollectValid()) return;
+            if (!Data.IsValidCollect()) return;
 
             LookModeDisplayPackages = new string[Data.Packages.Length];
             for (var i = 0; i < Data.Packages.Length; i++) LookModeDisplayPackages[i] = Data.Packages[i].Name;

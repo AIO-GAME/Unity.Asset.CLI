@@ -32,7 +32,7 @@ namespace AIO.UEditor.CLI
                 if (Application.isPlaying) return Rule.GetAssetAddress(data);
                 if (!data.UserData.Contains('_')) return "Error : Rule mismatch";
                 var info = data.UserData.SplitOnce('_');
-                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2).GetByPath(data.CollectPath);
+                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2).GetByPath(data.CollectPath);
                 if (collector is null) return "Error : Not found collector";
                 if (!Collectors.ContainsKey(collector))
                 {
@@ -51,7 +51,8 @@ namespace AIO.UEditor.CLI
                     Extension   = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
                 };
                 infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
-                return collector.GetAssetAddress(infoData, ASConfig.GetOrCreate().LoadPathToLower);
+                var config = ASConfig.GetOrCreate();
+                return collector.GetAssetAddress(infoData, config.LoadPathToLower, config.HasExtension);
             }
 
             #endregion
@@ -70,7 +71,7 @@ namespace AIO.UEditor.CLI
             {
                 if (!data.GroupName.Contains('_')) return "Error : Rule mismatch";
                 var info = data.GroupName.SplitOnce('_');
-                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2).GetByPath(data.CollectPath);
+                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2).GetByPath(data.CollectPath);
                 if (collector is null) return "Error : Not found collector";
                 if (!Collectors.ContainsKey(collector))
                 {
@@ -89,7 +90,8 @@ namespace AIO.UEditor.CLI
                     Extension   = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
                 };
                 infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
-                return collector.GetAssetAddress(infoData, ASConfig.GetOrCreate().LoadPathToLower);
+                var config = ASConfig.GetOrCreate();
+                return collector.GetAssetAddress(infoData, config.LoadPathToLower, config.HasExtension);
             }
 
             #endregion

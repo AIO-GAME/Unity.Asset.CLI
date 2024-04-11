@@ -172,8 +172,14 @@ namespace AIO.UEditor
                     item.RulePackIndex = GELayout.Popup(item.RulePackIndex, AssetCollectSetting.MapPacks.Displays,
                                                         GEStyle.PreDropDown);
 
-                    item.LoadType     = GELayout.Popup(item.LoadType, GEStyle.PreDropDown, GP_Width_75);
-                    item.HasExtension = GELayout.ToggleLeft("后缀", item.HasExtension, GTOption.Width(42));
+                    item.LoadType = GELayout.Popup(item.LoadType, GEStyle.PreDropDown, GP_Width_75);
+                    if (Config.HasExtension)
+                    {
+                        GUI.enabled       = false;
+                        item.HasExtension = GELayout.ToggleLeft("后缀", true, GTOption.Width(42));
+                        GUI.enabled       = true;
+                    }
+                    else item.HasExtension = GELayout.ToggleLeft("后缀", item.HasExtension, GTOption.Width(42));
                 }
 
                 using (new EditorGUILayout.HorizontalScope())
@@ -186,16 +192,16 @@ namespace AIO.UEditor
                     else
                     {
                         item.RuleCollectIndex = GELayout.Mask(
-                                                              item.RuleCollectIndex,
-                                                              AssetCollectSetting.MapCollect.Displays,
-                                                              GEStyle.PreDropDown, GTOption.Width(80));
+                            item.RuleCollectIndex,
+                            AssetCollectSetting.MapCollect.Displays,
+                            GEStyle.PreDropDown, GTOption.Width(80));
                         GELayout.HelpBox(GetInfo(AssetCollectSetting.MapCollect.Displays, item.RuleCollectIndex));
                     }
 
                     item.RuleUseCollectCustom = GELayout.ToggleLeft(
-                                                                    new GUIContent("自定",
-                                                                        "自定义收集规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开 \n可无需填写点(.)"),
-                                                                    item.RuleUseCollectCustom, GTOption.Width(42));
+                        new GUIContent("自定",
+                                       "自定义收集规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开 \n可无需填写点(.)"),
+                        item.RuleUseCollectCustom, GTOption.Width(42));
                 }
 
                 using (new EditorGUILayout.HorizontalScope())
@@ -208,16 +214,16 @@ namespace AIO.UEditor
                     else
                     {
                         item.RuleFilterIndex = GELayout.Mask(
-                                                             item.RuleFilterIndex,
-                                                             AssetCollectSetting.MapFilter.Displays,
-                                                             GEStyle.PreDropDown, GTOption.Width(80));
+                            item.RuleFilterIndex,
+                            AssetCollectSetting.MapFilter.Displays,
+                            GEStyle.PreDropDown, GTOption.Width(80));
                         GELayout.HelpBox(GetInfo(AssetCollectSetting.MapFilter.Displays, item.RuleFilterIndex));
                     }
 
                     item.RuleUseFilterCustom = GELayout.ToggleLeft(
-                                                                   new GUIContent("自定",
-                                                                       "自定义过滤规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开\n可无需填写点(.)"),
-                                                                   item.RuleUseFilterCustom, GTOption.Width(42));
+                        new GUIContent("自定",
+                                       "自定义过滤规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开\n可无需填写点(.)"),
+                        item.RuleUseFilterCustom, GTOption.Width(42));
                 }
 
                 if (AssetCollectSetting.MapAddress.Displays[item.Address].Contains("UserData"))

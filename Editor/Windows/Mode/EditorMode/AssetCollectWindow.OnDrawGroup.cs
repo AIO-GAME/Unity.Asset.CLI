@@ -40,7 +40,7 @@ namespace AIO.UEditor
                     }
                 }
 
-                if (!Data.IsGroupValid()) return;
+                if (!Data.IsValidGroup()) return;
 
                 for (var i = Data.CurrentPackage.Groups.Length - 1; i >= 0; i--)
                     using (new EditorGUILayout.HorizontalScope())

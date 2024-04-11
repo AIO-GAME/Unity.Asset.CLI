@@ -16,7 +16,7 @@ namespace AIO.UEditor
             }
 
             TempBuilder.Clear();
-            if (Data.IsPackageValid())
+            if (Data.IsValidPackage())
             {
                 if (!ViewGroupList.IsShow &&
                     GUILayout.Button("⇘ Group", GEStyle.TEtoolbarbutton, GP_Width_75, GP_Height_20))
@@ -38,7 +38,7 @@ namespace AIO.UEditor
                 ViewGroupList.IsShow = false;
             }
 
-            if (Data.IsGroupValid())
+            if (Data.IsValidGroup())
             {
                 TempBuilder.Append(" / ");
                 TempBuilder.Append(Data.CurrentGroup.Name);

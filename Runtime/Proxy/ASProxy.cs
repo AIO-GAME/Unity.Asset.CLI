@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Threading.Tasks;
 using UnityEngine.Scripting;
 
 namespace AIO.UEngine
@@ -25,6 +23,10 @@ namespace AIO.UEngine
 
         #endregion
 
+        /// <summary>
+        ///    资源框架初始化
+        /// </summary>
+        /// <returns>Ture:成功 False:失败</returns>
         public abstract IOperationAction<bool> Initialize();
 
         /// <summary>
@@ -32,6 +34,7 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="config">配置文件</param>
         /// <param name="completed">完成回调</param>
+        /// <returns>Ture:成功 False:失败</returns>
         public abstract IOperationAction<bool> UpdatePackagesTask(ASConfig config, Action<bool> completed = null);
 
         /// <summary>

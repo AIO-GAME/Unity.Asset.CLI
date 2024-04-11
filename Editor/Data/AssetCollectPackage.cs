@@ -37,10 +37,16 @@ namespace AIO.UEditor
             }
         }
 
-        public AssetCollectGroup this[int index]
+        public AssetCollectGroup this[int idxG]
         {
-            get => Groups[index];
-            set => Groups[index] = value;
+            get => Groups[idxG];
+            set => Groups[idxG] = value;
+        }
+
+        public AssetCollectItem this[int idxG, int idxC]
+        {
+            get => Groups[idxG].Collectors[idxC];
+            set => Groups[idxG].Collectors[idxC] = value;
         }
 
         public string[] AllTags

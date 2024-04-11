@@ -42,7 +42,7 @@ namespace AIO.UEditor.CLI
                 if (Application.isPlaying) return Rule.IsCollectAsset(data);
                 if (Instance is null || !data.UserData.Contains('_')) return false;
                 var info = data.UserData.SplitOnce('_');
-                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2)?.
+                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.
                                          GetByPath(data.CollectPath);
                 if (collector is null) return false;
 
@@ -110,7 +110,7 @@ namespace AIO.UEditor.CLI
                     Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1))
                     return false;
 
-                var collector = Instance.GetPackage(info.Item1)?.GetByGroupName(info.Item2)?.
+                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.
                                          GetByPath(data.CollectPath);
                 if (collector is null) return false;
 
