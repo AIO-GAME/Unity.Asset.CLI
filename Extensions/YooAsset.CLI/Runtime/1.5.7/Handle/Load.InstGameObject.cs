@@ -34,7 +34,7 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation.InstantiateSync(parent);
+                Result = operation.InstantiateSync(parent);           IsDone = true;
             }
 
             #endregion

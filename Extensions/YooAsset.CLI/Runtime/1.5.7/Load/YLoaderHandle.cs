@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace AIO.UEngine.YooAsset
 {
@@ -11,6 +12,7 @@ namespace AIO.UEngine.YooAsset
         {
             protected string Address   { get; private set; }
             protected Type   AssetType { get; }
+            protected string AssetPath;
 
             protected override void OnDispose()
             {
@@ -38,7 +40,7 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 Address    = AssetSystem.SettingToLocalPath(location);
-                IsValidate = Instance.CheckLocationValid(Address);
+                IsValidate = Instance.CheckLocationValid(Address, out AssetPath);
                 if (IsValidate)
                 {
                     IsDone   = false;
@@ -82,6 +84,7 @@ namespace AIO.UEngine.YooAsset
 
             #region IASOperation
 
+            string ILoaderHandle.AssetPath => AssetPath;
             string ILoaderHandle.Address   => Address;
             Type ILoaderHandle.  AssetType => AssetType;
 

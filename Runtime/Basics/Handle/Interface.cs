@@ -15,6 +15,11 @@ namespace AIO
         /// 可寻址资源地址
         /// </summary>
         string Address { get; }
+
+        /// <summary>
+        /// 资源路径
+        /// </summary>
+        string AssetPath { get; }
     }
 
     public interface ILoaderHandleList<TObject> : IOperationList<TObject>, ILoaderHandleList { }

@@ -83,9 +83,7 @@ namespace AIO.UEngine.YooAsset
             /// <inheritdoc />
             protected override void CreateSync()
             {
-                var task = GetTask();
-                task.RunSynchronously();
-                Result = task.Result;
+                Runner.StartCoroutine(CreateCoroutine);
             }
         }
     }

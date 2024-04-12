@@ -41,6 +41,7 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 Result = operation.GetSubAssetObjects<TObject>();
+                IsDone = true;
             }
 
             #endregion

@@ -33,7 +33,9 @@ namespace AIO.UEditor.CLI
         {
             return packages is null
                 ? Array.Empty<AssetBundleCollectorPackage>()
-                : packages.Where(package => !package.Equals(null)).Where(package => !package.Groups.Equals(null)).
+                : packages.Where(package => package != null).
+                           Where(package => package.Groups != null).
+                           Where(package => package.Groups.Length > 0).
                            Select(Convert);
         }
 
@@ -41,7 +43,9 @@ namespace AIO.UEditor.CLI
         {
             return groups is null
                 ? Array.Empty<AssetBundleCollectorGroup>()
-                : groups.Where(group => !group.Equals(null)).Where(group => !group.Collectors.Equals(null)).
+                : groups.Where(group => group != null).
+                         Where(group => group.Collectors != null).
+                         Where(group => group.Collectors.Length > 0).
                          Select(Convert);
         }
 
@@ -49,7 +53,7 @@ namespace AIO.UEditor.CLI
         {
             return collects is null
                 ? Array.Empty<AssetBundleCollector>()
-                : collects.Where(collect => !collect.Equals(null)).
+                : collects.Where(collect => collect != null).
                            Where(collect => !string.IsNullOrEmpty(collect.CollectPath)).
                            Where(collect => File.Exists(collect.CollectPath) || Directory.Exists(collect.CollectPath)).
                            Select(Convert);
@@ -57,7 +61,7 @@ namespace AIO.UEditor.CLI
 
         private static AssetBundleCollectorPackage Convert(AssetCollectPackage package)
         {
-            return new AssetBundleCollectorPackage()
+            return new AssetBundleCollectorPackage
             {
                 PackageName = package.Name,
                 PackageDesc = package.Description,
@@ -67,7 +71,7 @@ namespace AIO.UEditor.CLI
 
         private static AssetBundleCollectorGroup Convert(AssetCollectGroup group)
         {
-            return new AssetBundleCollectorGroup()
+            return new AssetBundleCollectorGroup
             {
                 AssetTags  = group.Tags,
                 GroupDesc  = group.Description,
@@ -78,7 +82,7 @@ namespace AIO.UEditor.CLI
 
         private static AssetBundleCollector Convert(AssetCollectItem collect)
         {
-            return new AssetBundleCollector()
+            return new AssetBundleCollector
             {
                 CollectorGUID   = collect.GUID,
                 CollectPath     = collect.CollectPath,
@@ -86,7 +90,7 @@ namespace AIO.UEditor.CLI
                 AssetTags       = collect.Tags,
                 AddressRuleName = nameof(AIOAddressRule),
                 FilterRuleName  = nameof(AIOFilterRule),
-                PackRuleName    = nameof(AIOPackRule),
+                PackRuleName    = collect.GetPackRule() is PackRawFile ? nameof(AIOPackRawRule) : nameof(AIOPackRule),
                 UserData        = collect.UserData
             };
         }

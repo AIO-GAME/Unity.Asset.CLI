@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.IO;
 using UnityEditor;
 using IAddressRule = AIO.UEditor.IAssetRuleAddress;
 using Object = UnityEngine.Object;
+
+#endregion
 
 namespace AIO.UEditor
 {
@@ -21,8 +25,8 @@ namespace AIO.UEditor
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return string.Concat(
-                                  Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath)).
-                              Replace('\\', '/');
+                    Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath)
+                ).Replace('\\', '/');
             }
 
             #endregion
@@ -42,7 +46,8 @@ namespace AIO.UEditor
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return data.AssetPath.Substring(data.CollectPath.Replace('\\', '/').LastIndexOf('/') + 1).
+                return data.AssetPath.Substring(
+                                data.CollectPath.Replace('\\', '/').LastIndexOf('/') + 1).
                             Replace('\\', '/');
             }
 
@@ -106,7 +111,9 @@ namespace AIO.UEditor
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return data.AssetPath.Replace(data.CollectPath, data.GroupName).Replace('\\', '/');
+                return data.AssetPath.
+                            Replace('\\', '/').
+                            Replace(data.CollectPath.Replace('\\', '/'), data.GroupName);
             }
 
             #endregion
@@ -128,13 +135,9 @@ namespace AIO.UEditor
             {
                 var path = string.Concat(data.AssetPath, '.', data.Extension);
                 var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
-                if (obj is null)
-                {
-                    AssetSystem.LogException($"异常资源: {path}");
-                    return string.Empty;
-                }
-
-                return obj.GetInstanceID().ToString();
+                if (obj) return obj.GetInstanceID().ToString();
+                AssetSystem.LogException($"异常资源: {path}");
+                return string.Empty;
             }
 
             #endregion

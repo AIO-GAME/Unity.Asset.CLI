@@ -54,6 +54,7 @@ namespace AIO.UEngine.YooAsset
                 Instance.Initialize_Internal();
                 foreach (var operation in Instance.InitializationOperations) operation.Task.RunSynchronously();
                 Result = true;
+                IsDone = true;
             }
         }
     }

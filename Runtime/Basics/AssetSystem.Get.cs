@@ -13,6 +13,15 @@ namespace AIO
     partial class AssetSystem
     {
         /// <summary>
+        ///    获取资源包配置
+        /// </summary>
+        /// <returns></returns>
+        public static string GetPackageVersionDefault()
+        {
+            return Proxy.GetPackageVersionDefault();
+        }
+        
+        /// <summary>
         ///     获取指定标签资源可寻址列表
         /// </summary>
         /// <param name="tag">资源标签</param>

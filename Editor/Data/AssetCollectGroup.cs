@@ -144,15 +144,7 @@ namespace AIO.UEditor
             return Collectors.GetEnumerator();
         }
 
-        public override int GetHashCode()
-        {
-            return GetHashCode(this);
-        }
-
-        /// <inheritdoc />
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        public override int     GetHashCode()   => GetHashCode(this);
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

@@ -27,6 +27,54 @@ namespace AIO.UEditor
     {
         private static AssetCollectRoot _Instance;
 
+        [InspectorName("开启地址化")]
+        public bool EnableAddressable = true;
+
+        [InspectorName("Bundle名称唯一")]
+        public bool UniqueBundleName = true;
+
+        [InspectorName("包含资源GUID")]
+        public bool IncludeAssetGUID;
+
+        [InspectorName("首包打包规则")]
+        public PackRule SequenceRecordPackRule = PackRule.PackGroup;
+
+        /// <summary>
+        ///     资源收集配置
+        /// </summary>
+        [SerializeField, InspectorName("收集包")]
+        public AssetCollectPackage[] Packages;
+
+        /// <summary>
+        ///     当前选择包下标
+        /// </summary>
+        [HideInInspector]
+        public int CurrentPackageIndex;
+
+        /// <summary>
+        ///     当前选择组下标
+        /// </summary>
+        [HideInInspector]
+        public int CurrentGroupIndex;
+
+        public enum PackRule
+        {
+            [InspectorName("文件路径")]
+            PackSeparately,
+
+            [InspectorName("父类文件夹路径")]
+            PackDirectory,
+
+            [InspectorName("收集器下顶级文件夹路径")]
+            PackTopDirectory,
+
+            [InspectorName("收集器路径")]
+            PackCollector,
+
+            [InspectorName("分组名称")]
+            PackGroup
+        }
+
         /// <summary>
         ///     资源收集器排序
         /// </summary>
@@ -124,42 +172,6 @@ namespace AIO.UEditor
             });
         }
 
-        [InspectorName("开启地址化")]
-        public bool EnableAddressable = true;
-
-        [InspectorName("Bundle名称唯一")]
-        public bool UniqueBundleName = true;
-
-        [InspectorName("包含资源GUID")]
-        public bool IncludeAssetGUID;
-
-        [InspectorName("首包打包规则")]
-        public PackRule SequenceRecordPackRule = PackRule.PackGroup;
-
-        public enum PackRule
-        {
-            [InspectorName("文件路径")]
-            PackSeparately,
-
-            [InspectorName("父类文件夹路径")]
-            PackDirectory,
-
-            [InspectorName("收集器下顶级文件夹路径")]
-            PackTopDirectory,
-
-            [InspectorName("收集器路径")]
-            PackCollector,
-
-            [InspectorName("分组名称")]
-            PackGroup
-        }
-
-        /// <summary>
-        ///     资源收集配置
-        /// </summary>
-        [SerializeField, InspectorName("收集包")]
-        public AssetCollectPackage[] Packages;
-
         /// <summary>
         ///    获取或创建资源收集配置
         /// </summary>
@@ -167,6 +179,7 @@ namespace AIO.UEditor
         /// <returns>资源收集配置</returns>
         public AssetCollectPackage GetByName(string packageName)
         {
+            if (string.IsNullOrEmpty(packageName)) return null;
             return Packages.
                    Where(package => !(package is null)).
                    FirstOrDefault(package => package.Name == packageName);
@@ -180,6 +193,8 @@ namespace AIO.UEditor
         /// <returns>资源收集配置</returns>
         public AssetCollectGroup GetByName(string packageName, string groupName)
         {
+            if (string.IsNullOrEmpty(packageName)) return null;
+            if (string.IsNullOrEmpty(groupName)) return null;
             return Packages.
                    Where(package => !(package is null)).
                    FirstOrDefault(package => package.Name == packageName)?.
@@ -197,6 +212,9 @@ namespace AIO.UEditor
         /// <returns>资源收集配置</returns>
         public AssetCollectItem GetByName(string packageName, string groupName, string collectPath)
         {
+            if (string.IsNullOrEmpty(packageName)) return null;
+            if (string.IsNullOrEmpty(groupName)) return null;
+            if (string.IsNullOrEmpty(collectPath)) return null;
             return Packages.
                    Where(package => !(package is null)).
                    FirstOrDefault(package => package.Name == packageName)?.
@@ -231,18 +249,6 @@ namespace AIO.UEditor
         }
 
         #region OnGUI
-
-        /// <summary>
-        ///     当前选择包下标
-        /// </summary>
-        [HideInInspector]
-        public int CurrentPackageIndex;
-
-        /// <summary>
-        ///     当前选择组下标
-        /// </summary>
-        [HideInInspector]
-        public int CurrentGroupIndex;
 
         public AssetCollectPackage CurrentPackage
         {
@@ -341,6 +347,9 @@ namespace AIO.UEditor
 
         #region GetTags
 
+        /// <summary>
+        ///    获取所有标签
+        /// </summary>
         public string[] GetTags()
         {
             if (Packages is null) return Array.Empty<string>();

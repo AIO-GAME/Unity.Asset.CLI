@@ -226,9 +226,7 @@ namespace AIO.UEditor
 
         PackRuleResult IAssetRulePack.GetPackRuleResult(PackRuleData data)
         {
-            var bundleName = data.AssetPath;
-            var result = new PackRuleResult(bundleName, DefaultPackRule.RawFileExtension);
-            return result;
+            return new PackRuleResult(data.AssetPath, DefaultPackRule.RawFileExtension);
         }
 
         bool IAssetRulePack.IsRawFilePackRule()

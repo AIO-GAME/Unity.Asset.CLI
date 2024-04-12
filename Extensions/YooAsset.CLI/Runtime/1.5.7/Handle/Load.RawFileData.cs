@@ -43,6 +43,7 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 Result = operation?.GetRawFileData();
+                IsDone = true;
             }
 
             #endregion

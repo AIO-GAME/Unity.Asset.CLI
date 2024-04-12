@@ -47,26 +47,7 @@ namespace AIO.UEngine.YooAsset
 
             protected override void CreateSync()
             {
-                var operation = Instance.HandleGet<SceneOperationHandle>(Address);
-                if (operation != null) Instance.HandleFree(Address);
-
-                var package = Instance.AutoGetPackageSync(Address);
-                if (package is null) throw new Exception($"场景配置 异常错误 : {Address} {sceneMode}");
-
-                operation = package.LoadSceneAsync(Address, sceneMode, suspendLoad, priority);
-                var awaiter = operation.CheckTask();
-                awaiter.RunSynchronously();
-                if (awaiter.Result)
-                {
-                    Instance.HandleAdd(Address, operation);
-                    operation.ActivateScene();
-                    Result = operation.SceneObject;
-                }
-                else
-                {
-                    AssetSystem.LogException($"场景配置 异常错误 : {package.PackageName} {Address} {sceneMode}");
-                    Result = SceneManager.GetActiveScene();
-                }
+                Runner.StartCoroutine(CreateCoroutine);
             }
 
             #endregion

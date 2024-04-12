@@ -54,7 +54,7 @@ namespace AIO.UEngine
         /// <summary>
         ///    全局 可寻址路径全部包含扩展名
         /// </summary>
-        public bool HasExtension = true;
+        public bool HasExtension = false;
 #endif
 
         /// <summary>

@@ -34,7 +34,7 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation?.GetAssetObject<TObject>();
+                Result = operation?.GetAssetObject<TObject>();           IsDone = true;
             }
 
             #endregion

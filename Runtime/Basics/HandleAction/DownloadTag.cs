@@ -57,7 +57,7 @@ namespace AIO
             }
 
             AssetSystem.WhiteListLocal.AddRange(AssetSystem.GetAddressByTag(tags));
-            InvokeOnCompleted();
+            IsDone = true;
         }
 
         #region CO

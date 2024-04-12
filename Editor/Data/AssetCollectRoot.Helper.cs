@@ -7,6 +7,8 @@ namespace AIO.UEditor
 {
     partial class AssetCollectRoot
     {
+        private static Tuple<string, string, string> Empty = new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+
         /// <summary>
         ///     获取资源收集配置
         /// </summary>
@@ -107,8 +109,6 @@ namespace AIO.UEditor
 
             return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
         }
-
-        private static Tuple<string, string, string> Empty = new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
 
         public static bool ObjToCollector(Object guid, out AssetCollectItem result)
         {

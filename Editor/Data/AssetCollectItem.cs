@@ -258,19 +258,16 @@ namespace AIO.UEditor
         /// <summary>
         ///     获取收集规则
         /// </summary>
-        public AssetRulePackResult GetPackRule(AssetRuleData data)
+        public IAssetRulePack GetPackRule()
         {
-            return AssetCollectSetting.MapPacks.GetValue(RulePackIndex).GetPackRuleResult(data);
+            return AssetCollectSetting.MapPacks.GetValue(RulePackIndex);
         }
 
         /// <summary>
         ///     设置可寻址规则
         /// </summary>
         public void SetAddress<T>()
-        where T : IAssetRuleAddress
-        {
-            Address = AssetCollectSetting.MapAddress.Values.FindIndex(address => address is T);
-        }
+        where T : IAssetRuleAddress => Address = AssetCollectSetting.MapAddress.Values.FindIndex(address => address is T);
 
         /// <summary>
         ///     判断是否符合收集规则
@@ -279,6 +276,8 @@ namespace AIO.UEditor
         /// <returns>Ture:忽略 False:需要过滤</returns>
         public bool IsCollectAsset(AssetRuleData data)
         {
+            if (string.IsNullOrEmpty(data.AssetPath)) return false;
+
             var rootPath = data.AssetPath.Substring(0, data.AssetPath.LastIndexOf('/'));
             if (rootPath.EndsWith("Editor"))
             {

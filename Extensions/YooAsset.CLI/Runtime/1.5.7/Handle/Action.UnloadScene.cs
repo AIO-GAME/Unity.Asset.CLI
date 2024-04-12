@@ -48,6 +48,7 @@ namespace AIO.UEngine.YooAsset
                 {
                     ReleaseOperationHandle(_handle);
                     AssetSystem.LogFormat("Free Scene Handle Release : {0}", _location);
+                    IsDone = true;
                 }));
             }
 

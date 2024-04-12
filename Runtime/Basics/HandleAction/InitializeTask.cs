@@ -114,6 +114,8 @@ namespace AIO
             {
                 IsValidate = false;
             }
+
+            IsDone = true;
         }
 
         #endregion

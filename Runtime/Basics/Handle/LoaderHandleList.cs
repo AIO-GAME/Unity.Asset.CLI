@@ -10,6 +10,7 @@ namespace AIO
           ILoaderHandleList<TObject>,
           ILoaderHandle
     {
+        public string AssetPath { get; }
         public string Address   { get; protected set; }
         public Type   AssetType { get; protected set; }
         object IOperationList.this[int index] => Result[index];

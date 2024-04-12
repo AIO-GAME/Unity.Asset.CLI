@@ -62,7 +62,11 @@ namespace AIO.UEditor
                 var dictionary = new List<string>();
                 foreach (var group in Groups)
                 {
-                    dictionary.AddRange(group.Collectors.Where(collect => !string.IsNullOrEmpty(collect.Tags)).
+                    if (group is null) continue;
+                    if (group.Collectors is null) group.Collectors = Array.Empty<AssetCollectItem>();
+
+                    dictionary.AddRange(group.Collectors.
+                                              Where(collect => !string.IsNullOrEmpty(collect.Tags)).
                                               SelectMany(collect => collect.Tags.Split(';', ' ', ',')));
 
                     if (string.IsNullOrEmpty(group.Tags)) continue;
@@ -91,12 +95,8 @@ namespace AIO.UEditor
             if (obj.Equals(null)) return 0;
             unchecked
             {
-                var hashCode = (obj.Name.GetHashCode() * 397) ^
-                               (!string.IsNullOrEmpty(obj.Name) ? obj.Name.GetHashCode() : 0);
-
-                hashCode = (hashCode * 397) ^
-                           (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
-
+                var hashCode = (obj.Name.GetHashCode() * 397) ^ (!string.IsNullOrEmpty(obj.Name) ? obj.Name.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (!string.IsNullOrEmpty(obj.Description) ? obj.Description.GetHashCode() : 0);
                 return obj.Groups is null
                     ? hashCode
                     : obj.Groups.Aggregate(hashCode, (current, item) => (current * 397) ^ item.GetHashCode());
@@ -125,9 +125,6 @@ namespace AIO.UEditor
             foreach (var group in Groups) group.Save();
         }
 
-        public override int GetHashCode()
-        {
-            return GetHashCode(this);
-        }
+        public override int GetHashCode() => GetHashCode(this);
     }
 }

@@ -25,6 +25,7 @@ namespace AIO.UEngine.YooAsset
 #else
                 AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
                 AssetSystem.LogError($"{remote} Request failed");
+                packages = Array.Empty<AssetsPackageConfig>();
                 return false;
 #endif
             }
@@ -42,6 +43,7 @@ namespace AIO.UEngine.YooAsset
             catch (Exception)
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionParsingJsonFailure);
+                packages = Array.Empty<AssetsPackageConfig>();
                 return false;
             }
 #endif
@@ -52,6 +54,7 @@ namespace AIO.UEngine.YooAsset
                 throw new ArgumentNullException($"Please set the ASConfig Packages configuration");
 #else
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
+                packages = Array.Empty<AssetsPackageConfig>();
                 return false;
 #endif
             }
@@ -354,6 +357,8 @@ namespace AIO.UEngine.YooAsset
                         AssetSystem.ExceptionEvent(ASException.NoSupportEASMode);
                         break;
                 }
+
+                IsDone = true;
             }
         }
     }

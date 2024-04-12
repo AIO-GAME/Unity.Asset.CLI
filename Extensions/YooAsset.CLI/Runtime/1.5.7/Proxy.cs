@@ -58,6 +58,18 @@ namespace AIO.UEngine.YooAsset
             return Dic.Values.Any(asset => asset.CheckLocationValid(location));
         }
 
+        public bool CheckLocationValid(string location, out string assetPath)
+        {
+            foreach (var asset in Dic.Values.Where(asset => asset.CheckLocationValid(location)))
+            {
+                assetPath = asset.GetAssetInfo(location).AssetPath;
+                return true;
+            }
+
+            assetPath = string.Empty;
+            return false;
+        }
+
         public override IASNetLoading GetLoadingHandle()
         {
             return new LoadingInfo();

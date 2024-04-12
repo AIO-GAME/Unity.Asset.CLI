@@ -9,6 +9,7 @@ namespace AIO
     internal abstract class LoaderHandle<TObject> : OperationGenerics<TObject>, ILoaderHandle<TObject>
     {
         private string Address   { get; set; }
+        public  string AssetPath { get; }
         private Type   AssetType { get; set; }
 
         protected override void OnDispose()
