@@ -11,6 +11,11 @@ namespace AIO.UEditor
     public sealed class AssetCollectGroup : IDisposable, IEqualityComparer<AssetCollectGroup>, IEnumerable
     {
         /// <summary>
+        ///    是否启用
+        /// </summary>
+        public bool Enable = true;
+        
+        /// <summary>
         ///     组名
         /// </summary>
         public string Name;

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using IFilterRule = AIO.UEditor.IAssetRuleFilter;
 
 namespace AIO.UEditor
 {
@@ -41,95 +40,5 @@ namespace AIO.UEditor
 
             return false;
         }
-
-        #region Nested type: CollectFBX
-
-        private class CollectFBX : IFilterRule
-        {
-            #region IFilterRule Members
-
-            public string DisplayFilterName => "*.fbx";
-
-            public bool IsCollectAsset(AssetRuleData data)
-            {
-                return data.Extension == "fbx";
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region Nested type: CollectMaterial
-
-        private class CollectMaterial : IFilterRule
-        {
-            #region IFilterRule Members
-
-            public string DisplayFilterName => "*.material";
-
-            public bool IsCollectAsset(AssetRuleData data)
-            {
-                return data.Extension == "mat";
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region Nested type: CollectPrefab
-
-        private class CollectPrefab : IFilterRule
-        {
-            #region IFilterRule Members
-
-            public string DisplayFilterName => "*.prefab";
-
-            public bool IsCollectAsset(AssetRuleData data)
-            {
-                return data.Extension == "prefab";
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region Nested type: CollectShader
-
-        private class CollectShader : IFilterRule
-        {
-            #region IFilterRule Members
-
-            public string DisplayFilterName => "*.shader";
-
-            public bool IsCollectAsset(AssetRuleData data)
-            {
-                return data.Extension == "shader";
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region Nested type: CollectUnity
-
-        private class CollectUnity : IFilterRule
-        {
-            #region IFilterRule Members
-
-            public string DisplayFilterName => "*.unity";
-
-            public bool IsCollectAsset(AssetRuleData data)
-            {
-                return data.Extension == "unity";
-            }
-
-            #endregion
-        }
-
-        #endregion
     }
 }

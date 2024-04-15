@@ -258,16 +258,13 @@ namespace AIO.UEditor
         /// <summary>
         ///     获取收集规则
         /// </summary>
-        public IAssetRulePack GetPackRule()
-        {
-            return AssetCollectSetting.MapPacks.GetValue(RulePackIndex);
-        }
+        public IAssetRulePack GetPackRule() => AssetCollectSetting.MapPacks.GetValue(RulePackIndex);
 
         /// <summary>
         ///     设置可寻址规则
         /// </summary>
         public void SetAddress<T>()
-        where T : IAssetRuleAddress => Address = AssetCollectSetting.MapAddress.Values.FindIndex(address => address is T);
+        where T : IAssetRuleAddress => Address = AssetCollectSetting.MapAddress.FindIndex(address => address is T);
 
         /// <summary>
         ///     判断是否符合收集规则
@@ -320,15 +317,9 @@ namespace AIO.UEditor
             return true;
         }
 
-        public string GetAddressByGUID(string guid)
-        {
-            return GetAddress(AssetDatabase.GUIDToAssetPath(guid));
-        }
+        public string GetAddressByGUID(string guid) => GetAddress(AssetDatabase.GUIDToAssetPath(guid));
 
-        public string GetAddress(Object asset)
-        {
-            return GetAddress(AssetDatabase.GetAssetPath(asset));
-        }
+        public string GetAddress(Object asset) => GetAddress(AssetDatabase.GetAssetPath(asset));
 
         /// <summary>
         ///     获取资源可寻地址

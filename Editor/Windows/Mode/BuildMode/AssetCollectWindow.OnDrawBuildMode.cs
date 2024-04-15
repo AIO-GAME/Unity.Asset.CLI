@@ -334,8 +334,8 @@ namespace AIO.UEditor
                     EditorGUILayout.LabelField("缓存清理数量", GP_Width_100);
                     using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
                     {
-                        BuildConfig.AutoCleanCacheNum = EditorGUILayout.IntSlider(
-                            BuildConfig.AutoCleanCacheNum, 1, 20);
+                        BuildConfig.AutoCleanCacheNumber = EditorGUILayout.IntSlider(
+                            BuildConfig.AutoCleanCacheNumber, 1, 20);
                     }
                 }
             }

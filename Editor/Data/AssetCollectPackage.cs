@@ -11,6 +11,11 @@ namespace AIO.UEditor
     public sealed class AssetCollectPackage : IDisposable, IEqualityComparer<AssetCollectPackage>
     {
         /// <summary>
+        ///    是否启用
+        /// </summary>
+        public bool Enable;
+
+        /// <summary>
         ///     包名
         /// </summary>
         public string Name;
@@ -24,6 +29,11 @@ namespace AIO.UEditor
         ///     资源组配置
         /// </summary>
         public AssetCollectGroup[] Groups;
+
+        /// <summary>
+        ///    是否为默认包
+        /// </summary>
+        public bool Default;
 
         /// <summary>
         ///     获取组数量

@@ -78,7 +78,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     资源收集器排序
         /// </summary>
-        public void Sort()
+        public void Sort(bool isAscending = true)
         {
             if (Packages is null)
             {

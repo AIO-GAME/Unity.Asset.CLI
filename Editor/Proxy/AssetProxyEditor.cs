@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -53,7 +54,8 @@ namespace AIO.UEditor
         /// <summary>
         ///     上传到GCloud
         /// </summary>
-        public static async Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters, bool isTips = false)
+        public static async Task<bool> UploadGCloud(
+            [ReadOnlyArray] ICollection<AsUploadGCloudParameter> parameters, bool isTips = false)
         {
             if (Editor is null)
             {

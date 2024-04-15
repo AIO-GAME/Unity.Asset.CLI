@@ -1,16 +1,16 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
 {
-    [Description("资源打包配置")]
     [Serializable]
-    [HelpURL(
-        "https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7-")]
+    [Description("资源打包配置")]
+    [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7-")]
     public partial class ASBuildConfig : ScriptableObject
     {
         private static ASBuildConfig _instance;
@@ -19,7 +19,7 @@ namespace AIO.UEditor
         ///     自动清理缓存数量
         /// </summary>
         [InspectorName("自动清理缓存数量")]
-        public int AutoCleanCacheNum = 5;
+        public int AutoCleanCacheNumber = 5;
 
         /// <summary>
         ///     打包管线

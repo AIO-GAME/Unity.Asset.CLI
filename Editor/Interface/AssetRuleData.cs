@@ -16,7 +16,7 @@
         public string AssetPath;
 
         /// <summary>
-        ///     扩展名 (小写 .xxx)
+        ///     扩展名 (小写 xxx)
         /// </summary>
         public string Extension;
 
