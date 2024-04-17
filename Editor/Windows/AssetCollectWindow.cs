@@ -13,14 +13,16 @@ namespace AIO.UEditor
              Menu = "AIO/Window/Asset",
              MinSizeHeight = 650,
              MinSizeWidth = 1200
-            )]
+    )]
     public partial class AssetCollectWindow : GraphicWindow
     {
+        private static AssetCollectWindow Instance;
+
         [LnkTools(
-                     Tooltip = "AIO 资源管理工具",
-                     IconResource = "Editor/Icon/Asset",
-                     ShowMode = ELnkShowMode.Toolbar
-                 )]
+            Tooltip = "AIO 资源管理工具",
+            IconResource = "Editor/Icon/Asset",
+            ShowMode = ELnkShowMode.Toolbar
+        )]
         public static void OpenWindow()
         {
             EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
@@ -103,13 +105,15 @@ namespace AIO.UEditor
 
         protected override void OnAwake()
         {
+            Instance               = this;
             Data                   = AssetCollectRoot.GetOrCreate();
             Selection.activeObject = Data;
         }
 
         protected override void OnActivation()
         {
-            Data = AssetCollectRoot.GetOrCreate();
+            Instance = this;
+            Data     = AssetCollectRoot.GetOrCreate();
             Data.Refresh();
             Selection.activeObject = Data;
 
@@ -124,7 +128,7 @@ namespace AIO.UEditor
         protected override void OnDraw()
         {
             using (new GUILayout.HorizontalScope(
-                                                 GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
+                       GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
             {
                 OnDrawHeader();
             }
@@ -312,14 +316,14 @@ namespace AIO.UEditor
                             }
                             else
                             {
-                                if (Data.CurrentGroup.Length <= 0) break;
-                                if (CurrentCurrentCollectorsIndex < Data.CurrentGroup.Length)
+                                if (Data.CurrentGroup.Count <= 0) break;
+                                if (CurrentCurrentCollectorsIndex < Data.CurrentGroup.Count)
                                 {
                                     CurrentCurrentCollectorsIndex += 1;
-                                    if (CurrentCurrentCollectorsIndex >= Data.CurrentGroup.Length)
+                                    if (CurrentCurrentCollectorsIndex >= Data.CurrentGroup.Count)
                                     {
                                         CurrentCurrentCollectorsIndex = 0;
-                                        OnDrawItemListScroll.y        = 27 * Data.CurrentGroup.Length - 1;
+                                        OnDrawItemListScroll.y        = 27 * Data.CurrentGroup.Count - 1;
                                     }
                                     else
                                     {
@@ -356,13 +360,13 @@ namespace AIO.UEditor
                             }
                             else
                             {
-                                if (Data.CurrentGroup.Length <= 0) break;
+                                if (Data.CurrentGroup.Count <= 0) break;
                                 if (CurrentCurrentCollectorsIndex >= 0)
                                 {
                                     CurrentCurrentCollectorsIndex -= 1;
                                     if (CurrentCurrentCollectorsIndex < 0)
                                     {
-                                        CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
+                                        CurrentCurrentCollectorsIndex = Data.CurrentGroup.Count - 1;
                                         OnDrawItemListScroll.y        = 0;
                                     }
                                     else

@@ -18,7 +18,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     资源收集根节点
         /// </summary>
-        public AssetCollectRoot Data;
+        public static AssetCollectRoot Data;
 
         /// <summary>
         ///     资源系统配置
@@ -60,7 +60,6 @@ namespace AIO.UEditor
         private Vector2 OnDrawConfigGCScroll  = Vector2.zero;
         private Vector2 OnDrawConfigScroll    = Vector2.zero;
         private Vector2 OnDrawGroupListScroll = Vector2.zero;
-        private Vector2 OnDrawGroupScroll     = Vector2.zero;
         private Vector2 OnDrawItemListScroll  = Vector2.zero;
 
         /// <summary>
@@ -69,13 +68,7 @@ namespace AIO.UEditor
         private GenericMenu onDrawLookDataItemMenu;
 
         private Vector2 OnDrawLookDataScroll = Vector2.zero;
-        private Vector2 OnDrawPackageScroll  = Vector2.zero;
         private Vector2 OnDrawSettingScroll  = Vector2.zero;
-
-        /// <summary>
-        ///     界面 - 收集器列表
-        /// </summary>
-        private ViewRect ViewCollectorsList;
 
         /// <summary>
         ///     界面 - 配置界面
@@ -97,10 +90,21 @@ namespace AIO.UEditor
         /// </summary>
         private ViewRect ViewGroupList;
 
+        private ViewTreeGroup ViewTreeGroup;
+
         /// <summary>
         ///     界面 - 包列表
         /// </summary>
         private ViewRect ViewPackageList;
+
+        private ViewTreePackage ViewTreePackage;
+
+        /// <summary>
+        ///     界面 - 收集器列表
+        /// </summary>
+        private ViewRect ViewCollectorsList;
+
+        private ViewTreeCollect ViewCurrentCollector;
 
         /// <summary>
         ///     界面 - 配置界面
@@ -197,35 +201,41 @@ namespace AIO.UEditor
                 width             = 400,
                 y                 = ViewDetailList.y + 3
             };
+
+            ViewTreePackage      = ViewTreePackage.Create();
+            ViewTreeGroup        = ViewTreeGroup.Create();
+            ViewCurrentCollector = ViewTreeCollect.Create(ViewCollectorsList.width, ViewCollectorsList.MinWidth);
+            ViewTreePackage.OnSelectionChanged += id =>
+            {
+                ViewTreeGroup.Reload();
+                ViewCurrentCollector.Reload();
+            };
+            ViewTreeGroup.OnSelectionChanged += id => { ViewCurrentCollector.Reload(); };
         }
 
         private void UpdatePageSizeMenu()
         {
             LookDataPageSizeMenu = new GenericMenu();
-            LookDataPageSizeMenu.AddItem(new GUIContent("25"), CurrentPageValues.PageSize == 25,
-                                         () =>
-                                         {
-                                             CurrentPageValues.PageSize = 25;
-                                             UpdatePageSizeMenu();
-                                         });
-            LookDataPageSizeMenu.AddItem(new GUIContent("30"), CurrentPageValues.PageSize == 30,
-                                         () =>
-                                         {
-                                             CurrentPageValues.PageSize = 30;
-                                             UpdatePageSizeMenu();
-                                         });
-            LookDataPageSizeMenu.AddItem(new GUIContent("40"), CurrentPageValues.PageSize == 40,
-                                         () =>
-                                         {
-                                             CurrentPageValues.PageSize = 40;
-                                             UpdatePageSizeMenu();
-                                         });
-            LookDataPageSizeMenu.AddItem(new GUIContent("50"), CurrentPageValues.PageSize == 50,
-                                         () =>
-                                         {
-                                             CurrentPageValues.PageSize = 50;
-                                             UpdatePageSizeMenu();
-                                         });
+            LookDataPageSizeMenu.AddItem(new GUIContent("25"), CurrentPageValues.PageSize == 25, () =>
+            {
+                CurrentPageValues.PageSize = 25;
+                UpdatePageSizeMenu();
+            });
+            LookDataPageSizeMenu.AddItem(new GUIContent("30"), CurrentPageValues.PageSize == 30, () =>
+            {
+                CurrentPageValues.PageSize = 30;
+                UpdatePageSizeMenu();
+            });
+            LookDataPageSizeMenu.AddItem(new GUIContent("40"), CurrentPageValues.PageSize == 40, () =>
+            {
+                CurrentPageValues.PageSize = 40;
+                UpdatePageSizeMenu();
+            });
+            LookDataPageSizeMenu.AddItem(new GUIContent("50"), CurrentPageValues.PageSize == 50, () =>
+            {
+                CurrentPageValues.PageSize = 50;
+                UpdatePageSizeMenu();
+            });
         }
 
         #region Build
@@ -300,7 +310,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     当前界面模式
         /// </summary>
-        public static Mode WindowMode = Mode.Editor;
+        public static Mode WindowMode { get; set; } = Mode.Editor;
 
         /// <summary>
         ///     Header中间显示信息
@@ -396,10 +406,17 @@ namespace AIO.UEditor
         /// </summary>
         public enum ESort
         {
-            [InspectorName("大小")]     FileSize,
-            [InspectorName("最后修改时间")] LastWrite,
-            [InspectorName("名称")]     AssetName,
-            [InspectorName("资源类型")]   ObjectType
+            [InspectorName("大小")]
+            FileSize,
+
+            [InspectorName("最后修改时间")]
+            LastWrite,
+
+            [InspectorName("名称")]
+            AssetName,
+
+            [InspectorName("资源类型")]
+            ObjectType
         }
 
         /// <summary>
@@ -450,17 +467,17 @@ namespace AIO.UEditor
         /// <summary>
         ///     当前选择包类型索引
         /// </summary>
-        private int LookModeDisplayTypeIndex;
+        private static int LookModeDisplayTypeIndex;
 
         /// <summary>
         ///     当前选择收集器索引
         /// </summary>
-        private int LookModeDisplayCollectorsIndex = -1;
+        private static int LookModeDisplayCollectorsIndex = -1;
 
         /// <summary>
         ///     当前标签列表索引
         /// </summary>
-        private int LookModeDisplayTagsIndex;
+        private static int LookModeDisplayTagsIndex;
 
         /// <summary>
         ///     收集器全部资源大小
@@ -476,7 +493,7 @@ namespace AIO.UEditor
         ///     是否显示资源详情
         /// </summary>
         private bool LookModeShowAssetDetail => !string.IsNullOrEmpty(LookCurrentSelectAssetDataInfo.GUID) &&
-                                                LookCurrentSelectAsset != null;
+                                                LookCurrentSelectAsset;
 
         /// <summary>
         ///     资源展示模式 当前页数量选项
@@ -549,10 +566,18 @@ namespace AIO.UEditor
         #region Tags Mode
 
         /// <summary>
-        ///     收集器标签列表
+        ///     标签模式 标签列表
         /// </summary>
         private string[] TagsModeDisplayTags;
+
+        /// <summary>
+        ///    标签模式 收集器列表
+        /// </summary>
         private string[] TagsModeDisplayCollectors;
+
+        /// <summary>
+        ///    标签模式 类型列表
+        /// </summary>
         private string[] TagsModeDisplayTypes;
 
         /// <summary>

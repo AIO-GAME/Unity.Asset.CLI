@@ -1,6 +1,5 @@
 ﻿#region
 
-using Config;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -9,40 +8,35 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    internal partial class ViewTreePackage
+    partial class ViewTreeGroup
     {
-        protected sealed class TreeViewItemPackage : TreeViewItem, IGraphDraw
+        protected sealed class TreeViewItemGroup : TreeViewItem, IGraphDraw
         {
-            private static Texture _MainIcon;
             private static Texture _Icon;
 
-            private static Texture Icon     => _Icon ?? (_Icon = Resources.Load<Texture>("Editor/Icon/Color/-school-bag"));
-            private static Texture MainIcon => _MainIcon ?? (_MainIcon = Resources.Load<Texture>("Editor/Icon/Color/-briefcase"));
+            private static Texture Icon => _Icon ?? (_Icon = Resources.Load<Texture>("Editor/Icon/Color/-tutorial-"));
 
-            public AssetCollectPackage Package { get; }
+            public AssetCollectGroup Group { get; }
 
-
-            public TreeViewItemPackage(int id, AssetCollectPackage package) : base(id, 1, package.Name)
+            public TreeViewItemGroup(int id, AssetCollectGroup group) : base(id, 2, group.Name)
             {
-                Package = package;
+                Group = group;
             }
 
-            public override Texture2D icon        => Package.Default ? MainIcon as Texture2D : Icon as Texture2D;
-            public override string    displayName => Package.Name;
-            public override string    ToString()  => Package.ToString();
+            public override Texture2D icon        => Icon as Texture2D;
+            public override string    displayName => Group.Name;
+            public override string    ToString()  => Group.ToString();
 
-            #region IGraphDraw
+            private static Rect GetRectLine(Rect cellRect)
+            {
+                return new Rect(cellRect.x + 30, cellRect.y + 8, cellRect.width - 40, 1);
+            }
 
-            float IGraphDraw.Height                                                   => 35;
-            bool IGraphDraw. AllowChangeExpandedState                                 => false;
-            bool IGraphDraw. AllowRename                                              => true;
-            Rect IGraphDraw. GetRenameRect(Rect cellRect, int row, TreeViewItem item) => cellRect;
-
-            #endregion
+            private static readonly Color ColorLine = new Color(0.5f, 0.5f, 0.5f, 0.5f);
 
             public void OnDraw(Rect cellRect, ref RowGUIArgs args)
             {
-                if (Package.Enable)
+                if (Group.Enable)
                 {
                     OnDrawContent(cellRect, ref args);
                 }
@@ -56,7 +50,14 @@ namespace AIO.UEditor
             }
 
 
-            private static readonly Color ColorLine = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+            #region IGraphDraw
+
+            float IGraphDraw.Height                                                   => 35;
+            bool IGraphDraw. AllowChangeExpandedState                                 => false;
+            bool IGraphDraw. AllowRename                                              => true;
+            Rect IGraphDraw. GetRenameRect(Rect cellRect, int row, TreeViewItem item) => cellRect;
+
+            #endregion
 
 
             private void DrawStyle(Rect cellRect, ref RowGUIArgs args)
@@ -81,8 +82,8 @@ namespace AIO.UEditor
                 DefaultGUI.BoldLabel(nameRect, displayName, args.selected, args.focused);
 
                 // 绘制描述
-                var descRect = new Rect(cellRect.x + iconRect.xMax + 1, cellRect.y + 9, cellRect.width - iconRect.width, cellRect.height);
-                DefaultGUI.Label(descRect, Package.Description, args.selected, args.focused);
+                var descRect = new Rect(cellRect.x + iconRect.xMax + 1, cellRect.y + 9, cellRect.width - iconRect.width - iconRect.x, cellRect.height);
+                DefaultGUI.Label(descRect, Group.Description, args.selected, args.focused);
             }
         }
     }

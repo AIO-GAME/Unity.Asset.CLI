@@ -10,6 +10,102 @@ namespace AIO.UEditor
         private static Tuple<string, string, string> Empty = new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
 
         /// <summary>
+        ///   排序
+        /// </summary>
+        /// <param name="isAscending">是否升序</param>
+        public void Sort(bool isAscending = true)
+        {
+            if (Packages is null)
+            {
+                Packages = Array.Empty<AssetCollectPackage>();
+                return;
+            }
+
+            Packages = isAscending
+                ? Packages.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture))
+                : Packages.Sort((a, b) => string.Compare(b.Name, a.Name, StringComparison.CurrentCulture));
+        }
+
+        /// <summary>
+        ///   排序
+        /// </summary>
+        /// <param name="isAscending">是否升序</param>
+        public void SortWithGroup(bool isAscending = true)
+        {
+            if (Packages is null)
+            {
+                Packages = Array.Empty<AssetCollectPackage>();
+                return;
+            }
+
+            for (var i = 0; i < Packages.Length; i++)
+            {
+                if (Packages[i] is null) Packages[i] = new AssetCollectPackage();
+                if (Packages[i].Groups is null)
+                {
+                    Packages[i].Groups = Array.Empty<AssetCollectGroup>();
+                    continue;
+                }
+
+                if (Packages[i].Groups.Length == 0) continue;
+
+                Packages[i].Groups = isAscending
+                    ? Packages[i].Groups.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture))
+                    : Packages[i].Groups.Sort((a, b) => string.Compare(b.Name, a.Name, StringComparison.CurrentCulture));
+            }
+
+            Packages = isAscending
+                ? Packages.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture))
+                : Packages.Sort((a, b) => string.Compare(b.Name, a.Name, StringComparison.CurrentCulture));
+        }
+
+        /// <summary>
+        ///   排序
+        /// </summary>
+        /// <param name="isAscending">是否升序</param>
+        public void SortWithGroupAndCollect(bool isAscending = true)
+        {
+            if (Packages is null)
+            {
+                Packages = Array.Empty<AssetCollectPackage>();
+                return;
+            }
+
+            for (var i = 0; i < Packages.Length; i++)
+            {
+                if (Packages[i] is null) Packages[i] = new AssetCollectPackage();
+                if (Packages[i].Groups is null)
+                {
+                    Packages[i].Groups = Array.Empty<AssetCollectGroup>();
+                    continue;
+                }
+
+                if (Packages[i].Groups.Length == 0) continue;
+                for (var j = 0; j < Packages[i].Groups.Length; j++)
+                {
+                    if (Packages[i].Groups[j].Collectors is null)
+                    {
+                        Packages[i].Groups[j].Collectors = Array.Empty<AssetCollectItem>();
+                        continue;
+                    }
+
+                    if (Packages[i].Groups[j].Collectors.Length == 0) continue;
+                    Packages[i].Groups[j].Collectors = isAscending
+                        ? Packages[i].Groups[j].Collectors.Sort((a, b) => string.Compare(a.CollectPath, b.CollectPath, StringComparison.CurrentCulture))
+                        : Packages[i].Groups[j].Collectors.Sort((a, b) => string.Compare(b.CollectPath, a.CollectPath, StringComparison.CurrentCulture));
+                }
+
+                Packages[i].Groups = isAscending
+                    ? Packages[i].Groups.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture))
+                    : Packages[i].Groups.Sort((a, b) => string.Compare(b.Name, a.Name, StringComparison.CurrentCulture));
+            }
+
+            Packages = isAscending
+                ? Packages.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture))
+                : Packages.Sort((a, b) => string.Compare(b.Name, a.Name, StringComparison.CurrentCulture));
+        }
+
+        /// <summary>
         ///     获取资源收集配置
         /// </summary>
         public static AssetCollectRoot GetOrCreate()

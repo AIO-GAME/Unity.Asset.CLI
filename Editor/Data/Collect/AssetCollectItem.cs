@@ -1,16 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using AIO.UEngine;
 using UnityEditor;
 using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
+    public static class AssetCollectItemEx
+    {
+        /// <summary>
+        ///     获取收集器显示名称
+        /// </summary>
+        public static string[] GetDisPlayNames(this IEnumerable<AssetCollectItem> collectors)
+        {
+            return (from item in collectors
+                    where item.Type == EAssetCollectItemType.MainAssetCollector
+                    where !string.IsNullOrEmpty(item.CollectPath)
+                    select item.CollectPath).
+                   Distinct().
+                   ToArray();
+        }
+    }
+
     partial class AssetCollectItem
     {
         /// <summary>
-        ///     是否折叠
+        ///    是否启用
+        /// </summary>
+        public bool Enable = true;
+
+        /// <summary>
+        ///     是否折叠 True:折叠 False:展开
         /// </summary>
         public bool Folded;
 

@@ -45,18 +45,6 @@ namespace AIO.UEditor
         [SerializeField, InspectorName("收集包")]
         public AssetCollectPackage[] Packages;
 
-        /// <summary>
-        ///     当前选择包下标
-        /// </summary>
-        [HideInInspector]
-        public int CurrentPackageIndex;
-
-        /// <summary>
-        ///     当前选择组下标
-        /// </summary>
-        [HideInInspector]
-        public int CurrentGroupIndex;
-
         public enum PackRule
         {
             [InspectorName("文件路径")]
@@ -76,40 +64,12 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        ///     资源收集器排序
+        ///    遍历操作
         /// </summary>
-        public void Sort(bool isAscending = true)
+        public void ForEach(Action<AssetCollectPackage> action)
         {
-            if (Packages is null)
-            {
-                Packages = Array.Empty<AssetCollectPackage>();
-                return;
-            }
-
-            for (var i = 0; i < Packages.Length; i++)
-            {
-                if (Packages[i] is null) Packages[i] = new AssetCollectPackage();
-                if (Packages[i].Groups is null)
-                {
-                    Packages[i].Groups = Array.Empty<AssetCollectGroup>();
-                    continue;
-                }
-
-                if (Packages[i].Groups.Length == 0) continue;
-                for (var j = 0; j < Packages[i].Groups.Length; j++)
-                {
-                    if (Packages[i].Groups[j].Collectors is null)
-                        Packages[i].Groups[j].Collectors = Array.Empty<AssetCollectItem>();
-
-                    if (Packages[i].Groups[j].Collectors.Length == 0) continue;
-                    Packages[i].Groups[j].Collectors.Sort(
-                        (a, b) => string.Compare(a.CollectPath, b.CollectPath, StringComparison.CurrentCulture));
-                }
-
-                Packages[i].Groups.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture));
-            }
-
-            Packages.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture));
+            if (Packages is null) return;
+            foreach (var package in Packages) action?.Invoke(package);
         }
 
         /// <summary>
@@ -148,7 +108,7 @@ namespace AIO.UEditor
                     if (group.Collectors is null) group.Collectors = Array.Empty<AssetCollectItem>();
                     if (group.Collectors.Length == 0) continue;
 
-                    tags.AddRange(group.Tags.Split(';'));
+                    tags.AddRange(group.Tag.Split(';'));
                     collectors.AddRange(group.Collectors);
                 }
 
@@ -166,7 +126,7 @@ namespace AIO.UEditor
                         Name        = "Merge Group",
                         Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
                         Collectors  = collectors.ToArray(),
-                        Tags        = string.Join(";", tags.Distinct())
+                        Tag         = string.Join(";", tags.Distinct())
                     }
                 }
             });
@@ -248,104 +208,12 @@ namespace AIO.UEditor
             Save();
         }
 
-        #region OnGUI
-
-        public AssetCollectPackage CurrentPackage
-        {
-            get
-            {
-                if (Packages is null || Packages.Length == 0)
-                {
-                    Packages = new[]
-                    {
-                        new AssetCollectPackage
-                        {
-                            Name        = "Default Package",
-                            Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
-                        }
-                    };
-                    CurrentPackageIndex = 0;
-                }
-                else if (CurrentPackageIndex < 0)
-                    CurrentPackageIndex = 0;
-                else if (Packages.Length <= CurrentPackageIndex)
-                    CurrentPackageIndex = Packages.Length - 1;
-
-                return Packages[CurrentPackageIndex];
-            }
-        }
-
-        public AssetCollectGroup CurrentGroup
-        {
-            get
-            {
-                if (CurrentPackage.Groups is null || CurrentPackage.Groups.Length == 0)
-                {
-                    CurrentPackage.Groups = new[]
-                    {
-                        new AssetCollectGroup
-                        {
-                            Name        = "Default Group",
-                            Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-                            Collectors  = Array.Empty<AssetCollectItem>()
-                        }
-                    };
-                    CurrentGroupIndex = 0;
-                }
-                else if (CurrentGroupIndex < 0)
-                {
-                    CurrentGroupIndex = 0;
-                }
-                else if (CurrentPackage.Groups.Length <= CurrentGroupIndex)
-                {
-                    CurrentGroupIndex = CurrentPackage.Groups.Length - 1;
-                }
-
-                return CurrentPackage.Groups[CurrentGroupIndex];
-            }
-        }
-
-        public bool IsValidPackage()
-        {
-            if (Packages == null)
-                Packages = Array.Empty<AssetCollectPackage>();
-            if (CurrentPackageIndex >= Packages.Length)
-                CurrentPackageIndex = Packages.Length - 1;
-            return Packages.Length > 0;
-        }
-
-        public bool IsValidGroup()
-        {
-            if (!IsValidPackage()) return false;
-
-            if (CurrentPackageIndex < 0) CurrentPackageIndex                = 0;
-            if (Packages.Length <= CurrentPackageIndex) CurrentPackageIndex = 0;
-            if (Packages[CurrentPackageIndex].Groups != null)
-                return Packages[CurrentPackageIndex].Groups.Length > 0;
-
-            Packages[CurrentPackageIndex].Groups = Array.Empty<AssetCollectGroup>();
-            return false;
-        }
-
-        public bool IsValidCollect()
-        {
-            if (!IsValidGroup()) return false;
-
-            if (CurrentGroupIndex < 0) CurrentGroupIndex                                            = 0;
-            if (Packages[CurrentPackageIndex].Groups.Length <= CurrentGroupIndex) CurrentGroupIndex = 0;
-
-            if (Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors is null)
-            {
-                Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors = Array.Empty<AssetCollectItem>();
-                return false;
-            }
-
-            return Packages[CurrentPackageIndex].Groups[CurrentGroupIndex].Collectors.Length > 0;
-        }
-
-        #endregion
-
         #region GetTags
+
+        /// <summary>
+        ///    资源标签列表
+        /// </summary>
+        public string[] Tags => GetTags();
 
         /// <summary>
         ///    获取所有标签
@@ -370,8 +238,8 @@ namespace AIO.UEditor
                                         Where(collect => !string.IsNullOrEmpty(collect.Tags)).
                                         SelectMany(collect => collect.Tags.Split(';')));
 
-                    if (string.IsNullOrEmpty(group.Tags)) continue;
-                    list.AddRange(group.Tags.Split(';'));
+                    if (string.IsNullOrEmpty(group.Tag)) continue;
+                    list.AddRange(group.Tag.Split(';'));
                 }
             }
 
@@ -393,8 +261,8 @@ namespace AIO.UEditor
                                   from tag in collect.Tags.Split(';')
                                   select tag);
 
-                    if (string.IsNullOrEmpty(group.Tags)) continue;
-                    list.AddRange(group.Tags.Split(';'));
+                    if (string.IsNullOrEmpty(group.Tag)) continue;
+                    list.AddRange(group.Tag.Split(';'));
                 }
             }
 
@@ -417,8 +285,8 @@ namespace AIO.UEditor
                                   from tag in collect.Tags.Split(';')
                                   select tag);
 
-                    if (string.IsNullOrEmpty(group.Tags)) continue;
-                    list.AddRange(group.Tags.Split(';'));
+                    if (string.IsNullOrEmpty(group.Tag)) continue;
+                    list.AddRange(group.Tag.Split(';'));
                 }
             }
 
@@ -442,8 +310,8 @@ namespace AIO.UEditor
                                   from tag in collect.Tags.Split(';')
                                   select tag);
 
-                    if (string.IsNullOrEmpty(group.Tags)) continue;
-                    list.AddRange(group.Tags.Split(';'));
+                    if (string.IsNullOrEmpty(group.Tag)) continue;
+                    list.AddRange(group.Tag.Split(';'));
                 }
             }
 

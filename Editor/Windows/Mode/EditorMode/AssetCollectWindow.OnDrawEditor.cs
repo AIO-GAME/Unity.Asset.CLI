@@ -14,34 +14,33 @@
             DoEditorDrawRect.width = ViewPackageList.width;
             ViewPackageList.Draw(DoEditorDrawRect, () =>
             {
-                ViewPackageList.MaxWidth =  temp;
-                OnDrawPackageScroll      =  GELayout.VScrollView(OnDrawPackage, OnDrawPackageScroll);
-                DoEditorDrawRect.x       += ViewPackageList.width;
+                ViewPackageList.MaxWidth = temp;
+                ViewTreePackage.OnGUI(ViewPackageList);
+                DoEditorDrawRect.x += ViewPackageList.width;
             }, GEStyle.INThumbnailShadow);
 
             DoEditorDrawRect.width = ViewGroupList.width;
             ViewGroupList.Draw(DoEditorDrawRect, () =>
             {
-                ViewGroupList.MaxWidth =  temp;
-                OnDrawGroupScroll      =  GELayout.VScrollView(OnDrawGroup, OnDrawGroupScroll);
-                DoEditorDrawRect.x     += ViewGroupList.width;
+                ViewGroupList.MaxWidth = temp;
+                ViewTreeGroup.OnGUI(ViewGroupList);
+                DoEditorDrawRect.x += ViewGroupList.width;
             }, GEStyle.INThumbnailShadow);
 
             DoEditorDrawRect.width = CurrentWidth - DoEditorDrawRect.x - 5;
-            ViewCollectorsList.Draw(DoEditorDrawRect,
-                                    () =>
-                                    {
-                                        OnDrawGroupListScroll =
-                                            GELayout.VScrollView(OnDrawGroupList, OnDrawGroupListScroll);
-                                    });
+            ViewCollectorsList.Draw(DoEditorDrawRect, () =>
+            {
+                ViewCollectorsList.width = DoEditorDrawRect.width;
+                ViewCurrentCollector.OnGUI(ViewCollectorsList);
+            });
         }
 
 
         protected void UpdateDataEditorMode()
         {
-            if (Data.CurrentGroup.Length > 0)
+            if (Data.CurrentGroup.Count > 0)
             {
-                CurrentCurrentCollectorsIndex = Data.CurrentGroup.Length - 1;
+                CurrentCurrentCollectorsIndex = Data.CurrentGroup.Count - 1;
                 OnDrawItemListScroll.y        = 0;
             }
         }

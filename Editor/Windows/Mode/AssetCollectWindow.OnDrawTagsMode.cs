@@ -34,38 +34,27 @@ namespace AIO.UEditor
                 if (TagsModeDisplayCollectors.Length == 1)
                 {
                     LookModeDisplayCollectorsIndex = 0;
-                    EditorGUILayout.Popup(0,
-                                          TagsModeDisplayCollectors,
-                                          GEStyle.PreDropDown,
-                                          GP_Width_100);
+                    EditorGUILayout.Popup(0, TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
                 }
                 else if (TagsModeDisplayCollectors.Length >= 31)
                 {
-                    LookModeDisplayCollectorsIndex = EditorGUILayout.Popup(LookModeDisplayCollectorsIndex,
-                                                                           TagsModeDisplayCollectors,
-                                                                           GEStyle.PreDropDown,
-                                                                           GP_Width_100);
+                    LookModeDisplayCollectorsIndex = EditorGUILayout.Popup(
+                        LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
                 }
                 else
                 {
-                    LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(LookModeDisplayCollectorsIndex,
-                                                                               TagsModeDisplayCollectors,
-                                                                               GEStyle.PreDropDown,
-                                                                               GP_Width_100);
+                    LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(
+                        LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
                 }
             }
 
             if (TagsModeDisplayTypes.Length > 0)
-                LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
-                                                                     TagsModeDisplayTypes,
-                                                                     GEStyle.PreDropDown,
-                                                                     GP_Width_100);
+                LookModeDisplayTypeIndex = EditorGUILayout.MaskField(
+                    LookModeDisplayTypeIndex, TagsModeDisplayTypes, GEStyle.PreDropDown, GP_Width_100);
 
             if (TagsModeDisplayTags.Length > 0)
-                LookModeDisplayTagsIndex = EditorGUILayout.MaskField(LookModeDisplayTagsIndex,
-                                                                     TagsModeDisplayTags,
-                                                                     GEStyle.PreDropDown,
-                                                                     GP_Width_100);
+                LookModeDisplayTagsIndex = EditorGUILayout.MaskField(
+                    LookModeDisplayTagsIndex, TagsModeDisplayTags, GEStyle.PreDropDown, GP_Width_100);
 
             if (GUI.changed)
                 if (
@@ -152,7 +141,7 @@ namespace AIO.UEditor
                 foreach (var group in package.Groups)
                 {
                     if (group.Collectors is null) continue;
-                    var flag = !string.IsNullOrEmpty(group.Tags);
+                    var flag = !string.IsNullOrEmpty(group.Tag);
                     foreach (var collector in group.Collectors)
                     {
                         if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
@@ -179,8 +168,7 @@ namespace AIO.UEditor
                 }
             }
 
-            TagsModeDisplayCollectors =
-                GetCollectorDisPlayNames(GetCollectorDisPlayNames(listItems).Distinct().ToArray());
+            TagsModeDisplayCollectors = GetCollectorDisPlayNames(listItems.GetDisPlayNames());
             if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
         }
 

@@ -314,13 +314,13 @@ namespace AIO.UEditor
                 return;
             }
 
-            if (Data.CurrentPackage.Length == 0)
+            if (Data.CurrentPackage.Count == 0)
             {
                 GELayout.HelpBox("当前无组资源数据");
                 return;
             }
 
-            if (Data.CurrentGroup.Length == 0)
+            if (Data.CurrentGroup.Count == 0)
             {
                 GELayout.HelpBox("当前无收集器资源数据");
                 return;
@@ -343,7 +343,7 @@ namespace AIO.UEditor
 
         private void OnDrawLookModeAssetList()
         {
-            var headerRect                                = new Rect(0, 0, ViewDetailList.width, 20);
+            var headerRect = new Rect(0, 0, ViewDetailList.width, 20);
             if (LookModeShowAssetDetail) headerRect.width -= ViewDetailList.DragHorizontalWidth;
 
             OnDrawLookModeHeader(headerRect);
@@ -809,9 +809,9 @@ namespace AIO.UEditor
                 return;
             }
 
-            CurrentSelectAssetIndex = index;
+            CurrentSelectAssetIndex        = index;
             LookCurrentSelectAssetDataInfo = CurrentPageValues.CurrentPageValues[index];
-            LookCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(LookCurrentSelectAssetDataInfo.AssetPath);
+            LookCurrentSelectAsset         = AssetDatabase.LoadAssetAtPath<Object>(LookCurrentSelectAssetDataInfo.AssetPath);
             Dependencies.Clear();
             DependenciesSize = 0;
             foreach (var dependency in AssetDatabase.GetDependencies(LookCurrentSelectAssetDataInfo.AssetPath))
@@ -837,23 +837,23 @@ namespace AIO.UEditor
         /// </summary>
         private void UpdateDataLookModeCollector(int packageIndex, int groupIndex)
         {
-            var i   = packageIndex;
-            var j   = groupIndex;
+            var i = packageIndex;
+            var j = groupIndex;
             var key = (i, j);
             if (Data.Count <= i) return;
             if (Data.Packages[i] is null || Data.Packages[i].Groups is null || j < 0) return;
-            if (Data.Packages[i].Length <= j) return;
-            LookModeDisplayTags[key] = Data.Packages[i].Groups[j].AllTags;
+            if (Data.Packages[i].Count <= j) return;
+            LookModeDisplayTags[key]                          = Data.Packages[i].Groups[j].Tags;
             LookModeDisplayGroups[LookModeDisplayPackages[i]] = GetGroupDisPlayNames(Data.Packages[i].Groups);
-            LookModeDisplayCollectors[key] = GetCollectorDisPlayNames(Data.Packages[i].Groups[j].Collectors);
-            LookModeDisplayCollectors[key] = GetCollectorDisPlayNames(LookModeDisplayCollectors[key]);
-            LookModeData[key] = new List<AssetDataInfo>();
-            LookModeDisplayTypes[(i, j)] = Array.Empty<string>();
+            LookModeDisplayCollectors[key]                    = Data.Packages[i].Groups[j].Collectors.GetDisPlayNames();
+            LookModeDisplayCollectors[key]                    = GetCollectorDisPlayNames(LookModeDisplayCollectors[key]);
+            LookModeData[key]                                 = new List<AssetDataInfo>();
+            LookModeDisplayTypes[(i, j)]                      = Array.Empty<string>();
             var listTypes = new List<string>();
             for (var k = 0; k < Data.Packages[i].Groups[j].Collectors.Length; k++)
                 Data.Packages[i].Groups[j].Collectors[k].CollectAssetAsync(
                     Data.Packages[i].Name,
-                    Data.Packages[i].Groups[j].Name, 
+                    Data.Packages[i].Groups[j].Name,
                     dic =>
                     {
                         Runner.StartCoroutine(() =>
@@ -891,10 +891,10 @@ namespace AIO.UEditor
             for (var i = 0; i < Data.Packages.Length; i++) LookModeDisplayPackages[i] = Data.Packages[i].Name;
 
             if (LookModeDisplayCollectors is null) LookModeDisplayCollectors = new Dictionary<(int, int), string[]>();
-            if (LookModeDisplayTags is null) LookModeDisplayTags = new Dictionary<(int, int), string[]>();
-            if (LookModeDisplayTypes is null) LookModeDisplayTypes = new Dictionary<(int, int), string[]>();
-            if (LookModeDisplayGroups is null) LookModeDisplayGroups = new Dictionary<string, string[]>();
-            if (LookModeData is null) LookModeData = new Dictionary<(int, int), List<AssetDataInfo>>();
+            if (LookModeDisplayTags is null) LookModeDisplayTags             = new Dictionary<(int, int), string[]>();
+            if (LookModeDisplayTypes is null) LookModeDisplayTypes           = new Dictionary<(int, int), string[]>();
+            if (LookModeDisplayGroups is null) LookModeDisplayGroups         = new Dictionary<string, string[]>();
+            if (LookModeData is null) LookModeData                           = new Dictionary<(int, int), List<AssetDataInfo>>();
 
             LookModeCollectorsALLSize  = 0;
             LookModeCollectorsPageSize = 0;

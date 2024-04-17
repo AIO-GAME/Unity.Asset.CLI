@@ -14,7 +14,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     收集器搜索结果
         /// </summary>
-        private readonly List<AssetCollectItem> ItemCollectorsSearchResult = new  List<AssetCollectItem> ();
+        private readonly List<AssetCollectItem> ItemCollectorsSearchResult = new List<AssetCollectItem>();
 
         private bool ItemCollectorsSearching => !string.IsNullOrEmpty(ItemCollectorsSearch);
 
@@ -23,11 +23,11 @@ namespace AIO.UEditor
             using (new EditorGUILayout.VerticalScope(GEStyle.INThumbnailShadow))
             {
                 Data.CurrentPackage.Name = GELayout.Field(
-                                                          "Package Name", Data.CurrentPackage.Name);
+                    "Package Name", Data.CurrentPackage.Name);
 
                 Data.CurrentPackage.Description = GELayout.Field(
-                                                                 "Package Description",
-                                                                 Data.CurrentPackage.Description);
+                    "Package Description",
+                    Data.CurrentPackage.Description);
             }
 
             if (!Data.IsValidGroup()) return;
@@ -36,13 +36,13 @@ namespace AIO.UEditor
             using (new EditorGUILayout.VerticalScope(GEStyle.INThumbnailShadow))
             {
                 Data.CurrentGroup.Name = GELayout.Field(
-                                                        "Group Name", Data.CurrentGroup.Name);
+                    "Group Name", Data.CurrentGroup.Name);
 
                 Data.CurrentGroup.Description = GELayout.Field(
-                                                               "Group Description", Data.CurrentGroup.Description);
+                    "Group Description", Data.CurrentGroup.Description);
 
-                Data.CurrentGroup.Tags = GELayout.Field(
-                                                        "Group Tags", Data.CurrentGroup.Tags);
+                Data.CurrentGroup.Tag = GELayout.Field(
+                    "Group Tags", Data.CurrentGroup.Tag);
             }
         }
 
@@ -136,31 +136,23 @@ namespace AIO.UEditor
             if (Data.Count <= 0) return;
             using (new EditorGUILayout.VerticalScope(GEStyle.GridList))
             {
-                EditorGUILayout.Space();
-                FoldoutPackageInfo = GELayout.VFoldoutHeaderGroupWithHelp(
-                                                                          OnDrawPackageInfo,
-                                                                          "Data Info",
-                                                                          FoldoutPackageInfo);
+                // EditorGUILayout.Space();
+                // FoldoutPackageInfo = GELayout.VFoldoutHeaderGroupWithHelp(
+                //                                                           OnDrawPackageInfo,
+                //                                                           "Data Info",
+                //                                                           FoldoutPackageInfo);
 
                 EditorGUILayout.Space();
                 var content = new GUIContent($"Collectors ({Data.CurrentGroup.Collectors.Length})");
                 FoldoutCollectors = GELayout.VFoldoutHeaderGroupWithHelp(
-                                                                         OnDrawItem,
-                                                                         content,
-                                                                         FoldoutCollectors,
-                                                                         () =>
-                                                                         {
-                                                                             CurrentCurrentCollectorsIndex =
-                                                                                 Data.CurrentGroup.Collectors.Length;
-                                                                             OnDrawItemListScroll.y = 0;
-                                                                             Data.CurrentGroup.Collectors =
-                                                                                 Data.CurrentGroup.Collectors.
-                                                                                     Add(new AssetCollectItem());
-                                                                         },
-                                                                         0,
-                                                                         null,
-                                                                         new GUIContent("✚")
-                                                                        );
+                    OnDrawItem, content, FoldoutCollectors, () =>
+                    {
+                        OnDrawItemListScroll.y        = 0;
+                        CurrentCurrentCollectorsIndex = Data.CurrentGroup.Collectors.Length;
+                        Data.CurrentGroup.Collectors  = Data.CurrentGroup.Collectors.Add(new AssetCollectItem());
+                    },
+                    0, null, new GUIContent("✚")
+                );
             }
         }
     }

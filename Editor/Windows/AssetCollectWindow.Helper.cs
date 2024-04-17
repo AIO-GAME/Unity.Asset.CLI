@@ -117,17 +117,6 @@ namespace AIO.UEditor
                         : groupName).ToArray();
         }
 
-        /// <summary>
-        ///     获取收集器显示名称
-        /// </summary>
-        private static string[] GetCollectorDisPlayNames(IEnumerable<AssetCollectItem> collectors)
-        {
-            return (from item in collectors
-                    where item.Type == EAssetCollectItemType.MainAssetCollector
-                    where !string.IsNullOrEmpty(item.CollectPath)
-                    select item.CollectPath).ToArray();
-        }
-
         private static string[] GetCollectorDisPlayNames(IList<string> collectors)
         {
             if (collectors.Count >= 31)

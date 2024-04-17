@@ -73,7 +73,7 @@ namespace AIO.UEditor.CLI
         {
             return new AssetBundleCollectorGroup
             {
-                AssetTags  = group.Tags,
+                AssetTags  = group.Tag,
                 GroupDesc  = group.Description,
                 GroupName  = group.Name,
                 Collectors = Convert(group.Collectors).ToList()
