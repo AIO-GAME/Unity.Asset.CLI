@@ -19,6 +19,10 @@ namespace AIO.UEditor
 
         #region 静态函数
 
+        protected static readonly Color ColorLine         = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        protected static readonly Color ColorAlternatingA = new Color(63 / 255f, 63 / 255f, 63 / 255f, 1); //#3F3F3F
+        protected static readonly Color ColorAlternatingB = new Color(56 / 255f, 56 / 255f, 56 / 255f, 1); //#383838
+
         protected static MultiColumnHeaderState.Column GetMultiColumnHeaderColumn(
             string name,
             float  width = 100,
@@ -50,11 +54,6 @@ namespace AIO.UEditor
             void OnDraw(Rect cellRect, ref RowGUIArgs args);
 
             /// <summary>
-            ///   高度
-            /// </summary>
-            float Height { get; }
-
-            /// <summary>
             ///   是否允许改变展开状态
             /// </summary>
             bool AllowChangeExpandedState { get; }
@@ -65,12 +64,18 @@ namespace AIO.UEditor
             bool AllowRename { get; }
 
             /// <summary>
+            ///   高度
+            /// </summary>
+            float GetHeight();
+
+            /// <summary>
             ///  获取重命名矩形
             /// </summary>
-            Rect GetRenameRect(Rect rowRect, int row, TreeViewItem item);
+            Rect GetRenameRect(Rect rowRect, int row);
         }
 
         private readonly string FullName;
+        protected        int    ContentID;
 
         protected ViewTreeRowSingle(TreeViewState state, MultiColumnHeader header) : base(state, header)
         {
@@ -144,6 +149,20 @@ namespace AIO.UEditor
         /// <param name="item">选中组件</param>
         protected virtual void OnContextClicked(GenericMenu menu, TreeViewItem item) { }
 
+        /// <summary>
+        ///   按键按下
+        /// </summary>
+        /// <param name="keyCode"> 按键 </param>
+        /// <param name="item"> 选中组件 </param>
+        protected virtual void OnEventKeyDown(KeyCode keyCode, TreeViewItem item) { }
+
+        /// <summary>
+        ///   按键抬起
+        /// </summary>
+        /// <param name="keyCode"> 按键 </param>
+        /// <param name="item"> 选中组件 </param>
+        protected virtual void OnEventKeyUp(KeyCode keyCode, TreeViewItem item) { }
+
         #endregion
 
         #region 工具函数
@@ -189,13 +208,16 @@ namespace AIO.UEditor
                 var cellRect = args.GetCellRect(0);
                 cellRect.x += 10;
                 CenterRectUsingSingleLineHeight(ref cellRect);
+                EditorGUI.BeginChangeCheck();
                 item.OnDraw(cellRect, ref args);
+                if (EditorGUI.EndChangeCheck()) Reload();
             }
         }
 
         public sealed override void OnGUI(Rect rect)
         {
             base.OnGUI(rect);
+            ContentID = GUIUtility.GetControlID(FocusType.Passive, rect);
             multiColumnHeader.state.AutoWidth(rect.width);
             if (Event.current.type == EventType.MouseDown
              && Event.current.button == 0
@@ -258,7 +280,7 @@ namespace AIO.UEditor
         /// <returns></returns>
         protected sealed override Rect GetRenameRect(Rect rowRect, int row, TreeViewItem item)
         {
-            if (item is IGraphDraw draw) return draw.GetRenameRect(rowRect, row, item);
+            if (item is IGraphDraw draw) return draw.GetRenameRect(rowRect, row);
             return base.GetRenameRect(rowRect, row, item);
         }
 
@@ -270,7 +292,7 @@ namespace AIO.UEditor
         /// <returns>行高</returns>
         protected sealed override float GetCustomRowHeight(int row, TreeViewItem item)
         {
-            if (item is IGraphDraw draw) return draw.Height;
+            if (item is IGraphDraw draw) return draw.GetHeight();
             return base.GetCustomRowHeight(row, item);
         }
 
@@ -300,6 +322,26 @@ namespace AIO.UEditor
         /// <param name="id">ID</param>
         protected sealed override void DoubleClickedItem(int id) { }
 
+        protected sealed override void KeyEvent()
+        {
+            if (state.selectedIDs.Count != 1) return;
+            var code = Event.current.keyCode;
+            if (code == KeyCode.None) return;
+            switch (Event.current.type)
+            {
+                case EventType.KeyDown:
+                {
+                    OnEventKeyDown(code, FindItem(state.selectedIDs[0], rootItem));
+                    break;
+                }
+                case EventType.KeyUp:
+                {
+                    OnEventKeyUp(code, FindItem(state.selectedIDs[0], rootItem));
+                    break;
+                }
+            }
+        }
+
         #region 拖拽事件
 
         /// <summary>
@@ -315,6 +357,13 @@ namespace AIO.UEditor
         /// <returns></returns>
         protected sealed override DragAndDropVisualMode HandleDragAndDrop(DragAndDropArgs args)
         {
+            if (!GUI.enabled) return DragAndDropVisualMode.None;
+            if (DragAndDrop.activeControlID == ContentID)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.None;
+                return DragAndDropVisualMode.None;
+            }
+
             switch (args.dragAndDropPosition)
             {
                 case DragAndDropPosition.BetweenItems:
@@ -332,10 +381,11 @@ namespace AIO.UEditor
 
                 if (args.performDrop)
                 {
+                    DragAndDrop.AcceptDrag();
                     OnDragSwapData(dragArgs.draggedItem.id - 1, args.parentItem.id - 1);
                     ReloadAndSelect(new[] { args.parentItem.id });
-                    DragAndDrop.AcceptDrag();
                     DragAndDrop.PrepareStartDrag();
+                    HandleUtility.Repaint();
                 }
 
                 return DragAndDropVisualMode.Move;
@@ -351,14 +401,17 @@ namespace AIO.UEditor
         /// <returns></returns>
         protected sealed override bool CanStartDrag(CanStartDragArgs args)
         {
+            if (!GUI.enabled) return false;
             if (args.draggedItemIDs.Count != 1 || args.draggedItem == null) return false;
 
             if (!IsSelected(args.draggedItem.id))
             {
                 OnSelection(args.draggedItem.id);
                 OnSelectionChanged?.Invoke(args.draggedItem.id);
+                return false;
             }
 
+            DragAndDrop.activeControlID = ContentID;
             if (HasSelection() && isDragging)
             {
                 DragAndDrop.SetGenericData(FullName, args);

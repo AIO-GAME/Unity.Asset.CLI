@@ -61,6 +61,7 @@ namespace AIO.UEditor
 
         protected override void OnContextClicked(GenericMenu menu)
         {
+            menu.AddItem(GC_MENU_ADD, false, OP_CreateCollect);
             menu.AddItem(GC_MENU_ALL_DISABLE, false, () => { Config.CurrentGroup.ForEach(group => group.Enable = false); });
             menu.AddItem(GC_MENU_ALL_ENABLE, false, () => { Config.CurrentGroup.ForEach(group => group.Enable  = true); });
         }
@@ -69,6 +70,34 @@ namespace AIO.UEditor
         protected override void OnDragSwapData(int from, int to)
         {
             (Config.CurrentGroup[from], Config.CurrentGroup[to]) = (Config.CurrentGroup[to], Config.CurrentGroup[from]);
+        }
+
+        /// <inheritdoc />
+        protected override void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
+        {
+            if (!(item is TreeViewItemCollect collect)) return;
+            switch (keyCode)
+            {
+                case KeyCode.KeypadEnter:
+                case KeyCode.Return:
+                    if (collect.Item.Path)
+                    {
+                        collect.Item.Folded = !collect.Item.Folded;
+                        Event.current.Use();
+                        Reload();
+                    }
+
+                    break;
+                case KeyCode.Delete:
+                    collect.OP_DEL();
+                    break;
+            }
+        }
+
+        private void OP_CreateCollect()
+        {
+            Config.CurrentGroup.Add(new AssetCollectItem());
+            Reload();
         }
     }
 }

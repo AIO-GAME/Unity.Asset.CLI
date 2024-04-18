@@ -125,16 +125,24 @@ namespace AIO.UEditor
                 menu.AddItem(contentEnable, false, ChangeEnable, item);
             }
 
-            menu.AddItem(GC_MENU_RENAME, false, RenameGroupName, item);
+            menu.AddItem(GC_MENU_RENAME, false, RenamePackageName, item);
             menu.AddItem(GC_MENU_DELETE, false, DeletePackages, item.id);
         }
 
         #endregion
 
-        protected override void KeyEvent()
+        /// <inheritdoc />
+        protected override void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
         {
-            if (Event.current.keyCode == KeyCode.Delete
-             && GetSelection().Count > 0) DeletePackages(GetSelection());
+            switch (keyCode)
+            {
+                case KeyCode.F2:
+                    RenamePackageName(item);
+                    break;
+                case KeyCode.Delete:
+                    DeletePackages(item.id);
+                    break;
+            }
         }
 
         private void ChangeDefPackage(object obj)
@@ -234,7 +242,7 @@ namespace AIO.UEditor
             }
         }
 
-        private void RenameGroupName(object obj)
+        private void RenamePackageName(object obj)
         {
             switch (obj)
             {

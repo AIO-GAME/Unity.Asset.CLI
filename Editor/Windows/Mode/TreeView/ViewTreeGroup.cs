@@ -45,6 +45,20 @@ namespace AIO.UEditor
             Config = AssetCollectRoot.GetOrCreate();
         }
 
+        /// <inheritdoc />
+        protected override void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
+        {
+            switch (keyCode)
+            {
+                case KeyCode.F2:
+                    OP_RenameGroupName(item);
+                    break;
+                case KeyCode.Delete:
+                    OP_DeleteGroup(item);
+                    break;
+            }
+        }
+
         protected override void OnRename(RenameEndedArgs args)
         {
             if (Config.CurrentPackage.All(group => group.Name != args.newName))

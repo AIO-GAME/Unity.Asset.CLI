@@ -23,16 +23,12 @@ namespace AIO.UEditor
                 Group = group;
             }
 
-            public override Texture2D icon        => Icon as Texture2D;
-            public override string    displayName => Group.Name;
-            public override string    ToString()  => Group.ToString();
+            public override Texture2D icon => Icon as Texture2D;
 
             private static Rect GetRectLine(Rect cellRect)
             {
                 return new Rect(cellRect.x + 30, cellRect.y + 8, cellRect.width - 40, 1);
             }
-
-            private static readonly Color ColorLine = new Color(0.5f, 0.5f, 0.5f, 0.5f);
 
             public void OnDraw(Rect cellRect, ref RowGUIArgs args)
             {
@@ -52,10 +48,10 @@ namespace AIO.UEditor
 
             #region IGraphDraw
 
-            float IGraphDraw.Height                                                   => 35;
-            bool IGraphDraw. AllowChangeExpandedState                                 => false;
-            bool IGraphDraw. AllowRename                                              => true;
-            Rect IGraphDraw. GetRenameRect(Rect cellRect, int row, TreeViewItem item) => cellRect;
+            float IGraphDraw.GetHeight()                           => 35;
+            bool IGraphDraw. AllowChangeExpandedState              => false;
+            bool IGraphDraw. AllowRename                           => true;
+            Rect IGraphDraw. GetRenameRect(Rect cellRect, int row) => cellRect;
 
             #endregion
 
@@ -66,7 +62,7 @@ namespace AIO.UEditor
                 GUI.Box(rect, string.Empty, args.selected ? GEStyle.SelectionRect : GEStyle.INThumbnailShadow);
                 rect.Set(cellRect.x + 30, cellRect.y + 8, cellRect.width - 40, 1);
                 EditorGUI.DrawRect(rect, ColorLine);
-                rect.Set(cellRect.x + cellRect.width - 11, cellRect.y - 9, 1, cellRect.height + 16);
+                rect.Set(cellRect.x + cellRect.width - 11, cellRect.y - 9, 1, args.rowRect.height);
                 EditorGUI.DrawRect(rect, ColorLine);
             }
 
@@ -74,16 +70,18 @@ namespace AIO.UEditor
             {
                 DrawStyle(cellRect, ref args);
 
-                var iconRect = new Rect(cellRect.x, cellRect.y + 1, cellRect.height - 1, cellRect.height - 1);
-                GUI.DrawTexture(iconRect, icon, ScaleMode.ScaleToFit);
+                var rect = new Rect(cellRect.x, cellRect.y + 1, cellRect.height - 1, cellRect.height - 1);
+                GUI.DrawTexture(rect, icon, ScaleMode.ScaleToFit);
 
-                // 绘制名称
-                var nameRect = new Rect(cellRect.x + iconRect.xMax + 1, cellRect.y - 9, cellRect.width - iconRect.width - iconRect.x, cellRect.height);
-                DefaultGUI.BoldLabel(nameRect, displayName, args.selected, args.focused);
+                var width = cellRect.width - rect.width - rect.x;
+                var x = cellRect.x + rect.xMax + 1;
 
-                // 绘制描述
-                var descRect = new Rect(cellRect.x + iconRect.xMax + 1, cellRect.y + 9, cellRect.width - iconRect.width - iconRect.x, cellRect.height);
-                DefaultGUI.Label(descRect, Group.Description, args.selected, args.focused);
+                rect.Set(x, cellRect.y - 9, width, cellRect.height); // 绘制名称
+                DefaultGUI.BoldLabel(rect, Group.Name, args.selected, args.focused);
+
+
+                rect.Set(x, cellRect.y + 9, width, cellRect.height); // 绘制描述
+                DefaultGUI.Label(rect, Group.Description, args.selected, args.focused);
             }
         }
     }
