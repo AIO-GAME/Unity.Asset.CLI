@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using System.Linq;
 
 #endregion
 
@@ -11,6 +12,37 @@ namespace AIO.UEditor
         private static DisplayList<IAssetRuleAddress> _MapAddress;
         private static DisplayList<IAssetRuleFilter>  _MapCollectFilter;
         private static DisplayList<IAssetRulePack>    _MapPacks;
+
+        private static string[] _CollectFilterDisplays { get; set; }
+        private static string[] _PackDisplays          { get; set; }
+        private static string[] _AddressDisplays       { get; set; }
+
+        public static string[] CollectFilterDisplays
+        {
+            get
+            {
+                if (_CollectFilterDisplays is null) Initialize();
+                return _CollectFilterDisplays;
+            }
+        }
+
+        public static string[] PackDisplays
+        {
+            get
+            {
+                if (_PackDisplays is null) Initialize();
+                return _PackDisplays;
+            }
+        }
+
+        public static string[] AddressDisplays
+        {
+            get
+            {
+                if (_AddressDisplays is null) Initialize();
+                return _AddressDisplays;
+            }
+        }
 
         public static IAssetRuleFilter GetAssetRuleFilter<T>()
         where T : IAssetRuleFilter
@@ -91,10 +123,7 @@ namespace AIO.UEditor
             if (_MapAddress is null) _MapAddress = new DisplayList<IAssetRuleAddress>();
             else _MapAddress.Clear();
 
-            if (_MapCollectFilter is null)
-            {
-                _MapCollectFilter = new DisplayList<IAssetRuleFilter>();
-            }
+            if (_MapCollectFilter is null) _MapCollectFilter = new DisplayList<IAssetRuleFilter>();
             else _MapCollectFilter.Clear();
 
             if (_MapPacks is null) _MapPacks = new DisplayList<IAssetRulePack>();
@@ -128,13 +157,17 @@ namespace AIO.UEditor
             _MapCollectFilter.OnCompare += CollectFilterCompare;
             _MapCollectFilter.Sort();
             _MapCollectFilter.OnCompare -= CollectFilterCompare;
+
+            _CollectFilterDisplays = _MapCollectFilter.Displays.ToArray();
+            _PackDisplays          = _MapPacks.Displays.ToArray();
+            _AddressDisplays       = _MapAddress.Displays.ToArray();
         }
 
         private static int CollectFilterCompare(string a, string b)
         {
             var a1 = _MapCollectFilter.GetValue(a);
             if (a1 == null) return 1;
-            
+
             var b1 = _MapCollectFilter.GetValue(b);
             if (b1 == null) return string.Compare(a, b, StringComparison.Ordinal);
 

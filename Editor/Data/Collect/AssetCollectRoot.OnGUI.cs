@@ -50,15 +50,9 @@ namespace AIO.UEditor
             {
                 if (Packages is null || Packages.Length == 0)
                 {
-                    Packages = new[]
-                    {
-                        new AssetCollectPackage
-                        {
-                            Name        = "Default Package",
-                            Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
-                        }
-                    };
+                    Packages            = Array.Empty<AssetCollectPackage>();
                     CurrentPackageIndex = 0;
+                    return null;
                 }
                 else if (CurrentPackageIndex < 0)
                     CurrentPackageIndex = 0;
@@ -75,18 +69,12 @@ namespace AIO.UEditor
             {
                 if (CurrentPackage.Groups is null || CurrentPackage.Groups.Length == 0)
                 {
-                    CurrentPackage.Groups = new[]
-                    {
-                        new AssetCollectGroup
-                        {
-                            Name        = "Default Group",
-                            Description = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-                            Collectors  = Array.Empty<AssetCollectItem>()
-                        }
-                    };
-                    CurrentGroupIndex = 0;
+                    CurrentPackage.Groups = Array.Empty<AssetCollectGroup>();
+                    CurrentGroupIndex     = 0;
+                    return null;
                 }
-                else if (CurrentGroupIndex < 0)
+
+                if (CurrentGroupIndex < 0)
                 {
                     CurrentGroupIndex = 0;
                 }

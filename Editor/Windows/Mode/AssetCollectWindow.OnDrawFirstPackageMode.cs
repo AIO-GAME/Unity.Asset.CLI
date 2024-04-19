@@ -187,35 +187,42 @@ namespace AIO.UEditor
                 return;
             }
 
-            if (EditorApplication.isPlaying)
-            {
-                var index = 0;
-                foreach (var record in Config.SequenceRecord)
-                    using (new EditorGUILayout.VerticalScope())
-                    {
-                        GELayout.Label(
-                            $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
-                        GELayout.HelpBox(
-                            $"{record.Time:yyyy-MM-dd HH:mm:ss} [Num : {record.Count}] [Size : {record.Bytes.ToConverseStringFileSize()}] ");
-                    }
-            }
-            else
-            {
-                if (!LookModeShowAssetDetail) ViewDetailList.width = CurrentWidth;
-                else ViewDetailList.MaxWidth                       = CurrentWidth - 300;
-                ViewDetailList.height            = CurrentHeight - DrawHeaderHeight;
-                ViewDetailList.IsAllowHorizontal = LookModeShowAssetDetail;
-                ViewDetailList.Draw(OnDrawLookModeAssetList, GEStyle.Badge);
+            // if (EditorApplication.isPlaying)
+            // {
+            //     var index = 0;
+            //     foreach (var record in Config.SequenceRecord)
+            //         using (new EditorGUILayout.VerticalScope())
+            //         {
+            //             GELayout.Label(
+            //                 $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
+            //             GELayout.HelpBox(
+            //                 $"{record.Time:yyyy-MM-dd HH:mm:ss} [Num : {record.Count}] [Size : {record.Bytes.ToConverseStringFileSize()}] ");
+            //         }
+            // }
+            // else
+            // {
+            //     if (!LookModeShowAssetDetail) ViewDetailList.width = CurrentWidth;
+            //     else ViewDetailList.MaxWidth                       = CurrentWidth - 300;
+            //     ViewDetailList.height            = CurrentHeight - DrawHeaderHeight;
+            //     ViewDetailList.IsAllowHorizontal = LookModeShowAssetDetail;
+            //     ViewDetailList.Draw(OnDrawLookModeAssetList, GEStyle.Badge);
+            //
+            //     if (LookModeShowAssetDetail)
+            //     {
+            //         ViewDetails.IsShow = true;
+            //         ViewDetails.x      = ViewDetailList.width;
+            //         ViewDetails.width  = CurrentWidth - ViewDetails.x;
+            //         ViewDetails.height = ViewDetailList.height - 3;
+            //         ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
+            //     }
+            // }
 
-                if (LookModeShowAssetDetail)
-                {
-                    ViewDetails.IsShow = true;
-                    ViewDetails.x      = ViewDetailList.width;
-                    ViewDetails.width  = CurrentWidth - ViewDetails.x;
-                    ViewDetails.height = ViewDetailList.height - 3;
-                    ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
-                }
-            }
+            // ViewDetailList.y      = 10;
+            ViewDetailList.x      = 5;
+            ViewDetailList.width  = CurrentWidth - 10;
+            ViewDetailList.y      = 0;
+            ViewDetailList.height = CurrentHeight - DrawHeaderHeight;
+            ViewDetailList.Draw((rect) => { ViewTreeQueryAsset.OnGUI(ViewDetailList); }, GEStyle.INThumbnailShadow);
         }
 
         private bool FirstPackageModeDataFilter(AssetDataInfo data)

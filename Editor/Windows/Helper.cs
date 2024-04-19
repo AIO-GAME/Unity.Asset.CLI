@@ -44,7 +44,7 @@ namespace AIO.UEditor
 
                         GUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField("寻址规则", GUILayout.MaxWidth(65));
-                        result.Address = GELayout.Popup(result.Address, AssetCollectSetting.MapAddress.Displays,
+                        result.AddressIndex = GELayout.Popup(result.AddressIndex, AssetCollectSetting.MapAddress.Displays,
                                                         GEStyle.PreDropDown);
                         GUILayout.EndHorizontal();
 

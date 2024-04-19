@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using AIO.UEngine;
 using UnityEditor;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
@@ -74,7 +75,8 @@ namespace AIO.UEditor
         /// <summary>
         ///     定位规则
         /// </summary>
-        public int Address;
+        [FormerlySerializedAs("Address")]
+        public int AddressIndex;
 
         /// <summary>
         ///     定位格式
@@ -179,7 +181,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     是否允许多线程收集
         /// </summary>
-        public bool AllowThread => AssetCollectSetting.MapAddress?.GetValue(Address)?.AllowThread ?? false;
+        public bool AllowThread => AssetCollectSetting.MapAddress?.GetValue(AddressIndex)?.AllowThread ?? false;
 
         /// <summary>
         ///     获取收集器标签
@@ -255,7 +257,7 @@ namespace AIO.UEditor
                    Equals(x.Path, y.Path) &&
                    x.UserData == y.UserData &&
                    x.FileName == y.FileName &&
-                   x.Address == y.Address &&
+                   x.AddressIndex == y.AddressIndex &&
                    x.RuleCollect == y.RuleCollect &&
                    x.RuleFilter == y.RuleFilter;
         }
@@ -270,7 +272,7 @@ namespace AIO.UEditor
                 hashCode = (hashCode * 397) ^ (obj.Path != null ? obj.Path.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.UserData != null ? obj.UserData.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.FileName != null ? obj.FileName.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ obj.Address.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.AddressIndex.GetHashCode();
                 hashCode = (hashCode * 397) ^ (obj.RuleCollect != null ? obj.RuleCollect.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (obj.RuleFilter != null ? obj.RuleFilter.GetHashCode() : 0);
                 return hashCode;
@@ -286,7 +288,7 @@ namespace AIO.UEditor
         ///     设置可寻址规则
         /// </summary>
         public void SetAddress<T>()
-        where T : IAssetRuleAddress => Address = AssetCollectSetting.MapAddress.FindIndex(address => address is T);
+        where T : IAssetRuleAddress => AddressIndex = AssetCollectSetting.MapAddress.FindIndex(address => address is T);
 
         /// <summary>
         ///     判断是否符合收集规则
@@ -401,7 +403,7 @@ namespace AIO.UEditor
 
         public string GetAssetAddress(AssetRuleData data, bool pathToLower, bool hasExtension)
         {
-            var rule = AssetCollectSetting.MapAddress.GetValue(Address);
+            var rule = AssetCollectSetting.MapAddress.GetValue(AddressIndex);
             var address = rule.GetAssetAddress(data);
             if (string.IsNullOrEmpty(address)) return string.Empty;
 

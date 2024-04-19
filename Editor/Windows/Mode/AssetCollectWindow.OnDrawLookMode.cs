@@ -341,7 +341,7 @@ namespace AIO.UEditor
             }
         }
 
-        private void OnDrawLookModeAssetList()
+        private void OnDrawLookModeAssetList(Rect cellRect)
         {
             var headerRect = new Rect(0, 0, ViewDetailList.width, 20);
             if (LookModeShowAssetDetail) headerRect.width -= ViewDetailList.DragHorizontalWidth;
@@ -373,7 +373,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     绘制 资源查询模式 资源详情
         /// </summary>
-        private void OnDrawLookModeAssetDetail()
+        private void OnDrawLookModeAssetDetail(Rect cellRect)
         {
             using (new EditorGUILayout.VerticalScope(GEStyle.GridList))
             {

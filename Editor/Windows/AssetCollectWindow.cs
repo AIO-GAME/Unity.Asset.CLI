@@ -127,8 +127,7 @@ namespace AIO.UEditor
 
         protected override void OnDraw()
         {
-            using (new GUILayout.HorizontalScope(
-                       GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
+            using (new GUILayout.HorizontalScope(GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
             {
                 OnDrawHeader();
             }
@@ -189,6 +188,8 @@ namespace AIO.UEditor
                 {
                     ViewGroupList.DragHorizontal(eventData);
                     ViewPackageList.DragHorizontal(eventData);
+                    OnDraw();
+                    eventData.Use();
                     break;
                 }
                 case Mode.LookFirstPackage:

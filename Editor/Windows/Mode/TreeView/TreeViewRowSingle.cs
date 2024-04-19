@@ -13,69 +13,12 @@ namespace AIO.UEditor
     /// <summary>
     ///     SingleRowTreeEditor
     /// </summary>
-    public abstract class ViewTreeRowSingle : TreeView
+    public abstract class ViewTreeRowSingle : TreeViewBasics
     {
         public event Action<int> OnSelectionChanged;
-
-        #region 静态函数
-
-        protected static readonly Color ColorLine         = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-        protected static readonly Color ColorAlternatingA = new Color(63 / 255f, 63 / 255f, 63 / 255f, 1); //#3F3F3F
-        protected static readonly Color ColorAlternatingB = new Color(56 / 255f, 56 / 255f, 56 / 255f, 1); //#383838
-
-        protected static MultiColumnHeaderState.Column GetMultiColumnHeaderColumn(
-            string name,
-            float  width = 100,
-            float  min   = 80,
-            float  max   = 200
-        ) => new MultiColumnHeaderState.Column
-        {
-            headerContent         = new GUIContent(name),
-            minWidth              = min,
-            maxWidth              = max,
-            width                 = width,
-            sortedAscending       = true,
-            headerTextAlignment   = TextAlignment.Center,
-            sortingArrowAlignment = TextAlignment.Center,
-            canSort               = true,
-            autoResize            = true,
-            allowToggleVisibility = false
-        };
-
-        #endregion
-
-        protected interface IGraphDraw
-        {
-            /// <summary>
-            ///    绘制
-            /// </summary>
-            /// <param name="cellRect"> 单元格矩形 </param>
-            /// <param name="args"> 行参数 </param>
-            void OnDraw(Rect cellRect, ref RowGUIArgs args);
-
-            /// <summary>
-            ///   是否允许改变展开状态
-            /// </summary>
-            bool AllowChangeExpandedState { get; }
-
-            /// <summary>
-            ///  是否允许重命名
-            /// </summary>
-            bool AllowRename { get; }
-
-            /// <summary>
-            ///   高度
-            /// </summary>
-            float GetHeight();
-
-            /// <summary>
-            ///  获取重命名矩形
-            /// </summary>
-            Rect GetRenameRect(Rect rowRect, int row);
-        }
+        protected int            ContentID;
 
         private readonly string FullName;
-        protected        int    ContentID;
 
         protected ViewTreeRowSingle(TreeViewState state, MultiColumnHeader header) : base(state, header)
         {
@@ -96,32 +39,32 @@ namespace AIO.UEditor
         #region 虚函数
 
         /// <summary>
-        ///    初始化
+        ///     初始化
         /// </summary>
         protected abstract void OnInitialize();
 
         /// <summary>
-        ///   构建行
+        ///     构建行
         /// </summary>
         /// <param name="root">根节点</param>
         protected abstract void OnBuildRows(TreeViewItem root);
 
         /// <summary>
-        ///   重命名完成
+        ///     重命名完成
         /// </summary>
         /// <param name="args">重命名参数</param>
         protected virtual void OnRename(RenameEndedArgs args) { }
 
         /// <summary>
-        ///    排序
+        ///     排序
         /// </summary>
         /// <param name="header">多列头</param>
         protected virtual void OnSorting(MultiColumnHeader header) { }
 
         /// <summary>
-        ///    绘制
+        ///     绘制
         /// </summary>
-        protected virtual void OnDraw() { }
+        protected virtual void OnDraw(Rect rect) { }
 
         /// <summary>
         ///     选择
@@ -130,34 +73,34 @@ namespace AIO.UEditor
         protected virtual void OnSelection(int id) { }
 
         /// <summary>
-        ///    拖拽交换数据
+        ///     拖拽交换数据
         /// </summary>
         /// <param name="from">源</param>
         /// <param name="to">目标</param>
         protected virtual void OnDragSwapData(int from, int to) { }
 
         /// <summary>
-        ///    右键点击空白区域
+        ///     右键点击空白区域
         /// </summary>
         /// <param name="menu">菜单</param>
         protected virtual void OnContextClicked(GenericMenu menu) { }
 
         /// <summary>
-        ///   右键点击Item区域
+        ///     右键点击Item区域
         /// </summary>
         /// <param name="menu">菜单</param>
         /// <param name="item">选中组件</param>
         protected virtual void OnContextClicked(GenericMenu menu, TreeViewItem item) { }
 
         /// <summary>
-        ///   按键按下
+        ///     按键按下
         /// </summary>
         /// <param name="keyCode"> 按键 </param>
         /// <param name="item"> 选中组件 </param>
         protected virtual void OnEventKeyDown(KeyCode keyCode, TreeViewItem item) { }
 
         /// <summary>
-        ///   按键抬起
+        ///     按键抬起
         /// </summary>
         /// <param name="keyCode"> 按键 </param>
         /// <param name="item"> 选中组件 </param>
@@ -171,17 +114,6 @@ namespace AIO.UEditor
         {
             OnSorting(header);
             Reload();
-        }
-
-        protected void ReloadAndSelect()             => ReloadAndSelect(Array.Empty<int>());
-        protected void ReloadAndSelect(int hashCode) => ReloadAndSelect(new[] { hashCode });
-
-        protected void ReloadAndSelect(IList<int> hashCodes)
-        {
-            Reload();
-            SetSelection(hashCodes, TreeViewSelectionOptions.RevealAndFrame);
-            SelectionChanged(hashCodes);
-            SetFocus();
         }
 
         #endregion
@@ -203,14 +135,19 @@ namespace AIO.UEditor
         /// </summary>
         protected sealed override void RowGUI(RowGUIArgs args)
         {
-            if (args.item is IGraphDraw item)
+            switch (args.item)
             {
-                var cellRect = args.GetCellRect(0);
-                cellRect.x += 10;
-                CenterRectUsingSingleLineHeight(ref cellRect);
-                EditorGUI.BeginChangeCheck();
-                item.OnDraw(cellRect, ref args);
-                if (EditorGUI.EndChangeCheck()) Reload();
+                case IGraphDraw item:
+                {
+                    var cellRect = args.GetCellRect(0);
+                    cellRect.x += 10;
+                    CenterRectUsingSingleLineHeight(ref cellRect);
+                    EditorGUI.BeginChangeCheck();
+                    var cast = Cast(args);
+                    item.OnDraw(cellRect, ref cast);
+                    if (EditorGUI.EndChangeCheck()) Reload();
+                    break;
+                }
             }
         }
 
@@ -219,38 +156,28 @@ namespace AIO.UEditor
             base.OnGUI(rect);
             ContentID = GUIUtility.GetControlID(FocusType.Passive, rect);
             multiColumnHeader.state.AutoWidth(rect.width);
+
+            OnDraw(rect);
             if (Event.current.type == EventType.MouseDown
              && Event.current.button == 0
              && rect.Contains(Event.current.mousePosition)
                ) SetSelection(state.selectedIDs, TreeViewSelectionOptions.FireSelectionChanged);
 
-            OnDraw();
+            rect.height = 26;
+            EditorGUI.DrawRect(rect, ColorLine);
         }
-
-        /// <summary>
-        ///     构建根节点
-        /// </summary>
-        /// <returns>根节点</returns>
-        protected sealed override TreeViewItem BuildRoot() => new TreeViewItem
-        {
-            id          = 0,
-            depth       = -1,
-            displayName = "root",
-            children    = new List<TreeViewItem>()
-        };
 
         /// <summary>
         ///     更改名称完成
         /// </summary>
         protected sealed override void RenameEnded(RenameEndedArgs args)
         {
-            if (string.IsNullOrEmpty(args.newName) || args.newName == args.originalName)
-            {
-                args.acceptedRename = false;
-                return;
-            }
-
+            if (!args.acceptedRename ||
+                string.IsNullOrEmpty(args.newName) ||
+                args.newName == args.originalName
+               ) return;
             OnRename(args);
+            EndRename();
         }
 
         /// <summary>
@@ -317,7 +244,7 @@ namespace AIO.UEditor
             => item.displayName.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0;
 
         /// <summary>
-        ///    多选
+        ///     多选
         /// </summary>
         /// <param name="id">ID</param>
         protected sealed override void DoubleClickedItem(int id) { }
@@ -345,13 +272,13 @@ namespace AIO.UEditor
         #region 拖拽事件
 
         /// <summary>
-        ///   设置拖拽
+        ///     设置拖拽
         /// </summary>
         /// <param name="args"></param>
         protected sealed override void SetupDragAndDrop(SetupDragAndDropArgs args) { }
 
         /// <summary>
-        ///   处理拖拽
+        ///     处理拖拽
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -395,7 +322,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        ///  是否能开始拖拽
+        ///     是否能开始拖拽
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -435,6 +362,7 @@ namespace AIO.UEditor
         {
             if (selectedIds.Count == 0) return;
             var id = selectedIds[0];
+            if (rootItem.children.Count > selectedIds.Count) SetSelection(selectedIds, TreeViewSelectionOptions.RevealAndFrame);
             OnSelection(id);
             OnSelectionChanged?.Invoke(id);
         }
@@ -472,7 +400,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     右键点击 Item区域
         /// </summary>
-        protected override void ContextClickedItem(int id)
+        protected sealed override void ContextClickedItem(int id)
         {
             ReloadAndSelect(id);
             var item = FindItem(id, rootItem);

@@ -31,11 +31,6 @@ namespace AIO.UEditor
         public ASBuildConfig BuildConfig;
 
         /// <summary>
-        ///     当前选择的收集器
-        /// </summary>
-        private int CurrentCurrentCollectorsIndex;
-
-        /// <summary>
         ///     当前选择的资源
         /// </summary>
         private int CurrentSelectAssetIndex;
@@ -57,10 +52,8 @@ namespace AIO.UEditor
 
         private Vector2 OnDrawConfigFTPScroll = Vector2.zero;
 
-        private Vector2 OnDrawConfigGCScroll  = Vector2.zero;
-        private Vector2 OnDrawConfigScroll    = Vector2.zero;
-        private Vector2 OnDrawGroupListScroll = Vector2.zero;
-        private Vector2 OnDrawItemListScroll  = Vector2.zero;
+        private Vector2 OnDrawConfigGCScroll = Vector2.zero;
+        private Vector2 OnDrawConfigScroll   = Vector2.zero;
 
         /// <summary>
         ///     界面 - 查询模式 显示ICON
@@ -104,12 +97,14 @@ namespace AIO.UEditor
         /// </summary>
         private ViewRect ViewCollectorsList;
 
-        private ViewTreeCollect ViewCurrentCollector;
+        private ViewTreeCollect ViewTreeCollector;
 
         /// <summary>
         ///     界面 - 配置界面
         /// </summary>
         private ViewRect ViewSetting;
+
+        private TreeViewQueryAsset ViewTreeQueryAsset;
 
         private void GPInit()
         {
@@ -140,7 +135,12 @@ namespace AIO.UEditor
             GPInit();
             GUIContentInit();
 
-            if (CurrentPageValues is null) CurrentPageValues = new PageList<AssetDataInfo> { PageSize = 30 };
+            if (CurrentPageValues is null)
+            {
+                CurrentPageValues  = new PageList<AssetDataInfo> { PageSize = 30 };
+                ViewTreeQueryAsset = TreeViewQueryAsset.Create(CurrentPageValues);
+            }
+
             if (LookDataPageSizeMenu is null) UpdatePageSizeMenu();
         }
 
@@ -163,34 +163,33 @@ namespace AIO.UEditor
                 DragHorizontalWidth = 5,
                 width               = CurrentWidth - ViewSetting.width
             };
-            ViewPackageList = new ViewRect(100, DoEditorDrawRect.height)
+            ViewPackageList = new ViewRect(120, DoEditorDrawRect.height)
             {
                 IsShow              = true,
                 IsAllowHorizontal   = true,
                 DragHorizontalWidth = 5,
                 width               = 150
             };
-            ViewGroupList = new ViewRect(100, DoEditorDrawRect.height)
+            ViewGroupList = new ViewRect(120, DoEditorDrawRect.height)
             {
                 IsShow              = true,
                 IsAllowHorizontal   = true,
                 DragHorizontalWidth = 5,
                 width               = 150
             };
-            ViewCollectorsList = new ViewRect(100, DoEditorDrawRect.height)
+            ViewCollectorsList = new ViewRect(700, DoEditorDrawRect.height)
             {
-                IsShow            = true,
-                IsAllowHorizontal = false,
-                width             = 400
+                IsShow              = true,
+                IsAllowHorizontal   = false,
+                width               = 750
             };
-
             ViewDetailList = new ViewRect(300, DoEditorDrawRect.height)
             {
                 IsShow              = true,
                 IsAllowHorizontal   = false,
                 DragHorizontalWidth = 10,
                 width               = 400,
-                x                   = 0,
+                x                   = 5,
                 y                   = DrawHeaderHeight
             };
 
@@ -204,13 +203,13 @@ namespace AIO.UEditor
 
             ViewTreePackage      = ViewTreePackage.Create();
             ViewTreeGroup        = ViewTreeGroup.Create();
-            ViewCurrentCollector = ViewTreeCollect.Create(ViewCollectorsList.width, ViewCollectorsList.MinWidth);
+            ViewTreeCollector = ViewTreeCollect.Create(ViewCollectorsList.width, ViewCollectorsList.MinWidth);
             ViewTreePackage.OnSelectionChanged += id =>
             {
                 ViewTreeGroup.Reload();
-                ViewCurrentCollector.Reload();
+                ViewTreeCollector.Reload();
             };
-            ViewTreeGroup.OnSelectionChanged += id => { ViewCurrentCollector.Reload(); };
+            ViewTreeGroup.OnSelectionChanged += id => { ViewTreeCollector.Reload(); };
         }
 
         private void UpdatePageSizeMenu()
@@ -264,20 +263,6 @@ namespace AIO.UEditor
         ///     折叠栏 - Google Cloud 上传
         /// </summary>
         private bool FoldoutUploadGCloud = true;
-
-        #endregion
-
-        #region Draw Group List
-
-        /// <summary>
-        ///     折叠栏 - 资源包信息
-        /// </summary>
-        private bool FoldoutPackageInfo = true;
-
-        /// <summary>
-        ///     折叠栏 - 收集器列表
-        /// </summary>
-        private bool FoldoutCollectors = true;
 
         #endregion
 

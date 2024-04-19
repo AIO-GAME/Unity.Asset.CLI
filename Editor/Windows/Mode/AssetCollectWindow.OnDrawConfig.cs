@@ -59,8 +59,7 @@ namespace AIO.UEditor
             DoConfigDrawRect.x      = 5;
             DoConfigDrawRect.height = CurrentHeight - DrawHeaderHeight;
             DoConfigDrawRect.width  = ViewConfig.width;
-            ViewConfig.Draw(DoConfigDrawRect,
-                            () =>
+            ViewConfig.Draw(DoConfigDrawRect, rect =>
                             {
                                 ViewConfig.MaxWidth = CurrentWidth - ViewSetting.MinWidth;
                                 OnDrawConfigScroll  = GELayout.VScrollView(OnDrawASConfig, OnDrawConfigScroll);
@@ -71,7 +70,7 @@ namespace AIO.UEditor
             DoConfigDrawRect.width =  CurrentWidth - ViewConfig.width;
             ViewSetting.width      =  DoConfigDrawRect.width;
             ViewSetting.Draw(DoConfigDrawRect,
-                             () => { OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll); },
+                             (rect) => { OnDrawSettingScroll = GELayout.VScrollView(OnDrawSetting, OnDrawSettingScroll); },
                              GEStyle.INThumbnailShadow);
         }
 
@@ -284,7 +283,7 @@ namespace AIO.UEditor
                                           config.IsDefault = GELayout.Toggle(config.IsDefault, GUILayout.Width(20));
                                           if (!config.IsDefault) return;
                                           foreach (var package in Config.Packages.Where(package => config.Name !=
-                                                       package.Name))
+                                                                                                   package.Name))
                                               package.IsDefault = false;
                                       });
                         GUI.enabled = true;
