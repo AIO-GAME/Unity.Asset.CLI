@@ -11,50 +11,48 @@ namespace AIO.UEditor
         /// <summary>
         ///     绘制 标签模式 导航栏
         /// </summary>
-        private void OnDrawHeaderTagsMode()
+        partial void OnDrawHeaderTagsMode(Rect rect)
         {
             if (!Data.IsValidCollect())
             {
-                EditorGUILayout.Separator();
                 return;
             }
 
-            SearchText = CurrentTagValues.Count > 300
-                ? EditorGUILayout.DelayedTextField(SearchText, GEStyle.SearchTextField)
-                : EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
-
-            if (GUILayout.Button(GC_CLEAR, GEStyle.TEtoolbarbutton, GP_Width_25))
-            {
-                GUI.FocusControl(null);
-                SearchText = string.Empty;
-            }
-
+            var width = rect.width;
+            rect.x     = 0;
+            rect.width = 0;
             if (TagsModeDisplayCollectors.Length > 0)
             {
+                rect.x     += rect.width;
+                rect.width =  100;
                 if (TagsModeDisplayCollectors.Length == 1)
                 {
                     LookModeDisplayCollectorsIndex = 0;
-                    EditorGUILayout.Popup(0, TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
+                    EditorGUI.Popup(rect, 0, TagsModeDisplayCollectors, GEStyle.PreDropDown);
                 }
                 else if (TagsModeDisplayCollectors.Length >= 31)
                 {
-                    LookModeDisplayCollectorsIndex = EditorGUILayout.Popup(
-                        LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
+                    LookModeDisplayCollectorsIndex = EditorGUI.Popup(rect, LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown);
                 }
                 else
                 {
-                    LookModeDisplayCollectorsIndex = EditorGUILayout.MaskField(
-                        LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown, GP_Width_100);
+                    LookModeDisplayCollectorsIndex = EditorGUI.MaskField(rect, LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown);
                 }
             }
 
             if (TagsModeDisplayTypes.Length > 0)
-                LookModeDisplayTypeIndex = EditorGUILayout.MaskField(
-                    LookModeDisplayTypeIndex, TagsModeDisplayTypes, GEStyle.PreDropDown, GP_Width_100);
+            {
+                rect.x                   += rect.width;
+                rect.width               =  100;
+                LookModeDisplayTypeIndex =  EditorGUI.MaskField(rect, LookModeDisplayTypeIndex, TagsModeDisplayTypes, GEStyle.PreDropDown);
+            }
 
             if (TagsModeDisplayTags.Length > 0)
-                LookModeDisplayTagsIndex = EditorGUILayout.MaskField(
-                    LookModeDisplayTagsIndex, TagsModeDisplayTags, GEStyle.PreDropDown, GP_Width_100);
+            {
+                rect.x                   += rect.width;
+                rect.width               =  100;
+                LookModeDisplayTagsIndex =  EditorGUI.MaskField(rect, LookModeDisplayTagsIndex, TagsModeDisplayTags, GEStyle.PreDropDown);
+            }
 
             if (GUI.changed)
                 if (
@@ -71,15 +69,49 @@ namespace AIO.UEditor
                     CurrentPageValues.Add(CurrentTagValues.Where(data => !TagsModeDataFilter(data)));
                     CurrentPageValues.PageIndex                       = 0;
                     LookModeCollectorsALLSize                         = CurrentPageValues.Sum(data => data.Size);
-                    TempTable[nameof(SearchText)]                     = SearchText;
+                    TempTable[nameof(SearchText)]                     = ViewTreeQueryAsset.searchString = SearchText;
                     TempTable[nameof(LookModeDisplayCollectorsIndex)] = LookModeDisplayCollectorsIndex;
                     TempTable[nameof(LookModeDisplayTypeIndex)]       = LookModeDisplayTypeIndex;
                     TempTable[nameof(LookModeDisplayTagsIndex)]       = LookModeDisplayTagsIndex;
+                    ViewTreeQueryAsset.Reload();
                 }
 
-            OnDrawHeaderLookPageSetting();
+            rect.x     += rect.width + 3;
+            rect.width =  width - 190 - 30 - 30 - rect.x;
+            SearchText = CurrentTagValues.Count > 300
+                ? EditorGUI.DelayedTextField(rect, SearchText, GEStyle.SearchTextField)
+                : EditorGUI.TextField(rect, SearchText, GEStyle.SearchTextField);
 
-            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
+            rect.x     += rect.width;
+            rect.width =  30;
+            if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
+            {
+                GUI.FocusControl(null);
+                ViewTreeQueryAsset.searchString = SearchText = string.Empty;
+            }
+
+            rect.x     += rect.width;
+            rect.width =  190;
+            OnDrawHeaderLookPageSetting(rect);
+
+            rect.x     = width - 30;
+            rect.width = 30;
+            if (GUI.Button(rect, GC_SAVE, GEStyle.TEtoolbarbutton))
+            {
+                GUI.FocusControl(null);
+                Config.SequenceRecord.Save();
+                Config.Save();
+#if UNITY_2021_1_OR_NEWER
+                AssetDatabase.SaveAssetIfDirty(Config);
+#else
+                AssetDatabase.SaveAssets();
+#endif
+                if (EditorUtility.DisplayDialog("保存", "保存成功", "确定")) AssetDatabase.Refresh();
+            }
+
+            rect.x     -= rect.width;
+            rect.width =  30;
+            if (GUI.Button(rect, GC_REFRESH, GEStyle.TEtoolbarbutton))
             {
                 LookCurrentSelectAsset   = null;
                 SearchText               = string.Empty;
@@ -91,7 +123,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     绘制 标签模式 资源列表
         /// </summary>
-        partial void OnDrawTagsMode()
+        partial void OnDrawTagsMode(Rect rect)
         {
             if (Data.Packages.Length == 0)
             {
@@ -99,19 +131,24 @@ namespace AIO.UEditor
                 return;
             }
 
-            if (!LookModeShowAssetDetail) ViewDetailList.width = CurrentWidth;
-            else ViewDetailList.MaxWidth                       = CurrentWidth - 300;
-            ViewDetailList.height            = CurrentHeight - DrawHeaderHeight;
-            ViewDetailList.IsAllowHorizontal = LookModeShowAssetDetail;
-            ViewDetailList.Draw(OnDrawLookModeAssetList, GEStyle.Badge);
+            ViewDetailList.height = CurrentHeight - DrawHeaderHeight;
             if (LookModeShowAssetDetail)
             {
-                ViewDetails.IsShow = true;
-                ViewDetails.x      = ViewDetailList.width;
-                ViewDetails.width  = CurrentWidth - ViewDetails.x;
-                ViewDetails.height = ViewDetailList.height - 3;
-                ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
+                ViewDetailList.width = CurrentWidth - 410;
+                ViewDetails.IsShow   = true;
+                ViewDetails.y        = 0;
+                ViewDetails.x        = ViewDetailList.width + ViewDetailList.x + 5;
+                ViewDetails.width    = CurrentWidth - ViewDetails.x - 5;
+                ViewDetails.height   = ViewDetailList.height;
             }
+            else
+            {
+                ViewDetails.IsShow   = false;
+                ViewDetailList.width = CurrentWidth - 10;
+            }
+
+            ViewDetailList.Draw(ViewTreeQueryAsset.OnGUI, GEStyle.INThumbnailShadow);
+            ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.INThumbnailShadow);
         }
 
         /// <summary>
@@ -163,6 +200,7 @@ namespace AIO.UEditor
                             }
 
                             CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
+                            ViewTreeQueryAsset.Reload();
                         });
                     }
                 }
@@ -170,6 +208,7 @@ namespace AIO.UEditor
 
             TagsModeDisplayCollectors = GetCollectorDisPlayNames(listItems.GetDisPlayNames());
             if (LookModeDisplayCollectorsIndex < 0) LookModeDisplayCollectorsIndex = 0;
+            ViewTreeQueryAsset.Reload();
         }
 
         /// <summary>

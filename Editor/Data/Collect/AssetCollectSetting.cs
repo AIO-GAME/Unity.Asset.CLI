@@ -2,6 +2,8 @@
 
 using System;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 #endregion
 
@@ -41,6 +43,37 @@ namespace AIO.UEditor
             {
                 if (_AddressDisplays is null) Initialize();
                 return _AddressDisplays;
+            }
+        }
+
+        private static GUIContent[] _GT_CollectFilterDisplays { get; set; }
+        private static GUIContent[] _GT_PackDisplays          { get; set; }
+        private static GUIContent[] _GT_AddressDisplays       { get; set; }
+
+        public static GUIContent[] GT_GTCollectFilterDisplays
+        {
+            get
+            {
+                if (_GT_CollectFilterDisplays is null) Initialize();
+                return _GT_CollectFilterDisplays;
+            }
+        }
+
+        public static GUIContent[] GT_PackDisplays
+        {
+            get
+            {
+                if (_GT_PackDisplays is null) Initialize();
+                return _GT_PackDisplays;
+            }
+        }
+
+        public static GUIContent[] GT_AddressDisplays
+        {
+            get
+            {
+                if (_GT_AddressDisplays is null) Initialize();
+                return _GT_AddressDisplays;
             }
         }
 
@@ -158,9 +191,12 @@ namespace AIO.UEditor
             _MapCollectFilter.Sort();
             _MapCollectFilter.OnCompare -= CollectFilterCompare;
 
-            _CollectFilterDisplays = _MapCollectFilter.Displays.ToArray();
-            _PackDisplays          = _MapPacks.Displays.ToArray();
-            _AddressDisplays       = _MapAddress.Displays.ToArray();
+            _AddressDisplays          = _MapAddress.Displays.ToArray();
+            _PackDisplays             = _MapPacks.Displays.ToArray();
+            _CollectFilterDisplays    = _MapCollectFilter.Displays.ToArray();
+            _GT_CollectFilterDisplays = EditorGUIUtility.TrTempContent(_CollectFilterDisplays);
+            _GT_PackDisplays          = EditorGUIUtility.TrTempContent(_PackDisplays);
+            _GT_AddressDisplays       = EditorGUIUtility.TrTempContent(_AddressDisplays);
         }
 
         private static int CollectFilterCompare(string a, string b)

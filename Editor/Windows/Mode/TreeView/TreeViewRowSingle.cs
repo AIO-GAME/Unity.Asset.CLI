@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace AIO.UEditor
     {
         public event Action<int> OnSelectionChanged;
         protected int            ContentID;
+
+        protected void InvokeSelectionChanged(int id) => OnSelectionChanged?.Invoke(id);
 
         private readonly string FullName;
 
@@ -137,15 +140,33 @@ namespace AIO.UEditor
         {
             switch (args.item)
             {
-                case IGraphDraw item:
+                case ITVItemDraw item:
                 {
-                    var cellRect = args.GetCellRect(0);
-                    cellRect.x += 10;
-                    CenterRectUsingSingleLineHeight(ref cellRect);
-                    EditorGUI.BeginChangeCheck();
-                    var cast = Cast(args);
-                    item.OnDraw(cellRect, ref cast);
-                    if (EditorGUI.EndChangeCheck()) Reload();
+                    var count = args.GetNumVisibleColumns() - 1;
+                    for (var i = 0; i <= count; i++)
+                    {
+                        EditorGUI.BeginChangeCheck();
+                        var cellRect = args.GetCellRect(i);
+                        CenterRectUsingSingleLineHeight(ref cellRect);
+                        try
+                        {
+                            var cast = Cast(args);
+                            item.OnDraw(cellRect, i, ref cast);
+                        }
+                        catch (Exception)
+                        {
+                            GUIUtility.ExitGUI();
+                        }
+
+                        if (i == count)
+                        {
+                            cellRect.Set(cellRect.width + cellRect.x + count - 1, args.rowRect.y, 1, args.rowRect.height - 1);
+                            EditorGUI.DrawRect(cellRect, ColorLine);
+                        }
+
+                        if (EditorGUI.EndChangeCheck()) Reload();
+                    }
+
                     break;
                 }
             }
@@ -194,7 +215,7 @@ namespace AIO.UEditor
         /// <returns>Ture:能 False:不能</returns>
         protected sealed override bool CanRename(TreeViewItem item)
         {
-            if (item is IGraphDraw draw) return draw.AllowRename && state.lastClickedID == item.id;
+            if (item is ITVItemDraw draw) return draw.AllowRename && state.lastClickedID == item.id;
             return base.CanRename(item);
         }
 
@@ -207,7 +228,7 @@ namespace AIO.UEditor
         /// <returns></returns>
         protected sealed override Rect GetRenameRect(Rect rowRect, int row, TreeViewItem item)
         {
-            if (item is IGraphDraw draw) return draw.GetRenameRect(rowRect, row);
+            if (item is ITVItemDraw draw) return draw.GetRenameRect(rowRect, row);
             return base.GetRenameRect(rowRect, row, item);
         }
 
@@ -219,7 +240,7 @@ namespace AIO.UEditor
         /// <returns>行高</returns>
         protected sealed override float GetCustomRowHeight(int row, TreeViewItem item)
         {
-            if (item is IGraphDraw draw) return draw.GetHeight();
+            if (item is ITVItemDraw draw) return draw.GetHeight();
             return base.GetCustomRowHeight(row, item);
         }
 
@@ -230,7 +251,7 @@ namespace AIO.UEditor
         /// <returns>Ture:能 False:不能</returns>
         protected sealed override bool CanChangeExpandedState(TreeViewItem item)
         {
-            if (item is IGraphDraw draw) return draw.AllowChangeExpandedState;
+            if (item is ITVItemDraw draw) return draw.AllowChangeExpandedState;
             return base.CanChangeExpandedState(item);
         }
 
@@ -241,7 +262,28 @@ namespace AIO.UEditor
         /// <param name="search">搜索内容</param>
         /// <returns>Ture:匹配 False:不匹配</returns>
         protected sealed override bool DoesItemMatchSearch(TreeViewItem item, string search)
-            => item.displayName.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0;
+        {
+            if (item is ITVItemDraw draw) return draw.MatchSearch(search);
+            return base.DoesItemMatchSearch(item, search);
+        }
+
+        /// <summary>
+        ///    搜索改变
+        /// </summary>
+        /// <param name="newSearch">新搜索</param>
+        protected override void SearchChanged(string newSearch)
+        {
+            if (string.IsNullOrEmpty(newSearch))
+            {
+                Reload();
+                return;
+            }
+
+            var search = newSearch.ToLower();
+            rootItem.children = rootItem.children.Where(item => DoesItemMatchSearch(item, search)).ToList();
+            SetupDepthsFromParentsAndChildren(rootItem);
+            BuildRows(rootItem);
+        }
 
         /// <summary>
         ///     多选
@@ -258,12 +300,14 @@ namespace AIO.UEditor
             {
                 case EventType.KeyDown:
                 {
-                    OnEventKeyDown(code, FindItem(state.selectedIDs[0], rootItem));
+                    OnEventKeyDown(code, rootItem.children[state.selectedIDs[0]]);
+                    Event.current.Use();
                     break;
                 }
                 case EventType.KeyUp:
                 {
-                    OnEventKeyUp(code, FindItem(state.selectedIDs[0], rootItem));
+                    OnEventKeyUp(code, rootItem.children[state.selectedIDs[0]]);
+                    Event.current.Use();
                     break;
                 }
             }
@@ -309,7 +353,7 @@ namespace AIO.UEditor
                 if (args.performDrop)
                 {
                     DragAndDrop.AcceptDrag();
-                    OnDragSwapData(dragArgs.draggedItem.id - 1, args.parentItem.id - 1);
+                    OnDragSwapData(dragArgs.draggedItem.id, args.parentItem.id);
                     ReloadAndSelect(new[] { args.parentItem.id });
                     DragAndDrop.PrepareStartDrag();
                     HandleUtility.Repaint();
@@ -321,6 +365,8 @@ namespace AIO.UEditor
             return DragAndDropVisualMode.None;
         }
 
+        protected bool AllowDrag { get; set; } = true;
+
         /// <summary>
         ///     是否能开始拖拽
         /// </summary>
@@ -328,7 +374,7 @@ namespace AIO.UEditor
         /// <returns></returns>
         protected sealed override bool CanStartDrag(CanStartDragArgs args)
         {
-            if (!GUI.enabled) return false;
+            if (!AllowDrag || !GUI.enabled) return false;
             if (args.draggedItemIDs.Count != 1 || args.draggedItem == null) return false;
 
             if (!IsSelected(args.draggedItem.id))
@@ -371,7 +417,7 @@ namespace AIO.UEditor
         protected sealed override void SingleClickedItem(int id)
         {
             if (state.lastClickedID == id) return;
-            SelectionClick(FindItem(id, rootItem), false);
+            SelectionClick(rootItem.children[id], false);
             state.selectedIDs.Clear();
             state.selectedIDs.Add(id);
             state.lastClickedID = id;
@@ -403,9 +449,8 @@ namespace AIO.UEditor
         protected sealed override void ContextClickedItem(int id)
         {
             ReloadAndSelect(id);
-            var item = FindItem(id, rootItem);
             var menu = new GenericMenu();
-            OnContextClicked(menu, item);
+            OnContextClicked(menu, rootItem.children[id]);
             if (menu.GetItemCount() == 0) return;
             menu.ShowAsContext();
             Event.current.Use();

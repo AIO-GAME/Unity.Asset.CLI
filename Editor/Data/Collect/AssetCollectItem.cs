@@ -341,16 +341,17 @@ namespace AIO.UEditor
             return true;
         }
 
-        public string GetAddressByGUID(string guid) => GetAddress(AssetDatabase.GUIDToAssetPath(guid));
-
-        public string GetAddress(Object asset) => GetAddress(AssetDatabase.GetAssetPath(asset));
+        public string GetAddressByGUID(string guid,  bool isLower, bool hasExtension) => GetAddress(AssetDatabase.GUIDToAssetPath(guid), isLower, hasExtension);
+        public string GetAddress(Object       asset, bool isLower, bool hasExtension) => GetAddress(AssetDatabase.GetAssetPath(asset), isLower, hasExtension);
 
         /// <summary>
         ///     获取资源可寻地址
         /// </summary>
         /// <param name="assetPath">资源相对路径</param>
+        /// <param name="isLower">是否小写</param>
+        /// <param name="hasExtension">是否包含后缀</param>
         /// <returns>可寻址路径</returns>
-        public string GetAddress(string assetPath)
+        public string GetAddress(string assetPath, bool isLower, bool hasExtension)
         {
             UpdateCollect();
             UpdateFilter();
@@ -364,9 +365,8 @@ namespace AIO.UEditor
                 Extension   = System.IO.Path.GetExtension(assetPath).Replace(".", "").ToLower()
             };
             data.AssetPath = assetPath.Substring(0, assetPath.Length - data.Extension.Length - 1);
-            var config = ASConfig.GetOrCreate();
             return IsCollectAsset(data)
-                ? GetAssetAddress(data, config.LoadPathToLower, config.HasExtension)
+                ? GetAssetAddress(data, isLower, hasExtension)
                 : string.Empty;
         }
 
@@ -579,10 +579,7 @@ namespace AIO.UEditor
 
         public void UpdateData()
         {
-            if (_Path == null)
-            {
-                Folded = false;
-            }
+            if (!_Path) Folded = false;
             else
             {
                 var temp = AssetDatabase.GetAssetPath(_Path).Replace("\\", "/");

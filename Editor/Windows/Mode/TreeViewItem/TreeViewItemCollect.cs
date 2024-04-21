@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public sealed class TreeViewItemCollect : TreeViewItem, IGraphDraw
+    public sealed class TreeViewItemCollect : TreeViewItem, ITVItemDraw
     {
         private static readonly GUIContent GC_FOLDOUT_ON = EditorGUIUtility.IconContent("d_Folder Icon").SetTooltips("折叠");
         private static readonly GUIContent GC_FOLDOUT    = EditorGUIUtility.IconContent("d_FolderOpened Icon").SetTooltips("展开");
@@ -28,9 +28,9 @@ namespace AIO.UEditor
             "自定",
             "自定义过滤规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开\n可无需填写点(.)");
 
-        public readonly AssetCollectItem Item;
+        public AssetCollectItem Item;
 
-        public TreeViewItemCollect(int id, AssetCollectItem item) : base(id, 1)
+        public TreeViewItemCollect(int id, AssetCollectItem item) : base(id, 3)
         {
             Item = item;
         }
@@ -38,7 +38,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     收缩状态变更事件
         /// </summary>
-        public event Action<bool> OnChangedFold;
+        public Action<bool> OnChangedFold;
 
         public void OP_Open()
         {
@@ -62,19 +62,19 @@ namespace AIO.UEditor
                 return;
             }
 
-            using (new EditorGUI.DisabledGroupScope(isNull))
-            {
-                cell.x -= 20;
-                if (GELayout.Button(cell, GC_OPEN, GEStyle.IconButton)) OP_Open();
+            if (isNull) GUI.enabled = false;
+            cell.x -= 20;
+            if (GELayout.Button(cell, GC_OPEN, GEStyle.IconButton)) OP_Open();
 
-                cell.x     = rect.x + 5;
-                cell.width = 24;
-                if (GUI.Button(cell, Item.Folded ? GC_FOLDOUT.image : GC_FOLDOUT_ON.image, GEStyle.IconButton))
-                {
-                    Item.Folded = !Item.Folded;
-                    OnChangedFold?.Invoke(Item.Folded);
-                }
+            cell.x     = rect.x + 5;
+            cell.width = 24;
+            if (GUI.Button(cell, Item.Folded ? GC_FOLDOUT.image : GC_FOLDOUT_ON.image, GEStyle.IconButton))
+            {
+                Item.Folded = !Item.Folded;
+                OnChangedFold?.Invoke(Item.Folded);
             }
+
+            if (isNull) GUI.enabled = true;
 
             cell.y     -= 2;
             cell.x     += cell.width;
@@ -86,19 +86,19 @@ namespace AIO.UEditor
             Item.Path  =  GELayout.FieldObject(cell, Item.Path, GEStyle.ToolbarDropDownToggle, GEStyle.DDItemStyle);
 
             if (Item.Folded) return;
-            using (new EditorGUI.DisabledGroupScope(isNull))
-            {
-                cell.x            += cell.width;
-                cell.width        =  200;
-                Item.AddressIndex =  EditorGUI.IntPopup(cell, Item.AddressIndex, AssetCollectSetting.MapAddress.Displays.ToArray(), null, GEStyle.PreDropDown);
 
-                cell.x             += cell.width;
-                Item.RulePackIndex =  EditorGUI.IntPopup(cell, Item.RulePackIndex, AssetCollectSetting.MapPacks.Displays.ToArray(), null, GEStyle.PreDropDown);
+            if (isNull) GUI.enabled = false;
+            cell.x            += cell.width;
+            cell.width        =  200;
+            Item.AddressIndex =  EditorGUI.IntPopup(cell, Item.AddressIndex, AssetCollectSetting.GT_AddressDisplays, null, GEStyle.PreDropDown);
 
-                cell.x        += cell.width;
-                cell.width    =  50;
-                Item.LoadType =  (EAssetLoadType)EditorGUI.EnumPopup(cell, Item.LoadType, GEStyle.PreDropDown);
-            }
+            cell.x             += cell.width;
+            Item.RulePackIndex =  EditorGUI.IntPopup(cell, Item.RulePackIndex, AssetCollectSetting.GT_PackDisplays, null, GEStyle.PreDropDown);
+
+            cell.x        += cell.width;
+            cell.width    =  50;
+            Item.LoadType =  (EAssetLoadType)EditorGUI.EnumPopup(cell, Item.LoadType, GEStyle.PreDropDown);
+            if (isNull) GUI.enabled = true;
         }
 
         private void OnDrawBody1(Rect rect)
@@ -108,7 +108,7 @@ namespace AIO.UEditor
 
             cell.x            += cell.width - 3;
             cell.width        =  rect.width - cell.x - 394;
-            Item.AddressIndex =  EditorGUI.IntPopup(cell, Item.AddressIndex, AssetCollectSetting.MapAddress.Displays.ToArray(), null, GEStyle.PreDropDown);
+            Item.AddressIndex =  EditorGUI.IntPopup(cell, Item.AddressIndex, AssetCollectSetting.GT_AddressDisplays, null, GEStyle.PreDropDown);
 
             cell.width = 45;
             cell.x     = rect.width - cell.width;
@@ -141,7 +141,7 @@ namespace AIO.UEditor
 
             cell.width         =  200;
             cell.x             -= cell.width;
-            Item.RulePackIndex =  EditorGUI.IntPopup(cell, Item.RulePackIndex, AssetCollectSetting.MapPacks.Displays.ToArray(), null, GEStyle.PreDropDown);
+            Item.RulePackIndex =  EditorGUI.IntPopup(cell, Item.RulePackIndex, AssetCollectSetting.GT_PackDisplays, null, GEStyle.PreDropDown);
         }
 
         private void OnDrawBody2(Rect rect)
@@ -217,7 +217,6 @@ namespace AIO.UEditor
 
         private void OnDrawContent(Rect cellRect, ref RowGUIArgs args)
         {
-            EditorGUI.DrawRect(args.rowRect, args.row % 2 == 0 ? TreeViewBasics.ColorAlternatingA : TreeViewBasics.ColorAlternatingB);
             var cell = new Rect(args.rowRect);
             cell.height -= 2;
             GUI.Box(cell, string.Empty, GEStyle.INThumbnailShadow);
@@ -232,8 +231,6 @@ namespace AIO.UEditor
             cell.Set(args.rowRect.x, args.rowRect.y + 2, cellRect.width, 22);
             OnDrawHeader(cell);
 
-            var line = new Rect(cellRect.width - 1, args.rowRect.y, 1, args.rowRect.height - 2);
-            EditorGUI.DrawRect(line, TreeViewBasics.ColorLine);
             if (!Item.Folded) return;
 
             cell.y += 23;
@@ -254,7 +251,7 @@ namespace AIO.UEditor
                 OnDrawBody5(cell);
             }
 
-            line.Set(args.rowRect.x, args.rowRect.y + 48, cellRect.width, 1);
+            var line = new Rect(args.rowRect.x, args.rowRect.y + 48, cellRect.width, 1);
             EditorGUI.DrawRect(line, TreeViewBasics.ColorLine);
             line.y += 23;
             EditorGUI.DrawRect(line, TreeViewBasics.ColorLine);
@@ -287,10 +284,15 @@ namespace AIO.UEditor
 
         #region IGraphDraw
 
-        bool IGraphDraw.AllowChangeExpandedState => false;
-        bool IGraphDraw.AllowRename              => false;
+        bool ITVItemDraw.AllowChangeExpandedState              => false;
+        bool ITVItemDraw.AllowRename                           => false;
+        Rect ITVItemDraw.GetRenameRect(Rect cellRect, int row) => Rect.zero;
 
-        Rect IGraphDraw.GetRenameRect(Rect cellRect, int row) => Rect.zero;
+        bool ITVItemDraw.MatchSearch(string search)
+        {
+            if (string.IsNullOrEmpty(search)) return true;
+            return Item.CollectPath.Contains(search) || Item.UserData.Contains(search) || Item.Tags.Contains(search);
+        }
 
         public float GetHeight()
         {
@@ -302,9 +304,10 @@ namespace AIO.UEditor
 
         private bool isNull;
 
-        void IGraphDraw.OnDraw(Rect cellRect, ref RowGUIArgs args)
+        void ITVItemDraw.OnDraw(Rect cellRect, int col, ref RowGUIArgs args)
         {
             isNull = !Item.Path;
+            EditorGUI.DrawRect(args.rowRect, args.row % 2 == 0 ? TreeViewBasics.ColorAlternatingA : TreeViewBasics.ColorAlternatingB);
             if (Item.Enable)
             {
                 OnDrawContent(cellRect, ref args);

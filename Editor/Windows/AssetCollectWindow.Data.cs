@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
@@ -30,20 +32,7 @@ namespace AIO.UEditor
         /// </summary>
         public ASBuildConfig BuildConfig;
 
-        /// <summary>
-        ///     当前选择的资源
-        /// </summary>
-        private int CurrentSelectAssetIndex;
-
-        /// <summary>
-        ///     宽度偏移量
-        /// </summary>
-        private Rect DoConfigDrawRect = Rect.zero;
-
-        /// <summary>
-        ///     宽度偏移量
-        /// </summary>
-        private Rect DoEditorDrawRect = Rect.zero;
+        private Rect DrawRect;
 
         /// <summary>
         ///     界面 - 收集器选择下标
@@ -53,15 +42,11 @@ namespace AIO.UEditor
         private Vector2 OnDrawConfigFTPScroll = Vector2.zero;
 
         private Vector2 OnDrawConfigGCScroll = Vector2.zero;
-        private Vector2 OnDrawConfigScroll   = Vector2.zero;
 
         /// <summary>
         ///     界面 - 查询模式 显示ICON
         /// </summary>
         private GenericMenu onDrawLookDataItemMenu;
-
-        private Vector2 OnDrawLookDataScroll = Vector2.zero;
-        private Vector2 OnDrawSettingScroll  = Vector2.zero;
 
         /// <summary>
         ///     界面 - 配置界面
@@ -108,23 +93,25 @@ namespace AIO.UEditor
 
         private void GPInit()
         {
-            GP_MAX_Width_100 = GUILayout.MaxWidth(100);
-            GP_MIN_Width_50  = GUILayout.MinWidth(50);
-            GP_Width_EXPAND  = GUILayout.ExpandWidth(true);
-            GP_Width_120     = GUILayout.Width(120);
-            GP_Width_150     = GUILayout.Width(150);
-            GP_Width_160     = GUILayout.Width(160);
-            GP_Width_100     = GUILayout.Width(100);
-            GP_Width_75      = GUILayout.Width(75);
-            GP_Width_80      = GUILayout.Width(80);
-            GP_Width_50      = GUILayout.Width(50);
-            GP_Width_40      = GUILayout.Width(40);
-            GP_Width_30      = GUILayout.Width(30);
-            GP_Width_25      = GUILayout.Width(25);
-            GP_Width_20      = GUILayout.Width(20);
-            GP_Height_30     = GUILayout.Height(30);
-            GP_Height_25     = GUILayout.Height(25);
-            GP_Height_20     = GUILayout.Height(20);
+            GP_Width_EXPAND_TURE = GTOption.WidthExpand(true);
+            GP_MAX_Width_100     = GTOption.MaxWidth(100);
+            GP_MIN_Width_50      = GTOption.MinWidth(50);
+
+            GP_Width_120 = GTOption.Width(120);
+            GP_Width_150 = GTOption.Width(150);
+            GP_Width_160 = GTOption.Width(160);
+            GP_Width_100 = GTOption.Width(100);
+            GP_Width_75  = GTOption.Width(75);
+            GP_Width_80  = GTOption.Width(80);
+            GP_Width_50  = GTOption.Width(50);
+            GP_Width_40  = GTOption.Width(40);
+            GP_Width_30  = GTOption.Width(30);
+            GP_Width_25  = GTOption.Width(25);
+            GP_Width_20  = GTOption.Width(20);
+
+            GP_Height_30 = GTOption.Height(30);
+            GP_Height_25 = GTOption.Height(25);
+            GP_Height_20 = GTOption.Height(20);
         }
 
         partial void GUIContentInit();
@@ -137,63 +124,118 @@ namespace AIO.UEditor
 
             if (CurrentPageValues is null)
             {
-                CurrentPageValues  = new PageList<AssetDataInfo> { PageSize = 30 };
-                ViewTreeQueryAsset = TreeViewQueryAsset.Create(CurrentPageValues);
+                CurrentPageValues                         =  new PageList<AssetDataInfo> { PageSize = 30 };
+                ViewTreeQueryAsset                        =  TreeViewQueryAsset.Create(CurrentPageValues);
+                ViewTreeQueryAsset.IsFirstPackageResource += IsFirstPackageResource;
+                ViewTreeQueryAsset.OnFirstPackageResource += OnFirstPackageResource;
+                ViewTreeQueryAsset.OnSelectionChanged     += OnSelectionChanged;
             }
 
             if (LookDataPageSizeMenu is null) UpdatePageSizeMenu();
         }
 
+        private void OnSelectionChanged(int id)
+        {
+            LookCurrentSelectAssetDataInfo = CurrentPageValues.CurrentPageValues[id];
+            LookCurrentSelectAsset         = AssetDatabase.LoadAssetAtPath<Object>(LookCurrentSelectAssetDataInfo.AssetPath);
+            Dependencies.Clear();
+            // 获取依赖资源
+            var dependencies = AssetDatabase.GetDependencies(LookCurrentSelectAssetDataInfo.AssetPath);
+            DependenciesSize = 0;
+            foreach (var dependency in dependencies)
+            {
+                if (LookCurrentSelectAssetDataInfo.AssetPath == dependency) continue;
+                var info = new DependenciesInfo
+                {
+                    AssetPath = dependency,
+                    Object    = AssetDatabase.LoadAssetAtPath<Object>(dependency)
+                };
+                if (info.Object is null) continue;
+                DependenciesSize += info.Size = new FileInfo(dependency).Length;
+                Dependencies.Add(dependency, info);
+            }
+        }
+
+        private bool IsFirstPackageResource(string guid)
+        {
+            if (string.IsNullOrEmpty(guid)) return false;
+            return Config.EnableSequenceRecord && Config.SequenceRecord.ContainsGUID(guid);
+        }
+
+        private void OnFirstPackageResource(AssetDataInfo data, bool isAdd)
+        {
+            if (isAdd)
+            {
+                var record = new AssetSystem.SequenceRecord
+                {
+                    AssetPath   = data.AssetPath,
+                    Location    = data.Address,
+                    PackageName = data.Package,
+                    Bytes       = data.Size,
+                    Count       = 1,
+                    Time        = DateTime.MinValue
+                };
+                record.SetGUID(data.GUID);
+                Config.SequenceRecord.Add(record);
+                Config.SequenceRecord.Save();
+                Config.SequenceRecord.UpdateLocal();
+                if (WindowMode == Mode.LookFirstPackage)
+                {
+                    CurrentPageValues.Add(data);
+                    ViewTreeQueryAsset.Reload(CurrentPageValues);
+                }
+            }
+            else
+            {
+                Config.SequenceRecord.UpdateLocal();
+                Config.SequenceRecord.RemoveAssetPath(data.AssetPath);
+                Config.SequenceRecord.Save();
+                Config.SequenceRecord.UpdateLocal();
+                if (WindowMode == Mode.LookFirstPackage)
+                {
+                    for (var i = 0; i < CurrentPageValues.Count; i++)
+                    {
+                        if (CurrentPageValues[i].GUID != data.GUID) continue;
+                        CurrentPageValues.RemoveAt(i);
+                        ViewTreeQueryAsset.Reload(CurrentPageValues);
+                        break;
+                    }
+                }
+            }
+
+            Event.current?.Use();
+        }
+
         private void ViewRectUpdate()
         {
-            DoEditorDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
-            DoConfigDrawRect = new Rect(5, DrawHeaderHeight, 0, CurrentHeight - DrawHeaderHeight);
+            var height = CurrentHeight - DrawHeaderHeight;
 
-            ViewSetting = new ViewRect(250, DoEditorDrawRect.height)
+            ViewSetting = new ViewRect(250, height)
             {
                 IsShow              = true,
                 IsAllowHorizontal   = false,
                 DragHorizontalWidth = 5,
                 width               = 250
             };
-            ViewConfig = new ViewRect(550, DoEditorDrawRect.height)
+
+            ViewConfig = new ViewRect(550, height)
             {
                 IsShow              = true,
                 IsAllowHorizontal   = true,
                 DragHorizontalWidth = 5,
                 width               = CurrentWidth - ViewSetting.width
             };
-            ViewPackageList = new ViewRect(120, DoEditorDrawRect.height)
-            {
-                IsShow              = true,
-                IsAllowHorizontal   = true,
-                DragHorizontalWidth = 5,
-                width               = 150
-            };
-            ViewGroupList = new ViewRect(120, DoEditorDrawRect.height)
-            {
-                IsShow              = true,
-                IsAllowHorizontal   = true,
-                DragHorizontalWidth = 5,
-                width               = 150
-            };
-            ViewCollectorsList = new ViewRect(700, DoEditorDrawRect.height)
-            {
-                IsShow              = true,
-                IsAllowHorizontal   = false,
-                width               = 750
-            };
-            ViewDetailList = new ViewRect(300, DoEditorDrawRect.height)
+
+            ViewDetailList = new ViewRect(300, height)
             {
                 IsShow              = true,
                 IsAllowHorizontal   = false,
                 DragHorizontalWidth = 10,
                 width               = 400,
                 x                   = 5,
-                y                   = DrawHeaderHeight
             };
 
-            ViewDetails = new ViewRect(300, DoEditorDrawRect.height)
+            ViewDetails = new ViewRect(300, height)
             {
                 IsShow            = false,
                 IsAllowHorizontal = false,
@@ -201,8 +243,33 @@ namespace AIO.UEditor
                 y                 = ViewDetailList.y + 3
             };
 
-            ViewTreePackage      = ViewTreePackage.Create();
-            ViewTreeGroup        = ViewTreeGroup.Create();
+            #region Editor Mode
+
+            ViewPackageList = new ViewRect(120, height)
+            {
+                IsShow              = true,
+                IsAllowHorizontal   = true,
+                DragHorizontalWidth = 5,
+                width               = 150,
+            };
+
+            ViewGroupList = new ViewRect(120, height)
+            {
+                IsShow              = true,
+                IsAllowHorizontal   = true,
+                DragHorizontalWidth = 5,
+                width               = 150,
+            };
+
+            ViewCollectorsList = new ViewRect(700, height)
+            {
+                IsShow            = true,
+                IsAllowHorizontal = false,
+                width             = 750,
+            };
+
+            ViewTreePackage   = ViewTreePackage.Create();
+            ViewTreeGroup     = ViewTreeGroup.Create();
             ViewTreeCollector = ViewTreeCollect.Create(ViewCollectorsList.width, ViewCollectorsList.MinWidth);
             ViewTreePackage.OnSelectionChanged += id =>
             {
@@ -210,6 +277,8 @@ namespace AIO.UEditor
                 ViewTreeCollector.Reload();
             };
             ViewTreeGroup.OnSelectionChanged += id => { ViewTreeCollector.Reload(); };
+
+            #endregion
         }
 
         private void UpdatePageSizeMenu()
@@ -589,7 +658,7 @@ namespace AIO.UEditor
         private GUILayoutOption GP_Width_40;
         private GUILayoutOption GP_Width_25;
         private GUILayoutOption GP_Width_20;
-        private GUILayoutOption GP_Width_EXPAND;
+        private GUILayoutOption GP_Width_EXPAND_TURE;
         private GUILayoutOption GP_Height_20;
         private GUILayoutOption GP_Height_25;
         private GUILayoutOption GP_Height_30;

@@ -48,7 +48,7 @@ namespace AIO.UEditor
             Config.CurrentGroup.Sort(header.IsSortedAscending(header.sortedColumnIndex));
             var index = Config.CurrentGroup.IndexOf(currentCollect);
             Config.CurrentCollectIndex = index;
-            SetSelection(new[] { index + 1 });
+            SetSelection(new[] { index });
         }
 
         protected override void OnDraw(Rect rect)
@@ -64,17 +64,18 @@ namespace AIO.UEditor
 
         protected override void OnBuildRows(TreeViewItem root)
         {
-            for (var idxG = 0; idxG < Config.CurrentGroup?.Count; idxG++)
+            for (var idxG = 0; idxG < Config?.CurrentGroup?.Count; idxG++)
             {
-                var collect = new TreeViewItemCollect(idxG + 1, Config.CurrentGroup[idxG]);
-                collect.OnChangedFold += fold => Reload();
-                root.AddChild(collect);
+                root.AddChild(new TreeViewItemCollect(idxG, Config.CurrentGroup[idxG])
+                {
+                    OnChangedFold = fold => Reload()
+                });
             }
         }
 
         protected override void OnSelection(int id)
         {
-            Config.CurrentCollectIndex = id - 1;
+            Config.CurrentCollectIndex = id;
         }
 
         protected override void OnContextClicked(GenericMenu menu)
@@ -143,28 +144,47 @@ namespace AIO.UEditor
         /// <inheritdoc />
         protected override void OnDragSwapData(int from, int to)
         {
-            (Config.CurrentGroup[from], Config.CurrentGroup[to]) = (Config.CurrentGroup[to], Config.CurrentGroup[from]);
+            Config.CurrentGroup.Swap(from, to);
         }
 
         /// <inheritdoc />
         protected override void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
         {
-            if (!(item is TreeViewItemCollect collect)) return;
-            switch (keyCode)
+            switch (item)
             {
-                case KeyCode.KeypadEnter:
-                case KeyCode.Return:
-                    if (collect.Item.Path)
+                case TreeViewItemCollect collect:
+                {
+                    switch (keyCode)
                     {
-                        collect.Item.Folded = !collect.Item.Folded;
-                        Event.current.Use();
-                        Reload();
+                        case KeyCode.KeypadEnter:
+                        case KeyCode.Return:
+                            if (collect.Item.Path)
+                            {
+                                collect.Item.Folded = !collect.Item.Folded;
+                                Reload();
+                            }
+
+
+                            break;
+                        case KeyCode.Delete:
+                            collect.OP_DEL();
+                            break;
+                        case KeyCode.DownArrow: // 数字键盘 下键
+                        {
+                            var temp = item.id + 1;
+                            ReloadAndSelect(temp >= Count ? 0 : temp);
+                            break;
+                        }
+                        case KeyCode.UpArrow: // 数字键盘 上键
+                        {
+                            var temp = item.id - 1;
+                            ReloadAndSelect(temp < 0 ? Count - 1 : temp);
+                            break;
+                        }
                     }
 
                     break;
-                case KeyCode.Delete:
-                    collect.OP_DEL();
-                    break;
+                }
             }
         }
 

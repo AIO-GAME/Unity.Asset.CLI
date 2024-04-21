@@ -6,7 +6,91 @@ namespace AIO.UEditor
 {
     public partial class AssetCollectWindow
     {
-        #region FTP
+        private void OnDrawBuildFTP(in Rect rect, out Rect outRect)
+        {
+            if (BuildConfig.FTPConfigs is null || BuildConfig.FTPConfigs.Length == 0)
+            {
+                outRect = rect;
+                return;
+            }
+
+            var cell = new Rect(rect.x, rect.y, rect.width, 300);
+            var view = new Rect(rect.x, rect.y, rect.width - 16, 20 * BuildConfig.FTPConfigs.Length);
+            using (var scope = new GUI.ScrollViewScope(cell, OnDrawConfigFTPScroll, view))
+            {
+                OnDrawConfigFTPScroll = scope.scrollPosition;
+                if (view.height > cell.height) cell.width -= 16;
+                var rectItem = new Rect(rect.x, rect.y, rect.width - 16, 20);
+                for (var i = BuildConfig.FTPConfigs.Length - 1; i >= 0; i--)
+                {
+                    rectItem.width = 20;
+                    rectItem.x     = cell.width - rectItem.width;
+
+                    if (GUI.Button(rectItem, GC_DEL, GEStyle.toolbarbutton))
+                    {
+                        GUI.FocusControl(null);
+                        if (EditorUtility.DisplayDialog("提示", "确定删除?", "确定", "取消"))
+                        {
+                            BuildConfig.FTPConfigs = BuildConfig.FTPConfigs.RemoveAt(i).Exclude();
+                        }
+
+                        continue;
+                    }
+
+                    if (!string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].Server)
+                     && !string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].User)
+                     && !string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].Pass))
+                    {
+                        rectItem.width =  20;
+                        rectItem.x     -= rectItem.width;
+                        if (GUI.Button(rectItem, GC_REFRESH, GEStyle.toolbarbutton))
+                        {
+                            GUI.FocusControl(null);
+                            BuildConfig.FTPConfigs[i].DirTreeFiled.UpdateOption();
+                        }
+
+                        if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
+                        {
+                            rectItem.width =  100;
+                            rectItem.x     -= rectItem.width;
+                            if (GUI.Button(rectItem, "更新首包配置", GEStyle.toolbarbutton))
+                            {
+                                UpdateUploadFirstPack(BuildConfig.FTPConfigs[i]);
+                                GUI.FocusControl(null);
+                            }
+                        }
+
+                        rectItem.width =  50;
+                        rectItem.x     -= rectItem.width;
+                        if (GUI.Button(rectItem, "校验", GEStyle.toolbarbutton))
+                        {
+                            GUI.FocusControl(null);
+                            ValidateFTP(BuildConfig.FTPConfigs[i]);
+                        }
+                    }
+
+                    rectItem.width =  rectItem.x - 30;
+                    rectItem.x     -= rectItem.width;
+                    GUI.Label(rectItem, GetFTPItemDes(BuildConfig.FTPConfigs[i], i), GEStyle.HeaderLabel);
+
+                    rectItem.width =  30;
+                    rectItem.x     -= rectItem.width;
+                    if (GUI.Button(rectItem, BuildConfig.FTPConfigs[i].Folded ? GC_FOLDOUT : GC_FOLDOUT_ON, GEStyle.TEtoolbarbutton))
+                    {
+                        BuildConfig.FTPConfigs[i].Folded = !BuildConfig.FTPConfigs[i].Folded;
+                        GUI.FocusControl(null);
+                    }
+
+                    rectItem.y += rectItem.height;
+                    if (!BuildConfig.FTPConfigs[i].Folded) continue;
+                    rectItem.x     = cell.x;
+                    rectItem.width = cell.width;
+                    OnDrawBuildFTP(BuildConfig.FTPConfigs[i], rectItem, out rectItem);
+                }
+            }
+
+            outRect = new Rect(rect.x, cell.y + cell.height, rect.width, cell.height);
+        }
 
         private string GetFTPItemDes(ASBuildConfig.FTPConfig config, int i)
         {
@@ -34,116 +118,93 @@ namespace AIO.UEditor
             return _builder.ToString().Replace('\\', '/');
         }
 
-        private void OnDrawBuildFTP()
+        private static void OnDrawBuildFTP(ASBuildConfig.FTPConfig config, in Rect rect, out Rect outRect)
         {
-            if (BuildConfig.FTPConfigs is null || BuildConfig.FTPConfigs.Length == 0) return;
-            using (var scope = new EditorGUILayout.ScrollViewScope(OnDrawConfigFTPScroll))
+            using (new EditorGUI.DisabledScope(config.isUploading))
             {
-                OnDrawConfigFTPScroll = scope.scrollPosition;
-                for (var i = BuildConfig.FTPConfigs.Length - 1; i >= 0; i--)
-                    using (GELayout.Vertical(GEStyle.INThumbnailShadow))
-                    {
-                        using (GELayout.VHorizontal(GEStyle.Toolbar))
-                        {
-                            if (GELayout.Button(BuildConfig.FTPConfigs[i].Folded ? GC_FOLDOUT : GC_FOLDOUT_ON,
-                                                GEStyle.TEtoolbarbutton, GP_Width_30))
-                            {
-                                BuildConfig.FTPConfigs[i].Folded = !BuildConfig.FTPConfigs[i].Folded;
-                                GUI.FocusControl(null);
-                            }
+                #region 名称:描述
 
-                            GELayout.Label(GetFTPItemDes(BuildConfig.FTPConfigs[i], i), GEStyle.HeaderLabel,
-                                           GP_Width_EXPAND);
+                var cell = new Rect(rect.x + 5, rect.y, 100, 20);
+                EditorGUI.LabelField(cell, "名称:描述", GEStyle.HeaderLabel);
 
-                            if (!string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].Server) &&
-                                !string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].User) &&
-                                !string.IsNullOrEmpty(BuildConfig.FTPConfigs[i].Pass))
-                            {
-                                if (GUILayout.Button("校验", GEStyle.toolbarbutton, GP_Width_50))
-                                {
-                                    GUI.FocusControl(null);
-                                    ValidateFTP(BuildConfig.FTPConfigs[i]);
-                                }
+                cell.x      += cell.width;
+                cell.width  =  (rect.width - cell.x) / 2;
+                config.Name =  EditorGUI.DelayedTextField(cell, config.Name);
 
-                                if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
-                                    if (GUILayout.Button("更新首包配置", GEStyle.toolbarbutton, GP_Width_100))
-                                    {
-                                        UpdateUploadFirstPack(BuildConfig.FTPConfigs[i]);
-                                        GUI.FocusControl(null);
-                                    }
+                cell.x             += cell.width;
+                config.Description =  EditorGUI.DelayedTextField(cell, config.Description);
 
-                                if (GUILayout.Button(GC_REFRESH, GEStyle.toolbarbutton, GP_Width_20))
-                                {
-                                    GUI.FocusControl(null);
-                                    BuildConfig.FTPConfigs[i].DirTreeFiled.UpdateOption();
-                                    return;
-                                }
-                            }
+                #endregion
 
-                            if (GUILayout.Button(GC_DEL, GEStyle.toolbarbutton, GP_Width_20))
-                            {
-                                GUI.FocusControl(null);
-                                if (EditorUtility.DisplayDialog("提示", "确定删除?", "确定", "取消"))
-                                {
-                                    BuildConfig.FTPConfigs = BuildConfig.FTPConfigs.RemoveAt(i).Exclude();
-                                    return;
-                                }
-                            }
-                        }
+                #region 地址:端口
 
-                        OnDrawBuildFTP(BuildConfig.FTPConfigs[i]);
-                    }
-            }
-        }
+                cell.y     += cell.height;
+                cell.x     =  rect.x + 5;
+                cell.width =  100;
+                EditorGUI.LabelField(cell, "地址:端口", GEStyle.HeaderLabel);
 
-        private void OnDrawBuildFTP(ASBuildConfig.FTPConfig config)
-        {
-            if (!config.Folded) return;
+                cell.x        += cell.width;
+                cell.width    =  rect.width - cell.x - 50;
+                config.Server =  EditorGUI.DelayedTextField(cell, config.Server);
 
-            if (config.isUploading) GUI.enabled = false;
+                cell.x      += cell.width;
+                cell.width  =  50;
+                config.Port =  EditorGUI.DelayedIntField(cell, config.Port);
 
-            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
-            {
-                EditorGUILayout.LabelField("名称:描述", GP_Width_100);
-                config.Name        = GELayout.FieldDelayed(config.Name);
-                config.Description = GELayout.FieldDelayed(config.Description);
-            }
+                #endregion
 
-            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
-            {
-                EditorGUILayout.LabelField("地址:端口", GP_Width_100);
-                config.Server = GELayout.FieldDelayed(config.Server);
-                config.Port   = GELayout.FieldDelayed(config.Port, GP_Width_50);
-            }
+                #region 账户:密码
 
-            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
-            {
-                EditorGUILayout.LabelField("账户:密码", GP_Width_100);
-                config.User = GELayout.FieldDelayed(config.User);
-                config.Pass = GELayout.FieldDelayed(config.Pass);
-            }
+                cell.y     += cell.height;
+                cell.x     =  rect.x + 5;
+                cell.width =  100;
+                EditorGUI.LabelField(cell, "账户:密码", GEStyle.HeaderLabel);
 
-            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
-            {
-                EditorGUILayout.LabelField("远程路径", GP_Width_100);
-                config.RemotePath = GELayout.FieldDelayed(config.RemotePath);
-                if (!string.IsNullOrEmpty(config.RemotePath))
-                    if (GUILayout.Button("创建", GEStyle.toolbarbutton, GP_Width_50))
-                    {
-                        GUI.FocusControl(null);
+                cell.x      += cell.width;
+                cell.width  =  (rect.width - cell.x) / 2;
+                config.User =  EditorGUI.DelayedTextField(cell, config.User);
+
+                cell.x      += cell.width;
+                config.Pass =  EditorGUI.DelayedTextField(cell, config.Pass);
+
+                #endregion
+
+                #region 远程路径
+
+                cell.y     += cell.height;
+                cell.x     =  rect.x + 5;
+                cell.width =  100;
+                EditorGUI.LabelField(cell, "远程路径", GEStyle.HeaderLabel);
+
+                cell.x            += cell.width;
+                cell.width        =  rect.width - cell.x - 50;
+                config.RemotePath =  EditorGUI.DelayedTextField(cell, config.RemotePath);
+
+                cell.x     += cell.width;
+                cell.width =  50;
+                if (GUI.Button(cell, "创建", GEStyle.toolbarbutton))
+                {
+                    GUI.FocusControl(null);
+                    if (string.IsNullOrEmpty(config.RemotePath))
+                        EditorUtility.DisplayDialog("提示", "远程路径不能为空", "确定");
+                    else
                         CreateFTP(config);
-                        return;
-                    }
-            }
+                }
 
-            using (GELayout.VHorizontal(GEStyle.ToolbarBottom))
-            {
+                #endregion
+
+                #region 地址:端口
+
+                cell.y += cell.height;
                 if (config.isUploading)
                 {
-                    EditorGUILayout.LabelField($"上传进度... {config.UploadProgress}",
-                                               GEStyle.CenteredLabel, GP_Width_EXPAND);
+                    cell.x     = rect.x + 5;
+                    cell.width = rect.width - cell.x - 50;
+                    EditorGUI.LabelField(cell, $"上传进度... {config.UploadProgress}", GEStyle.CenteredLabel);
 
-                    if (GUILayout.Button("取消", GEStyle.toolbarbutton, GP_Width_50))
+                    cell.x     += cell.width;
+                    cell.width =  50;
+                    if (GUI.Button(cell, "取消", GEStyle.toolbarbutton))
                     {
                         GUI.FocusControl(null);
                         config.UploadOperation?.Cancel();
@@ -151,24 +212,35 @@ namespace AIO.UEditor
                 }
                 else
                 {
-                    EditorGUILayout.LabelField("本地路径", GP_Width_100);
-                    config.DirTreeFiled.OnDraw();
+                    cell.width = 0;
                     if (!string.IsNullOrEmpty(config.Server) &&
                         !string.IsNullOrEmpty(config.User) &&
                         !string.IsNullOrEmpty(config.Pass) &&
                         !string.IsNullOrEmpty(config.DirTreeFiled.DirPath)
                        )
-                        if (GUILayout.Button("上传", GEStyle.toolbarbutton, GP_Width_50))
+                    {
+                        cell.x     = rect.width - 50;
+                        cell.width = 50;
+                        if (GUI.Button(cell, "上传", GEStyle.toolbarbutton))
                         {
                             GUI.FocusControl(null);
                             config.Upload();
                         }
+                    }
+
+                    cell.x     = rect.x + 5 + 100;
+                    cell.width = rect.width - cell.width - cell.x;
+                    config.DirTreeFiled.OnDraw(cell);
+
+                    cell.width =  100;
+                    cell.x     -= cell.width;
+                    EditorGUI.LabelField(cell, "本地路径", GEStyle.HeaderLabel);
                 }
+
+                #endregion
+
+                outRect = new Rect(rect.x, cell.y + cell.height, rect.width, rect.height);
             }
-
-            if (config.isUploading) GUI.enabled = true;
         }
-
-        #endregion
     }
 }

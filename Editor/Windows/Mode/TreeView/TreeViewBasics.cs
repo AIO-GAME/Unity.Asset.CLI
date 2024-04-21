@@ -43,14 +43,15 @@ namespace AIO.UEditor
         public bool isRenaming;
     }
 
-    public interface IGraphDraw
+    public interface ITVItemDraw
     {
         /// <summary>
         ///     绘制
         /// </summary>
         /// <param name="cellRect"> 单元格矩形 </param>
+        /// <param name="col"> 列 </param>
         /// <param name="args"> 行参数 </param>
-        void OnDraw(Rect cellRect, ref RowGUIArgs args);
+        void OnDraw(Rect cellRect, int col, ref RowGUIArgs args);
 
         /// <summary>
         ///     是否允许改变展开状态
@@ -71,6 +72,13 @@ namespace AIO.UEditor
         ///     获取重命名矩形
         /// </summary>
         Rect GetRenameRect(Rect rowRect, int row);
+
+        /// <summary>
+        ///    匹配搜索
+        /// </summary>
+        /// <param name="search"> 搜索 </param>
+        /// <returns> 是否匹配 </returns>
+        bool MatchSearch(string search);
     }
 
     public abstract class TreeViewBasics : TreeView
@@ -79,21 +87,24 @@ namespace AIO.UEditor
         public static readonly Color ColorAlternatingA = new Color(63 / 255f, 63 / 255f, 63 / 255f, 1); //#3F3F3F
         public static readonly Color ColorAlternatingB = new Color(56 / 255f, 56 / 255f, 56 / 255f, 1); //#383838
 
+        protected int Count => rootItem?.children?.Count ?? 0;
+
         protected static MultiColumnHeaderState.Column GetMultiColumnHeaderColumn(
             string name,
             float  width = 100,
             float  min   = 80,
-            float  max   = 200
+            float  max   = 200,
+            bool   sort  = true
         ) => new MultiColumnHeaderState.Column
         {
             headerContent         = new GUIContent(name),
+            width                 = width,
             minWidth              = min,
             maxWidth              = max,
-            width                 = width,
             sortedAscending       = true,
             headerTextAlignment   = TextAlignment.Center,
             sortingArrowAlignment = TextAlignment.Center,
-            canSort               = true,
+            canSort               = sort,
             autoResize            = true,
             allowToggleVisibility = false
         };
@@ -110,12 +121,19 @@ namespace AIO.UEditor
         /// <summary>
         /// 重载并选中
         /// </summary>
-        protected void ReloadAndSelect(int hc) => ReloadAndSelect(new[] { hc });
+        protected void ReloadAndSelect(int hc) => ReloadAndSelect(new[]
+        {
+            Mathf.Clamp(hc, 0, Count - 1)
+        });
 
         /// <summary>
         /// 重载并选中
         /// </summary>
-        protected void ReloadAndSelect(int hc1, int hc2) => ReloadAndSelect(new[] { hc1, hc2 });
+        protected void ReloadAndSelect(int hc1, int hc2) => ReloadAndSelect(new[]
+        {
+            Mathf.Clamp(hc1, 0, Count - 1),
+            Mathf.Clamp(hc2, 0, Count - 1)
+        });
 
         /// <summary>
         /// 重载并选中
@@ -126,10 +144,10 @@ namespace AIO.UEditor
             if (hashCodes.Count > 0) SelectionChanged(hashCodes);
             SetFocus();
         }
-        
-        protected static AIO.UEditor.RowGUIArgs Cast(RowGUIArgs args)
+
+        protected static UEditor.RowGUIArgs Cast(RowGUIArgs args)
         {
-            var RowGUIArgs = new AIO.UEditor.RowGUIArgs
+            var RowGUIArgs = new UEditor.RowGUIArgs
             {
                 item       = args.item,
                 label      = args.label,

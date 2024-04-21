@@ -135,18 +135,18 @@ namespace AIO.UEditor
         ///     根据资源路径查找资源可寻址路径
         /// </summary>
         /// <param name="assetPath">资源路径</param>
+        /// <param name="isLower">是否小写</param>
+        /// <param name="hasExtension">是否包含后缀</param>
         /// <param name="limitPackage">限制包名 只查找指定包资源 空则忽略</param>
         /// <returns>
         ///     Item1 包名
         ///     Item2 组名
         ///     Item3 可寻址路径
         /// </returns>
-        public static Tuple<string, string, string> AssetToAddress(string assetPath, string limitPackage = "")
+        public static Tuple<string, string, string> AssetToAddress(string assetPath, bool isLower, bool hasExtension, string limitPackage = "")
         {
-            if (string.IsNullOrEmpty(assetPath))
-                return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
-            var root = GetOrCreate();
-            foreach (var package in root.Packages)
+            if (string.IsNullOrEmpty(assetPath)) return Empty;
+            foreach (var package in GetOrCreate().Packages)
             {
                 if (package is null) continue;
                 if (!string.IsNullOrEmpty(limitPackage))
@@ -161,31 +161,34 @@ namespace AIO.UEditor
                         if (item is null) continue;
                         if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
                         if (!assetPath.StartsWith(item.CollectPath)) continue;
-                        var address = item.GetAddress(assetPath);
+                        item.GroupName   = group.Name;
+                        item.PackageName = package.Name;
+                        var address = item.GetAddress(assetPath, isLower, hasExtension);
                         if (string.IsNullOrEmpty(address)) continue;
                         return new Tuple<string, string, string>(package.Name, group.Name, address);
                     }
                 }
             }
 
-            return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            return Empty;
         }
 
         /// <summary>
         ///     根据资源路径查找资源可寻址路径
         /// </summary>
+        /// <param name="guid">资源GUID</param>
+        /// <param name="isLower">是否小写</param>
+        /// <param name="hasExtension">是否包含后缀</param>
         /// <returns>
         ///     Item1 包名
         ///     Item2 组名
         ///     Item3 可寻址路径
         /// </returns>
-        public static Tuple<string, string, string> GUIDToAddress(string guid)
+        public static Tuple<string, string, string> GUIDToAddress(string guid, bool isLower, bool hasExtension)
         {
-            if (string.IsNullOrEmpty(guid))
-                return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            if (string.IsNullOrEmpty(guid)) return Empty;
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var root = GetOrCreate();
-            foreach (var package in root.Packages)
+            foreach (var package in GetOrCreate().Packages)
             {
                 if (package is null) continue;
                 foreach (var group in package.Groups)
@@ -196,14 +199,14 @@ namespace AIO.UEditor
                         if (item is null) continue;
                         if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
                         if (!assetPath.StartsWith(item.CollectPath)) continue;
-                        var address = item.GetAddress(assetPath);
+                        var address = item.GetAddress(assetPath, isLower, hasExtension);
                         if (string.IsNullOrEmpty(address)) continue;
                         return new Tuple<string, string, string>(package.Name, group.Name, address);
                     }
                 }
             }
 
-            return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
+            return Empty;
         }
 
         public static bool ObjToCollector(Object guid, out AssetCollectItem result)
@@ -248,19 +251,20 @@ namespace AIO.UEditor
         /// <summary>
         ///     根据资源路径查找资源可寻址路径
         /// </summary>
+        /// <param name="guid">资源GUID</param>
+        /// <param name="isLower">是否小写</param>
+        /// <param name="hasExtension">是否包含后缀</param>
         /// <returns>
         ///     Item1 包名
         ///     Item2 组名
         ///     Item3 可寻址路径
         /// </returns>
-        public static Tuple<string, string, string> ObjToAddress(Object guid)
+        public static Tuple<string, string, string> ObjToAddress(Object guid, bool isLower, bool hasExtension)
         {
             if (!guid) return Empty;
             var assetPath = AssetDatabase.GetAssetPath(guid);
             if (!File.Exists(assetPath)) return Empty;
-
-            var root = GetOrCreate();
-            foreach (var package in root.Packages)
+            foreach (var package in GetOrCreate().Packages)
             {
                 if (package is null) continue;
                 foreach (var group in package.Groups)
@@ -271,7 +275,7 @@ namespace AIO.UEditor
                         if (item is null) continue;
                         if (item.Type != EAssetCollectItemType.MainAssetCollector) continue;
                         if (!assetPath.StartsWith(item.CollectPath)) continue;
-                        var address = item.GetAddress(assetPath); // 是否是否被过滤
+                        var address = item.GetAddress(assetPath, isLower, hasExtension);
                         if (string.IsNullOrEmpty(address)) continue;
                         return new Tuple<string, string, string>(package.Name, group.Name, address);
                     }

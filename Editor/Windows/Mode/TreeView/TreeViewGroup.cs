@@ -63,6 +63,18 @@ namespace AIO.UEditor
                 case KeyCode.Delete:
                     OP_DeleteGroup(item);
                     break;
+                case KeyCode.DownArrow: // 数字键盘 下键
+                {
+                    var temp = item.id + 1;
+                    ReloadAndSelect(temp >= Count ? 0 : temp);
+                    break;
+                }
+                case KeyCode.UpArrow: // 数字键盘 上键
+                {
+                    var temp = item.id - 1;
+                    ReloadAndSelect(temp < 0 ? Count - 1 : temp);
+                    break;
+                }
             }
         }
 
@@ -75,7 +87,7 @@ namespace AIO.UEditor
                 {
                     if (Config.CurrentPackage.All(group => group.Name != args.newName))
                     {
-                        var group = Config.CurrentPackage[args.itemID - 1];
+                        var group = Config.CurrentPackage[args.itemID];
                         if (group.Name == args.originalName)
                             group.Name = args.newName;
                         Reload();
@@ -89,7 +101,7 @@ namespace AIO.UEditor
                 }
                 case 2: // 重命名描述
                 {
-                    Config.CurrentPackage[args.itemID - 1].Description = args.newName;
+                    Config.CurrentPackage[args.itemID].Description = args.newName;
                     Reload();
                     break;
                 }
@@ -104,18 +116,18 @@ namespace AIO.UEditor
             Config.CurrentPackage.Sort(header.IsSortedAscending(header.sortedColumnIndex));
             var index = Config.CurrentPackage.IndexOf(tempGroup);
             Config.CurrentGroupIndex = index;
-            SetSelection(new[] { index + 1 });
+            SetSelection(new[] { index });
         }
 
         protected override void OnBuildRows(TreeViewItem root)
         {
             for (var idxG = 0; idxG < Config.CurrentPackage?.Count; idxG++)
-                root.AddChild(new TreeViewItemGroup(idxG + 1, Config.CurrentPackage[idxG]));
+                root.AddChild(new TreeViewItemGroup(idxG, Config.CurrentPackage[idxG]));
         }
 
         protected override void OnSelection(int id)
         {
-            Config.CurrentGroupIndex = id - 1;
+            Config.CurrentGroupIndex = id;
         }
 
         protected override void OnContextClicked(GenericMenu menu)
@@ -129,7 +141,7 @@ namespace AIO.UEditor
         protected override void OnContextClicked(GenericMenu menu, TreeViewItem item)
         {
             if (!Config.CurrentPackage.Enable) return;
-            if (Config.CurrentPackage[item.id - 1].Enable)
+            if (Config.CurrentPackage[item.id].Enable)
             {
                 menu.AddItem(GC_MENU_ADD, false, OP_AddCollect, item);
                 menu.AddItem(GC_MENU_DISABLE, false, OP_DisableGroup, item);
@@ -155,7 +167,7 @@ namespace AIO.UEditor
             switch (obj)
             {
                 case TreeViewItem item:
-                    Config.CurrentPackage[item.id - 1].Add(new AssetCollectItem());
+                    Config.CurrentPackage[item.id].Add(new AssetCollectItem());
                     ReloadAndSelect(item.id);
                     break;
             }
@@ -166,7 +178,7 @@ namespace AIO.UEditor
             switch (obj)
             {
                 case TreeViewItem item:
-                    Config.CurrentPackage[item.id - 1].Enable = true;
+                    Config.CurrentPackage[item.id].Enable = true;
                     ReloadAndSelect(item.id);
                     break;
             }
@@ -177,7 +189,7 @@ namespace AIO.UEditor
             switch (obj)
             {
                 case TreeViewItem item:
-                    Config.CurrentPackage[item.id - 1].Enable = false;
+                    Config.CurrentPackage[item.id].Enable = false;
                     ReloadAndSelect(item.id);
                     break;
             }
@@ -190,10 +202,10 @@ namespace AIO.UEditor
                 case TreeViewItem item:
                     if (EditorUtility.DisplayDialog(
                             "删除资源组",
-                            $"是否删除资源组 : {Config.CurrentPackage[item.id - 1].Name}",
+                            $"是否删除资源组 : {Config.CurrentPackage[item.id].Name}",
                             "确定", "取消"))
                     {
-                        Config.CurrentPackage.RemoveAt(item.id - 1);
+                        Config.CurrentPackage.RemoveAt(item.id);
                         ReloadAndSelect(Config.CurrentGroupIndex--);
                     }
 
@@ -218,7 +230,7 @@ namespace AIO.UEditor
             switch (obj)
             {
                 case TreeViewItem item:
-                    item.displayName = Config.CurrentPackage[item.id - 1].Name;
+                    item.displayName = Config.CurrentPackage[item.id].Name;
                     RenameIndex      = 1;
                     BeginRename(item, 0.1f);
                     ReloadAndSelect(item.id);
@@ -232,7 +244,7 @@ namespace AIO.UEditor
             {
                 case TreeViewItem item:
                     RenameIndex      = 2;
-                    item.displayName = Config.CurrentPackage[item.id - 1].Description;
+                    item.displayName = Config.CurrentPackage[item.id].Description;
                     if (BeginRename(item, 0.1f))
                     {
                         ReloadAndSelect(item.id);

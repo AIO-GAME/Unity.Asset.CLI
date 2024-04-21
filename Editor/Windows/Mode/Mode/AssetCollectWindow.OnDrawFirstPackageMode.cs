@@ -17,17 +17,21 @@ namespace AIO.UEditor
             if (!Config.EnableSequenceRecord) return;
             if (Config.SequenceRecord.ExistsLocal()) Config.SequenceRecord.UpdateLocal();
             UpdatePageValuesFirstPackageMode();
+            ViewTreeQueryAsset.Reload();
         }
 
         /// <summary>
         ///     绘制 资源查询模式 导航栏
         /// </summary>
-        private void OnDrawHeaderFirstPackageMode()
+        partial void OnDrawHeaderFirstPackageMode(Rect rect)
         {
+            var width = rect.width;
+            rect.x     = 0;
+            rect.width = 0;
             if (!Config.EnableSequenceRecord)
             {
-                EditorGUILayout.Separator();
-                if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+                rect.width = 30;
+                if (GUI.Button(rect, GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     Selection.activeObject = Config;
@@ -38,13 +42,17 @@ namespace AIO.UEditor
 
             if (File.Exists(AssetSystem.SequenceRecordQueue.LOCAL_PATH))
             {
-                if (GELayout.Button(GC_OPEN_FOLDER, GEStyle.TEtoolbarbutton, GP_Width_25))
+                rect.x     += rect.width;
+                rect.width =  30;
+                if (GUI.Button(rect, GC_OPEN_FOLDER, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     EditorUtility.RevealInFinder(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                 }
 
-                if (GELayout.Button(GC_DEL, GEStyle.TEtoolbarbutton, GP_Width_25))
+                rect.x     += rect.width;
+                rect.width =  30;
+                if (GUI.Button(rect, GC_DEL, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     AHelper.IO.DeleteFile(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
@@ -58,62 +66,62 @@ namespace AIO.UEditor
 
             if (!string.IsNullOrEmpty(Config.URL))
             {
-                if (GELayout.Button(GC_NET, GEStyle.TEtoolbarbutton, GP_Width_25))
+                rect.x     += rect.width;
+                rect.width =  30;
+                if (GUI.Button(rect, GC_NET, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     Application.OpenURL(AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Config));
                 }
 
-                if (GELayout.Button(GC_DOWNLOAD, GEStyle.TEtoolbarbutton, GP_Width_25))
+                rect.x     += rect.width;
+                rect.width =  30;
+                if (GUI.Button(rect, GC_DOWNLOAD, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     SyncSequenceRecords();
                 }
             }
 
-            SearchText = EditorGUILayout.TextField(SearchText, GEStyle.SearchTextField);
-            if (GUILayout.Button(GC_CLEAR, GEStyle.TEtoolbarbutton, GP_Width_25))
-            {
-                GUI.FocusControl(null);
-                SearchText = string.Empty;
-            }
-
             if (TagsModeDisplayTypes != null && TagsModeDisplayTypes.Length > 0)
-                LookModeDisplayTypeIndex = EditorGUILayout.MaskField(LookModeDisplayTypeIndex,
-                                                                     TagsModeDisplayTypes, GEStyle.PreDropDown,
-                                                                     GP_Width_100);
-
-            if (GUI.changed)
-                if (TempTable.GetOrDefault<int>(nameof(LookModeDisplayTypeIndex)) !=
-                    LookModeDisplayTypeIndex ||
-                    TempTable.GetOrDefault<string>(nameof(SearchText)) != SearchText)
-                {
-                    CurrentPageValues.Clear();
-                    CurrentPageValues.Add(CurrentTagValues.Where(data => !FirstPackageModeDataFilter(data)));
-                    CurrentPageValues.PageIndex                 = 0;
-                    LookModeCollectorsALLSize                   = CurrentPageValues.Sum(data => data.Size);
-                    TempTable[nameof(SearchText)]               = SearchText;
-                    TempTable[nameof(LookModeDisplayTypeIndex)] = LookModeDisplayTypeIndex;
-                }
-
-            OnDrawHeaderLookPageSetting();
-
-            if (GUILayout.Button(GC_REFRESH, GEStyle.TEtoolbarbutton, GP_Width_25))
             {
-                GUI.FocusControl(null);
-                SearchText               = string.Empty;
-                LookModeDisplayTypeIndex = 0;
-                Config.SequenceRecord.UpdateLocal();
-                UpdatePageValuesFirstPackageMode();
+                rect.x                   += rect.width;
+                rect.width               =  100;
+                LookModeDisplayTypeIndex =  EditorGUI.MaskField(rect, LookModeDisplayTypeIndex, TagsModeDisplayTypes, GEStyle.PreDropDown);
             }
 
-            if (GUILayout.Button(GC_Select_ASConfig, GEStyle.TEtoolbarbutton, GP_Width_30, GP_Height_20))
+            rect.x     += rect.width + 3;
+            rect.width =  width - 190 - 30 - 30 - 30 - 30 - rect.x;
+            SearchText =  GUI.TextField(rect, SearchText, GEStyle.SearchTextField);
+
+            rect.x     += rect.width;
+            rect.width =  30;
+            if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
-                Selection.activeObject = Config;
+                ViewTreeQueryAsset.searchString = SearchText = string.Empty;
             }
 
-            if (GELayout.Button(GC_SAVE, GEStyle.TEtoolbarbutton, GP_Width_25))
+            if (GUI.changed &&
+                (TempTable.GetOrDefault<int>(nameof(LookModeDisplayTypeIndex)) != LookModeDisplayTypeIndex
+              || TempTable.GetOrDefault<string>(nameof(SearchText)) != SearchText))
+            {
+                CurrentPageValues.Clear();
+                CurrentPageValues.Add(CurrentTagValues.Where(data => !FirstPackageModeDataFilter(data)));
+                CurrentPageValues.PageIndex                 = 0;
+                LookModeCollectorsALLSize                   = CurrentPageValues.Sum(data => data.Size);
+                TempTable[nameof(SearchText)]               = ViewTreeQueryAsset.searchString = SearchText;
+                TempTable[nameof(LookModeDisplayTypeIndex)] = LookModeDisplayTypeIndex;
+                ViewTreeQueryAsset.Reload();
+            }
+
+            rect.x     += rect.width;
+            rect.width =  190;
+            OnDrawHeaderLookPageSetting(rect);
+
+            rect.x     = width - 30;
+            rect.width = 30;
+            if (GUI.Button(rect, GC_SAVE, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
                 Config.SequenceRecord.Save();
@@ -124,6 +132,25 @@ namespace AIO.UEditor
                 AssetDatabase.SaveAssets();
 #endif
                 if (EditorUtility.DisplayDialog("保存", "保存成功", "确定")) AssetDatabase.Refresh();
+            }
+
+            rect.x     -= rect.width;
+            rect.width =  30;
+            if (GUI.Button(rect, GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
+            {
+                GUI.FocusControl(null);
+                Selection.activeObject = Config;
+            }
+
+            rect.x     -= rect.width;
+            rect.width =  30;
+            if (GUI.Button(rect, GC_REFRESH, GEStyle.TEtoolbarbutton))
+            {
+                GUI.FocusControl(null);
+                SearchText               = string.Empty;
+                LookModeDisplayTypeIndex = 0;
+                Config.SequenceRecord.UpdateLocal();
+                UpdatePageValuesFirstPackageMode();
             }
         }
 
@@ -146,9 +173,10 @@ namespace AIO.UEditor
             var asset = new Dictionary<string, AssetDataInfo>();
             for (var i = 0; i < Config.SequenceRecord.Count; i++)
             {
-                if (asset.ContainsKey(Config.SequenceRecord[i].AssetPath)) continue;
-                var temp = AssetCollectRoot.AssetToAddress(
-                    Config.SequenceRecord[i].AssetPath);
+                var address = Config.SequenceRecord[i].AssetPath;
+                if (string.IsNullOrEmpty(address)) continue;
+                if (asset.ContainsKey(address)) continue;
+                var temp = AssetCollectRoot.AssetToAddress(address, Config.LoadPathToLower, Config.HasExtension);
                 Config.SequenceRecord[i].SetPackageName(temp.Item1);
                 var info = new AssetDataInfo
                 {
@@ -156,7 +184,7 @@ namespace AIO.UEditor
                     Address   = temp.Item3,
                     Package   = temp.Item1,
                     Group     = "N/A",
-                    Extension = Path.GetExtension(Config.SequenceRecord[i].AssetPath)
+                    Extension = Path.GetExtension(address)
                 };
                 asset[info.AssetPath] = info;
                 CurrentTagValues.Add(info);
@@ -187,42 +215,24 @@ namespace AIO.UEditor
                 return;
             }
 
-            // if (EditorApplication.isPlaying)
-            // {
-            //     var index = 0;
-            //     foreach (var record in Config.SequenceRecord)
-            //         using (new EditorGUILayout.VerticalScope())
-            //         {
-            //             GELayout.Label(
-            //                 $"{++index} : {record.PackageName} -> {record.Location} : {record.AssetPath} ");
-            //             GELayout.HelpBox(
-            //                 $"{record.Time:yyyy-MM-dd HH:mm:ss} [Num : {record.Count}] [Size : {record.Bytes.ToConverseStringFileSize()}] ");
-            //         }
-            // }
-            // else
-            // {
-            //     if (!LookModeShowAssetDetail) ViewDetailList.width = CurrentWidth;
-            //     else ViewDetailList.MaxWidth                       = CurrentWidth - 300;
-            //     ViewDetailList.height            = CurrentHeight - DrawHeaderHeight;
-            //     ViewDetailList.IsAllowHorizontal = LookModeShowAssetDetail;
-            //     ViewDetailList.Draw(OnDrawLookModeAssetList, GEStyle.Badge);
-            //
-            //     if (LookModeShowAssetDetail)
-            //     {
-            //         ViewDetails.IsShow = true;
-            //         ViewDetails.x      = ViewDetailList.width;
-            //         ViewDetails.width  = CurrentWidth - ViewDetails.x;
-            //         ViewDetails.height = ViewDetailList.height - 3;
-            //         ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.Badge);
-            //     }
-            // }
-
-            // ViewDetailList.y      = 10;
-            ViewDetailList.x      = 5;
-            ViewDetailList.width  = CurrentWidth - 10;
-            ViewDetailList.y      = 0;
             ViewDetailList.height = CurrentHeight - DrawHeaderHeight;
-            ViewDetailList.Draw((rect) => { ViewTreeQueryAsset.OnGUI(ViewDetailList); }, GEStyle.INThumbnailShadow);
+            if (LookModeShowAssetDetail)
+            {
+                ViewDetailList.width = CurrentWidth - 410;
+                ViewDetails.IsShow   = true;
+                ViewDetails.y        = 0;
+                ViewDetails.x        = ViewDetailList.width + ViewDetailList.x + 5;
+                ViewDetails.width    = CurrentWidth - ViewDetails.x - 5;
+                ViewDetails.height   = ViewDetailList.height;
+            }
+            else
+            {
+                ViewDetails.IsShow   = false;
+                ViewDetailList.width = CurrentWidth - 10;
+            }
+
+            ViewDetailList.Draw(ViewTreeQueryAsset.OnGUI, GEStyle.INThumbnailShadow);
+            ViewDetails.Draw(OnDrawLookModeAssetDetail, GEStyle.INThumbnailShadow);
         }
 
         private bool FirstPackageModeDataFilter(AssetDataInfo data)

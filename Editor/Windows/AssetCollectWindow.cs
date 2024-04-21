@@ -30,41 +30,54 @@ namespace AIO.UEditor
 
         partial void GCInit();
 
-        partial void OnDrawHeader()
+        partial void OnDrawHeaderBuildMode(Rect        rect);
+        partial void OnDrawHeaderEditorMode(Rect       rect);
+        partial void OnDrawHeaderConfigMode(Rect       rect);
+        partial void OnDrawHeaderLookMode(Rect         rect);
+        partial void OnDrawHeaderFirstPackageMode(Rect rect);
+        partial void OnDrawHeaderTagsMode(Rect         rect);
+
+        partial void OnDrawHeader(Rect rect)
         {
-            using (new GUILayout.HorizontalScope())
+            rect.x     =  0;
+            rect.y     =  0;
+            rect.width -= 75;
+            using (new GUI.GroupScope(rect))
             {
+                rect.height = 20;
                 switch (WindowMode)
                 {
                     case Mode.Editor:
-                        OnDrawHeaderEditorMode();
+                        OnDrawHeaderEditorMode(rect);
                         break;
                     case Mode.Config:
-                        OnDrawHeaderConfigMode();
+                        OnDrawHeaderConfigMode(rect);
                         break;
                     case Mode.Look:
-                        OnDrawHeaderLookMode();
+                        OnDrawHeaderLookMode(rect);
                         break;
                     case Mode.Build:
-                        OnDrawHeaderBuildMode();
+                        OnDrawHeaderBuildMode(rect);
                         break;
                     case Mode.LookTags:
-                        OnDrawHeaderTagsMode();
+                        OnDrawHeaderTagsMode(rect);
                         break;
                     case Mode.LookFirstPackage:
-                        OnDrawHeaderFirstPackageMode();
+                        OnDrawHeaderFirstPackageMode(rect);
                         break;
                 }
+            }
 
-                WindowMode = GELayout.Popup(WindowMode, GEStyle.PreDropDown, GP_Width_75, GP_Height_20);
+            rect.x     = rect.width;
+            rect.width = 75;
+            WindowMode = (Mode)EditorGUI.EnumPopup(rect, WindowMode, GEStyle.PreDropDown);
 
-                if (GUI.changed)
-                {
-                    if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
-                    GUI.FocusControl(null);
-                    UpdateData();
-                    TempTable[nameof(WindowMode)] = WindowMode;
-                }
+            if (GUI.changed)
+            {
+                if (WindowMode == TempTable.GetOrDefault<Mode>(nameof(WindowMode))) return;
+                GUI.FocusControl(null);
+                UpdateData();
+                TempTable[nameof(WindowMode)] = WindowMode;
             }
         }
 
@@ -73,13 +86,11 @@ namespace AIO.UEditor
         /// </summary>
         private void UpdateData()
         {
+            LookCurrentSelectAsset = null;
             switch (WindowMode)
             {
                 case Mode.Config:
                     UpdateDataConfigMode();
-                    break;
-                case Mode.Editor:
-                    UpdateDataEditorMode();
                     break;
                 case Mode.Look:
                     LookModeDisplayTypeIndex       = 0;
@@ -127,32 +138,11 @@ namespace AIO.UEditor
 
         protected override void OnDraw()
         {
-            using (new GUILayout.HorizontalScope(GEStyle.INThumbnailShadow, GTOption.Height(DrawHeaderHeight - 5)))
-            {
-                OnDrawHeader();
-            }
-
-            switch (WindowMode)
-            {
-                case Mode.Editor:
-                    OnDrawEditorMode();
-                    break;
-                case Mode.Config:
-                    OnDrawConfigMode();
-                    break;
-                case Mode.Look:
-                    OnDrawLookMode();
-                    break;
-                case Mode.Build:
-                    OnDrawBuildMode();
-                    break;
-                case Mode.LookTags:
-                    OnDrawTagsMode();
-                    break;
-                case Mode.LookFirstPackage:
-                    OnDrawFirstPackageMode();
-                    break;
-            }
+            DrawRect.Set(0, 0, CurrentWidth, DrawHeaderHeight - 5);
+            using (new GUI.GroupScope(DrawRect, GEStyle.INThumbnailShadow)) OnDrawHeader(DrawRect);
+            DrawRect.y      = DrawHeaderHeight;
+            DrawRect.height = CurrentHeight - DrawHeaderHeight;
+            using (new GUI.GroupScope(DrawRect)) OnDrawBody(DrawRect);
 
             DrawVersion(Setting.Version);
             OnOpenEvent();
@@ -189,7 +179,6 @@ namespace AIO.UEditor
                     ViewGroupList.DragHorizontal(eventData);
                     ViewPackageList.DragHorizontal(eventData);
                     OnDraw();
-                    eventData.Use();
                     break;
                 }
                 case Mode.LookFirstPackage:
@@ -212,75 +201,6 @@ namespace AIO.UEditor
         {
             switch (WindowMode)
             {
-                case Mode.LookTags:
-                case Mode.Look:
-                case Mode.LookFirstPackage:
-                {
-                    switch (keyCode)
-                    {
-                        case KeyCode.Escape: // 判断ESC
-                            GUI.FocusControl(null);
-                            CancelCurrentSelectAsset();
-                            eventData.Use();
-                            break;
-
-                        case KeyCode.LeftArrow: // 数字键盘 右键
-                            if (CurrentPageValues.PageIndex > 0)
-                            {
-                                GUI.FocusControl(null);
-                                CurrentSelectAssetIndex     =  0;
-                                CurrentPageValues.PageIndex -= 1;
-                                eventData.Use();
-                            }
-
-                            break;
-
-                        case KeyCode.RightArrow: // 数字键盘 左键 
-                            if (CurrentPageValues.PageIndex < CurrentPageValues.PageCount - 1)
-                            {
-                                GUI.FocusControl(null);
-                                CurrentSelectAssetIndex     =  0;
-                                CurrentPageValues.PageIndex += 1;
-                                eventData.Use();
-                            }
-
-                            break;
-
-                        case KeyCode.UpArrow: // 数字键盘 上键
-                            if (CurrentSelectAssetIndex >= 0)
-                            {
-                                GUI.FocusControl(null);
-                                CurrentSelectAssetIndex -= 1;
-                                if (CurrentSelectAssetIndex < 0)
-                                {
-                                    if (CurrentPageValues.CurrentPageValues.Length > 0)
-                                        CurrentSelectAssetIndex  = CurrentPageValues.CurrentPageValues.Length - 1;
-                                    else CurrentSelectAssetIndex = 0;
-                                }
-
-                                UpdateCurrentSelectAsset(CurrentSelectAssetIndex);
-                                eventData.Use();
-                            }
-
-                            break;
-
-                        case KeyCode.DownArrow: // 数字键盘 下键
-                            if (CurrentPageValues.CurrentPageValues is null) break;
-                            if (CurrentSelectAssetIndex < CurrentPageValues.CurrentPageValues.Length)
-                            {
-                                GUI.FocusControl(null);
-                                CurrentSelectAssetIndex += 1;
-                                if (CurrentSelectAssetIndex >= CurrentPageValues.CurrentPageValues.Length)
-                                    CurrentSelectAssetIndex = 0;
-                                UpdateCurrentSelectAsset(CurrentSelectAssetIndex);
-                                eventData.Use();
-                            }
-
-                            break;
-                    }
-
-                    break;
-                }
                 case Mode.Config:
                     if (eventData.control && keyCode == KeyCode.S)
                     {
@@ -373,17 +293,41 @@ namespace AIO.UEditor
 
         #region 绘制
 
-        partial void OnDrawConfigMode();
-        partial void OnDrawEditorMode();
-        partial void OnDrawTagsMode();
-        partial void OnDrawBuildMode();
-        partial void OnDrawLookMode();
-        partial void OnDrawHeader();
-        partial void OnDrawSetting();
-        partial void OnDrawPackage();
-        partial void OnDrawGroup();
-        partial void OnDrawGroupList();
-        partial void OnDrawASConfig();
+        private void OnDrawBody(Rect rect)
+        {
+            rect.x = 0;
+            rect.y = 5;
+            switch (WindowMode)
+            {
+                case Mode.Editor:
+                    OnDrawEditorMode(rect);
+                    break;
+                case Mode.Config:
+                    OnDrawConfigMode(rect);
+                    break;
+                case Mode.Look:
+                    OnDrawLookMode(rect);
+                    break;
+                case Mode.Build:
+                    OnDrawBuildMode(rect);
+                    break;
+                case Mode.LookTags:
+                    OnDrawTagsMode(rect);
+                    break;
+                case Mode.LookFirstPackage:
+                    OnDrawFirstPackageMode();
+                    break;
+            }
+        }
+
+        partial void OnDrawConfigMode(Rect rect);
+        partial void OnDrawEditorMode(Rect rect);
+        partial void OnDrawTagsMode(Rect   rect);
+        partial void OnDrawBuildMode(Rect  rect);
+        partial void OnDrawLookMode(Rect   rect);
+        partial void OnDrawHeader(Rect     rect);
+        partial void OnDrawSetting(Rect    rect);
+        partial void OnDrawASConfig(Rect   rect);
 
         /// <summary>
         ///     绘制资源 阴影

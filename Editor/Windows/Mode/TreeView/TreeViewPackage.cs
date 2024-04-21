@@ -47,12 +47,12 @@ namespace AIO.UEditor
             Config.Sort(header.IsSortedAscending(header.sortedColumnIndex));
             var index = Config.IndexOf(temp);
             Config.CurrentPackageIndex = index;
-            SetSelection(new[] { index + 1 });
+            SetSelection(new[] { index });
         }
 
         protected override void OnSelection(int id)
         {
-            Config.CurrentPackageIndex = id - 1;
+            Config.CurrentPackageIndex = id;
         }
 
         protected override void OnBuildRows(TreeViewItem root)
@@ -60,7 +60,7 @@ namespace AIO.UEditor
             var isDefault = false;
             for (var idxP = 0; idxP < Config?.Count; idxP++)
             {
-                root.AddChild(new TreeViewItemPackage(idxP + 1, Config[idxP]));
+                root.AddChild(new TreeViewItemPackage(idxP, Config[idxP]));
                 if (!Config[idxP].Default) continue;
 
                 if (isDefault) Config[idxP].Default = false;
@@ -180,6 +180,18 @@ namespace AIO.UEditor
                 case KeyCode.Delete:
                     OP_DeletePackages(item.id);
                     break;
+                case KeyCode.DownArrow: // 数字键盘 下键
+                {
+                    var temp = item.id + 1;
+                    ReloadAndSelect(temp >= Count ? 0 : temp);
+                    break;
+                }
+                case KeyCode.UpArrow: // 数字键盘 上键
+                {
+                    var temp = item.id - 1;
+                    ReloadAndSelect(temp < 0 ? Count - 1 : temp);
+                    break;
+                }
             }
         }
 
@@ -190,7 +202,7 @@ namespace AIO.UEditor
                 case TreeViewItem item:
                 {
                     foreach (var package in Config.Where(package => package.Default)) package.Default = false;
-                    Config[item.id - 1].Default = true;
+                    Config[item.id].Default = true;
                     ReloadAndSelect(item.id);
                     break;
                 }
@@ -202,9 +214,9 @@ namespace AIO.UEditor
             switch (obj)
             {
                 case TreeViewItem item:
-                    var index = item.id - 1;
+                    var index = item.id;
                     Config[index].Enable = !Config[index].Enable;
-                    ReloadAndSelect(item.id);
+                    ReloadAndSelect(index);
                     break;
             }
         }
@@ -232,7 +244,7 @@ namespace AIO.UEditor
                         Name       = GetOnlyName("Group"),
                         Collectors = Array.Empty<AssetCollectItem>()
                     };
-                    var index = item.id - 1;
+                    var index = item.id;
                     Config[index].Groups = Config[index].Groups is null
                         ? new[] { newObj }
                         : Config[index].Groups.Add(newObj);
@@ -249,7 +261,7 @@ namespace AIO.UEditor
             {
                 case int index:
                 {
-                    if (Config[index - 1].Default)
+                    if (Config[index].Default)
                     {
                         EditorUtility.DisplayDialog("错误", "默认包不能删除", "确定");
                         return;
@@ -276,7 +288,7 @@ namespace AIO.UEditor
             {
                 case TreeViewItem item:
                     RenameIndex      = 1;
-                    item.displayName = Config[item.id - 1].Name;
+                    item.displayName = Config[item.id].Name;
                     if (BeginRename(item, 0.1f))
                     {
                         ReloadAndSelect(item.id);
@@ -295,7 +307,7 @@ namespace AIO.UEditor
             {
                 case TreeViewItem item:
                     RenameIndex      = 2;
-                    item.displayName = Config[item.id - 1].Description;
+                    item.displayName = Config[item.id].Description;
                     if (BeginRename(item, 0.1f))
                     {
                         ReloadAndSelect(item.id);

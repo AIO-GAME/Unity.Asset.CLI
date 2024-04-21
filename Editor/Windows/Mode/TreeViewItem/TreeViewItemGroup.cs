@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    internal sealed class TreeViewItemGroup : TreeViewItem, IGraphDraw
+    internal sealed class TreeViewItemGroup : TreeViewItem, ITVItemDraw
     {
         private static Texture _Icon;
 
@@ -25,8 +25,9 @@ namespace AIO.UEditor
 
         #region IGraphDraw Members
 
-        public void OnDraw(Rect cellRect, ref RowGUIArgs args)
+        void ITVItemDraw.OnDraw(Rect cellRect, int col, ref RowGUIArgs args)
         {
+            cellRect.x += 10;
             if (Group.Enable)
             {
                 OnDrawContent(cellRect, ref args);
@@ -38,6 +39,12 @@ namespace AIO.UEditor
                 OnDrawContent(cellRect, ref args);
                 GUI.color = oldColor;
             }
+        }
+
+        bool ITVItemDraw.MatchSearch(string search)
+        {
+            if (string.IsNullOrEmpty(search)) return true;
+            return Group.Name.Contains(search) || Group.Description.Contains(search);
         }
 
         #endregion
@@ -53,8 +60,6 @@ namespace AIO.UEditor
             GUI.Box(args.rowRect, GUIContent.none, args.selected ? GEStyle.SelectionRect : GEStyle.INThumbnailShadow);
 
             var rect = new Rect(cellRect.x + 30, args.rowRect.y + args.rowRect.height / 2f - 1, cellRect.width - 40, 1);
-            EditorGUI.DrawRect(rect, TreeViewBasics.ColorLine);
-            rect.Set(cellRect.width - 1, args.rowRect.y, 1, args.rowRect.height);
             EditorGUI.DrawRect(rect, TreeViewBasics.ColorLine);
         }
 
@@ -79,10 +84,10 @@ namespace AIO.UEditor
 
         #region IGraphDraw
 
-        float IGraphDraw.GetHeight()                           => 35;
-        bool IGraphDraw. AllowChangeExpandedState              => false;
-        bool IGraphDraw. AllowRename                           => true;
-        Rect IGraphDraw. GetRenameRect(Rect cellRect, int row) => cellRect;
+        float ITVItemDraw.GetHeight()                           => 35;
+        bool ITVItemDraw. AllowChangeExpandedState              => false;
+        bool ITVItemDraw. AllowRename                           => true;
+        Rect ITVItemDraw. GetRenameRect(Rect cellRect, int row) => cellRect;
 
         #endregion
     }
