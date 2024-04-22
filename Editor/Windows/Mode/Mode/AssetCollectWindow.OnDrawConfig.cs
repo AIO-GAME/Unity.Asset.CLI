@@ -198,18 +198,14 @@ namespace AIO.UEditor
                 cell.width =  100;
                 if (GUI.Button(cell, "清空运行缓存", GEStyle.toolbarbuttonRight))
                 {
-                    var sandbox = Path.Combine(EHelper.Path.Project, Config.RuntimeRootDirectory);
-                    if (Directory.Exists(sandbox))
-                        AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
+                    ClearRuntimeCache();
                 }
 
                 cell.x     += cell.width;
                 cell.width =  100;
                 if (GUI.Button(cell, "清空构建缓存", GEStyle.toolbarbuttonRight))
                 {
-                    var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
-                    if (Directory.Exists(sandbox))
-                        AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
+                    ClearBuildCache();
                 }
             }
 

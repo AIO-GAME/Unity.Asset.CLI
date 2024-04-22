@@ -42,8 +42,13 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation?.GetRawFileData();
-                IsDone = true;
+                if (operation != null)
+                {
+                    AssetPath = operation.GetRawFilePath();
+                    Result    = operation.GetRawFileData();
+                }
+         
+                IsDone    = true;
             }
 
             #endregion
@@ -77,7 +82,12 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation?.GetRawFileData();
+      
+                if (operation != null)
+                {
+                    AssetPath = operation.GetRawFilePath();
+                    Result    = operation.GetRawFileData();
+                }
                 InvokeOnCompleted();
             }
 
@@ -104,7 +114,9 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                return operation?.GetRawFileData();
+                if (operation == null) return Array.Empty<byte>();
+                AssetPath = operation.GetRawFilePath();
+                return operation.GetRawFileData();
             }
 
             protected override TaskAwaiter<byte[]> CreateAsync()

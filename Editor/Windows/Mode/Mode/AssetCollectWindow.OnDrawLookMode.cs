@@ -98,6 +98,20 @@ namespace AIO.UEditor
             }
             else LookModeDisplayTagsIndex = 0;
 
+            rect.x     += rect.width;
+            rect.width =  width - 190 - 30 - 30 - rect.x;
+            SearchText = LookModeData[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Count > 300
+                ? EditorGUI.DelayedTextField(rect, SearchText, GEStyle.SearchTextField)
+                : EditorGUI.TextField(rect, SearchText, GEStyle.SearchTextField);
+
+            rect.x     += rect.width;
+            rect.width =  30;
+            if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
+            {
+                GUI.FocusControl(null);
+                SearchText = string.Empty;
+            }
+
             if (GUI.changed)
             {
                 if (TempTable.GetOrDefault<int>(nameof(Data.CurrentPackageIndex)) != Data.CurrentPackageIndex ||
@@ -137,20 +151,6 @@ namespace AIO.UEditor
                     TempTable[nameof(LookModeDisplayTagsIndex)]       = LookModeDisplayTagsIndex;
                     ViewTreeQueryAsset.Reload();
                 }
-            }
-
-            rect.x     += rect.width;
-            rect.width =  width - 190 - 30 - 30 - rect.x;
-            SearchText = LookModeData[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Count > 300
-                ? EditorGUI.DelayedTextField(rect, SearchText, GEStyle.SearchTextField)
-                : EditorGUI.TextField(rect, SearchText, GEStyle.SearchTextField);
-
-            rect.x     += rect.width;
-            rect.width =  30;
-            if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
-            {
-                GUI.FocusControl(null);
-                SearchText = string.Empty;
             }
 
             rect.x     += rect.width;

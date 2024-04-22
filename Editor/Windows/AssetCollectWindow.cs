@@ -1,4 +1,5 @@
-﻿using AIO.UEngine;
+﻿using System.IO;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
@@ -26,6 +27,22 @@ namespace AIO.UEditor
         public static void OpenWindow()
         {
             EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
+        }
+
+        [MenuItem("AIO/Asset/清空运行时缓存")]
+        public static void ClearRuntimeCache()
+        {
+            var sandbox = Path.Combine(EHelper.Path.Project, ASConfig.GetOrCreate().RuntimeRootDirectory);
+            if (Directory.Exists(sandbox))
+                AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
+        }
+
+        [MenuItem("AIO/Asset/清空构建时缓存")]
+        public static void ClearBuildCache()
+        {
+            var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
+            if (Directory.Exists(sandbox))
+                AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
         }
 
         partial void GCInit();
