@@ -85,9 +85,10 @@ namespace AIO.UEditor
 
             if (TagsModeDisplayTypes != null && TagsModeDisplayTypes.Length > 0)
             {
-                rect.x                   += rect.width;
-                rect.width               =  100;
-                LookModeDisplayTypeIndex =  EditorGUI.MaskField(rect, LookModeDisplayTypeIndex, TagsModeDisplayTypes, GEStyle.PreDropDown);
+                rect.x     += rect.width;
+                rect.width =  100;
+                LookModeDisplayTypeIndex =
+                    EditorGUI.MaskField(rect, LookModeDisplayTypeIndex, TagsModeDisplayTypes, GEStyle.PreDropDown);
             }
 
             rect.x     += rect.width + 3;
@@ -166,9 +167,9 @@ namespace AIO.UEditor
         private void UpdatePageValuesFirstPackageMode()
         {
             CurrentTagValues.Clear();
+            TagsModeDisplayTypes       = Array.Empty<string>();
             LookModeCollectorsALLSize  = 0;
             LookModeCollectorsPageSize = 0;
-            TagsModeDisplayTypes       = Array.Empty<string>();
             var types = new List<string>();
             var asset = new Dictionary<string, AssetDataInfo>();
             for (var i = 0; i < Config.SequenceRecord.Count; i++)
@@ -176,15 +177,16 @@ namespace AIO.UEditor
                 var address = Config.SequenceRecord[i].AssetPath;
                 if (string.IsNullOrEmpty(address)) continue;
                 if (asset.ContainsKey(address)) continue;
-                var temp = AssetCollectRoot.AssetToAddress(address, Config.LoadPathToLower, Config.HasExtension);
-                Config.SequenceRecord[i].SetPackageName(temp.Item1);
+                var tuple = AssetCollectRoot.AssetToAddress(address, Config.LoadPathToLower, Config.HasExtension);
+                if (string.IsNullOrEmpty(tuple.Item1)) continue;
+                Config.SequenceRecord[i].SetPackageName(tuple.Item1);
                 var info = new AssetDataInfo
                 {
-                    AssetPath = Config.SequenceRecord[i].AssetPath,
-                    Address   = temp.Item3,
-                    Package   = temp.Item1,
-                    Group     = "N/A",
-                    Extension = Path.GetExtension(address)
+                    AssetPath = Config.SequenceRecord[i].AssetPath
+                  , Address   = tuple.Item3
+                  , Package   = tuple.Item1
+                  , Group     = "N/A"
+                  , Extension = Path.GetExtension(address)
                 };
                 asset[info.AssetPath] = info;
                 CurrentTagValues.Add(info);
@@ -204,14 +206,15 @@ namespace AIO.UEditor
             if (!Config.EnableSequenceRecord)
             {
                 var content = new GUIContent("请启用序列记录功能");
-                var size = GEStyle.HeaderButton.CalcSize(content) * 3;
-                var rect = new Rect(RectCenter.position - size / 2, size);
-                GELayout.Button(rect, content, () =>
+                var size    = GEStyle.HeaderButton.CalcSize(content) * 3;
+                var rect    = new Rect(RectCenter.position - size / 2, size);
+                if (GUI.Button(rect, content, GEStyle.HeaderButton))
                 {
                     GUI.FocusControl(null);
                     Config.EnableSequenceRecord = true;
                     UpdateDataFirstPackageMode();
-                }, GEStyle.HeaderButton);
+                }
+
                 return;
             }
 

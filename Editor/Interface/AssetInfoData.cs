@@ -81,7 +81,6 @@ namespace AIO
             get
             {
                 if (string.IsNullOrEmpty(_guid)) _guid = AssetDatabase.AssetPathToGUID(AssetPath);
-
                 return _guid;
             }
         }
@@ -93,15 +92,12 @@ namespace AIO
         {
             get
             {
-                if (_lastWriteTime == default)
-                {
-                    if (File.Exists(AssetPath))
-                        _lastWriteTime = File.GetLastWriteTime(AssetPath);
-                    else if (Directory.Exists(AssetPath))
-                        _lastWriteTime  = Directory.GetLastWriteTime(AssetPath);
-                    else _lastWriteTime = DateTime.MinValue;
-                }
-
+                if (_lastWriteTime != default(DateTime)) return _lastWriteTime;
+                if (File.Exists(AssetPath))
+                    _lastWriteTime = File.GetLastWriteTime(AssetPath);
+                else if (Directory.Exists(AssetPath))
+                    _lastWriteTime  = Directory.GetLastWriteTime(AssetPath);
+                else _lastWriteTime = DateTime.MinValue;
                 return _lastWriteTime;
             }
         }
