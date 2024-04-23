@@ -56,58 +56,76 @@ namespace AIO.UEditor
         ///     重命名完成
         /// </summary>
         /// <param name="args">重命名参数</param>
-        protected virtual void OnRename(RenameEndedArgs args) { }
+        protected virtual void OnRename(RenameEndedArgs args)
+        {
+        }
 
         /// <summary>
         ///     排序
         /// </summary>
         /// <param name="header">多列头</param>
-        protected virtual void OnSorting(MultiColumnHeader header) { }
+        protected virtual void OnSorting(MultiColumnHeader header)
+        {
+        }
 
         /// <summary>
         ///     绘制
         /// </summary>
-        protected virtual void OnDraw(Rect rect) { }
+        protected virtual void OnDraw(Rect rect)
+        {
+        }
 
         /// <summary>
         ///     选择
         /// </summary>
         /// <param name="id">ID</param>
-        protected virtual void OnSelection(int id) { }
+        protected virtual void OnSelection(int id)
+        {
+        }
 
         /// <summary>
         ///     拖拽交换数据
         /// </summary>
         /// <param name="from">源</param>
         /// <param name="to">目标</param>
-        protected virtual void OnDragSwapData(int from, int to) { }
+        protected virtual void OnDragSwapData(int from, int to)
+        {
+        }
 
         /// <summary>
         ///     右键点击空白区域
         /// </summary>
         /// <param name="menu">菜单</param>
-        protected virtual void OnContextClicked(GenericMenu menu) { }
+        protected virtual void OnContextClicked(GenericMenu menu)
+        {
+        }
 
         /// <summary>
         ///     右键点击Item区域
         /// </summary>
         /// <param name="menu">菜单</param>
         /// <param name="item">选中组件</param>
-        protected virtual void OnContextClicked(GenericMenu menu, TreeViewItem item) { }
+        protected virtual void OnContextClicked(GenericMenu menu, TreeViewItem item)
+        {
+        }
 
         /// <summary>
         ///     按键按下
         /// </summary>
         /// <param name="keyCode"> 按键 </param>
         /// <param name="item"> 选中组件 </param>
-        protected virtual void OnEventKeyDown(KeyCode keyCode, TreeViewItem item) { }
+        protected virtual void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
+        {
+        }
 
         /// <summary>
         ///     按键抬起
         /// </summary>
         /// <param name="keyCode"> 按键 </param>
         /// <param name="item"> 选中组件 </param>
-        protected virtual void OnEventKeyUp(KeyCode keyCode, TreeViewItem item) { }
+        protected virtual void OnEventKeyUp(KeyCode keyCode, TreeViewItem item)
+        {
+        }
 
         #endregion
 
@@ -160,7 +178,8 @@ namespace AIO.UEditor
 
                         if (i == count)
                         {
-                            cellRect.Set(cellRect.width + cellRect.x + count - 1, args.rowRect.y, 1, args.rowRect.height - 1);
+                            cellRect.Set(cellRect.width + cellRect.x + count - 1, args.rowRect.y, 1,
+                                         args.rowRect.height - 1);
                             EditorGUI.DrawRect(cellRect, ColorLine);
                         }
 
@@ -289,7 +308,9 @@ namespace AIO.UEditor
         ///     多选
         /// </summary>
         /// <param name="id">ID</param>
-        protected sealed override void DoubleClickedItem(int id) { }
+        protected sealed override void DoubleClickedItem(int id)
+        {
+        }
 
         protected sealed override void KeyEvent()
         {
@@ -319,7 +340,9 @@ namespace AIO.UEditor
         ///     设置拖拽
         /// </summary>
         /// <param name="args"></param>
-        protected sealed override void SetupDragAndDrop(SetupDragAndDropArgs args) { }
+        protected sealed override void SetupDragAndDrop(SetupDragAndDropArgs args)
+        {
+        }
 
         /// <summary>
         ///     处理拖拽
@@ -408,7 +431,8 @@ namespace AIO.UEditor
         {
             if (selectedIds.Count == 0) return;
             var id = selectedIds[0];
-            if (rootItem.children.Count > selectedIds.Count) SetSelection(selectedIds, TreeViewSelectionOptions.RevealAndFrame);
+            if (rootItem.children.Count > selectedIds.Count)
+                SetSelection(selectedIds, TreeViewSelectionOptions.RevealAndFrame);
             OnSelection(id);
             OnSelectionChanged?.Invoke(id);
         }

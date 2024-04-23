@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace AIO.UEditor
 {
@@ -58,8 +56,9 @@ namespace AIO.UEditor
             if (ViewGroupList.IsShow && ViewGroupList.IsAllowHorizontal)
                 temp -= ViewGroupList.MinWidth;
 
-            ViewGroupList.MaxWidth = ViewPackageList.MaxWidth  = temp;
-            ViewGroupList.height   = ViewCollectorsList.height = ViewPackageList.height = rect.height;
+            ViewGroupList.MaxWidth   = temp;
+            ViewPackageList.MaxWidth = temp;
+            ViewGroupList.height     = ViewCollectorsList.height = ViewPackageList.height = rect.height;
 
             ViewCollectorsList.x = 5;
             if (ViewPackageList.IsShow)
@@ -151,14 +150,14 @@ namespace AIO.UEditor
             }
 
             rect.x     = 0;
-            rect.width = ViewPackageList.width + ViewPackageList.DragHorizontalWidth / 2;
+            rect.width = ViewPackageList.width + ViewPackageList.DragStretchHorizontalWidth / 2;
             if (GUI.Button(rect, $"{(ViewPackageList.IsShow ? "⇘" : "⇗")} Package", GEStyle.TEtoolbarbutton))
             {
                 ViewPackageList.IsShow = !ViewPackageList.IsShow;
             }
 
             rect.x     += rect.width;
-            rect.width =  ViewGroupList.width + ViewGroupList.DragHorizontalWidth / 2;
+            rect.width =  ViewGroupList.width + ViewGroupList.DragStretchHorizontalWidth / 2;
             if (GUI.Button(rect, $"{(ViewGroupList.IsShow ? "⇘" : "⇗")} Group", GEStyle.TEtoolbarbutton))
             {
                 ViewGroupList.IsShow = !ViewGroupList.IsShow;
@@ -170,22 +169,17 @@ namespace AIO.UEditor
                 TempBuilder.Append(Data.CurrentPackage.Name);
                 if (!string.IsNullOrEmpty(Data.CurrentPackage.Description))
                 {
-                    TempBuilder.Append('(').
-                                Append(Data.CurrentPackage.Description).
-                                Append(')');
+                    TempBuilder.Append('(').Append(Data.CurrentPackage.Description).Append(')');
                 }
             }
             else ViewGroupList.IsShow = false;
 
             if (Data.IsValidGroup())
             {
-                TempBuilder.Append(" / ").
-                            Append(Data.CurrentGroup.Name);
+                TempBuilder.Append(" / ").Append(Data.CurrentGroup.Name);
                 if (!string.IsNullOrEmpty(Data.CurrentGroup.Description))
                 {
-                    TempBuilder.Append('(').
-                                Append(Data.CurrentGroup.Description).
-                                Append(')');
+                    TempBuilder.Append('(').Append(Data.CurrentGroup.Description).Append(')');
                 }
             }
 

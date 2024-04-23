@@ -145,7 +145,7 @@ namespace AIO.UEditor
         /// </returns>
         public static Tuple<string, string, string> AssetToAddress(string assetPath, bool isLower, bool hasExtension, string limitPackage = "")
         {
-            if (string.IsNullOrEmpty(assetPath)) return Empty;
+            if (IsNoAssetPath(assetPath)) return Empty;
             foreach (var package in GetOrCreate().Packages)
             {
                 if (package is null) continue;
@@ -174,6 +174,20 @@ namespace AIO.UEditor
         }
 
         /// <summary>
+        ///    根据资源路径查找资源可寻址路径
+        /// </summary>
+        /// <param name="assetPath">资源路径</param>
+        /// <returns> 可寻址路径 </returns>
+        private static bool IsNoAssetPath(string assetPath)
+        {
+            if (string.IsNullOrEmpty(assetPath)) return true;
+            return assetPath.StartsWith("Assets/Plugins")
+                || assetPath.StartsWith("Assets/StreamingAssets")
+                || assetPath.StartsWith("Assets/Editor")
+                || assetPath.StartsWith("Assets/Resources");
+        }
+
+        /// <summary>
         ///     根据资源路径查找资源可寻址路径
         /// </summary>
         /// <param name="guid">资源GUID</param>
@@ -188,6 +202,9 @@ namespace AIO.UEditor
         {
             if (string.IsNullOrEmpty(guid)) return Empty;
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+
+            if (IsNoAssetPath(assetPath)) return Empty;
+
             foreach (var package in GetOrCreate().Packages)
             {
                 if (package is null) continue;
@@ -209,15 +226,21 @@ namespace AIO.UEditor
             return Empty;
         }
 
-        public static bool ObjToCollector(Object guid, out AssetCollectItem result)
+        public static bool ObjToCollector(Object obj, out AssetCollectItem result)
         {
-            if (!guid)
+            if (!obj)
             {
                 result = null;
                 return false;
             }
 
-            var assetPath = AssetDatabase.GetAssetPath(guid);
+            var assetPath = AssetDatabase.GetAssetPath(obj);
+            if (IsNoAssetPath(assetPath))
+            {
+                result = null;
+                return false;
+            }
+
             if (!Directory.Exists(assetPath))
             {
                 result = null;

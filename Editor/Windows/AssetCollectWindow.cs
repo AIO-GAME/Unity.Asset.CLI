@@ -9,21 +9,21 @@ namespace AIO.UEditor
     ///     资源管理窗口
     /// </summary>
     [GWindow("资源管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
-             IconResource = "Editor/Icon/Asset",
-             Group = "Tools",
-             Menu = "AIO/Window/Asset",
-             MinSizeHeight = 650,
-             MinSizeWidth = 1200
-    )]
+                IconResource = "Editor/Icon/Asset",
+                Group = "Tools",
+                Menu = "AIO/Window/Asset",
+                MinSizeHeight = 650,
+                MinSizeWidth = 1200
+            )]
     public partial class AssetCollectWindow : GraphicWindow
     {
         private static AssetCollectWindow Instance;
 
         [LnkTools(
-            Tooltip = "AIO 资源管理工具",
-            IconResource = "Editor/Icon/Asset",
-            ShowMode = ELnkShowMode.Toolbar
-        )]
+                     Tooltip = "AIO 资源管理工具",
+                     IconResource = "Editor/Icon/Asset",
+                     ShowMode = ELnkShowMode.Toolbar
+                 )]
         public static void OpenWindow()
         {
             EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
@@ -170,16 +170,16 @@ namespace AIO.UEditor
             switch (WindowMode)
             {
                 case Mode.Editor:
-                    ViewGroupList.ContainsHorizontal(eventData);
-                    ViewPackageList.ContainsHorizontal(eventData);
+                    ViewGroupList.ContainsDragStretch(eventData, ViewRect.DragStretchType.Horizontal);
+                    ViewPackageList.ContainsDragStretch(eventData, ViewRect.DragStretchType.Horizontal);
                     break;
                 case Mode.LookFirstPackage:
                 case Mode.LookTags:
                 case Mode.Look:
-                    ViewDetailList.ContainsHorizontal(eventData);
+                    ViewDetailList.ContainsDragStretch(eventData, ViewRect.DragStretchType.Horizontal);
                     break;
                 case Mode.Config:
-                    ViewConfig.ContainsHorizontal(eventData);
+                    ViewConfig.ContainsDragStretch(eventData, ViewRect.DragStretchType.Horizontal);
                     break;
                 case Mode.Build:
                 default:
@@ -193,8 +193,8 @@ namespace AIO.UEditor
             {
                 case Mode.Editor:
                 {
-                    ViewGroupList.DragHorizontal(eventData);
-                    ViewPackageList.DragHorizontal(eventData);
+                    ViewGroupList.DraggingStretch(eventData, ViewRect.DragStretchType.Horizontal);
+                    ViewPackageList.DraggingStretch(eventData, ViewRect.DragStretchType.Horizontal);
                     OnDraw();
                     break;
                 }
@@ -202,11 +202,11 @@ namespace AIO.UEditor
                 case Mode.LookTags:
                 case Mode.Look:
                 {
-                    ViewDetailList.DragHorizontal(eventData);
+                    ViewDetailList.DraggingStretch(eventData, ViewRect.DragStretchType.Horizontal);
                     break;
                 }
                 case Mode.Config:
-                    ViewConfig.DragHorizontal(eventData);
+                    ViewConfig.DraggingStretch(eventData, ViewRect.DragStretchType.Horizontal);
                     break;
                 case Mode.Build:
                 default:
@@ -301,11 +301,11 @@ namespace AIO.UEditor
 
         public override void EventMouseUp(in Event eventData)
         {
-            ViewDetailList.CancelHorizontal();
-            ViewConfig.CancelHorizontal();
-            ViewGroupList.CancelHorizontal();
-            ViewPackageList.CancelHorizontal();
-            ViewSetting.CancelHorizontal();
+            ViewDetailList.CancelDragStretch();
+            ViewConfig.CancelDragStretch();
+            ViewGroupList.CancelDragStretch();
+            ViewPackageList.CancelDragStretch();
+            ViewSetting.CancelDragStretch();
         }
 
         #region 绘制

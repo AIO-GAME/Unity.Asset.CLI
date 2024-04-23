@@ -106,12 +106,12 @@ namespace AIO.UEditor
                             if (Config.HasExtension)
                             {
                                 GUI.enabled         = false;
-                                result.HasExtension = GELayout.ToggleLeft("后缀", true, GTOption.Width(42));
+                                result.HasExtension = GELayout.ToggleLeft("后缀", true, GTOptions.Width(42));
                                 GUI.enabled         = true;
                             }
                             else
                             {
-                                result.HasExtension = GELayout.ToggleLeft("后缀", result.HasExtension, GTOption.Width(42));
+                                result.HasExtension = GELayout.ToggleLeft("后缀", result.HasExtension, GTOptions.Width(42));
                             }
 
                             GUILayout.EndHorizontal();

@@ -91,11 +91,11 @@ namespace AIO.UEditor.CLI
         {
             using (GELayout.VHorizontal())
             {
-                GELayout.Label("输出路径", GTOption.Width(true));
-                if (GELayout.Button("Select", GTOption.Width(50)))
+                GELayout.Label("输出路径", GTOptions.Width(true));
+                if (GELayout.Button("Select", GTOptions.Width(50)))
                     Commond.OutputRoot = EditorUtility.OpenFolderPanel("请选择导出路径", Commond.OutputRoot, "");
 
-                if (GELayout.Button("Open", GTOption.Width(50)))
+                if (GELayout.Button("Open", GTOptions.Width(50)))
                 {
                     PrPlatform.Open.Path(Commond.OutputRoot).Async();
                     return;
@@ -116,7 +116,7 @@ namespace AIO.UEditor.CLI
             using (GELayout.VHorizontal())
             {
                 Commond.PackageVersion = GELayout.Field("构建版本", Commond.PackageVersion);
-                if (GELayout.Button("刷新", GTOption.Width(50)))
+                if (GELayout.Button("刷新", GTOptions.Width(50)))
                     Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
             }
 
@@ -141,12 +141,12 @@ namespace AIO.UEditor.CLI
         {
             using (GELayout.VHorizontal())
             {
-                GELayout.Label("平台路径", GTOption.Width(true));
-                if (GELayout.Button("Select", GTOption.Width(50)))
+                GELayout.Label("平台路径", GTOptions.Width(true));
+                if (GELayout.Button("Select", GTOptions.Width(50)))
                     BuildInFilePlatform = EditorUtility.OpenFolderPanel("请选择平台路径", BuildInFilePlatform, "");
 
                 if (Directory.Exists(BuildInFilePlatform))
-                    if (GELayout.Button("Open", GTOption.Width(50)))
+                    if (GELayout.Button("Open", GTOptions.Width(50)))
                     {
                         PrPlatform.Open.Path(BuildInFilePlatform).Async();
                         return;
@@ -163,22 +163,22 @@ namespace AIO.UEditor.CLI
 
             using (GELayout.VHorizontal())
             {
-                GELayout.Label("项目导出工程路径", GTOption.Width(true));
+                GELayout.Label("项目导出工程路径", GTOptions.Width(true));
 
                 EngineeringPathPath[BuildTarget].VersionIndex = GELayout.Popup(
                     EngineeringPathPath[BuildTarget].
                         VersionIndex,
                     YooAssetUnityArgs.Versions,
-                    GTOption.Width(50));
+                    GTOptions.Width(50));
 
-                if (GELayout.Button("Select", GTOption.Width(50)))
+                if (GELayout.Button("Select", GTOptions.Width(50)))
                 {
                     EngineeringPathPath[BuildTarget].OutputRoot = EditorUtility.OpenFolderPanel("项目导出工程路径",
                                                                                                 EngineeringPathPath[BuildTarget].OutputRoot, "");
                     return;
                 }
 
-                if (GELayout.Button("Open", GTOption.Width(50)))
+                if (GELayout.Button("Open", GTOptions.Width(50)))
                 {
                     PrPlatform.Open.Path(EngineeringPathPath[BuildTarget].OutputRoot).Async();
                     return;
@@ -236,7 +236,7 @@ namespace AIO.UEditor.CLI
 
         private void Command0()
         {
-            GELayout.Label("YooAsset 命令合集", GEStyle.DDHeaderStyle, GTOption.Height(25));
+            GELayout.Label("YooAsset 命令合集", GEStyle.DDHeaderStyle, GTOptions.Height(25));
             using (GELayout.VHorizontal())
             {
                 if (GELayout.Button("构建", 50, 25))
@@ -299,8 +299,8 @@ namespace AIO.UEditor.CLI
         {
             using (GELayout.VHorizontal())
             {
-                GELayout.Label("Upload FTP", GEStyle.DDHeaderStyle, GTOption.Height(25));
-                if (GELayout.Button("Upload", GTOption.Width(50), GTOption.Height(25))) Upload();
+                GELayout.Label("Upload FTP", GEStyle.DDHeaderStyle, GTOptions.Height(25));
+                if (GELayout.Button("Upload", GTOptions.Width(50), GTOptions.Height(25))) Upload();
             }
 
             using (GELayout.Vertical())
@@ -317,8 +317,8 @@ namespace AIO.UEditor.CLI
         {
             using (GELayout.VHorizontal())
             {
-                GELayout.Label("Local Storage", GEStyle.DDHeaderStyle, GTOption.Height(25));
-                if (GELayout.Button("Move", GTOption.Width(50), GTOption.Height(25)))
+                GELayout.Label("Local Storage", GEStyle.DDHeaderStyle, GTOptions.Height(25));
+                if (GELayout.Button("Move", GTOptions.Width(50), GTOptions.Height(25)))
                 {
                     var source = Commond.OutputRoot.Trim('/', '\\');
                     var target = LocalStoragePath.Trim('/', '\\');
@@ -327,7 +327,7 @@ namespace AIO.UEditor.CLI
                     PrPlatform.Folder.Copy(target, source).Async();
                 }
 
-                if (GELayout.Button("Link", GTOption.Width(50), GTOption.Height(25)))
+                if (GELayout.Button("Link", GTOptions.Width(50), GTOptions.Height(25)))
                 {
                     var source = Commond.OutputRoot.Trim('/', '\\');
                     var target = LocalStoragePath.Trim('/', '\\');
@@ -340,11 +340,11 @@ namespace AIO.UEditor.CLI
                     symbolic.Async();
                 }
 
-                if (GELayout.Button("Select", GTOption.Width(50), GTOption.Height(25)))
+                if (GELayout.Button("Select", GTOptions.Width(50), GTOptions.Height(25)))
                     LocalStoragePath =
                         EditorUtility.OpenFolderPanel("Please select the path", LocalStoragePath, "");
 
-                if (GELayout.Button("Open", GTOption.Width(50), GTOption.Height(25)))
+                if (GELayout.Button("Open", GTOptions.Width(50), GTOptions.Height(25)))
                     PrPlatform.Open.Path(LocalStoragePath).Async();
             }
 
@@ -361,9 +361,9 @@ namespace AIO.UEditor.CLI
             if (!AHelper.IO.ExistsDir(BuildInFilePlatform)) return;
             using (GELayout.VHorizontal())
             {
-                GELayout.Label("组合资源 StreamingAssets", GEStyle.DDHeaderStyle, GTOption.Height(25));
+                GELayout.Label("组合资源 StreamingAssets", GEStyle.DDHeaderStyle, GTOptions.Height(25));
 
-                if (GELayout.Button("Pack", GTOption.Width(50), GTOption.Height(25)))
+                if (GELayout.Button("Pack", GTOptions.Width(50), GTOptions.Height(25)))
                 {
                     var dic = YooAssetPackageTarget.ToDictionary(
                         target => target,
@@ -380,7 +380,7 @@ namespace AIO.UEditor.CLI
                 using (GELayout.VHorizontal())
                 {
                     YooAssetPackageIndex = GELayout.Popup("资源包名", YooAssetPackageIndex, YooAssetPackageNames);
-                    if (GELayout.Button("Add", GTOption.Width(50)))
+                    if (GELayout.Button("Add", GTOptions.Width(50)))
                     {
                         if (!YooAssetPackageVersionTarget.ContainsKey(YooAssetPackageNames[YooAssetPackageIndex]))
                         {
@@ -410,7 +410,7 @@ namespace AIO.UEditor.CLI
                         var j = YooAssetPackageTarget.Count - i - 1;
                         using (GELayout.VHorizontal())
                         {
-                            if (GELayout.Button(YooAssetPackageTarget[j], GTOption.Width(150)))
+                            if (GELayout.Button(YooAssetPackageTarget[j], GTOptions.Width(150)))
                             {
                                 PrPlatform.Open.Path(Path.Combine(BuildInFilePlatform, YooAssetPackageTarget[j])).
                                            Async();
@@ -421,7 +421,7 @@ namespace AIO.UEditor.CLI
                                 GELayout.Popup(YooAssetPackageTargetIndex[YooAssetPackageTarget[j]],
                                                YooAssetPackageVersionTarget[YooAssetPackageTarget[j]]);
 
-                            if (GELayout.Button("Del", GTOption.Width(50)))
+                            if (GELayout.Button("Del", GTOptions.Width(50)))
                             {
                                 YooAssetPackageNames.Add(YooAssetPackageTarget[j]);
                                 YooAssetPackageTargetIndex.Remove(YooAssetPackageTarget[j]);

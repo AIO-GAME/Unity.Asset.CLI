@@ -93,25 +93,25 @@ namespace AIO.UEditor
 
         private void GPInit()
         {
-            GP_Width_EXPAND_TURE = GTOption.WidthExpand(true);
-            GP_MAX_Width_100     = GTOption.MaxWidth(100);
-            GP_MIN_Width_50      = GTOption.MinWidth(50);
+            GP_Width_EXPAND_TURE = GTOptions.WidthExpand(true);
+            GP_MAX_Width_100     = GTOptions.MaxWidth(100);
+            GP_MIN_Width_50      = GTOptions.MinWidth(50);
 
-            GP_Width_120 = GTOption.Width(120);
-            GP_Width_150 = GTOption.Width(150);
-            GP_Width_160 = GTOption.Width(160);
-            GP_Width_100 = GTOption.Width(100);
-            GP_Width_75  = GTOption.Width(75);
-            GP_Width_80  = GTOption.Width(80);
-            GP_Width_50  = GTOption.Width(50);
-            GP_Width_40  = GTOption.Width(40);
-            GP_Width_30  = GTOption.Width(30);
-            GP_Width_25  = GTOption.Width(25);
-            GP_Width_20  = GTOption.Width(20);
+            GP_Width_120 = GTOptions.Width(120);
+            GP_Width_150 = GTOptions.Width(150);
+            GP_Width_160 = GTOptions.Width(160);
+            GP_Width_100 = GTOptions.Width(100);
+            GP_Width_75  = GTOptions.Width(75);
+            GP_Width_80  = GTOptions.Width(80);
+            GP_Width_50  = GTOptions.Width(50);
+            GP_Width_40  = GTOptions.Width(40);
+            GP_Width_30  = GTOptions.Width(30);
+            GP_Width_25  = GTOptions.Width(25);
+            GP_Width_20  = GTOptions.Width(20);
 
-            GP_Height_30 = GTOption.Height(30);
-            GP_Height_25 = GTOption.Height(25);
-            GP_Height_20 = GTOption.Height(20);
+            GP_Height_30 = GTOptions.Height(30);
+            GP_Height_25 = GTOptions.Height(25);
+            GP_Height_20 = GTOptions.Height(20);
         }
 
         partial void GUIContentInit();
@@ -214,7 +214,7 @@ namespace AIO.UEditor
             {
                 IsShow              = true,
                 IsAllowHorizontal   = false,
-                DragHorizontalWidth = 5,
+                DragStretchHorizontalWidth = 5,
                 width               = 250
             };
 
@@ -222,7 +222,7 @@ namespace AIO.UEditor
             {
                 IsShow              = true,
                 IsAllowHorizontal   = true,
-                DragHorizontalWidth = 5,
+                DragStretchHorizontalWidth = 5,
                 width               = CurrentWidth - ViewSetting.width
             };
 
@@ -230,7 +230,7 @@ namespace AIO.UEditor
             {
                 IsShow              = true,
                 IsAllowHorizontal   = false,
-                DragHorizontalWidth = 10,
+                DragStretchHorizontalWidth = 10,
                 width               = 400,
                 x                   = 5,
             };
@@ -249,7 +249,7 @@ namespace AIO.UEditor
             {
                 IsShow              = true,
                 IsAllowHorizontal   = true,
-                DragHorizontalWidth = 5,
+                DragStretchHorizontalWidth = 5,
                 width               = 150,
             };
 
@@ -257,7 +257,7 @@ namespace AIO.UEditor
             {
                 IsShow              = true,
                 IsAllowHorizontal   = true,
-                DragHorizontalWidth = 5,
+                DragStretchHorizontalWidth = 5,
                 width               = 150,
             };
 

@@ -421,7 +421,7 @@ namespace AIO.UEditor
                 {
                     DependenciesSearchText = EditorGUILayout.TextField(DependenciesSearchText, GEStyle.SearchTextField);
                     if (!string.IsNullOrEmpty(DependenciesSearchText))
-                        if (GUILayout.Button("✘", GEStyle.toolbarbuttonLeft, GTOption.Width(21)))
+                        if (GUILayout.Button("✘", GEStyle.toolbarbuttonLeft, GTOptions.Width(21)))
                         {
                             GUI.FocusControl(null);
                             DependenciesSearchText = string.Empty;
@@ -444,7 +444,7 @@ namespace AIO.UEditor
                         EditorGUILayout.LabelField(dependency.Value.Name, GUILayout.MinWidth(100), GUILayout.ExpandWidth(true));
                         EditorGUILayout.LabelField(dependency.Value.Size.ToConverseStringFileSize(), GUILayout.MinWidth(50), GUILayout.MaxWidth(125));
                         EditorGUILayout.ObjectField(dependency.Value.Object, dependency.Value.GetType(), false, GUILayout.MinWidth(50), GUILayout.MaxWidth(150));
-                        if (GUILayout.Button(GC_LookMode_Object_Select, GEStyle.IconButton, GTOption.Width(16)))
+                        if (GUILayout.Button(GC_LookMode_Object_Select, GEStyle.IconButton, GTOptions.Width(16)))
                         {
                             EditorUtility.RevealInFinder(dependency.Key);
                             Selection.activeObject = dependency.Value.Object;

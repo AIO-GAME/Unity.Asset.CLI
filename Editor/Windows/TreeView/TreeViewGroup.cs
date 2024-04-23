@@ -24,7 +24,10 @@ namespace AIO.UEditor
 
         private AssetCollectRoot Config;
         private int              RenameIndex = -1;
-        private ViewTreeGroup(TreeViewState state, MultiColumnHeader header) : base(state, header) { }
+
+        private ViewTreeGroup(TreeViewState state, MultiColumnHeader header) : base(state, header)
+        {
+        }
 
         public static ViewTreeGroup Create()
         {
@@ -134,8 +137,10 @@ namespace AIO.UEditor
         {
             if (!Config.CurrentPackage.Enable) return;
             menu.AddItem(GC_MENU_ADD_GROUP, false, OP_CreateGroup);
-            menu.AddItem(GC_MENU_ALL_DISABLE, false, () => { Config.CurrentPackage.ForEach(group => group.Enable = false); });
-            menu.AddItem(GC_MENU_ALL_ENABLE, false, () => { Config.CurrentPackage.ForEach(group => group.Enable  = true); });
+            menu.AddItem(GC_MENU_ALL_DISABLE, false,
+                         () => { Config.CurrentPackage.ForEach(group => group.Enable = false); });
+            menu.AddItem(GC_MENU_ALL_ENABLE, false,
+                         () => { Config.CurrentPackage.ForEach(group => group.Enable = true); });
         }
 
         protected override void OnContextClicked(GenericMenu menu, TreeViewItem item)
@@ -156,10 +161,10 @@ namespace AIO.UEditor
             menu.AddItem(GC_MENU_DELETE, false, OP_DeleteGroup, item);
         }
 
-
         protected override void OnDragSwapData(int from, int to)
         {
-            (Config.CurrentPackage[from], Config.CurrentPackage[to]) = (Config.CurrentPackage[to], Config.CurrentPackage[from]);
+            (Config.CurrentPackage[from], Config.CurrentPackage[to]) =
+                (Config.CurrentPackage[to], Config.CurrentPackage[from]);
         }
 
         private void OP_AddCollect(object obj)
@@ -201,9 +206,9 @@ namespace AIO.UEditor
             {
                 case TreeViewItem item:
                     if (EditorUtility.DisplayDialog(
-                            "删除资源组",
-                            $"是否删除资源组 : {Config.CurrentPackage[item.id].Name}",
-                            "确定", "取消"))
+                                                    "删除资源组",
+                                                    $"是否删除资源组 : {Config.CurrentPackage[item.id].Name}",
+                                                    "确定", "取消"))
                     {
                         Config.CurrentPackage.RemoveAt(item.id);
                         ReloadAndSelect(Config.CurrentGroupIndex--);

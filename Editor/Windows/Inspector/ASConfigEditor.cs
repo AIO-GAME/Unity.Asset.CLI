@@ -49,7 +49,7 @@ namespace AIO.UEditor
             {
                 using (GELayout.VHorizontal(GSBackground))
                 {
-                    GELayout.Label("加载模式", GTOption.Width(100));
+                    GELayout.Label("加载模式", GTOptions.Width(100));
                     Target.ASMode = GELayout.Popup(Target.ASMode, GEStyle.PreDropDown);
                 }
 
@@ -189,7 +189,7 @@ namespace AIO.UEditor
 
             using (GELayout.VHorizontal(GSBackground))
             {
-                Target.URL = GELayout.AreaText(Target.URL, GEStyle.ToolbarTextField, GTOption.WidthExpand(true));
+                Target.URL = GELayout.AreaText(Target.URL, GEStyle.ToolbarTextField, GTOptions.WidthExpand(true));
             }
 
             if (Target.EnableSequenceRecord)
@@ -254,28 +254,28 @@ namespace AIO.UEditor
                     {
                         GELayout.Label($"{++index:000} : {record.PackageName}",
                                        GEStyle.HeaderLabel,
-                                       GTOption.WidthMin(10),
-                                       GTOption.WidthMax(100));
+                                       GTOptions.WidthMin(10),
+                                       GTOptions.WidthMax(100));
 
                         GELayout.Label(record.Location,
-                                       GTOption.WidthMin(50));
+                                       GTOptions.WidthMin(50));
 
                         if (GELayout.Button("寻址路径",
                                             GSValue,
-                                            GTOption.WidthMin(20),
-                                            GTOption.WidthMax(75)))
+                                            GTOptions.WidthMin(20),
+                                            GTOptions.WidthMax(75)))
                             EditorGUIUtility.systemCopyBuffer = record.Location;
 
                         if (GELayout.Button("资源路径",
                                             GSValue,
-                                            GTOption.WidthMin(20),
-                                            GTOption.WidthMax(75)))
+                                            GTOptions.WidthMin(20),
+                                            GTOptions.WidthMax(75)))
                             EditorGUIUtility.systemCopyBuffer = record.AssetPath;
 
                         if (GELayout.Button("定位",
                                             GSValue,
-                                            GTOption.WidthMin(20),
-                                            GTOption.WidthMax(50)))
+                                            GTOptions.WidthMin(20),
+                                            GTOptions.WidthMax(50)))
                         {
                             var path = record.AssetPath;
                             if (File.Exists(path))
