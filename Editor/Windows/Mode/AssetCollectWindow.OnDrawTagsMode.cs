@@ -21,33 +21,35 @@ namespace AIO.UEditor
             var width = rect.width;
             rect.x     = 0;
             rect.width = 0;
-            if (TagsModeDisplayCollectors.Length > 0)
+            if (TagsModeDisplayCollectors?.Length > 0)
             {
                 rect.x     += rect.width;
                 rect.width =  100;
-                if (TagsModeDisplayCollectors.Length == 1)
+                switch (TagsModeDisplayCollectors.Length)
                 {
-                    LookModeDisplayCollectorsIndex = 0;
-                    EditorGUI.Popup(rect, 0, TagsModeDisplayCollectors, GEStyle.PreDropDown);
-                }
-                else if (TagsModeDisplayCollectors.Length >= 31)
-                {
-                    LookModeDisplayCollectorsIndex = EditorGUI.Popup(rect, LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown);
-                }
-                else
-                {
-                    LookModeDisplayCollectorsIndex = EditorGUI.MaskField(rect, LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown);
+                    case 1:
+                        LookModeDisplayCollectorsIndex = 0;
+                        EditorGUI.Popup(rect, 0, TagsModeDisplayCollectors, GEStyle.PreDropDown);
+                        break;
+                    default:
+                    {
+                        LookModeDisplayCollectorsIndex = TagsModeDisplayCollectors.Length >= 31
+                            ? EditorGUI.Popup(rect, LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown)
+                            : EditorGUI.MaskField(rect, LookModeDisplayCollectorsIndex, TagsModeDisplayCollectors, GEStyle.PreDropDown);
+
+                        break;
+                    }
                 }
             }
 
-            if (TagsModeDisplayTypes.Length > 0)
+            if (TagsModeDisplayTypes?.Length > 0)
             {
                 rect.x                   += rect.width;
                 rect.width               =  100;
                 LookModeDisplayTypeIndex =  EditorGUI.MaskField(rect, LookModeDisplayTypeIndex, TagsModeDisplayTypes, GEStyle.PreDropDown);
             }
 
-            if (TagsModeDisplayTags.Length > 0)
+            if (TagsModeDisplayTags?.Length > 0)
             {
                 rect.x                   += rect.width;
                 rect.width               =  100;
@@ -55,39 +57,34 @@ namespace AIO.UEditor
             }
 
             if (GUI.changed)
-                if (
-                    TempTable.GetOrDefault<string>(nameof(SearchText)) != SearchText ||
-                    TempTable.GetOrDefault<int>(nameof(LookModeDisplayCollectorsIndex)) !=
-                    LookModeDisplayCollectorsIndex ||
-                    TempTable.GetOrDefault<int>(nameof(LookModeDisplayTypeIndex)) !=
-                    LookModeDisplayTypeIndex ||
-                    TempTable.GetOrDefault<int>(nameof(LookModeDisplayTagsIndex)) !=
-                    LookModeDisplayTagsIndex
-                )
+                if (TempTable.GetOrDefault<string>(nameof(ViewTreeQueryAsset.searchString)) != ViewTreeQueryAsset.searchString
+                 || TempTable.GetOrDefault<int>(nameof(LookModeDisplayCollectorsIndex)) != LookModeDisplayCollectorsIndex
+                 || TempTable.GetOrDefault<int>(nameof(LookModeDisplayTypeIndex)) != LookModeDisplayTypeIndex
+                 || TempTable.GetOrDefault<int>(nameof(LookModeDisplayTagsIndex)) != LookModeDisplayTagsIndex)
                 {
                     CurrentPageValues.Clear();
                     CurrentPageValues.Add(CurrentTagValues.Where(data => !TagsModeDataFilter(data)));
-                    CurrentPageValues.PageIndex                       = 0;
-                    LookModeCollectorsALLSize                         = CurrentPageValues.Sum(data => data.Size);
-                    TempTable[nameof(SearchText)]                     = ViewTreeQueryAsset.searchString = SearchText;
-                    TempTable[nameof(LookModeDisplayCollectorsIndex)] = LookModeDisplayCollectorsIndex;
-                    TempTable[nameof(LookModeDisplayTypeIndex)]       = LookModeDisplayTypeIndex;
-                    TempTable[nameof(LookModeDisplayTagsIndex)]       = LookModeDisplayTagsIndex;
-                    ViewTreeQueryAsset.Reload();
+                    CurrentPageValues.PageIndex                        = 0;
+                    LookModeCollectorsALLSize                          = CurrentPageValues.Sum(data => data.Size);
+                    TempTable[nameof(ViewTreeQueryAsset.searchString)] = ViewTreeQueryAsset.searchString = ViewTreeQueryAsset.searchString;
+                    TempTable[nameof(LookModeDisplayCollectorsIndex)]  = LookModeDisplayCollectorsIndex;
+                    TempTable[nameof(LookModeDisplayTypeIndex)]        = LookModeDisplayTypeIndex;
+                    TempTable[nameof(LookModeDisplayTagsIndex)]        = LookModeDisplayTagsIndex;
+                    ViewTreeQueryAsset.ReloadAndSelect(0);
                 }
 
             rect.x     += rect.width + 3;
             rect.width =  width - 190 - 30 - 30 - rect.x;
-            SearchText = CurrentTagValues.Count > 300
-                ? EditorGUI.DelayedTextField(rect, SearchText, GEStyle.SearchTextField)
-                : EditorGUI.TextField(rect, SearchText, GEStyle.SearchTextField);
+            ViewTreeQueryAsset.searchString = CurrentTagValues.Count > 300
+                ? EditorGUI.DelayedTextField(rect, ViewTreeQueryAsset.searchString, GEStyle.SearchTextField)
+                : EditorGUI.TextField(rect, ViewTreeQueryAsset.searchString, GEStyle.SearchTextField);
 
             rect.x     += rect.width;
             rect.width =  30;
             if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
-                ViewTreeQueryAsset.searchString = SearchText = string.Empty;
+                ViewTreeQueryAsset.searchString = string.Empty;
             }
 
             rect.x     += rect.width;
@@ -113,9 +110,9 @@ namespace AIO.UEditor
             rect.width =  30;
             if (GUI.Button(rect, GC_REFRESH, GEStyle.TEtoolbarbutton))
             {
-                LookCurrentSelectAsset   = null;
-                SearchText               = string.Empty;
-                LookModeDisplayTagsIndex = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
+                LookCurrentSelectAsset          = null;
+                ViewTreeQueryAsset.searchString = string.Empty;
+                LookModeDisplayTagsIndex        = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
                 UpdateDataTagsMode();
             }
         }
@@ -166,9 +163,12 @@ namespace AIO.UEditor
             LookModeCollectorsPageSize = 0;
 
             if (Data.Packages.Length == 0) return;
-            TagsModeDisplayCollectors = new[] { "ALL" };
-            TagsModeDisplayTypes      = Array.Empty<string>();
-            TagsModeDisplayTags       = Data.GetTags();
+            TagsModeDisplayCollectors = new[]
+            {
+                "ALL"
+            };
+            TagsModeDisplayTypes = Array.Empty<string>();
+            TagsModeDisplayTags  = Data.GetTags();
 
             var listTypes = new List<string>();
             var listItems = new List<AssetCollectItem>();
@@ -200,7 +200,7 @@ namespace AIO.UEditor
                             }
 
                             CurrentPageValues.PageIndex = CurrentPageValues.PageIndex;
-                            ViewTreeQueryAsset.Reload();
+                            ViewTreeQueryAsset.ReloadAndSelect(0);
                         });
                     }
                 }
@@ -226,7 +226,7 @@ namespace AIO.UEditor
             if (IsFilterTags(LookModeDisplayTagsIndex, data.Tags.Split(';', ',', ' '), TagsModeDisplayTags))
                 filter++;
 
-            if (IsFilterSearch(SearchText, data))
+            if (IsFilterSearch(ViewTreeQueryAsset.searchString, data))
                 filter++;
 
             return filter != 4;

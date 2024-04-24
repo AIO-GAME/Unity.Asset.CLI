@@ -24,10 +24,7 @@ namespace AIO.UEditor
                      IconResource = "Editor/Icon/Asset",
                      ShowMode = ELnkShowMode.Toolbar
                  )]
-        public static void OpenWindow()
-        {
-            EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
-        }
+        public static void OpenWindow() { EditorApplication.ExecuteMenuItem("AIO/Window/Asset"); }
 
         [MenuItem("AIO/Asset/清空运行时缓存")]
         public static void ClearRuntimeCache()
@@ -195,7 +192,6 @@ namespace AIO.UEditor
                 {
                     ViewGroupList.DraggingStretch(eventData, ViewRect.DragStretchType.Horizontal);
                     ViewPackageList.DraggingStretch(eventData, ViewRect.DragStretchType.Horizontal);
-                    OnDraw();
                     break;
                 }
                 case Mode.LookFirstPackage:

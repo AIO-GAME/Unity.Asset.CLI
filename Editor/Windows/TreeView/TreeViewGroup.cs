@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    internal class ViewTreeGroup : ViewTreeRowSingle
+    internal class TreeViewGroup : TreeViewRowSingle
     {
         private readonly GUIContent GC_MENU_ADD         = new GUIContent("添加 : 收集器");
         private readonly GUIContent GC_MENU_ADD_GROUP   = new GUIContent("添加 : 资源组");
@@ -25,13 +25,13 @@ namespace AIO.UEditor
         private AssetCollectRoot Config;
         private int              RenameIndex = -1;
 
-        private ViewTreeGroup(TreeViewState state, MultiColumnHeader header) : base(state, header)
+        private TreeViewGroup(TreeViewState state, MultiColumnHeader header) : base(state, header)
         {
         }
 
-        public static ViewTreeGroup Create()
+        public static TreeViewGroup Create()
         {
-            return new ViewTreeGroup(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
+            return new TreeViewGroup(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
             {
                 GetMultiColumnHeaderColumn("资源组", 150, 100)
             })));
@@ -53,9 +53,9 @@ namespace AIO.UEditor
             if (GELayout.Button(rect.center, new Vector2(100, 30), "创建资源组")) OP_CreateGroup();
         }
 
-        protected override void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
+        protected override void OnEventKeyDown(Event evt, TreeViewItem item)
         {
-            switch (keyCode)
+            switch (evt.keyCode)
             {
                 case KeyCode.F2:
                     OP_RenameGroupName(item);
@@ -113,10 +113,10 @@ namespace AIO.UEditor
             RenameIndex = -1;
         }
 
-        protected override void OnSorting(MultiColumnHeader header)
+        protected override void OnSorting(int columnIndex, bool ascending)
         {
             var tempGroup = Config.CurrentGroup;
-            Config.CurrentPackage.Sort(header.IsSortedAscending(header.sortedColumnIndex));
+            Config.CurrentPackage.Sort(ascending);
             var index = Config.CurrentPackage.IndexOf(tempGroup);
             Config.CurrentGroupIndex = index;
             SetSelection(new[] { index });

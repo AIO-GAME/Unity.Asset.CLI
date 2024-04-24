@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public class ViewTreeCollect : ViewTreeRowSingle
+    public class TreeViewCollect : TreeViewRowSingle
     {
         private readonly GUIContent GC_MENU_ADD         = new GUIContent("添加 : 收集器");
         private readonly GUIContent GC_MENU_ALL_DISABLE = new GUIContent("全部 : 禁用");
@@ -22,14 +22,11 @@ namespace AIO.UEditor
         private readonly GUIContent GC_MENU_UNFOLD      = new GUIContent("修改 : 展开");
         private readonly GUIContent GC_MENU_FOLD        = new GUIContent("修改 : 折叠");
 
-        private ViewTreeCollect(TreeViewState state, MultiColumnHeader header) : base(state, header)
-        {
-            showAlternatingRowBackgrounds = false;
-        }
+        private TreeViewCollect(TreeViewState state, MultiColumnHeader header) : base(state, header) { showAlternatingRowBackgrounds = false; }
 
-        public static ViewTreeCollect Create(float width = 100, float min = 80, float max = 200)
+        public static TreeViewCollect Create(float width = 100, float min = 80, float max = 200)
         {
-            return new ViewTreeCollect(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
+            return new TreeViewCollect(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
             {
                 GetMultiColumnHeaderColumn("收集器", width, min, max)
             })));
@@ -37,15 +34,12 @@ namespace AIO.UEditor
 
         private AssetCollectRoot Config;
 
-        protected override void OnInitialize()
-        {
-            Config = AssetCollectRoot.GetOrCreate();
-        }
+        protected override void OnInitialize() { Config = AssetCollectRoot.GetOrCreate(); }
 
-        protected override void OnSorting(MultiColumnHeader header)
+        protected override void OnSorting(int columnIndex, bool ascending)
         {
             var currentCollect = Config.CurrentCollect;
-            Config.CurrentGroup.Sort(header.IsSortedAscending(header.sortedColumnIndex));
+            Config.CurrentGroup.Sort(ascending);
             var index = Config.CurrentGroup.IndexOf(currentCollect);
             Config.CurrentCollectIndex = index;
             SetSelection(new[] { index });
@@ -73,10 +67,7 @@ namespace AIO.UEditor
             }
         }
 
-        protected override void OnSelection(int id)
-        {
-            Config.CurrentCollectIndex = id;
-        }
+        protected override void OnSelection(int id) { Config.CurrentCollectIndex = id; }
 
         protected override void OnContextClicked(GenericMenu menu)
         {
@@ -142,19 +133,16 @@ namespace AIO.UEditor
         }
 
         /// <inheritdoc />
-        protected override void OnDragSwapData(int from, int to)
-        {
-            Config.CurrentGroup.Swap(from, to);
-        }
+        protected override void OnDragSwapData(int from, int to) { Config.CurrentGroup.Swap(from, to); }
 
         /// <inheritdoc />
-        protected override void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
+        protected override void OnEventKeyDown(Event evt, TreeViewItem item)
         {
             switch (item)
             {
                 case TreeViewItemCollect collect:
                 {
-                    switch (keyCode)
+                    switch (evt.keyCode)
                     {
                         case KeyCode.KeypadEnter:
                         case KeyCode.Return:

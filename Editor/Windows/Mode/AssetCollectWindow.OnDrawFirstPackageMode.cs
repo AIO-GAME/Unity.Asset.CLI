@@ -17,7 +17,7 @@ namespace AIO.UEditor
             if (!Config.EnableSequenceRecord) return;
             if (Config.SequenceRecord.ExistsLocal()) Config.SequenceRecord.UpdateLocal();
             UpdatePageValuesFirstPackageMode();
-            ViewTreeQueryAsset.Reload();
+            ViewTreeQueryAsset.ReloadAndSelect(0);
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace AIO.UEditor
                 {
                     GUI.FocusControl(null);
                     AHelper.IO.DeleteFile(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
-                    SearchText               = string.Empty;
-                    LookModeDisplayTypeIndex = 0;
+                    ViewTreeQueryAsset.searchString = string.Empty;
+                    LookModeDisplayTypeIndex        = 0;
                     Config.SequenceRecord.UpdateLocal();
                     UpdatePageValuesFirstPackageMode();
                     return;
@@ -91,27 +91,26 @@ namespace AIO.UEditor
                     EditorGUI.MaskField(rect, LookModeDisplayTypeIndex, TagsModeDisplayTypes, GEStyle.PreDropDown);
             }
 
-            rect.x     += rect.width + 3;
-            rect.width =  width - 190 - 30 - 30 - 30 - 30 - rect.x;
-            SearchText =  GUI.TextField(rect, SearchText, GEStyle.SearchTextField);
+            rect.x                          += rect.width + 3;
+            rect.width                      =  width - 190 - 30 - 30 - 30 - 30 - rect.x;
+            ViewTreeQueryAsset.searchString =  GUI.TextField(rect, ViewTreeQueryAsset.searchString, GEStyle.SearchTextField);
 
             rect.x     += rect.width;
             rect.width =  30;
             if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
-                ViewTreeQueryAsset.searchString = SearchText = string.Empty;
+                ViewTreeQueryAsset.searchString = string.Empty;
             }
 
             if (GUI.changed &&
                 (TempTable.GetOrDefault<int>(nameof(LookModeDisplayTypeIndex)) != LookModeDisplayTypeIndex
-              || TempTable.GetOrDefault<string>(nameof(SearchText)) != SearchText))
+              || TempTable.GetOrDefault<string>(nameof(ViewTreeQueryAsset.searchString)) != ViewTreeQueryAsset.searchString))
             {
                 CurrentPageValues.Clear();
                 CurrentPageValues.Add(CurrentTagValues.Where(data => !FirstPackageModeDataFilter(data)));
                 CurrentPageValues.PageIndex                 = 0;
                 LookModeCollectorsALLSize                   = CurrentPageValues.Sum(data => data.Size);
-                TempTable[nameof(SearchText)]               = ViewTreeQueryAsset.searchString = SearchText;
                 TempTable[nameof(LookModeDisplayTypeIndex)] = LookModeDisplayTypeIndex;
                 ViewTreeQueryAsset.Reload();
             }
@@ -148,8 +147,8 @@ namespace AIO.UEditor
             if (GUI.Button(rect, GC_REFRESH, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
-                SearchText               = string.Empty;
-                LookModeDisplayTypeIndex = 0;
+                ViewTreeQueryAsset.searchString = string.Empty;
+                LookModeDisplayTypeIndex        = 0;
                 Config.SequenceRecord.UpdateLocal();
                 UpdatePageValuesFirstPackageMode();
             }
@@ -157,8 +156,8 @@ namespace AIO.UEditor
 
         private async void SyncSequenceRecords()
         {
-            SearchText               = string.Empty;
-            LookModeDisplayTypeIndex = 0;
+            ViewTreeQueryAsset.searchString = string.Empty;
+            LookModeDisplayTypeIndex        = 0;
             await Config.SequenceRecord.DownloadTask(Config.URL);
             Config.SequenceRecord.UpdateLocal();
             UpdatePageValuesFirstPackageMode();
@@ -244,7 +243,7 @@ namespace AIO.UEditor
             if (IsFilterTypes(LookModeDisplayTypeIndex, data.AssetPath, TagsModeDisplayTypes))
                 filter++;
 
-            if (IsFilterSearch(SearchText, data))
+            if (IsFilterSearch(ViewTreeQueryAsset.searchString, data))
                 filter++;
 
             return filter != 2;

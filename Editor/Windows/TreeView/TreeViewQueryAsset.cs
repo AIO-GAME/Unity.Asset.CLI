@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -7,7 +8,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public class TreeViewQueryAsset : ViewTreeRowSingle
+    public class TreeViewQueryAsset : TreeViewRowSingle
     {
         private TreeViewQueryAsset(TreeViewState state, MultiColumnHeader header, PageList<AssetDataInfo> pageList)
             : base(state, header)
@@ -16,6 +17,7 @@ namespace AIO.UEditor
             showAlternatingRowBackgrounds = true;
             PageValues                    = pageList;
             PageValues.PageIndex          = 0;
+            AllowMultiSelect              = true;
         }
 
         /// <summary>
@@ -28,7 +30,6 @@ namespace AIO.UEditor
             var index = PageValues.PageIndex;
             PageValues           = dataInfos;
             PageValues.PageIndex = index;
-            PageValues.Sort();
             ReloadAndSelect(0);
         }
 
@@ -36,12 +37,9 @@ namespace AIO.UEditor
         {
             return new TreeViewQueryAsset(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
             {
-                GetMultiColumnHeaderColumn("可寻址路径", 400, 400),
-                GetMultiColumnHeaderColumn("真实地址", 350, 300, 400),
-                GetMultiColumnHeaderColumn("资源类型", 175, 150, 200),
-                GetMultiColumnHeaderColumn("资源大小", 75, 75, 75),
-                GetMultiColumnHeaderColumn("修改时间", 75, 75, 75),
-                GetMultiColumnHeaderColumn("首包", 30, 30, 30, false),
+                GetMultiColumnHeaderColumn("可寻址路径", 400, 400), GetMultiColumnHeaderColumn("真实地址", 350, 300, 400),
+                GetMultiColumnHeaderColumn("资源类型", 175, 150, 200), GetMultiColumnHeaderColumn("资源大小", 75, 75, 75),
+                GetMultiColumnHeaderColumn("修改时间", 75, 75, 75), GetMultiColumnHeaderColumn("首包", 30, 30, 30, false)
             })), pageValues);
         }
 
@@ -61,41 +59,43 @@ namespace AIO.UEditor
         }
 
         /// <inheritdoc />
-        protected override void OnSorting(MultiColumnHeader header)
+        protected override void OnSorting(int columnIndex, bool ascending)
         {
-            switch (header.sortedColumnIndex)
+            switch (columnIndex)
             {
                 case 0:
-                    if (header.IsSortedAscending(header.sortedColumnIndex))
+                    if (ascending)
                         PageValues.Sort((a, b) => string.Compare(a.Address, b.Address, StringComparison.CurrentCulture));
                     else
                         PageValues.Sort((a, b) => string.Compare(b.Address, a.Address, StringComparison.CurrentCulture));
                     break;
                 case 1:
-                    if (header.IsSortedAscending(header.sortedColumnIndex))
+                    if (ascending)
                         PageValues.Sort((a, b) => string.Compare(a.AssetPath, b.AssetPath, StringComparison.CurrentCulture));
                     else
                         PageValues.Sort((a, b) => string.Compare(b.AssetPath, a.AssetPath, StringComparison.CurrentCulture));
                     break;
                 case 2:
-                    if (header.IsSortedAscending(header.sortedColumnIndex))
+                    if (ascending)
                         PageValues.Sort((a, b) => string.Compare(a.Type, b.Type, StringComparison.CurrentCulture));
                     else
                         PageValues.Sort((a, b) => string.Compare(b.Type, a.Type, StringComparison.CurrentCulture));
                     break;
                 case 3:
-                    if (header.IsSortedAscending(header.sortedColumnIndex))
+                    if (ascending)
                         PageValues.Sort((a, b) => a.Size.CompareTo(b.Size));
                     else
                         PageValues.Sort((a, b) => b.Size.CompareTo(a.Size));
                     break;
                 case 4:
-                    if (header.IsSortedAscending(header.sortedColumnIndex))
-                        PageValues.Sort((a, b) => string.Compare(a.GetLatestTime(), b.GetLatestTime(), StringComparison.CurrentCulture));
+                    if (ascending)
+                        PageValues.Sort((a, b) => a.LastWriteTime.CompareTo(b.LastWriteTime));
                     else
-                        PageValues.Sort((a, b) => string.Compare(b.GetLatestTime(), a.GetLatestTime(), StringComparison.CurrentCulture));
+                        PageValues.Sort((a, b) => b.LastWriteTime.CompareTo(a.LastWriteTime));
                     break;
             }
+
+            ReloadAndSelect(0);
         }
 
         protected override void OnInitialize() { }
@@ -128,10 +128,73 @@ namespace AIO.UEditor
         /// </summary>
         public event Action<AssetDataInfo, bool> OnFirstPackageResource;
 
-        /// <inheritdoc />
-        protected override void OnSelection(int id)
+        protected override void OnSelection(int id) => InvokeSelectionChanged(id);
+
+        protected override void OnContextClicked(GenericMenu menu, IList<TreeViewItem> item)
         {
-            InvokeSelectionChanged(id);
+            menu.AddItem(new GUIContent("复制 : 可寻址路径"), false, () =>
+            {
+                var str = string.Empty;
+                foreach (var treeViewItem in item)
+                {
+                    if (!(treeViewItem is TreeViewItemQueryAsset asset)) continue;
+                    str += asset.data.Address + "\n";
+                }
+
+                GUIUtility.systemCopyBuffer = str;
+            });
+
+            menu.AddItem(new GUIContent("复制 : 资源路径"), false, () =>
+            {
+                var str = string.Empty;
+                foreach (var treeViewItem in item)
+                {
+                    if (!(treeViewItem is TreeViewItemQueryAsset asset)) continue;
+                    str += asset.data.AssetPath + "\n";
+                }
+
+                GUIUtility.systemCopyBuffer = str;
+            });
+
+            menu.AddItem(new GUIContent("复制 : GUID"), false, () =>
+            {
+                var str = string.Empty;
+                foreach (var treeViewItem in item)
+                {
+                    if (!(treeViewItem is TreeViewItemQueryAsset asset)) continue;
+                    str += asset.data.GUID + "\n";
+                }
+
+                GUIUtility.systemCopyBuffer = str;
+            });
+
+            if (IsFirstPackageResource != null
+             && OnFirstPackageResource != null
+             && ASConfig.GetOrCreate().EnableSequenceRecord)
+            {
+                if (AssetCollectWindow.WindowMode != AssetCollectWindow.Mode.LookFirstPackage)
+                {
+                    menu.AddItem(new GUIContent("添加 : 首包列表"), false, () =>
+                    {
+                        foreach (var treeViewItem in item)
+                        {
+                            if (!(treeViewItem is TreeViewItemQueryAsset asset)) continue;
+                            if (!IsFirstPackageResource.Invoke(asset.data.GUID))
+                                OnFirstPackageResource.Invoke(asset.data, true);
+                        }
+                    });
+                }
+
+                menu.AddItem(new GUIContent("移除 : 首包列表"), false, () =>
+                {
+                    foreach (var treeViewItem in item)
+                    {
+                        if (!(treeViewItem is TreeViewItemQueryAsset asset)) continue;
+                        if (IsFirstPackageResource.Invoke(asset.data.GUID))
+                            OnFirstPackageResource.Invoke(asset.data, false);
+                    }
+                });
+            }
         }
 
         /// <inheritdoc />
@@ -169,29 +232,47 @@ namespace AIO.UEditor
         }
 
         /// <inheritdoc />
-        protected override void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
+        protected override void OnEventKeyDown(Event evt, TreeViewItem item)
         {
-            switch (keyCode)
+            switch (evt.keyCode)
             {
                 case KeyCode.Return:
                 case KeyCode.KeypadEnter:
+                {
                     if (item is TreeViewItemQueryAsset asset)
                         OnFirstPackageResource?.Invoke(asset.data, !IsFirstPackageResource?.Invoke(asset.data.GUID) ?? false);
                     break;
+                }
+                case KeyCode.A:
+                {
+                    if (evt.control) // 全选
+                    {
+                        state.selectedIDs.Clear();
+                        foreach (var treeViewItem in rootItem.children)
+                            state.selectedIDs.Add(treeViewItem.id);
+                        if (state.selectedIDs.Count > 0) state.lastClickedID = state.selectedIDs.Last();
+                    }
 
+                    break;
+                }
+                case KeyCode.Escape:
+                {
+                    state.selectedIDs.Clear();
+                    state.lastClickedID = -1;
+                    break;
+                }
                 case KeyCode.LeftArrow: // 数字键盘 右键
-                    if (PageValues.PageIndex > 0)
-                        PageValues.PageIndex  -= 1;
-                    else PageValues.PageIndex =  PageValues.PageCount - 1;
+                {
+                    PageValues.PageIndex = PageValues.PageIndex > 0 ? PageValues.PageIndex - 1 : PageValues.PageCount - 1;
                     ReloadAndSelect(0);
                     break;
-
+                }
                 case KeyCode.RightArrow: // 数字键盘 左键 
-                    if (PageValues.PageIndex < PageValues.PageCount - 1)
-                        PageValues.PageIndex  += 1;
-                    else PageValues.PageIndex =  0;
+                {
+                    PageValues.PageIndex = PageValues.PageIndex < PageValues.PageCount - 1 ? PageValues.PageIndex + 1 : 0;
                     ReloadAndSelect(0);
                     break;
+                }
                 case KeyCode.DownArrow: // 数字键盘 下键
                 {
                     var temp = item.id + 1;

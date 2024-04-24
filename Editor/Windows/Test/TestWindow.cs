@@ -7,20 +7,20 @@ namespace AIO.UEditor.Test
     public class TestWindow : GraphicWindow
     {
         private Rect            TempRect;
-        private ViewTreePackage VT_Package;
-        private ViewTreeGroup   VT_Group;
+        private TreeViewPackage VT_Package;
+        private TreeViewGroup   VT_Group;
 
         /// <inheritdoc />
         protected override void OnActivation()
         {
             if (VT_Package is null)
             {
-                VT_Package                    =  ViewTreePackage.Create();
-                VT_Package.OnSelectionChanged += id => { VT_Group.Reload(); };
+                VT_Package                    =  TreeViewPackage.Create();
+                VT_Package.OnSingleSelectionChanged += id => { VT_Group.Reload(); };
             }
             else VT_Package.Reload();
 
-            if (VT_Group is null) VT_Group = ViewTreeGroup.Create();
+            if (VT_Group is null) VT_Group = TreeViewGroup.Create();
             else VT_Group.Reload();
         }
 

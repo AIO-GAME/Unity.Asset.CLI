@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    internal class ViewTreePackage : ViewTreeRowSingle
+    internal class TreeViewPackage : TreeViewRowSingle
     {
         private readonly GUIContent GC_MENU_ADD_GROUP   = new GUIContent("添加 : 资源组");
         private readonly GUIContent GC_MENU_ADD_PACKAGE = new GUIContent("添加 : 资源包");
@@ -26,34 +26,28 @@ namespace AIO.UEditor
 
         private int              RenameIndex { get; set; } = -1;
         private AssetCollectRoot Config;
-        private ViewTreePackage(TreeViewState state, MultiColumnHeader header) : base(state, header) { }
+        private TreeViewPackage(TreeViewState state, MultiColumnHeader header) : base(state, header) { }
 
-        public static ViewTreePackage Create()
+        public static TreeViewPackage Create()
         {
-            return new ViewTreePackage(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
+            return new TreeViewPackage(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
             {
                 GetMultiColumnHeaderColumn("资源包", 150, 100)
             })));
         }
 
-        protected override void OnInitialize()
-        {
-            Config = AssetCollectRoot.GetOrCreate();
-        }
+        protected override void OnInitialize() { Config = AssetCollectRoot.GetOrCreate(); }
 
-        protected override void OnSorting(MultiColumnHeader header)
+        protected override void OnSorting(int columnIndex, bool ascending)
         {
             var temp = Config.CurrentPackage;
-            Config.Sort(header.IsSortedAscending(header.sortedColumnIndex));
+            Config.Sort(ascending);
             var index = Config.IndexOf(temp);
             Config.CurrentPackageIndex = index;
             SetSelection(new[] { index });
         }
 
-        protected override void OnSelection(int id)
-        {
-            Config.CurrentPackageIndex = id;
-        }
+        protected override void OnSelection(int id) { Config.CurrentPackageIndex = id; }
 
         protected override void OnBuildRows(TreeViewItem root)
         {
@@ -121,12 +115,7 @@ namespace AIO.UEditor
             RenameIndex = -1;
         }
 
-
-        protected override void OnDragSwapData(int from, int to)
-        {
-            Config.Swap(from, to);
-        }
-
+        protected override void OnDragSwapData(int from, int to) { Config.Swap(from, to); }
 
         #region 右键事件
 
@@ -136,7 +125,6 @@ namespace AIO.UEditor
             menu.AddItem(GC_MENU_ALL_DISABLE, false, () => { Config.ForEach(package => { package.Enable = package.Default; }); });
             menu.AddItem(GC_MENU_ALL_ENABLE, false, () => { Config.ForEach(package => package.Enable = true); });
         }
-
 
         protected override void OnContextClicked(GenericMenu menu, TreeViewItem item)
         {
@@ -166,10 +154,9 @@ namespace AIO.UEditor
 
         #endregion
 
-
-        protected override void OnEventKeyDown(KeyCode keyCode, TreeViewItem item)
+        protected override void OnEventKeyDown(Event evt, TreeViewItem item)
         {
-            switch (keyCode)
+            switch (evt.keyCode)
             {
                 case KeyCode.F2:
                     OP_RenamePackageName(item);
@@ -268,9 +255,9 @@ namespace AIO.UEditor
                     }
 
                     if (EditorUtility.DisplayDialog(
-                            "删除",
-                            $"确定是否删除 {Config[index - 1].Name} 资源包? 【删除后不可恢复】",
-                            "确定", "取消"))
+                                                    "删除",
+                                                    $"确定是否删除 {Config[index - 1].Name} 资源包? 【删除后不可恢复】",
+                                                    "确定", "取消"))
                     {
                         Config.RemoveAt(index - 1);
                         ReloadAndSelect(Config.CurrentPackageIndex--);
@@ -300,7 +287,6 @@ namespace AIO.UEditor
             }
         }
 
-
         private void OP_RenameDescription(object obj)
         {
             switch (obj)
@@ -318,7 +304,6 @@ namespace AIO.UEditor
                     break;
             }
         }
-
 
         protected override void OnDraw(Rect rect)
         {

@@ -64,19 +64,19 @@ namespace AIO.UEditor
             if (ViewPackageList.IsShow)
             {
                 ViewPackageList.x = ViewCollectorsList.x;
-                ViewPackageList.Draw(ViewTreePackage.OnGUI, GEStyle.INThumbnailShadow);
+                ViewPackageList.Draw(_treeViewPackage.OnGUI, GEStyle.INThumbnailShadow);
                 ViewCollectorsList.x = ViewPackageList.width + ViewPackageList.x;
             }
 
             if (ViewGroupList.IsShow)
             {
                 ViewGroupList.x = ViewCollectorsList.x;
-                ViewGroupList.Draw(ViewTreeGroup.OnGUI, GEStyle.INThumbnailShadow);
+                ViewGroupList.Draw(_treeViewGroup.OnGUI, GEStyle.INThumbnailShadow);
                 ViewCollectorsList.x = ViewGroupList.width + ViewGroupList.x;
             }
 
             ViewCollectorsList.width = rect.width - ViewCollectorsList.x - 5;
-            ViewCollectorsList.Draw(ViewTreeCollector.OnGUI);
+            ViewCollectorsList.Draw(_treeViewCollector.OnGUI);
         }
 
         partial void OnDrawHeaderEditorMode(Rect rect)

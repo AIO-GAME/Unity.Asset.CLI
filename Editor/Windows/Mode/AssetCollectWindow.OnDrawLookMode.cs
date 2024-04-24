@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
@@ -20,10 +18,9 @@ namespace AIO.UEditor
                 LookModeDisplayPackages.Length == 0) return;
 
             var width = rect.width;
-            rect.x     = 0;
-            rect.width = 100;
-            Data.CurrentPackageIndex =
-                EditorGUI.Popup(rect, Data.CurrentPackageIndex, LookModeDisplayPackages, GEStyle.PreDropDown);
+            rect.x                   = 0;
+            rect.width               = 100;
+            Data.CurrentPackageIndex = EditorGUI.Popup(rect, Data.CurrentPackageIndex, LookModeDisplayPackages, GEStyle.PreDropDown);
 
             if (!Data.IsValidGroup()) return;
 
@@ -44,90 +41,74 @@ namespace AIO.UEditor
             if (GUI.changed && !LookModeData.ContainsKey((Data.CurrentPackageIndex, Data.CurrentGroupIndex)))
                 UpdateDataLookModeCollector(Data.CurrentPackageIndex, Data.CurrentGroupIndex);
 
-            if (LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length > 0)
+            var collectors = LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)];
+            if (collectors.Length > 0)
             {
                 rect.x     += rect.width;
                 rect.width =  100;
-                if (LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length == 1)
+                switch (collectors.Length)
                 {
-                    LookModeDisplayCollectorsIndex = 0;
-                    EditorGUI.Popup(rect, 0
-                                  , LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                                  , GEStyle.PreDropDown);
-                }
-                else if (LookModeDisplayCollectors[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length >= 31)
-                {
-                    LookModeDisplayCollectorsIndex = EditorGUI.Popup(
-                                                                     rect, LookModeDisplayCollectorsIndex
-                                                                   , LookModeDisplayCollectors
-                                                                         [(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                                                                   , GEStyle.PreDropDown);
-                }
-                else
-                {
-                    LookModeDisplayCollectorsIndex = EditorGUI.MaskField(
-                                                                         rect, LookModeDisplayCollectorsIndex
-                                                                       , LookModeDisplayCollectors
-                                                                             [(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                                                                       , GEStyle.PreDropDown);
+                    case 1:
+                        LookModeDisplayCollectorsIndex = 0;
+                        EditorGUI.Popup(rect, 0, collectors, GEStyle.PreDropDown);
+                        break;
+                    default:
+                    {
+                        LookModeDisplayCollectorsIndex = collectors.Length >= 31
+                            ? EditorGUI.Popup(rect, LookModeDisplayCollectorsIndex, collectors, GEStyle.PreDropDown)
+                            : EditorGUI.MaskField(rect, LookModeDisplayCollectorsIndex, collectors, GEStyle.PreDropDown);
+                        break;
+                    }
                 }
             }
             else LookModeDisplayCollectorsIndex = 0;
 
-            if (LookModeDisplayTypes[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length > 0)
+            var types = LookModeDisplayTypes[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)];
+            if (types.Length > 0)
             {
                 rect.x     += rect.width;
                 rect.width =  100;
-                if (LookModeDisplayTypes[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length == 1)
+                if (types.Length == 1)
                 {
                     LookModeDisplayTypeIndex = 0;
-                    EditorGUI.Popup(rect, 0, LookModeDisplayTypes[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                                  , GEStyle.PreDropDown);
+                    EditorGUI.Popup(rect, 0, types, GEStyle.PreDropDown);
                 }
                 else
                 {
-                    LookModeDisplayTypeIndex = EditorGUI.MaskField(
-                                                                   rect, LookModeDisplayTypeIndex
-                                                                 , LookModeDisplayTypes
-                                                                       [(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                                                                 , GEStyle.PreDropDown);
+                    LookModeDisplayTypeIndex = EditorGUI.MaskField(rect, LookModeDisplayTypeIndex, types, GEStyle.PreDropDown);
                 }
             }
             else LookModeDisplayTypeIndex = 0;
 
-            if (LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length > 0)
+            var tags = LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)];
+            if (tags.Length > 0)
             {
                 rect.x     += rect.width;
                 rect.width =  100;
-                if (LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Length == 1)
+                if (tags.Length == 1)
                 {
                     LookModeDisplayTagsIndex = 0;
-                    EditorGUI.Popup(rect, 0, LookModeDisplayTags[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                                  , GEStyle.PreDropDown);
+                    EditorGUI.Popup(rect, 0, tags, GEStyle.PreDropDown);
                 }
                 else
                 {
-                    LookModeDisplayTagsIndex = EditorGUI.MaskField(
-                                                                   rect, LookModeDisplayTagsIndex
-                                                                 , LookModeDisplayTags
-                                                                       [(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]
-                                                                 , GEStyle.PreDropDown);
+                    LookModeDisplayTagsIndex = EditorGUI.MaskField(rect, LookModeDisplayTagsIndex, tags, GEStyle.PreDropDown);
                 }
             }
             else LookModeDisplayTagsIndex = 0;
 
             rect.x     += rect.width;
             rect.width =  width - 190 - 30 - 30 - rect.x;
-            SearchText = LookModeData[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Count > 300
-                ? EditorGUI.DelayedTextField(rect, SearchText, GEStyle.SearchTextField)
-                : EditorGUI.TextField(rect, SearchText, GEStyle.SearchTextField);
+            ViewTreeQueryAsset.searchString = LookModeData[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Count > 300
+                ? EditorGUI.DelayedTextField(rect, ViewTreeQueryAsset.searchString, GEStyle.SearchTextField)
+                : EditorGUI.TextField(rect, ViewTreeQueryAsset.searchString, GEStyle.SearchTextField);
 
             rect.x     += rect.width;
             rect.width =  30;
             if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
-                SearchText = string.Empty;
+                ViewTreeQueryAsset.searchString = string.Empty;
             }
 
             if (GUI.changed)
@@ -145,7 +126,7 @@ namespace AIO.UEditor
                 }
 
                 if (
-                    TempTable.GetOrDefault<string>(nameof(SearchText)) != SearchText ||
+                    TempTable.GetOrDefault<string>(nameof(ViewTreeQueryAsset.searchString)) != ViewTreeQueryAsset.searchString ||
                     TempTable.GetOrDefault<int>(nameof(LookModeDisplayCollectorsIndex)) !=
                     LookModeDisplayCollectorsIndex ||
                     TempTable.GetOrDefault<int>(nameof(LookModeDisplayTypeIndex)) !=
@@ -161,12 +142,12 @@ namespace AIO.UEditor
                                                   .Where(data => !LookModeDataFilter(data)));
                     }
 
-                    CurrentPageValues.PageIndex                       = 0;
-                    LookModeCollectorsALLSize                         = CurrentPageValues.Sum(data => data.Size);
-                    TempTable[nameof(SearchText)]                     = ViewTreeQueryAsset.searchString = SearchText;
-                    TempTable[nameof(LookModeDisplayCollectorsIndex)] = LookModeDisplayCollectorsIndex;
-                    TempTable[nameof(LookModeDisplayTypeIndex)]       = LookModeDisplayTypeIndex;
-                    TempTable[nameof(LookModeDisplayTagsIndex)]       = LookModeDisplayTagsIndex;
+                    CurrentPageValues.PageIndex                        = 0;
+                    LookModeCollectorsALLSize                          = CurrentPageValues.Sum(data => data.Size);
+                    TempTable[nameof(ViewTreeQueryAsset.searchString)] = ViewTreeQueryAsset.searchString;
+                    TempTable[nameof(LookModeDisplayCollectorsIndex)]  = LookModeDisplayCollectorsIndex;
+                    TempTable[nameof(LookModeDisplayTypeIndex)]        = LookModeDisplayTypeIndex;
+                    TempTable[nameof(LookModeDisplayTagsIndex)]        = LookModeDisplayTagsIndex;
                     ViewTreeQueryAsset.Reload();
                 }
             }
@@ -180,7 +161,7 @@ namespace AIO.UEditor
             if (GUI.Button(rect, GC_REFRESH, GEStyle.TEtoolbarbutton))
             {
                 LookCurrentSelectAsset          = null;
-                ViewTreeQueryAsset.searchString = SearchText               = string.Empty;
+                ViewTreeQueryAsset.searchString = string.Empty;
                 LookModeDisplayTagsIndex        = LookModeDisplayTypeIndex = LookModeDisplayCollectorsIndex = 0;
                 UpdateDataLookMode();
             }
@@ -364,18 +345,20 @@ namespace AIO.UEditor
             {
                 cell.y     += cell.height + 5;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, "Package");
+                cell.width =  100;
+                EditorGUI.LabelField(cell, "资源包", GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
                 EditorGUI.LabelField(cell, LookCurrentSelectAssetDataInfo.Package);
             }
+
+            if (WindowMode != Mode.LookFirstPackage)
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, "Group");
+                cell.width =  100;
+                EditorGUI.LabelField(cell, "资源组", GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -385,8 +368,8 @@ namespace AIO.UEditor
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_IsSubAsset);
+                cell.width =  100;
+                EditorGUI.LabelField(cell, GC_LookMode_Detail_IsSubAsset, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -396,8 +379,8 @@ namespace AIO.UEditor
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_Size);
+                cell.width =  100;
+                EditorGUI.LabelField(cell, GC_LookMode_Detail_Size, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -407,8 +390,8 @@ namespace AIO.UEditor
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_GUID);
+                cell.width =  100;
+                EditorGUI.LabelField(cell, GC_LookMode_Detail_GUID, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -418,8 +401,8 @@ namespace AIO.UEditor
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_Type);
+                cell.width =  100;
+                EditorGUI.LabelField(cell, GC_LookMode_Detail_Type, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -429,19 +412,22 @@ namespace AIO.UEditor
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_Path);
+                cell.width =  100;
+                EditorGUI.LabelField(cell, GC_LookMode_Detail_Path, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
-                EditorGUI.LabelField(cell, LookCurrentSelectAssetDataInfo.AssetPath);
+                if (GUI.Button(cell, LookCurrentSelectAssetDataInfo.AssetPath, GEStyle.LinkLabel))
+                {
+                    EditorUtility.RevealInFinder(LookCurrentSelectAssetDataInfo.AssetPath);
+                }
             }
 
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_LastWriteTime);
+                cell.width =  100;
+                EditorGUI.LabelField(cell, GC_LookMode_Detail_LastWriteTime, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -453,8 +439,8 @@ namespace AIO.UEditor
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_Tags);
+                cell.width =  100;
+                EditorGUI.LabelField(cell, GC_LookMode_Detail_Tags, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x - 16;
@@ -472,8 +458,8 @@ namespace AIO.UEditor
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
-                cell.width =  150;
-                EditorGUI.LabelField(cell, "首包资源");
+                cell.width =  100;
+                EditorGUI.LabelField(cell, "首包资源", GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -487,79 +473,30 @@ namespace AIO.UEditor
                 cell.y     += cell.height;
                 cell.x     =  10;
                 cell.width =  rect.width - cell.x;
-                EditorGUI.LabelField(cell
-                                   , $"Dependencies({Dependencies.Count})[{DependenciesSize.ToConverseStringFileSize()}]"
-                                   , GEStyle.HeaderLabel);
-
+                EditorGUI.LabelField(cell, $"Dependencies({Dependencies.Count})[{DependenciesSize.ToConverseStringFileSize()}]", GEStyle.HeaderLabel);
 
                 cell.y     += cell.height;
                 cell.width =  0;
-                if (!string.IsNullOrEmpty(DependenciesSearchText))
+                if (!string.IsNullOrEmpty(DependenciesTree.searchString))
                 {
                     cell.width = 21;
-                    cell.x     = rect.width - cell.width;
-                    if (GUILayout.Button("✘", GEStyle.toolbarbuttonLeft, GTOptions.Width(21)))
+                    cell.x     = rect.width - cell.width - 10;
+                    if (GUI.Button(cell, "✘", GEStyle.toolbarbuttonLeft))
                     {
                         GUI.FocusControl(null);
-                        DependenciesSearchText = string.Empty;
+                        DependenciesTree.searchString = string.Empty;
                     }
                 }
 
-                cell.x                 =  10 + rect.width - cell.width;
-                cell.width             =  rect.width - cell.x;
-                DependenciesSearchText =  EditorGUI.TextField(cell, DependenciesSearchText, GEStyle.SearchTextField);
-                cell.y                 += cell.height;
+                cell.width                    = rect.width - cell.width - 20;
+                cell.x                        = 10;
+                DependenciesTree.searchString = EditorGUI.TextField(cell, DependenciesTree.searchString, GEStyle.SearchTextField);
 
-                var positionRect = new Rect(10, cell.y, rect.width - 20, rect.height - cell.y);
-                var viewRect     = new Rect(10, 0, rect.width - 20, 0);
-                LookModeShowAssetDetailScroll
-                    = GUI.BeginScrollView(positionRect, LookModeShowAssetDetailScroll, viewRect);
-
-                cell.x = 10;
-                cell.y = 0;
-                foreach (var dependency in Dependencies)
-                {
-                    if (!string.IsNullOrEmpty(DependenciesSearchText))
-                    {
-                        if (!DependenciesSearchText.Contains(dependency.Value.Name
-                                                           , StringComparison.CurrentCultureIgnoreCase)
-                         && !DependenciesSearchText.Contains(dependency.Value.Type
-                                                           , StringComparison.CurrentCultureIgnoreCase)
-                         && !dependency.Value.Name.Contains(DependenciesSearchText
-                                                          , StringComparison.CurrentCultureIgnoreCase)
-                         && !dependency.Value.Type.Contains(DependenciesSearchText
-                                                          , StringComparison.CurrentCultureIgnoreCase)
-                           )
-                            continue;
-                    }
-
-                    viewRect.height += cell.height;
-
-                    cell.y     += cell.height;
-                    cell.width =  16;
-                    cell.x     =  rect.width - cell.width;
-                    if (GUI.Button(cell, GC_LookMode_Object_Select, GEStyle.IconButton))
-                    {
-                        EditorUtility.RevealInFinder(dependency.Key);
-                        Selection.activeObject = dependency.Value.Object;
-                    }
-
-                    cell.width =  150;
-                    cell.x     -= cell.width;
-                    EditorGUI.ObjectField(cell, dependency.Value.Object, dependency.Value.GetType(), false);
-
-
-                    cell.width =  100;
-                    cell.x     -= cell.width;
-                    EditorGUI.LabelField(cell, dependency.Value.Size.ToConverseStringFileSize());
-
-                    cell.width = rect.width - cell.x - 10;
-                    cell.x     = 10;
-                    EditorGUI.LabelField(cell, dependency.Value.Object.name, GEStyle.HeaderLabel);
-                }
-
-                GUI.EndScrollView();
+                cell.y += cell.height;
+                DependenciesTree.OnGUI(new Rect(0, cell.y, rect.width, rect.height - cell.y));
             }
+
+            EditorGUI.DrawRect(new Rect(8, 0, 1, cell.y), TreeViewBasics.ColorLine);
         }
 
         /// <summary>
@@ -590,7 +527,7 @@ namespace AIO.UEditor
                                                              , Array.Empty<string>()))
                ) filter++;
 
-            if (IsFilterSearch(SearchText, data))
+            if (IsFilterSearch(ViewTreeQueryAsset.searchString, data))
                 filter++;
 
             return filter != 4;
@@ -607,12 +544,12 @@ namespace AIO.UEditor
             if (Data.Count <= i) return;
             if (Data.Packages[i] is null || Data.Packages[i].Groups is null || j < 0) return;
             if (Data.Packages[i].Count <= j) return;
-            LookModeDisplayTags[key] = Data.Packages[i].Groups[j].Tags;
+            LookModeDisplayTags[key]                          = Data.Packages[i].Groups[j].Tags;
             LookModeDisplayGroups[LookModeDisplayPackages[i]] = GetGroupDisPlayNames(Data.Packages[i].Groups);
-            LookModeDisplayCollectors[key] = Data.Packages[i].Groups[j].Collectors.GetDisPlayNames();
-            LookModeDisplayCollectors[key] = GetCollectorDisPlayNames(LookModeDisplayCollectors[key]);
-            LookModeData[key] = new List<AssetDataInfo>();
-            LookModeDisplayTypes[(i, j)] = Array.Empty<string>();
+            LookModeDisplayCollectors[key]                    = Data.Packages[i].Groups[j].Collectors.GetDisPlayNames();
+            LookModeDisplayCollectors[key]                    = GetCollectorDisPlayNames(LookModeDisplayCollectors[key]);
+            LookModeData[key]                                 = new List<AssetDataInfo>();
+            LookModeDisplayTypes[(i, j)]                      = Array.Empty<string>();
             var listTypes = new List<string>();
             foreach (var item in Data.Packages[i].Groups[j].Collectors)
                 item.CollectAssetAsync(Data.Packages[i].Name, Data.Packages[i].Groups[j].Name, dictionary =>
@@ -645,10 +582,10 @@ namespace AIO.UEditor
             for (var i = 0; i < Data.Packages.Length; i++) LookModeDisplayPackages[i] = Data.Packages[i].Name;
 
             if (LookModeDisplayCollectors is null) LookModeDisplayCollectors = new Dictionary<(int, int), string[]>();
-            if (LookModeDisplayTags is null) LookModeDisplayTags = new Dictionary<(int, int), string[]>();
-            if (LookModeDisplayTypes is null) LookModeDisplayTypes = new Dictionary<(int, int), string[]>();
-            if (LookModeDisplayGroups is null) LookModeDisplayGroups = new Dictionary<string, string[]>();
-            if (LookModeData is null) LookModeData = new Dictionary<(int, int), List<AssetDataInfo>>();
+            if (LookModeDisplayTags is null) LookModeDisplayTags             = new Dictionary<(int, int), string[]>();
+            if (LookModeDisplayTypes is null) LookModeDisplayTypes           = new Dictionary<(int, int), string[]>();
+            if (LookModeDisplayGroups is null) LookModeDisplayGroups         = new Dictionary<string, string[]>();
+            if (LookModeData is null) LookModeData                           = new Dictionary<(int, int), List<AssetDataInfo>>();
 
             LookModeCollectorsALLSize  = 0;
             LookModeCollectorsPageSize = 0;

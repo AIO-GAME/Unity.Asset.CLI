@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using AIO.UEngine;
 using UnityEditor;
@@ -68,21 +69,21 @@ namespace AIO.UEditor
         /// </summary>
         private ViewRect ViewGroupList;
 
-        private ViewTreeGroup ViewTreeGroup;
+        private TreeViewGroup _treeViewGroup;
 
         /// <summary>
         ///     界面 - 包列表
         /// </summary>
         private ViewRect ViewPackageList;
 
-        private ViewTreePackage ViewTreePackage;
+        private TreeViewPackage _treeViewPackage;
 
         /// <summary>
         ///     界面 - 收集器列表
         /// </summary>
         private ViewRect ViewCollectorsList;
 
-        private ViewTreeCollect ViewTreeCollector;
+        private TreeViewCollect _treeViewCollector;
 
         /// <summary>
         ///     界面 - 配置界面
@@ -90,6 +91,8 @@ namespace AIO.UEditor
         private ViewRect ViewSetting;
 
         private TreeViewQueryAsset ViewTreeQueryAsset;
+
+        private TreeViewDependencies DependenciesTree;
 
         private void GPInit()
         {
@@ -126,21 +129,28 @@ namespace AIO.UEditor
             {
                 CurrentPageValues = new PageList<AssetDataInfo>
                 {
-                    PageSize = 30
+                    PageSize = 25
                 };
-                ViewTreeQueryAsset                        =  TreeViewQueryAsset.Create(CurrentPageValues);
-                ViewTreeQueryAsset.IsFirstPackageResource += IsFirstPackageResource;
-                ViewTreeQueryAsset.OnFirstPackageResource += OnFirstPackageResource;
-                ViewTreeQueryAsset.OnSelectionChanged     += OnSelectionChanged;
+                ViewTreeQueryAsset                          =  TreeViewQueryAsset.Create(CurrentPageValues);
+                ViewTreeQueryAsset.IsFirstPackageResource   += IsFirstPackageResource;
+                ViewTreeQueryAsset.OnFirstPackageResource   += OnFirstPackageResource;
+                ViewTreeQueryAsset.OnSingleSelectionChanged += OnQueryAsseChanged;
             }
 
             if (LookDataPageSizeMenu is null) UpdatePageSizeMenu();
         }
 
-        private void OnSelectionChanged(int id)
+        private void OnQueryAsseChanged(IList<int> id)
+        {
+            DependenciesSize       = 0;
+            LookCurrentSelectAsset = null;
+            Dependencies.Clear();
+        }
+
+        private void OnQueryAsseChanged(int id)
         {
             LookCurrentSelectAssetDataInfo = CurrentPageValues.CurrentPageValues[id];
-            DependenciesSize = 0;
+            DependenciesSize               = 0;
             Runner.StopCoroutine(OnSelectionChangedRef);
             Runner.StartCoroutine(OnSelectionChangedRef);
         }
@@ -148,7 +158,7 @@ namespace AIO.UEditor
         private IEnumerator OnSelectionChangedRef()
         {
             var assetPath = LookCurrentSelectAssetDataInfo.AssetPath;
-            LookCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+
             Dependencies.Clear();
             foreach (var dependency in AssetDatabase.GetDependencies(assetPath))
             {
@@ -156,14 +166,15 @@ namespace AIO.UEditor
                 if (Dependencies.ContainsKey(dependency)) continue;
                 var info = new DependenciesInfo
                 {
-                    AssetPath = dependency
-                  , Object    = AssetDatabase.LoadAssetAtPath<Object>(dependency)
+                    AssetPath = dependency, Object = AssetDatabase.LoadAssetAtPath<Object>(dependency)
                 };
                 if (!info.Object) continue;
                 DependenciesSize += info.Size = new FileInfo(dependency).Length;
                 Dependencies.Add(dependency, info);
             }
 
+            DependenciesTree.Reload(Dependencies.Values);
+            LookCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
             yield break;
         }
 
@@ -179,12 +190,7 @@ namespace AIO.UEditor
             {
                 var record = new AssetSystem.SequenceRecord
                 {
-                    AssetPath   = data.AssetPath
-                  , Location    = data.Address
-                  , PackageName = data.Package
-                  , Bytes       = data.Size
-                  , Count       = 1
-                  , Time        = DateTime.MinValue
+                    AssetPath = data.AssetPath, Location = data.Address, PackageName = data.Package, Bytes = data.Size, Count = 1, Time = DateTime.MinValue
                 };
                 record.SetGUID(data.GUID);
                 Config.SequenceRecord.Add(record);
@@ -223,75 +229,54 @@ namespace AIO.UEditor
 
             ViewSetting = new ViewRect(250, height)
             {
-                IsShow                     = true
-              , IsAllowHorizontal          = false
-              , DragStretchHorizontalWidth = 5
-              , width                      = 250
+                IsShow = true, IsAllowHorizontal = false, DragStretchHorizontalWidth = 5, width = 250
             };
 
             ViewConfig = new ViewRect(550, height)
             {
-                IsShow                     = true
-              , IsAllowHorizontal          = true
-              , DragStretchHorizontalWidth = 5
-              , width                      = CurrentWidth - ViewSetting.width
+                IsShow = true, IsAllowHorizontal = true, DragStretchHorizontalWidth = 5, width = CurrentWidth - ViewSetting.width
             };
 
             ViewDetailList = new ViewRect(300, height)
             {
-                IsShow                     = true
-              , IsAllowHorizontal          = false
-              , DragStretchHorizontalWidth = 10
-              , width                      = 400
-              , x                          = 5
-               ,
+                IsShow = true, IsAllowHorizontal = false, DragStretchHorizontalWidth = 10, width = 400, x = 5,
             };
 
             ViewDetails = new ViewRect(300, height)
             {
-                IsShow            = false
-              , IsAllowHorizontal = false
-              , width             = 400
-              , y                 = ViewDetailList.y + 3
+                IsShow = false, IsAllowHorizontal = false, width = 400, y = ViewDetailList.y + 3
             };
 
             #region Editor Mode
 
             ViewPackageList = new ViewRect(120, height)
             {
-                IsShow                     = true
-              , IsAllowHorizontal          = true
-              , DragStretchHorizontalWidth = 5
-              , width                      = 150
-               ,
+                IsShow = true, IsAllowHorizontal = true, DragStretchHorizontalWidth = 5, width = 150,
             };
 
             ViewGroupList = new ViewRect(120, height)
             {
-                IsShow                     = true
-              , IsAllowHorizontal          = true
-              , DragStretchHorizontalWidth = 5
-              , width                      = 150
-               ,
+                IsShow = true, IsAllowHorizontal = true, DragStretchHorizontalWidth = 5, width = 150,
             };
 
             ViewCollectorsList = new ViewRect(700, height)
             {
-                IsShow            = true
-              , IsAllowHorizontal = false
-              , width             = 750
-               ,
+                IsShow = true, IsAllowHorizontal = false, width = 750,
             };
 
-            ViewTreePackage   = ViewTreePackage.Create();
-            ViewTreeGroup     = ViewTreeGroup.Create();
-            ViewTreeCollector = ViewTreeCollect.Create(ViewCollectorsList.width, ViewCollectorsList.MinWidth);
-            ViewTreePackage.OnSelectionChanged += id =>
+            _treeViewPackage   = TreeViewPackage.Create();
+            _treeViewGroup     = TreeViewGroup.Create();
+            _treeViewCollector = TreeViewCollect.Create(ViewCollectorsList.width, ViewCollectorsList.MinWidth);
+            _treeViewPackage.OnSingleSelectionChanged += id =>
             {
-                ViewTreeGroup.Reload();
-                ViewTreeCollector.Reload();
+                _treeViewGroup.Reload();
+                _treeViewCollector.Reload();
             };
-            ViewTreeGroup.OnSelectionChanged += id => { ViewTreeCollector.Reload(); };
+            _treeViewGroup.OnSingleSelectionChanged += id =>
+            {
+                _treeViewCollector.Reload();
+            };
+            DependenciesTree = TreeViewDependencies.Create(Dependencies.Values);
 
             #endregion
         }
@@ -303,21 +288,25 @@ namespace AIO.UEditor
             {
                 CurrentPageValues.PageSize = 25;
                 UpdatePageSizeMenu();
+                ViewTreeQueryAsset.Reload(CurrentPageValues);
             });
             LookDataPageSizeMenu.AddItem(new GUIContent("30"), CurrentPageValues.PageSize == 30, () =>
             {
                 CurrentPageValues.PageSize = 30;
                 UpdatePageSizeMenu();
+                ViewTreeQueryAsset.Reload(CurrentPageValues);
             });
             LookDataPageSizeMenu.AddItem(new GUIContent("40"), CurrentPageValues.PageSize == 40, () =>
             {
                 CurrentPageValues.PageSize = 40;
                 UpdatePageSizeMenu();
+                ViewTreeQueryAsset.Reload(CurrentPageValues);
             });
             LookDataPageSizeMenu.AddItem(new GUIContent("50"), CurrentPageValues.PageSize == 50, () =>
             {
                 CurrentPageValues.PageSize = 50;
                 UpdatePageSizeMenu();
+                ViewTreeQueryAsset.Reload(CurrentPageValues);
             });
         }
 
@@ -358,21 +347,21 @@ namespace AIO.UEditor
         public enum Mode
         {
             [InspectorName(" 编辑模式 [Ctrl + Alpha1\\Number1]")]
-            Editor = 0
+            Editor = 0,
 
-          , [InspectorName(" 配置管理 [Ctrl + Alpha2\\Number2]")]
-            Config = 1
+            [InspectorName(" 配置管理 [Ctrl + Alpha2\\Number2]")]
+            Config = 1,
 
-          , [InspectorName(" 查询模式 [Ctrl + Alpha3\\Number3]")]
-            Look = 2
+            [InspectorName(" 查询模式 [Ctrl + Alpha3\\Number3]")]
+            Look = 2,
 
-          , [InspectorName(" 查询标签 [Ctrl + Alpha4\\Number4]")]
-            LookTags = 3
+            [InspectorName(" 查询标签 [Ctrl + Alpha4\\Number4]")]
+            LookTags = 3,
 
-          , [InspectorName(" 查询首包 [Ctrl + Alpha5\\Number5]")]
-            LookFirstPackage = 4
+            [InspectorName(" 查询首包 [Ctrl + Alpha5\\Number5]")]
+            LookFirstPackage = 4,
 
-          , [InspectorName(" 打包工具 [Ctrl + Alpha6\\Number6]")]
+            [InspectorName(" 打包工具 [Ctrl + Alpha6\\Number6]")]
             Build = 5
         }
 
@@ -421,19 +410,9 @@ namespace AIO.UEditor
         private GUIContent GC_LookMode_Page_Size;
 
         /// <summary>
-        ///     界面内容 - 实例物体选择打开
-        /// </summary>
-        private GUIContent GC_LookMode_Object_Select;
-
-        /// <summary>
         ///     界面内容 -
         /// </summary>
         private GUIContent GC_LookMode_Detail_Size;
-
-        /// <summary>
-        ///     界面内容 -
-        /// </summary>
-        private GUIContent GC_LookMode_Detail_Asset;
 
         /// <summary>
         ///     界面内容 -
@@ -476,15 +455,15 @@ namespace AIO.UEditor
         public enum ESort
         {
             [InspectorName("大小")]
-            FileSize
+            FileSize,
 
-          , [InspectorName("最后修改时间")]
-            LastWrite
+            [InspectorName("最后修改时间")]
+            LastWrite,
 
-          , [InspectorName("名称")]
-            AssetName
+            [InspectorName("名称")]
+            AssetName,
 
-          , [InspectorName("资源类型")]
+            [InspectorName("资源类型")]
             ObjectType
         }
 
@@ -529,11 +508,6 @@ namespace AIO.UEditor
         private Dictionary<(int, int), string[]> LookModeDisplayTags;
 
         /// <summary>
-        ///     搜索文本
-        /// </summary>
-        private string SearchText = string.Empty;
-
-        /// <summary>
         ///     当前选择包类型索引
         /// </summary>
         private static int LookModeDisplayTypeIndex;
@@ -561,8 +535,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     是否显示资源详情
         /// </summary>
-        private bool LookModeShowAssetDetail =>
-            !string.IsNullOrEmpty(LookCurrentSelectAssetDataInfo.GUID) && LookCurrentSelectAsset;
+        private bool LookModeShowAssetDetail => !string.IsNullOrEmpty(LookCurrentSelectAssetDataInfo.GUID) && LookCurrentSelectAsset;
 
         /// <summary>
         ///     用户当前选择的资源实体
@@ -598,7 +571,7 @@ namespace AIO.UEditor
         /// </summary>
         private AssetDataInfo LookCurrentSelectAssetDataInfo;
 
-        private class DependenciesInfo
+        public class DependenciesInfo
         {
             private string _Type;
 
