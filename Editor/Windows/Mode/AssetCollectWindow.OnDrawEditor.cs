@@ -51,9 +51,9 @@ namespace AIO.UEditor
         partial void OnDrawEditorMode(Rect rect)
         {
             var temp = rect.width - ViewCollectorsList.MinWidth;
-            if (ViewPackageList.IsShow && ViewPackageList.IsAllowHorizontal)
+            if (ViewPackageList.IsShow && ViewPackageList.IsAllowDragStretchHorizontal)
                 temp -= ViewPackageList.MinWidth;
-            if (ViewGroupList.IsShow && ViewGroupList.IsAllowHorizontal)
+            if (ViewGroupList.IsShow && ViewGroupList.IsAllowDragStretchHorizontal)
                 temp -= ViewGroupList.MinWidth;
 
             ViewGroupList.MaxWidth   = temp;
@@ -64,19 +64,19 @@ namespace AIO.UEditor
             if (ViewPackageList.IsShow)
             {
                 ViewPackageList.x = ViewCollectorsList.x;
-                ViewPackageList.Draw(_treeViewPackage.OnGUI, GEStyle.INThumbnailShadow);
+                ViewPackageList.Draw(TreeViewPackage.OnGUI, GEStyle.INThumbnailShadow);
                 ViewCollectorsList.x = ViewPackageList.width + ViewPackageList.x;
             }
 
             if (ViewGroupList.IsShow)
             {
                 ViewGroupList.x = ViewCollectorsList.x;
-                ViewGroupList.Draw(_treeViewGroup.OnGUI, GEStyle.INThumbnailShadow);
+                ViewGroupList.Draw(TreeViewGroup.OnGUI, GEStyle.INThumbnailShadow);
                 ViewCollectorsList.x = ViewGroupList.width + ViewGroupList.x;
             }
 
             ViewCollectorsList.width = rect.width - ViewCollectorsList.x - 5;
-            ViewCollectorsList.Draw(_treeViewCollector.OnGUI);
+            ViewCollectorsList.Draw(TreeViewCollector.OnGUI);
         }
 
         partial void OnDrawHeaderEditorMode(Rect rect)

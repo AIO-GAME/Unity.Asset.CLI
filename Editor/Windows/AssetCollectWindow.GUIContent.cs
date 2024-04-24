@@ -6,11 +6,6 @@ namespace AIO.UEditor
     public partial class AssetCollectWindow
     {
         /// <summary>
-        ///     界面内容 - 添加
-        /// </summary>
-        private GUIContent GC_ADD;
-
-        /// <summary>
         ///     界面内容 - 清空
         /// </summary>
         private GUIContent GC_CLEAR;
@@ -61,11 +56,6 @@ namespace AIO.UEditor
         private GUIContent GC_NET;
 
         /// <summary>
-        ///     界面内容 - 打开
-        /// </summary>
-        private GUIContent GC_OPEN;
-
-        /// <summary>
         ///     界面内容 - 打开文件夹
         /// </summary>
         private GUIContent GC_OPEN_FOLDER;
@@ -96,37 +86,23 @@ namespace AIO.UEditor
         private GUIContent GC_SORT;
 
         /// <summary>
-        ///     界面内容 - 同步
-        /// </summary>
-        private GUIContent GC_SyncData;
-
-        /// <summary>
         ///     界面内容 - 转化
         /// </summary>
         private GUIContent GC_ToConvert;
-
-        /// <summary>
-        ///     界面内容 - 上传
-        /// </summary>
-        private GUIContent GC_UPLOAD;
 
         partial void GUIContentInit()
         {
             GC_SAVE                          = GEContent.NewBuiltin("d_SaveAs", "保存");
             GC_OPEN_FOLDER                   = GEContent.NewSetting("bangdingliucheng", "打开文件");
             GC_NET                           = GEContent.NewSetting("国际", "云端");
-            GC_UPLOAD                        = GEContent.NewSetting("上传", "上传");
             GC_DOWNLOAD                      = GEContent.NewSetting("下载", "下载");
             GC_FOLDOUT                       = GEContent.NewSetting("quanping-shouqi-xian", "收缩");
             GC_FOLDOUT_ON                    = GEContent.NewSetting("quanping-zhankai-xian", "展开");
             GC_Select_ASConfig               = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
             GC_REFRESH                       = EditorGUIUtility.IconContent("Refresh").SetTooltips("刷新");
             GC_COPY                          = GEContent.NewSetting("ic_copy", "复制资源路径");
-            GC_ADD                           = GEContent.NewSetting("新增", "添加元素");
             GC_DEL                           = GEContent.NewSetting("删除", "删除元素");
             GC_CLEAR                         = GEContent.NewSetting("cancel", "清空元素");
-            GC_OPEN                          = GEContent.NewSettingCustom("Editor/Setting/icon_information", "打开指定查询模式");
-            GC_SyncData                      = GEContent.NewSetting("下载", "下载");
             GC_LookMode_Page_MaxLeft         = EditorGUIUtility.IconContent("d_scrollleft").SetTooltips("跳转到第一页");
             GC_LookMode_Page_Left            = EditorGUIUtility.IconContent("ArrowNavigationLeft").SetTooltips("上一页");
             GC_LookMode_Page_MaxRight        = EditorGUIUtility.IconContent("d_scrollright").SetTooltips("跳转到最后一页");

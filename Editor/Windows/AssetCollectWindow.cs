@@ -198,7 +198,7 @@ namespace AIO.UEditor
                 case Mode.LookTags:
                 case Mode.Look:
                 {
-                    ViewDetailList.DraggingStretch(eventData, ViewRect.DragStretchType.Horizontal);
+                    if (LookModeShowAssetDetail) ViewDetailList.DraggingStretch(eventData, ViewRect.DragStretchType.Horizontal);
                     break;
                 }
                 case Mode.Config:

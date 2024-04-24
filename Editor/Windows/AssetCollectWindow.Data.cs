@@ -69,21 +69,21 @@ namespace AIO.UEditor
         /// </summary>
         private ViewRect ViewGroupList;
 
-        private TreeViewGroup _treeViewGroup;
+        private TreeViewGroup TreeViewGroup;
 
         /// <summary>
         ///     界面 - 包列表
         /// </summary>
         private ViewRect ViewPackageList;
 
-        private TreeViewPackage _treeViewPackage;
+        private TreeViewPackage TreeViewPackage;
 
         /// <summary>
         ///     界面 - 收集器列表
         /// </summary>
         private ViewRect ViewCollectorsList;
 
-        private TreeViewCollect _treeViewCollector;
+        private TreeViewCollect TreeViewCollector;
 
         /// <summary>
         ///     界面 - 配置界面
@@ -92,7 +92,7 @@ namespace AIO.UEditor
 
         private TreeViewQueryAsset ViewTreeQueryAsset;
 
-        private TreeViewDependencies DependenciesTree;
+        private TreeViewDependencies TreeViewDependencies;
 
         private void GPInit()
         {
@@ -100,12 +100,12 @@ namespace AIO.UEditor
             GP_MAX_Width_100     = GTOptions.MaxWidth(100);
             GP_MIN_Width_50      = GTOptions.MinWidth(50);
 
-            GP_Width_120 = GTOptions.Width(120);
             GP_Width_150 = GTOptions.Width(150);
             GP_Width_160 = GTOptions.Width(160);
+            GP_Width_120 = GTOptions.Width(120);
             GP_Width_100 = GTOptions.Width(100);
-            GP_Width_75  = GTOptions.Width(75);
             GP_Width_80  = GTOptions.Width(80);
+            GP_Width_75  = GTOptions.Width(75);
             GP_Width_50  = GTOptions.Width(50);
             GP_Width_40  = GTOptions.Width(40);
             GP_Width_30  = GTOptions.Width(30);
@@ -173,7 +173,7 @@ namespace AIO.UEditor
                 Dependencies.Add(dependency, info);
             }
 
-            DependenciesTree.Reload(Dependencies.Values);
+            TreeViewDependencies.Reload(Dependencies.Values);
             LookCurrentSelectAsset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
             yield break;
         }
@@ -229,54 +229,55 @@ namespace AIO.UEditor
 
             ViewSetting = new ViewRect(250, height)
             {
-                IsShow = true, IsAllowHorizontal = false, DragStretchHorizontalWidth = 5, width = 250
+                IsShow = true, IsAllowDragStretchHorizontal = false, DragStretchHorizontalWidth = 5, width = 250
             };
 
             ViewConfig = new ViewRect(550, height)
             {
-                IsShow = true, IsAllowHorizontal = true, DragStretchHorizontalWidth = 5, width = CurrentWidth - ViewSetting.width
+                IsShow = true, IsAllowDragStretchHorizontal = true, DragStretchHorizontalWidth = 5, width = CurrentWidth - ViewSetting.width
             };
 
             ViewDetailList = new ViewRect(300, height)
             {
-                IsShow = true, IsAllowHorizontal = false, DragStretchHorizontalWidth = 10, width = 400, x = 5,
+                IsShow = true, IsAllowDragStretchHorizontal = true, DragStretchHorizontalWidth = 5, MinWidth = 400, width = 400, x = 5,
             };
 
             ViewDetails = new ViewRect(300, height)
             {
-                IsShow = false, IsAllowHorizontal = false, width = 400, y = ViewDetailList.y + 3
+                IsShow = false, IsAllowDragStretchHorizontal = false, width = 400, y = ViewDetailList.y + 3
             };
 
             #region Editor Mode
 
             ViewPackageList = new ViewRect(120, height)
             {
-                IsShow = true, IsAllowHorizontal = true, DragStretchHorizontalWidth = 5, width = 150,
+                IsShow = true, IsAllowDragStretchHorizontal = true, DragStretchHorizontalWidth = 5, width = 150,
             };
 
             ViewGroupList = new ViewRect(120, height)
             {
-                IsShow = true, IsAllowHorizontal = true, DragStretchHorizontalWidth = 5, width = 150,
+                IsShow = true, IsAllowDragStretchHorizontal = true, DragStretchHorizontalWidth = 5, width = 150,
             };
 
             ViewCollectorsList = new ViewRect(700, height)
             {
-                IsShow = true, IsAllowHorizontal = false, width = 750,
+                IsShow = true, IsAllowDragStretchHorizontal = false, width = 750,
             };
 
-            _treeViewPackage   = TreeViewPackage.Create();
-            _treeViewGroup     = TreeViewGroup.Create();
-            _treeViewCollector = TreeViewCollect.Create(ViewCollectorsList.width, ViewCollectorsList.MinWidth);
-            _treeViewPackage.OnSingleSelectionChanged += id =>
+            TreeViewPackage   = TreeViewPackage.Create();
+            TreeViewGroup     = TreeViewGroup.Create();
+            TreeViewCollector = TreeViewCollect.Create(ViewCollectorsList.width, ViewCollectorsList.MinWidth);
+            TreeViewPackage.OnSingleSelectionChanged += id =>
             {
-                _treeViewGroup.Reload();
-                _treeViewCollector.Reload();
+                TreeViewGroup.Reload();
+                TreeViewCollector.Reload();
             };
-            _treeViewGroup.OnSingleSelectionChanged += id =>
+            TreeViewGroup.OnSingleSelectionChanged += id =>
             {
-                _treeViewCollector.Reload();
+                TreeViewCollector.Reload();
             };
-            DependenciesTree = TreeViewDependencies.Create(Dependencies.Values);
+            TreeViewDependencies = TreeViewDependencies.Create(Dependencies.Values);
+            TreeViewBuildSetting = TreeViewBuildSetting.Create();
 
             #endregion
         }

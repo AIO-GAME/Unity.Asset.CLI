@@ -34,7 +34,9 @@ namespace AIO.UEditor
                 case 0:
                     cellRect.x     += 5;
                     cellRect.width -= 5;
+                    GUI.enabled    =  false;
                     EditorGUI.ObjectField(cellRect, data.Object, data.GetType(), false);
+                    GUI.enabled    =  true;
                     cellRect.x     += cellRect.width;
                     cellRect.width =  1;
                     EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);

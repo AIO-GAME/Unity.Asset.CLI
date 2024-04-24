@@ -116,6 +116,9 @@ namespace AIO.UEditor
                     Refresh = ReloadAndSelect
                 });
             }
+
+            multiColumnHeader.GetColumn(1).headerContent =
+                EditorGUIUtility.TrTextContent($"资源数量 : {PageValues.Count} 合计大小 : {PageValues.Sum(a => a.Size).ToConverseStringFileSize()}");
         }
 
         /// <summary>

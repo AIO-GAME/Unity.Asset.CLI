@@ -181,11 +181,8 @@ namespace AIO.UEditor
                 Config.SequenceRecord[i].SetPackageName(tuple.Item1);
                 var info = new AssetDataInfo
                 {
-                    AssetPath = Config.SequenceRecord[i].AssetPath
-                  , Address   = tuple.Item3
-                  , Package   = tuple.Item1
-                  , Group     = "N/A"
-                  , Extension = Path.GetExtension(address)
+                    AssetPath = Config.SequenceRecord[i].AssetPath, Address = tuple.Item3, Package = tuple.Item1, Group = "N/A",
+                    Extension = Path.GetExtension(address)
                 };
                 asset[info.AssetPath] = info;
                 CurrentTagValues.Add(info);
@@ -220,12 +217,14 @@ namespace AIO.UEditor
             ViewDetailList.height = CurrentHeight - DrawHeaderHeight;
             if (LookModeShowAssetDetail)
             {
-                ViewDetailList.width = CurrentWidth - 410;
-                ViewDetails.IsShow   = true;
-                ViewDetails.y        = 0;
-                ViewDetails.x        = ViewDetailList.width + ViewDetailList.x + 5;
-                ViewDetails.width    = CurrentWidth - ViewDetails.x - 5;
-                ViewDetails.height   = ViewDetailList.height;
+                ViewDetailList.MaxWidth = CurrentWidth - ViewDetails.MinWidth - 10;
+                ViewDetailList.MinWidth = CurrentWidth - ViewDetails.MaxWidth - 10;
+
+                ViewDetails.IsShow = true;
+                ViewDetails.y      = 0;
+                ViewDetails.x      = ViewDetailList.width + ViewDetailList.x + 5;
+                ViewDetails.width  = CurrentWidth - ViewDetails.x - 5;
+                ViewDetails.height = ViewDetailList.height;
             }
             else
             {

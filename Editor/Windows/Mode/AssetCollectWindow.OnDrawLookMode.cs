@@ -477,23 +477,23 @@ namespace AIO.UEditor
 
                 cell.y     += cell.height;
                 cell.width =  0;
-                if (!string.IsNullOrEmpty(DependenciesTree.searchString))
+                if (!string.IsNullOrEmpty(TreeViewDependencies.searchString))
                 {
                     cell.width = 21;
                     cell.x     = rect.width - cell.width - 10;
                     if (GUI.Button(cell, "✘", GEStyle.toolbarbuttonLeft))
                     {
                         GUI.FocusControl(null);
-                        DependenciesTree.searchString = string.Empty;
+                        TreeViewDependencies.searchString = string.Empty;
                     }
                 }
 
                 cell.width                    = rect.width - cell.width - 20;
                 cell.x                        = 10;
-                DependenciesTree.searchString = EditorGUI.TextField(cell, DependenciesTree.searchString, GEStyle.SearchTextField);
+                TreeViewDependencies.searchString = EditorGUI.TextField(cell, TreeViewDependencies.searchString, GEStyle.SearchTextField);
 
                 cell.y += cell.height;
-                DependenciesTree.OnGUI(new Rect(0, cell.y, rect.width, rect.height - cell.y));
+                TreeViewDependencies.OnGUI(new Rect(0, cell.y, rect.width, rect.height - cell.y));
             }
 
             EditorGUI.DrawRect(new Rect(8, 0, 1, cell.y), TreeViewBasics.ColorLine);

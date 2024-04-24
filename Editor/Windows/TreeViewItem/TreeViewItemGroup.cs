@@ -49,12 +49,6 @@ namespace AIO.UEditor
 
         #endregion
 
-        private static Rect GetRectLine(Rect cellRect)
-        {
-            return new Rect(cellRect.x + 30, cellRect.y + 8, cellRect.width - 40, 1);
-        }
-
-
         private void DrawStyle(Rect cellRect, ref RowGUIArgs args)
         {
             GUI.Box(args.rowRect, GUIContent.none, args.selected ? GEStyle.SelectionRect : GEStyle.INThumbnailShadow);
