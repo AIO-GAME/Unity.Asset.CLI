@@ -1,25 +1,147 @@
 ﻿using System;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public partial class AssetCollectWindow
+    public partial class AssetPageEditCollect : IAssetPage
     {
+        int IAssetPage.   Order => 1;
+        string IAssetPage.Title => "编辑模式      [Ctrl + Number1]";
+
+        void IAssetPage.EventMouseDown(in Event evt)
+        {
+            if (ViewGroupList.IsShow) ViewGroupList.ContainsDragStretch(evt, ViewRect.DragStretchType.Horizontal);
+            if (ViewPackageList.IsShow) ViewPackageList.ContainsDragStretch(evt, ViewRect.DragStretchType.Horizontal);
+        }
+
+        void IAssetPage.EventMouseUp(in Event evt)
+        {
+            ViewGroupList.CancelDragStretch();
+            ViewPackageList.CancelDragStretch();
+        }
+
+        void IAssetPage.EventKeyDown(in Event evt, in KeyCode keyCode)
+        {
+            if (!evt.control || keyCode != KeyCode.S) return;
+            GUI.FocusControl(null);
+            Data.Save();
+            AssetDatabase.SaveAssets();
+            evt.Use();
+        }
+
+        void IAssetPage.EventKeyUp(in Event evt, in KeyCode keyCode) { }
+
+        void IAssetPage.EventMouseDrag(in Event evt)
+        {
+            ViewGroupList.DraggingStretch(evt, ViewRect.DragStretchType.Horizontal);
+            ViewPackageList.DraggingStretch(evt, ViewRect.DragStretchType.Horizontal);
+        }
+
+        bool IAssetPage.Shortcut(Event evt)
+        {
+            if (evt.type == EventType.KeyDown && evt.control)
+                return evt.keyCode == KeyCode.Keypad1
+                    || evt.keyCode == KeyCode.Alpha1
+                    ;
+
+            return false;
+        }
+
+        void IAssetPage.UpdateData()
+        {
+            Data = AssetCollectRoot.GetOrCreate();
+            TreeViewPackage.Reload();
+            TreeViewGroup.Reload();
+            TreeViewCollector.Reload();
+        }
+
+        private AssetCollectRoot Data;
+
+        private TreeViewGroup   TreeViewGroup;
+        private TreeViewPackage TreeViewPackage;
+        private TreeViewCollect TreeViewCollector;
+
+        private ViewRect ViewPackageList;
+        private ViewRect ViewGroupList;
+        private ViewRect ViewCollectorsList;
+
+        private StringBuilder TempBuilder;
+        private GUIContent    GC_Select_ASConfig;
+        private GUIContent    GC_MERGE;
+        private GUIContent    GC_ToConvert;
+        private GUIContent    GC_SAVE;
+        private GUIContent    GC_REFRESH;
+
+        public AssetPageEditCollect()
+        {
+            GC_MERGE           = new GUIContent("合并配置", "合并当前资源包的所有组和收集器");
+            GC_ToConvert       = new GUIContent("转换配置", "转换为第三方配置文件");
+            GC_SAVE            = EditorGUIUtility.IconContent("d_SaveAs", "保存");
+            GC_REFRESH         = EditorGUIUtility.IconContent("Refresh", "刷新");
+            GC_Select_ASConfig = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
+            TempBuilder        = new StringBuilder();
+
+            Data = AssetCollectRoot.GetOrCreate();
+
+            ViewPackageList    = new ViewRect();
+            ViewGroupList      = new ViewRect();
+            ViewCollectorsList = new ViewRect();
+
+
+            ViewPackageList = new ViewRect(120, 1)
+            {
+                IsShow = true, IsAllowDragStretchHorizontal = true, DragStretchHorizontalWidth = 5, width = 150,
+            };
+
+            ViewGroupList = new ViewRect(120, 1)
+            {
+                IsShow = true, IsAllowDragStretchHorizontal = true, DragStretchHorizontalWidth = 5, width = 150,
+            };
+
+            ViewCollectorsList = new ViewRect(700, 1)
+            {
+                IsShow = true, IsAllowDragStretchHorizontal = false, width = 750,
+            };
+
+            TreeViewPackage   = TreeViewPackage.Create();
+            TreeViewGroup     = TreeViewGroup.Create();
+            TreeViewCollector = TreeViewCollect.Create(300, ViewCollectorsList.MinWidth, ViewCollectorsList.MaxWidth);
+            TreeViewPackage.OnSingleSelectionChanged += id =>
+            {
+                Data.CurrentPackageIndex = id;
+                Data.CurrentGroupIndex   = 0;
+                TreeViewGroup.Reload();
+                TreeViewCollector.Reload();
+            };
+            TreeViewGroup.OnSingleSelectionChanged += id =>
+            {
+                Data.CurrentGroupIndex   = id;
+                Data.CurrentCollectIndex = 0;
+                TreeViewCollector.Reload();
+            };
+        }
+
+        public void Dispose()
+        {
+            TreeViewPackage   = null;
+            TreeViewGroup     = null;
+            TreeViewCollector = null;
+        }
+
         public static void OpenCollectItem(AssetCollectItem item)
         {
-            if (!Instance) return;
-
             if (item.Type == EAssetCollectItemType.MainAssetCollector)
             {
-                var list = Data.CurrentGroup.Collectors.GetDisPlayNames();
+                var list = AssetCollectRoot.GetOrCreate().CurrentGroup.Collectors.GetDisPlayNames();
                 if (list.Length > 31)
                 {
-                    LookModeDisplayCollectorsIndex = 0;
+                    AssetPageLook.DisplayCollectorsIndex = 0;
                     for (var i = 0; i < list.Length; i++)
                         if (list[i] == item.CollectPath)
                         {
-                            LookModeDisplayCollectorsIndex = i + 1;
+                            AssetPageLook.DisplayCollectorsIndex = i + 1;
                             break;
                         }
                 }
@@ -34,22 +156,23 @@ namespace AIO.UEditor
                             continue;
                         }
 
-                        LookModeDisplayCollectorsIndex = status;
+                        AssetPageLook.DisplayCollectorsIndex = status;
                         break;
                     }
                 }
 
-                Instance.UpdateDataLookMode();
-                WindowMode                             = Mode.Look;
-                Instance.TempTable[nameof(WindowMode)] = WindowMode;
+                AssetWindow.OpenPage<AssetPageLook.Collect>();
                 return;
             }
 
             EditorUtility.DisplayDialog("打开", "只有动态资源才能查询", "确定");
         }
 
-        partial void OnDrawEditorMode(Rect rect)
+        void IAssetPage.OnDrawContent(Rect rect)
         {
+            ViewGroupList.y = ViewPackageList.y = ViewCollectorsList.y = rect.y;
+            ViewGroupList.height = ViewCollectorsList.height = ViewPackageList.height = rect.height;
+
             var temp = rect.width - ViewCollectorsList.MinWidth;
             if (ViewPackageList.IsShow && ViewPackageList.IsAllowDragStretchHorizontal)
                 temp -= ViewPackageList.MinWidth;
@@ -58,7 +181,6 @@ namespace AIO.UEditor
 
             ViewGroupList.MaxWidth   = temp;
             ViewPackageList.MaxWidth = temp;
-            ViewGroupList.height     = ViewCollectorsList.height = ViewPackageList.height = rect.height;
 
             ViewCollectorsList.x = 5;
             if (ViewPackageList.IsShow)
@@ -79,8 +201,9 @@ namespace AIO.UEditor
             ViewCollectorsList.Draw(TreeViewCollector.OnGUI);
         }
 
-        partial void OnDrawHeaderEditorMode(Rect rect)
+        public void OnDrawHeader(Rect rect)
         {
+            var width = rect.width;
             rect.height = 20;
             rect.x      = rect.width - 30;
             rect.width  = 30;
@@ -101,13 +224,6 @@ namespace AIO.UEditor
                 {
                     // ignored
                 }
-            }
-
-            rect.width =  30;
-            rect.x     -= rect.width;
-            if (GUI.Button(rect, GC_SORT, GEStyle.TEtoolbarbutton))
-            {
-                Data.Sort();
             }
 
             rect.width =  30;
@@ -184,7 +300,7 @@ namespace AIO.UEditor
             }
 
             rect.x     = 0;
-            rect.width = CurrentWidth;
+            rect.width = width;
             EditorGUI.DropShadowLabel(rect, TempBuilder.ToString());
         }
     }

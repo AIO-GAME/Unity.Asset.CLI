@@ -118,7 +118,7 @@ namespace AIO.UEditor
             }
 
             multiColumnHeader.GetColumn(1).headerContent =
-                EditorGUIUtility.TrTextContent($"资源数量 : {PageValues.Count} 合计大小 : {PageValues.Sum(a => a.Size).ToConverseStringFileSize()}");
+                EditorGUIUtility.TrTextContent($"数量 : {PageValues.Count} 总计 : {PageValues.Sum(a => a.Size).ToConverseStringFileSize()}");
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace AIO.UEditor
              && OnFirstPackageResource != null
              && ASConfig.GetOrCreate().EnableSequenceRecord)
             {
-                if (AssetCollectWindow.WindowMode != AssetCollectWindow.Mode.LookFirstPackage)
+                if (AssetWindow.IsOpenPage<AssetPageLook.FirstPackage>())
                 {
                     menu.AddItem(new GUIContent("添加 : 首包列表"), false, () =>
                     {
@@ -226,7 +226,7 @@ namespace AIO.UEditor
             menu.AddItem(new GUIContent("复制 : 资源类型"), false, () => { GUIUtility.systemCopyBuffer  = data.Type; });
             if (!string.IsNullOrEmpty(data.Tags))
                 menu.AddItem(new GUIContent("复制 : 标签列表"), false, () => { GUIUtility.systemCopyBuffer = data.Tags; });
-            if (AssetCollectWindow.WindowMode == AssetCollectWindow.Mode.LookFirstPackage) return;
+            if (AssetWindow.IsOpenPage<AssetPageLook.FirstPackage>()) return;
             if (!ASConfig.GetOrCreate().EnableSequenceRecord) return;
             if (!IsFirstPackageResource?.Invoke(data.GUID) ?? false)
                 menu.AddItem(new GUIContent("添加 : 首包列表"), false, () => { OnFirstPackageResource?.Invoke(data, true); });
@@ -262,6 +262,7 @@ namespace AIO.UEditor
                 {
                     state.selectedIDs.Clear();
                     state.lastClickedID = -1;
+                    InvokeSelectionChanged(-1);
                     break;
                 }
                 case KeyCode.LeftArrow: // 数字键盘 右键

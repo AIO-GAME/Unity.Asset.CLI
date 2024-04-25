@@ -16,10 +16,7 @@ namespace AIO.UEditor
         private GUIStyle        GSBackground => GEStyle.TEToolbar;
 
         [MenuItem("AIO/Gen/Asset System Config")]
-        public static void Create()
-        {
-            Selection.activeObject = ASConfig.GetOrCreate();
-        }
+        public static void Create() => Selection.activeObject = ASConfig.GetOrCreate();
 
         protected override void OnHeaderGUI()
         {
@@ -205,8 +202,9 @@ namespace AIO.UEditor
                                                     AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Target));
 
                             if (GELayout.Button("Upload FTP", GSValue))
-                                AHandle.FTP.Create("", "", "").UploadFile(
-                                                                          AssetSystem.SequenceRecordQueue.LOCAL_PATH);
+                                AHandle.FTP.Create("", "", "")
+                                       .UploadFile(
+                                                   AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                         }
                     }
 
@@ -280,7 +278,7 @@ namespace AIO.UEditor
                             var path = record.AssetPath;
                             if (File.Exists(path))
                             {
-                                var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
+                                var obj                                 = AssetDatabase.LoadAssetAtPath<Object>(path);
                                 if (obj != null) Selection.activeObject = obj;
                             }
                         }

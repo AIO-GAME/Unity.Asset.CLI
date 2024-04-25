@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -8,7 +7,7 @@ namespace AIO.UEditor
 {
     public class TreeViewItemDependencies : TreeViewItem, ITVItemDraw
     {
-        private AssetCollectWindow.DependenciesInfo data;
+        private AssetPageLook.DependenciesInfo data;
 
         public bool  AllowChangeExpandedState             => false;
         public bool  AllowRename                          => false;
@@ -20,38 +19,38 @@ namespace AIO.UEditor
                                                || data.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase)
                                                || data.Type.Contains(search, StringComparison.CurrentCultureIgnoreCase);
 
-        internal TreeViewItemDependencies(int id, AssetCollectWindow.DependenciesInfo data) : base(id, 1) { this.data = data; }
+        internal TreeViewItemDependencies(int id, AssetPageLook.DependenciesInfo data) : base(id, 1) { this.data = data; }
 
         /// <summary>
         ///     界面内容 - 实例物体选择打开
         /// </summary>
         private readonly GUIContent GC_LookMode_Object_Select = GEContent.NewBuiltin("d_scenepicking_pickable_hover", "选择指向指定资源");
 
-        public void OnDraw(Rect cellRect, int col, ref RowGUIArgs args)
+        public void OnDraw(Rect cell, int col, ref RowGUIArgs args)
         {
             switch (col)
             {
                 case 0:
-                    cellRect.x     += 5;
-                    cellRect.width -= 5;
-                    GUI.enabled    =  false;
-                    EditorGUI.ObjectField(cellRect, data.Object, data.GetType(), false);
-                    GUI.enabled    =  true;
-                    cellRect.x     += cellRect.width;
-                    cellRect.width =  1;
-                    EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);
+                    cell.x      += 5;
+                    cell.width  -= 5;
+                    GUI.enabled =  false;
+                    EditorGUI.ObjectField(cell, data.Object, data.GetType(), false);
+                    GUI.enabled =  true;
+                    cell.x      += cell.width;
+                    cell.width  =  1;
+                    EditorGUI.DrawRect(cell, TreeViewBasics.ColorLine);
                     break;
                 case 1:
-                    cellRect.x     += 5;
-                    cellRect.width -= 5;
-                    EditorGUI.LabelField(cellRect, data.Size.ToConverseStringFileSize());
-                    cellRect.x     += cellRect.width + 2;
-                    cellRect.width =  1;
-                    EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);
+                    cell.x     += 5;
+                    cell.width -= 5;
+                    EditorGUI.LabelField(cell, data.Size.ToConverseStringFileSize());
+                    cell.x     += cell.width + 2;
+                    cell.width =  1;
+                    EditorGUI.DrawRect(cell, TreeViewBasics.ColorLine);
                     break;
                 case 2:
-                    cellRect.x += cellRect.width / 4;
-                    if (GUI.Button(cellRect, GC_LookMode_Object_Select, GEStyle.IconButton))
+                    cell.x += cell.width / 4;
+                    if (GUI.Button(cell, GC_LookMode_Object_Select, GEStyle.IconButton))
                     {
                         EditorUtility.RevealInFinder(data.AssetPath);
                         Selection.activeObject = data.Object;

@@ -12,10 +12,7 @@ namespace AIO.UEditor
     {
         private static Texture _Icon;
 
-        public TreeViewItemGroup(int id, AssetCollectGroup group) : base(id, 2, group.Name)
-        {
-            Group = group;
-        }
+        public TreeViewItemGroup(int id, AssetCollectGroup group) : base(id, 2, group.Name) { Group = group; }
 
         private static Texture Icon => _Icon ?? (_Icon = Resources.Load<Texture>("Editor/Icon/Color/-tutorial-"));
 
@@ -25,18 +22,18 @@ namespace AIO.UEditor
 
         #region IGraphDraw Members
 
-        void ITVItemDraw.OnDraw(Rect cellRect, int col, ref RowGUIArgs args)
+        void ITVItemDraw.OnDraw(Rect cell, int col, ref RowGUIArgs args)
         {
-            cellRect.x += 10;
+            cell.x += 10;
             if (Group.Enable)
             {
-                OnDrawContent(cellRect, ref args);
+                OnDrawContent(cell, ref args);
             }
             else
             {
                 var oldColor = GUI.color;
                 GUI.color = Color.gray;
-                OnDrawContent(cellRect, ref args);
+                OnDrawContent(cell, ref args);
                 GUI.color = oldColor;
             }
         }
@@ -65,7 +62,7 @@ namespace AIO.UEditor
             GUI.DrawTexture(rect, icon, ScaleMode.ScaleToFit);
 
             var width = cellRect.width - rect.width - rect.x;
-            var x = cellRect.x + rect.xMax + 1;
+            var x     = cellRect.x + rect.xMax + 1;
 
             rect.Set(x, cellRect.y - 9, width, cellRect.height); // 绘制名称
             TreeView.DefaultGUI.BoldLabel(rect, Group.Name, args.selected, args.focused);
@@ -74,7 +71,6 @@ namespace AIO.UEditor
             rect.Set(x, cellRect.y + 9, width, cellRect.height); // 绘制描述
             TreeView.DefaultGUI.Label(rect, Group.Description, args.selected, args.focused);
         }
-
 
         #region IGraphDraw
 

@@ -13,33 +13,28 @@ namespace AIO.UEditor
         private static Texture _MainIcon;
         private static Texture _Icon;
 
+        public TreeViewItemPackage(int id, AssetCollectPackage package) : base(id, 1, package.Name) { Package = package; }
 
-        public TreeViewItemPackage(int id, AssetCollectPackage package) : base(id, 1, package.Name)
-        {
-            Package = package;
-        }
-
-        private static Texture Icon     => _Icon ?? (_Icon = Resources.Load<Texture>("Editor/Icon/Color/-school-bag"));
-        private static Texture MainIcon => _MainIcon ?? (_MainIcon = Resources.Load<Texture>("Editor/Icon/Color/-briefcase"));
-
-        public AssetCollectPackage Package { get; }
+        private static Texture             Icon     => _Icon ?? (_Icon = Resources.Load<Texture>("Editor/Icon/Color/-school-bag"));
+        private static Texture             MainIcon => _MainIcon ?? (_MainIcon = Resources.Load<Texture>("Editor/Icon/Color/-briefcase"));
+        public         AssetCollectPackage Package  { get; }
 
         public override Texture2D icon => Package.Default ? MainIcon as Texture2D : Icon as Texture2D;
 
         #region IGraphDraw Members
 
-        void ITVItemDraw.OnDraw(Rect cellRect, int col, ref RowGUIArgs args)
+        void ITVItemDraw.OnDraw(Rect cell, int col, ref RowGUIArgs args)
         {
-            cellRect.x += 10;
+            cell.x += 10;
             if (Package.Enable)
             {
-                OnDrawContent(cellRect, ref args);
+                OnDrawContent(cell, ref args);
             }
             else
             {
                 var oldColor = GUI.color;
                 GUI.color = Color.gray;
-                OnDrawContent(cellRect, ref args);
+                OnDrawContent(cell, ref args);
                 GUI.color = oldColor;
             }
         }
@@ -51,7 +46,6 @@ namespace AIO.UEditor
         }
 
         #endregion
-
 
         private void DrawStyle(Rect cellRect, ref RowGUIArgs args)
         {
@@ -69,7 +63,7 @@ namespace AIO.UEditor
             GUI.DrawTexture(rect, icon, ScaleMode.ScaleToFit);
 
             var width = cellRect.width - rect.width - rect.x;
-            var x = cellRect.x + rect.xMax + 1;
+            var x     = cellRect.x + rect.xMax + 1;
 
             rect.Set(x, cellRect.y - 9, width, cellRect.height); // 绘制名称
             TreeView.DefaultGUI.BoldLabel(rect, Package.Name, args.selected, args.focused);

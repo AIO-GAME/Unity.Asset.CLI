@@ -28,24 +28,24 @@ namespace AIO.UEditor
         public bool  AllowChangeExpandedState             => false;
         public bool  AllowRename                          => false;
         public float GetHeight()                          => 20;
+        public bool  MatchSearch(string search)           => false;
         public Rect  GetRenameRect(Rect rowRect, int row) => rowRect;
-        public bool  MatchSearch(string search) => false;
 
-        public void OnDraw(Rect cellRect, int col, ref RowGUIArgs args)
+        public void OnDraw(Rect cell, int col, ref RowGUIArgs args)
         {
             switch (col)
             {
                 case 0:
-                    cellRect.x     += 10;
-                    cellRect.width -= 10;
-                    TreeView.DefaultGUI.BoldLabel(cellRect, displayName, args.selected, args.focused);
+                    cell.x     += 10;
+                    cell.width -= 10;
+                    TreeView.DefaultGUI.BoldLabel(cell, displayName, args.selected, args.focused);
 
-                    cellRect.x     += cellRect.width - 1;
-                    cellRect.width =  1;
-                    EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);
+                    cell.x     += cell.width - 1;
+                    cell.width =  1;
+                    EditorGUI.DrawRect(cell, TreeViewBasics.ColorLine);
                     break;
                 case 1:
-                    DrawContent(cellRect, ref args);
+                    DrawContent(cell, ref args);
                     break;
             }
         }
@@ -236,7 +236,6 @@ namespace AIO.UEditor
                     break;
 
                 case 7:
-
                     cell.width                = rect.width;
                     BuildConfig.BuildPipeline = (EBuildPipeline)EditorGUI.EnumPopup(cell, BuildConfig.BuildPipeline, GEStyle.PreDropDown);
                     break;
@@ -263,9 +262,7 @@ namespace AIO.UEditor
                         {
                             cell.width      = CurrentTagIndex == 0 ? rect.width : 200;
                             CurrentTagIndex = EditorGUI.MaskField(cell, CurrentTagIndex, Tags, GEStyle.PreDropDown);
-                            Debug.Log(CurrentTagIndex);
-                            if (GUI.changed)
-                                BuildConfig.FirstPackTag = string.Join(";", Tags.Where((t, i) => (CurrentTagIndex & (1 << i)) != 0));
+                            if (GUI.changed) BuildConfig.FirstPackTag = string.Join(";", Tags.Where((t, i) => (CurrentTagIndex & (1 << i)) != 0));
 
                             if (CurrentTagIndex != 0)
                             {

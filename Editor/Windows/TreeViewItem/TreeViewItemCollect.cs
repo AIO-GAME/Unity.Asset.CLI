@@ -20,20 +20,15 @@ namespace AIO.UEditor
         private static readonly GUIContent GC_OPEN       = EditorGUIUtility.IconContent("d_RectTransform Icon").SetTooltips("打开");
         private static readonly GUIContent GC_DEL        = EditorGUIUtility.IconContent("d_ol_minus_act").SetTooltips("删除");
 
-        private static readonly GUIContent GC_LABEL_RuleUseCollectCustom = new GUIContent(
-            "自定",
-            "自定义收集规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开 \n可无需填写点(.)");
+        private static readonly GUIContent GC_LABEL_RuleUseCollectCustom =
+            new GUIContent("自定", "自定义收集规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开 \n可无需填写点(.)");
 
-        private static readonly GUIContent GC_LABEL_RuleUseFilterCustom = new GUIContent(
-            "自定",
-            "自定义过滤规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开\n可无需填写点(.)");
+        private static readonly GUIContent GC_LABEL_RuleUseFilterCustom =
+            new GUIContent("自定", "自定义过滤规则 \n传入文件后缀 \n[冒号(;)/空格( )/逗号(,)]隔开\n可无需填写点(.)");
 
         public AssetCollectItem Item;
 
-        public TreeViewItemCollect(int id, AssetCollectItem item) : base(id, 3)
-        {
-            Item = item;
-        }
+        public TreeViewItemCollect(int id, AssetCollectItem item) : base(id, 3) { Item = item; }
 
         /// <summary>
         ///     收缩状态变更事件
@@ -43,7 +38,7 @@ namespace AIO.UEditor
         public void OP_Open()
         {
             GUI.FocusControl(null);
-            AssetCollectWindow.OpenCollectItem(Item);
+            AssetPageEditCollect.OpenCollectItem(Item);
         }
 
         public void OP_DEL()
@@ -272,7 +267,7 @@ namespace AIO.UEditor
             if (source == 0) return "忽略当前条件";
 
             var builder = new StringBuilder().Append("当前选中: ").Append(source).Append(" -> ");
-            var status = 1L;
+            var status  = 1L;
             foreach (var display in Displays)
             {
                 if ((source & status) == status) builder.Append(display).Append(";");
@@ -297,26 +292,26 @@ namespace AIO.UEditor
         public float GetHeight()
         {
             if (!Item.Path || !Item.Folded) return 27;
-            var temp = 127;
+            var temp                                                        = 127;
             if (Item.Type == EAssetCollectItemType.MainAssetCollector) temp += 16;
             return temp;
         }
 
         private bool isNull;
 
-        void ITVItemDraw.OnDraw(Rect cellRect, int col, ref RowGUIArgs args)
+        void ITVItemDraw.OnDraw(Rect cell, int col, ref RowGUIArgs args)
         {
             isNull = !Item.Path;
             EditorGUI.DrawRect(args.rowRect, args.row % 2 == 0 ? TreeViewBasics.ColorAlternatingA : TreeViewBasics.ColorAlternatingB);
             if (Item.Enable)
             {
-                OnDrawContent(cellRect, ref args);
+                OnDrawContent(cell, ref args);
             }
             else
             {
                 var oldColor = GUI.color;
                 GUI.color = Color.gray;
-                OnDrawContent(cellRect, ref args);
+                OnDrawContent(cell, ref args);
                 GUI.color = oldColor;
             }
         }

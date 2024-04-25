@@ -23,7 +23,7 @@ namespace AIO.UEditor
 
                 if (GUILayout.Button("打开", GEStyle.toolbarbuttonRight))
                 {
-                    AssetCollectWindow.WindowMode = AssetCollectWindow.Mode.Build;
+                    AssetWindow.OpenPage<AssetPageEditBuild>();
                     EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
                 }
 

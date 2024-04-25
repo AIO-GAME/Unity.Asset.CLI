@@ -24,7 +24,11 @@ namespace AIO.UEditor
 
         public AssetDataInfo data { get; private set; }
 
-        public TreeViewItemQueryAsset(int id, AssetDataInfo dataInfo, Func<string, bool> isFirstPackageResource, Action<AssetDataInfo, bool> onFirstPackageResource) : base(id, 1)
+        public TreeViewItemQueryAsset(
+            int                         id,
+            AssetDataInfo               dataInfo,
+            Func<string, bool>          isFirstPackageResource,
+            Action<AssetDataInfo, bool> onFirstPackageResource) : base(id, 1)
         {
             data                   = dataInfo;
             IsFirstPackageResource = isFirstPackageResource;
@@ -50,9 +54,9 @@ namespace AIO.UEditor
         public float GetHeight()                          => 22;
         public Rect  GetRenameRect(Rect rowRect, int row) => rowRect;
 
-        void ITVItemDraw.OnDraw(Rect cellRect, int col, ref RowGUIArgs args)
+        void ITVItemDraw.OnDraw(Rect cell, int col, ref RowGUIArgs args)
         {
-            var rect = new Rect(cellRect.x + 10, cellRect.y, cellRect.width - 10, cellRect.height);
+            var rect = new Rect(cell.x + 10, cell.y, cell.width - 10, cell.height);
             switch (col)
             {
                 case 0:
@@ -61,34 +65,34 @@ namespace AIO.UEditor
                     rect.x     += 22;
                     rect.width -= 22;
                     EditorGUI.LabelField(rect, data.Address);
-                    rect.x     = cellRect.x + 10;
+                    rect.x     = cell.x + 10;
                     rect.width = 20;
                     GUI.DrawTexture(rect, AssetDatabase.GetCachedIcon(data.AssetPath), ScaleMode.ScaleAndCrop);
-                    cellRect.Set(cellRect.width - 1, args.rowRect.y, 1, args.rowRect.height - 2);
-                    EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);
+                    cell.Set(cell.width - 1, args.rowRect.y, 1, args.rowRect.height - 2);
+                    EditorGUI.DrawRect(cell, TreeViewBasics.ColorLine);
                     break;
                 case 1: // 路径
                     EditorGUI.LabelField(rect, data.AssetPath);
-                    cellRect.Set(cellRect.x + cellRect.width + 2, args.rowRect.y, 1, args.rowRect.height - 1);
-                    EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);
+                    cell.Set(cell.x + cell.width + 2, args.rowRect.y, 1, args.rowRect.height - 1);
+                    EditorGUI.DrawRect(cell, TreeViewBasics.ColorLine);
                     break;
                 case 2: // 类型
                     EditorGUI.LabelField(rect, data.Type);
-                    cellRect.Set(cellRect.x + cellRect.width + 2, args.rowRect.y, 1, args.rowRect.height - 1);
-                    EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);
+                    cell.Set(cell.x + cell.width + 2, args.rowRect.y, 1, args.rowRect.height - 1);
+                    EditorGUI.DrawRect(cell, TreeViewBasics.ColorLine);
                     break;
                 case 3: // 大小
                     EditorGUI.LabelField(rect, data.Size.ToConverseStringFileSize());
-                    cellRect.Set(cellRect.x + cellRect.width + 2, args.rowRect.y, 1, args.rowRect.height - 1);
-                    EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);
+                    cell.Set(cell.x + cell.width + 2, args.rowRect.y, 1, args.rowRect.height - 1);
+                    EditorGUI.DrawRect(cell, TreeViewBasics.ColorLine);
                     break;
                 case 4: // 时间
                     EditorGUI.LabelField(rect, data.GetLatestTime());
-                    cellRect.Set(cellRect.x + cellRect.width + 2, args.rowRect.y, 1, args.rowRect.height - 1);
-                    EditorGUI.DrawRect(cellRect, TreeViewBasics.ColorLine);
+                    cell.Set(cell.x + cell.width + 2, args.rowRect.y, 1, args.rowRect.height - 1);
+                    EditorGUI.DrawRect(cell, TreeViewBasics.ColorLine);
                     break;
                 case 5: // 是否在首包中
-                    rect.x = cellRect.x + cellRect.width / 5 - 1;
+                    rect.x = cell.x + cell.width / 5 - 1;
                     if (IsFirstPackageResource?.Invoke(data.GUID) ?? false)
                     {
                         if (GUI.Button(rect, GC_FP_Cancel, GEStyle.IconButton))

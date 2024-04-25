@@ -1,17 +1,62 @@
-﻿using System.IO;
-using System.Linq;
-using AIO.UEngine;
+﻿using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public partial class AssetCollectWindow
+    internal class AssetPageEditConfig : IAssetPage
     {
+        int IAssetPage.  Order => 2;
+        private ViewRect ViewConfig;
+        private ViewRect ViewSetting;
+
+        private AssetCollectRoot Data;
+        private ASConfig         Config;
+        private GUIContent       GC_SAVE;
+        private GUIContent       GC_Select_ASConfig;
+
+        public AssetPageEditConfig()
+        {
+            GC_Select_ASConfig = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
+            GC_SAVE            = GEContent.NewBuiltin("d_SaveAs", "保存");
+            Data               = AssetCollectRoot.GetOrCreate();
+            Config             = ASConfig.GetOrCreate();
+
+
+            ViewConfig = new ViewRect(550, 1)
+            {
+                IsShow = true, IsAllowDragStretchHorizontal = true, DragStretchHorizontalWidth = 5, width = 900
+            };
+            ViewSetting = new ViewRect(250, 1)
+            {
+                IsShow = true, IsAllowDragStretchHorizontal = false, DragStretchHorizontalWidth = 5, width = 250
+            };
+        }
+
+        public void Dispose()
+        {
+            Data               = null;
+            Config             = null;
+            GC_SAVE            = null;
+            GC_Select_ASConfig = null;
+        }
+
+        public string Title => "配置管理      [Ctrl + Number2]";
+
+        bool IAssetPage.Shortcut(Event evt)
+        {
+            if (evt.type == EventType.KeyDown && evt.control)
+                return evt.keyCode == KeyCode.Keypad2
+                    || evt.keyCode == KeyCode.Alpha2
+                    ;
+
+            return false;
+        }
+
         /// <summary>
         ///     绘制 资源设置模式 导航栏
         /// </summary>
-        partial void OnDrawHeaderConfigMode(Rect rect)
+        void IAssetPage.OnDrawHeader(Rect rect)
         {
             rect.x     = rect.width - 30;
             rect.width = 30;
@@ -40,7 +85,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     更新数据 资源设置模式
         /// </summary>
-        private void UpdateDataConfigMode()
+        void IAssetPage.UpdateData()
         {
             AssetProxyEditor.ConvertConfig(Data);
             Config.Packages = new AssetsPackageConfig[Data.Packages.Length];
@@ -55,19 +100,32 @@ namespace AIO.UEditor
             Config.Packages[0].IsDefault = true;
         }
 
+        void IAssetPage.EventMouseDown(in Event evt)                     => ViewConfig.ContainsDragStretch(evt, ViewRect.DragStretchType.Horizontal);
+        void IAssetPage.EventMouseUp(in   Event evt)                     => ViewConfig.CancelDragStretch();
+        void IAssetPage.EventMouseDrag(in Event evt)                     => ViewConfig.DraggingStretch(evt, ViewRect.DragStretchType.Horizontal);
+        void IAssetPage.EventKeyUp(in     Event evt, in KeyCode keyCode) { }
+
+        void IAssetPage.EventKeyDown(in Event evt, in KeyCode keyCode)
+        {
+            if (!evt.control || keyCode != KeyCode.S) return;
+            GUI.FocusControl(null);
+            Config.Save();
+            AssetDatabase.SaveAssets();
+            evt.Use();
+        }
+
         /// <summary>
         ///     绘制 资源设置模式
         /// </summary>
-        partial void OnDrawConfigMode(Rect rect)
+        void IAssetPage.OnDrawContent(Rect rect)
         {
             ViewConfig.x        = 5;
             ViewConfig.y        = rect.y;
-            ViewConfig.height   = rect.height - 5;
-            ViewConfig.width    = rect.width - ViewSetting.MaxWidth;
+            ViewConfig.height   = rect.height;
             ViewConfig.MaxWidth = rect.width - ViewSetting.MinWidth;
             ViewConfig.Draw(OnDrawASConfig, GEStyle.INThumbnailShadow);
 
-            ViewSetting.x      = ViewConfig.width + ViewConfig.x + 5;
+            ViewSetting.x      = ViewConfig.width + ViewConfig.x;
             ViewSetting.width  = rect.width - ViewSetting.x - 5;
             ViewSetting.height = ViewConfig.height;
             ViewSetting.y      = rect.y;
@@ -77,7 +135,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     绘制资源设置
         /// </summary>
-        partial void OnDrawSetting(Rect rect)
+        private void OnDrawSetting(Rect rect)
         {
             rect.x      += 5;
             rect.y      += 5;
@@ -179,7 +237,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     绘制资源配置
         /// </summary>
-        partial void OnDrawASConfig(Rect rect)
+        private void OnDrawASConfig(Rect rect)
         {
             rect.x      += 5;
             rect.y      += 5;
@@ -198,17 +256,16 @@ namespace AIO.UEditor
                 cell.width =  100;
                 if (GUI.Button(cell, "清空运行缓存", GEStyle.toolbarbuttonRight))
                 {
-                    ClearRuntimeCache();
+                    AssetWindow.ClearRuntimeCache();
                 }
 
                 cell.x     += cell.width;
                 cell.width =  100;
                 if (GUI.Button(cell, "清空构建缓存", GEStyle.toolbarbuttonRight))
                 {
-                    ClearBuildCache();
+                    AssetWindow.ClearBuildCache();
                 }
             }
-
 
             {
                 cell.y     += cell.height;
@@ -273,8 +330,7 @@ namespace AIO.UEditor
                         cell.x     = rect.width - cell.width;
                         if (GUI.Button(cell, "跳转首包清单", GEStyle.toolbarbutton))
                         {
-                            WindowMode = Mode.LookFirstPackage;
-                            UpdateData();
+                            AssetWindow.OpenPage<AssetPageLook.FirstPackage>();
                             GUI.FocusControl(null);
                         }
 

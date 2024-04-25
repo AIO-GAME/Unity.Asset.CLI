@@ -8,7 +8,7 @@ namespace AIO.UEditor
 {
     public class TreeViewDependencies : TreeViewRowSingle
     {
-        public static TreeViewDependencies Create(ICollection<AssetCollectWindow.DependenciesInfo> data, float width = 100, float min = 80, float max = 200)
+        public static TreeViewDependencies Create(ICollection<AssetPageLook.DependenciesInfo> data, float width = 100, float min = 80, float max = 200)
         {
             return new TreeViewDependencies(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
             {
@@ -17,9 +17,9 @@ namespace AIO.UEditor
             })), data);
         }
 
-        private IEnumerable<AssetCollectWindow.DependenciesInfo> data;
+        private IEnumerable<AssetPageLook.DependenciesInfo> data;
 
-        private TreeViewDependencies(TreeViewState state, MultiColumnHeader header, IEnumerable<AssetCollectWindow.DependenciesInfo> list) : base(state, header)
+        private TreeViewDependencies(TreeViewState state, MultiColumnHeader header, IEnumerable<AssetPageLook.DependenciesInfo> list) : base(state, header)
         {
             data                          = list;
             showAlternatingRowBackgrounds = true;
@@ -55,7 +55,7 @@ namespace AIO.UEditor
             multiColumnHeader.GetColumn(0).headerContent = EditorGUIUtility.TrTextContent($"资源数量 : {idxG} 合计大小 : {size.ToConverseStringFileSize()}");
         }
 
-        public void Reload(ICollection<AssetCollectWindow.DependenciesInfo> list)
+        public void Reload(ICollection<AssetPageLook.DependenciesInfo> list)
         {
             if (list is null) return;
             data = list;

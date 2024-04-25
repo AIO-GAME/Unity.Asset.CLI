@@ -25,9 +25,7 @@ namespace AIO.UEditor
         private AssetCollectRoot Config;
         private int              RenameIndex = -1;
 
-        private TreeViewGroup(TreeViewState state, MultiColumnHeader header) : base(state, header)
-        {
-        }
+        private TreeViewGroup(TreeViewState state, MultiColumnHeader header) : base(state, header) { }
 
         public static TreeViewGroup Create()
         {
@@ -39,10 +37,7 @@ namespace AIO.UEditor
 
         protected override bool CanBeParent(TreeViewItem item) => true;
 
-        protected override void OnInitialize()
-        {
-            Config = AssetCollectRoot.GetOrCreate();
-        }
+        protected override void OnInitialize() { Config = AssetCollectRoot.GetOrCreate(); }
 
         protected override void OnDraw(Rect rect)
         {
@@ -128,10 +123,7 @@ namespace AIO.UEditor
                 root.AddChild(new TreeViewItemGroup(idxG, Config.CurrentPackage[idxG]));
         }
 
-        protected override void OnSelection(int id)
-        {
-            Config.CurrentGroupIndex = id;
-        }
+        protected override void OnSelection(int id) { Config.CurrentGroupIndex = id; }
 
         protected override void OnContextClicked(GenericMenu menu)
         {
