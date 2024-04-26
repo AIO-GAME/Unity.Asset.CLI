@@ -13,7 +13,7 @@ namespace AIO.UEditor
     /// <summary>
     ///     资源 上传 FTP 配置
     /// </summary>
-    public class AsUploadFtpParameter : ASUploadParameter
+    public class AssetUploadFtpParameter : AssetUploadParameter
     {
         /// <summary>
         ///     FTP 密码
@@ -61,7 +61,7 @@ namespace AIO.UEditor
         }
     }
 
-    public partial class ASBuildConfig
+    public partial class AssetBuildConfig
     {
         public void AddOrNewFTP()
         {

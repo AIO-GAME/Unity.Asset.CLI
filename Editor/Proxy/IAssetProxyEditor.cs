@@ -55,11 +55,11 @@ namespace AIO.UEditor
         ///     Tips:
         ///     需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters);
+        Task<bool> UploadGCloud(ICollection<AssetUploadGCloudParameter> parameters);
 
         /// <summary>
         ///     上传到Ftp
         /// </summary>
-        Task<bool> UploadFtp(ICollection<AsUploadFtpParameter> parameters);
+        Task<bool> UploadFtp(ICollection<AssetUploadFtpParameter> parameters);
     }
 }

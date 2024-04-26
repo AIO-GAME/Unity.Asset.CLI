@@ -48,7 +48,7 @@ namespace AIO.UEditor
                 if (!Config.EnableSequenceRecord)
                 {
                     rect.width = 30;
-                    if (GUI.Button(rect, GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
+                    if (GUI.Button(rect, Instance.GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
                     {
                         GUI.FocusControl(null);
                         Selection.activeObject = Config;
@@ -61,7 +61,7 @@ namespace AIO.UEditor
                 {
                     rect.x     += rect.width;
                     rect.width =  30;
-                    if (GUI.Button(rect, GC_OPEN_FOLDER, GEStyle.TEtoolbarbutton))
+                    if (GUI.Button(rect, Instance.GC_OPEN_FOLDER, GEStyle.TEtoolbarbutton))
                     {
                         GUI.FocusControl(null);
                         EditorUtility.RevealInFinder(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
@@ -69,7 +69,7 @@ namespace AIO.UEditor
 
                     rect.x     += rect.width;
                     rect.width =  30;
-                    if (GUI.Button(rect, GC_DEL, GEStyle.TEtoolbarbutton))
+                    if (GUI.Button(rect, Instance.GC_DEL, GEStyle.TEtoolbarbutton))
                     {
                         GUI.FocusControl(null);
                         AHelper.IO.DeleteFile(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
@@ -85,7 +85,7 @@ namespace AIO.UEditor
                 {
                     rect.x     += rect.width;
                     rect.width =  30;
-                    if (GUI.Button(rect, GC_NET, GEStyle.TEtoolbarbutton)) // 打开网络路径
+                    if (GUI.Button(rect, Instance.GC_NET, GEStyle.TEtoolbarbutton)) // 打开网络路径
                     {
                         GUI.FocusControl(null);
                         Application.OpenURL(AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(Config));
@@ -93,7 +93,7 @@ namespace AIO.UEditor
 
                     rect.x     += rect.width;
                     rect.width =  30;
-                    if (GUI.Button(rect, GC_DOWNLOAD, GEStyle.TEtoolbarbutton)) // 下载网络路径
+                    if (GUI.Button(rect, Instance.GC_DOWNLOAD, GEStyle.TEtoolbarbutton)) // 下载网络路径
                     {
                         GUI.FocusControl(null);
                         SyncSequenceRecords();
@@ -102,10 +102,11 @@ namespace AIO.UEditor
 
                 if (DisplayTypes != null && DisplayTypes.Length > 0)
                 {
+                    EditorGUI.BeginChangeCheck();
                     rect.x           += rect.width;
                     rect.width       =  100;
                     DisplayTypeIndex =  EditorGUI.MaskField(rect, DisplayTypeIndex, DisplayTypes, GEStyle.PreDropDown);
-                    if (GUI.changed)
+                    if (EditorGUI.EndChangeCheck())
                     {
                         PageValues.Clear();
                         PageValues.Add(Values.Where(data => !DataFilter(data)));
@@ -120,12 +121,11 @@ namespace AIO.UEditor
 
                 rect.x     += rect.width;
                 rect.width =  30;
-                if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
+                if (GUI.Button(rect, Instance.GC_CLEAR, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     TreeViewQueryAsset.searchString = string.Empty;
                 }
-
 
                 rect.x     += rect.width;
                 rect.width =  190;
@@ -133,7 +133,7 @@ namespace AIO.UEditor
 
                 rect.x     = width - 30;
                 rect.width = 30;
-                if (GUI.Button(rect, GC_SAVE, GEStyle.TEtoolbarbutton))
+                if (GUI.Button(rect, Instance.GC_SAVE, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     Config.SequenceRecord.Save();
@@ -148,7 +148,7 @@ namespace AIO.UEditor
 
                 rect.x     -= rect.width;
                 rect.width =  30;
-                if (GUI.Button(rect, GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
+                if (GUI.Button(rect, Instance.GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     Selection.activeObject = Config;
@@ -156,7 +156,7 @@ namespace AIO.UEditor
 
                 rect.x     -= rect.width;
                 rect.width =  30;
-                if (GUI.Button(rect, GC_REFRESH, GEStyle.TEtoolbarbutton))
+                if (GUI.Button(rect, Instance.GC_REFRESH, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     TreeViewQueryAsset.searchString = string.Empty;
@@ -175,39 +175,56 @@ namespace AIO.UEditor
                 UpdateDataAll();
             }
 
+            private void AddAsset(AssetSystem.SequenceRecord record, IList<string> types, IDictionary<string, AssetDataInfo> assets)
+            {
+                if (string.IsNullOrEmpty(record.AssetPath)
+                 || string.IsNullOrEmpty(record.PackageName)
+                 || assets.ContainsKey(record.AssetPath)) return;
+                var tuple = AssetCollectRoot.AssetToAddress(record.AssetPath, Config.LoadPathToLower, Config.HasExtension, record.PackageName);
+                if (string.IsNullOrEmpty(tuple.Item1)) return;
+                var info = new AssetDataInfo
+                {
+                    AssetPath = record.AssetPath,
+                    Extension = Path.GetExtension(record.AssetPath),
+                    Address   = tuple.Item3,
+                    Package   = record.PackageName,
+                    Group     = "N/A",
+                };
+                assets[info.AssetPath] = info;
+                Values.Add(info);
+                types.Add(info.Type);
+            }
+
             private void UpdateDataAll()
             {
                 Values.Clear();
                 DisplayTypes = Array.Empty<string>();
                 var types = new List<string>();
                 var asset = new Dictionary<string, AssetDataInfo>();
-                for (var i = 0; i < Config.SequenceRecord.Count; i++)
-                {
-                    var address = Config.SequenceRecord[i].AssetPath;
-                    var package = Config.SequenceRecord[i].PackageName;
-                    if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(package)) continue;
-                    if (asset.ContainsKey(address)) continue;
-                    var tuple = AssetCollectRoot.AssetToAddress(address, Config.LoadPathToLower, Config.HasExtension, package);
-                    if (string.IsNullOrEmpty(tuple.Item1)) continue;
-                    var info = new AssetDataInfo
-                    {
-                        AssetPath = Config.SequenceRecord[i].AssetPath,
-                        Extension = Path.GetExtension(address),
-                        Address   = tuple.Item3,
-                        Package   = package,
-                        Group     = "N/A",
-                    };
-                    asset[info.AssetPath] = info;
-                    Values.Add(info);
-                    types.Add(info.Type);
-                }
 
+                var count = Config.SequenceRecord.Count <= PageValues.PageSize ? Config.SequenceRecord.Count : PageValues.PageSize;
+                for (var i = 0; i < count; i++) AddAsset(Config.SequenceRecord[i], types, asset);
 
                 DisplayTypes = types.Distinct().ToArray();
                 PageValues.Clear();
                 PageValues.Add(Values.Where(data => !DataFilter(data)));
                 PageValues.PageIndex = 0;
-                TreeViewQueryAsset.ReloadAndSelect(0);
+                TreeViewQueryAsset.Reload(PageValues);
+                TreeViewQueryAsset.Select(0);
+
+                if (Config.SequenceRecord.Count > PageValues.PageSize)
+                {
+                    Runner.StartCoroutine(() =>
+                    {
+                        for (var i = count; i < Config.SequenceRecord.Count - count; i++)
+                            AddAsset(Config.SequenceRecord[i], types, asset);
+
+                        DisplayTypes = types.Distinct().ToArray();
+                        PageValues.Clear();
+                        PageValues.Add(Values.Where(data => !DataFilter(data)));
+                        TreeViewQueryAsset.Reload(PageValues);
+                    });
+                }
             }
 
             void IAssetPage.OnDrawContent(Rect rect)
@@ -247,17 +264,17 @@ namespace AIO.UEditor
                 else
                 {
                     Instance.ViewDetails.IsShow   = false;
-                    Instance.ViewDetailList.width = rect.width - 10;
+                    Instance.ViewDetailList.width = rect.width - 5;
                 }
 
                 Instance.ViewDetailList.Draw(TreeViewQueryAsset.OnGUI, GEStyle.INThumbnailShadow);
                 Instance.ViewDetails.Draw(Instance.OnDrawAssetDetail, GEStyle.INThumbnailShadow);
             }
 
-            private bool DataFilter(AssetDataInfo data)
+            private static bool DataFilter(AssetDataInfo data)
             {
                 var filter = 0;
-                if (IsFilterTypes(DisplayTagsIndex, data.AssetPath, DisplayTypes))
+                if (IsFilterTypes(DisplayTypeIndex, data, DisplayTypes))
                     filter++;
 
                 return filter != 1;

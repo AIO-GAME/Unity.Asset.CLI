@@ -14,7 +14,7 @@ namespace AIO.UEditor
 
         private DriveInfo            Disk;        // 磁盘信息
         private AssetCollectRoot     Data;        // 资源数据
-        private ASBuildConfig        BuildConfig; // 构建配置
+        private AssetBuildConfig        BuildConfig; // 构建配置
         private TreeViewBuildSetting TreeViewBuildSetting;
 
         public AssetPageEditBuild()
@@ -24,7 +24,7 @@ namespace AIO.UEditor
             GC_SAVE              = GEContent.NewBuiltin("d_SaveAs", "保存");
             TreeViewBuildSetting = TreeViewBuildSetting.Create();
             Data                 = AssetCollectRoot.GetOrCreate();
-            BuildConfig          = ASBuildConfig.GetOrCreate();
+            BuildConfig          = AssetBuildConfig.GetOrCreate();
         }
 
         public void Dispose()
@@ -100,7 +100,7 @@ namespace AIO.UEditor
             if (GUI.Button(rect, GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
-                Selection.activeObject = ASBuildConfig.GetOrCreate();
+                Selection.activeObject = AssetBuildConfig.GetOrCreate();
             }
 
 #if SUPPORT_YOOASSET

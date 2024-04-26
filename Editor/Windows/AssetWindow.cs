@@ -12,7 +12,7 @@ namespace AIO.UEditor
     [GWindow("资源管理器", "支持资源收集、资源管理、资源导出、资源打包等功能",
                 IconResource = "Editor/Icon/Asset",
                 Group = "Tools",
-                Menu = "AIO/Window/Asset",
+                Menu = MENU_WINDOW,
                 MinSizeHeight = 650,
                 MinSizeWidth = 1200
             )]

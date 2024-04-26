@@ -7,7 +7,7 @@ namespace AIO.UEditor
     /// <summary>
     ///     资源 上传 GCloud 配置
     /// </summary>
-    public class AsUploadGCloudParameter : ASUploadParameter
+    public class AssetUploadGCloudParameter : AssetUploadParameter
     {
         /// <summary>
         ///     Gcloud 路径
@@ -40,7 +40,7 @@ namespace AIO.UEditor
     /// <summary>
     ///     nameof(ASBuildConfig_GCloud)
     /// </summary>
-    public partial class ASBuildConfig
+    public partial class AssetBuildConfig
     {
         public void AddOrNewGCloud()
         {
@@ -172,7 +172,7 @@ namespace AIO.UEditor
                 }
 
                 isUploading = true;
-                var config = new AsUploadGCloudParameter
+                var config = new AssetUploadGCloudParameter
                 {
                     RemotePath    = BUCKET_NAME,
                     PackageName   = two,

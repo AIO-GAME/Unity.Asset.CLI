@@ -107,7 +107,7 @@ namespace AIO.UEditor.CLI
                         {
                             // 如果为增量更新 则判断是否需要清理缓存 
                             buildMode = YooAsset.Editor.EBuildMode.IncrementalBuild;
-                            var cleanCacheNum = ASBuildConfig.GetOrCreate().AutoCleanCacheNumber;
+                            var cleanCacheNum = AssetBuildConfig.GetOrCreate().AutoCleanCacheNumber;
                             if (dirs.Length >= cleanCacheNum)
                             {
                                 var caches = dirs.Sort((s, t) => // 如果缓存数量大于等于设置的缓存数量 则清理缓存 缓存清理机制为删除最早的缓存

@@ -8,7 +8,7 @@ namespace AIO.UEditor
 {
     public class TreeViewItemUploadFtp : TreeViewItem, ITVItemDraw
     {
-        public TreeViewItemUploadFtp(int id, ASBuildConfig.FTPConfig config) : base(id, 1) { Config = config; }
+        public TreeViewItemUploadFtp(int id, AssetBuildConfig.FTPConfig config) : base(id, 1) { Config = config; }
 
         #region ITVItemDraw
 
@@ -22,7 +22,7 @@ namespace AIO.UEditor
 
         private GUIContent              GC_FOLDOUT    = GEContent.NewSetting("quanping-shouqi-xian", "收缩");
         private GUIContent              GC_FOLDOUT_ON = GEContent.NewSetting("quanping-zhankai-xian", "展开");
-        public  ASBuildConfig.FTPConfig Config;
+        public  AssetBuildConfig.FTPConfig Config;
 
         private void OnDrawHeader(Rect rect)
         {
@@ -93,7 +93,7 @@ namespace AIO.UEditor
             OnDrawBuildFTP(Config, rectItem);
         }
 
-        private static void OnDrawBuildFTP(ASBuildConfig.FTPConfig config, in Rect rect)
+        private static void OnDrawBuildFTP(AssetBuildConfig.FTPConfig config, in Rect rect)
         {
             using (new EditorGUI.DisabledScope(config.isUploading))
             {
@@ -216,7 +216,7 @@ namespace AIO.UEditor
             }
         }
 
-        private static string GetFtpItemDes(ASBuildConfig.FTPConfig config, int i)
+        private static string GetFtpItemDes(AssetBuildConfig.FTPConfig config, int i)
         {
             var _builder = new StringBuilder();
             if (!config.Folded && config.isUploading) _builder.Append($"[上传中:{config.UploadProgress.Progress}%]");
@@ -245,7 +245,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     创建 FTP
         /// </summary>
-        private static async void CreateFTP(ASBuildConfig.FTPConfig config)
+        private static async void CreateFTP(AssetBuildConfig.FTPConfig config)
         {
             using (var handle = AHandle.FTP.Create(config.Server,
                                                    config.Port,
@@ -262,7 +262,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     验证 FTP 是否有效
         /// </summary>
-        private static async void ValidateFTP(ASBuildConfig.FTPConfig config)
+        private static async void ValidateFTP(AssetBuildConfig.FTPConfig config)
         {
             EditorUtility.DisplayDialog("提示", await config.Validate() ? "连接成功" : "连接失败", "确定");
         }

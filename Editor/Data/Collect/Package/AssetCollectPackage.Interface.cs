@@ -7,12 +7,21 @@ namespace AIO.UEditor
 {
     partial class AssetCollectPackage : IDisposable, IEqualityComparer<AssetCollectPackage>, IList<AssetCollectGroup>
     {
+        /// <summary>
+        ///    获取资源收集组
+        /// </summary>
+        /// <param name="idxG">组索引</param>
         public AssetCollectGroup this[int idxG]
         {
             get => Groups[idxG];
             set => Groups[idxG] = value;
         }
 
+        /// <summary>
+        ///   获取资源收集器
+        /// </summary>
+        /// <param name="idxG">组索引</param>
+        /// <param name="idxC">收集器索引</param>
         public AssetCollectItem this[int idxG, int idxC]
         {
             get => Groups[idxG].Collectors[idxC];
@@ -58,7 +67,7 @@ namespace AIO.UEditor
             if (Groups is null) Groups = new AssetCollectGroup[index + 1];
             if (Groups.Length <= index)
             {
-                var temp = new AssetCollectGroup[index + 1];
+                var temp                                        = new AssetCollectGroup[index + 1];
                 for (var i = 0; i < Groups.Length; i++) temp[i] = Groups[i];
                 Groups = temp;
             }
@@ -72,14 +81,11 @@ namespace AIO.UEditor
             Groups = Groups.RemoveAt(index);
         }
 
-        public void Add(AssetCollectGroup item)
-            => Groups = Groups is null ? new[] { item } : Groups.Add(item);
+        public void Add(AssetCollectGroup item) => Groups = Groups is null ? new[] { item } : Groups.Add(item);
 
-        public void Clear()
-            => Groups = Array.Empty<AssetCollectGroup>();
+        public void Clear() => Groups = Array.Empty<AssetCollectGroup>();
 
-        public bool Contains(AssetCollectGroup item)
-            => IndexOf(item) != -1;
+        public bool Contains(AssetCollectGroup item) => IndexOf(item) != -1;
 
         public void CopyTo(AssetCollectGroup[] array, int arrayIndex)
         {
@@ -139,29 +145,21 @@ namespace AIO.UEditor
         int ICollection<AssetCollectGroup>. Count      => Count;
         bool ICollection<AssetCollectGroup>.IsReadOnly => false;
 
-        int IList<AssetCollectGroup>.IndexOf(AssetCollectGroup item)
-            => IndexOf(item);
+        int IList<AssetCollectGroup>.IndexOf(AssetCollectGroup item) => IndexOf(item);
 
-        void ICollection<AssetCollectGroup>.Add(AssetCollectGroup item)
-            => Add(item);
+        void ICollection<AssetCollectGroup>.Add(AssetCollectGroup item) => Add(item);
 
-        void ICollection<AssetCollectGroup>.Clear()
-            => Clear();
+        void ICollection<AssetCollectGroup>.Clear() => Clear();
 
-        bool ICollection<AssetCollectGroup>.Contains(AssetCollectGroup item)
-            => Contains(item);
+        bool ICollection<AssetCollectGroup>.Contains(AssetCollectGroup item) => Contains(item);
 
-        void ICollection<AssetCollectGroup>.CopyTo(AssetCollectGroup[] array, int arrayIndex)
-            => CopyTo(array, arrayIndex);
+        void ICollection<AssetCollectGroup>.CopyTo(AssetCollectGroup[] array, int arrayIndex) => CopyTo(array, arrayIndex);
 
-        void IList<AssetCollectGroup>.Insert(int index, AssetCollectGroup item)
-            => Insert(index, item);
+        void IList<AssetCollectGroup>.Insert(int index, AssetCollectGroup item) => Insert(index, item);
 
-        bool ICollection<AssetCollectGroup>.Remove(AssetCollectGroup item)
-            => Remove(item);
+        bool ICollection<AssetCollectGroup>.Remove(AssetCollectGroup item) => Remove(item);
 
-        void IList<AssetCollectGroup>.RemoveAt(int index)
-            => RemoveAt(index);
+        void IList<AssetCollectGroup>.RemoveAt(int index) => RemoveAt(index);
 
         #endregion
     }

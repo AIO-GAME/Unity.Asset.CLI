@@ -38,22 +38,23 @@ namespace AIO.UEditor
         public static int DisplayCollectorsIndex = -1; // 当前选择收集器索引
         public static int DisplayTagsIndex;            // 当前标签列表索引
 
-        private static GUIContent GC_CLEAR;
-        private static GUIContent GC_DEL;
-        private static GUIContent GC_DOWNLOAD;
-        private static GUIContent GC_NET;
-        private static GUIContent GC_OPEN_FOLDER;
-        private static GUIContent GC_REFRESH;
-        private static GUIContent GC_SAVE;
-        private static GUIContent GC_Select_ASConfig;
-        private static GUIContent GC_LookMode_Detail_IsSubAsset;
-        private static GUIContent GC_LookMode_Detail_Size;
-        private static GUIContent GC_LookMode_Detail_GUID;
-        private static GUIContent GC_LookMode_Detail_Type;
-        private static GUIContent GC_LookMode_Detail_Path;
-        private static GUIContent GC_LookMode_Detail_LastWriteTime;
-        private static GUIContent GC_LookMode_Detail_Tags;
-        private static GUIContent GC_COPY;
+        private readonly GUIContent GC_CLEAR;
+        private readonly GUIContent GC_DEL;
+        private readonly GUIContent GC_DOWNLOAD;
+        private readonly GUIContent GC_NET;
+        private readonly GUIContent GC_OPEN_FOLDER;
+        private readonly GUIContent GC_REFRESH;
+        private readonly GUIContent GC_SAVE;
+
+        private readonly GUIContent GC_Select_ASConfig;
+        private readonly GUIContent GC_LookMode_Detail_IsSubAsset;
+        private readonly GUIContent GC_LookMode_Detail_Size;
+        private readonly GUIContent GC_LookMode_Detail_GUID;
+        private readonly GUIContent GC_LookMode_Detail_Type;
+        private readonly GUIContent GC_LookMode_Detail_Path;
+        private readonly GUIContent GC_LookMode_Detail_LastWriteTime;
+        private readonly GUIContent GC_LookMode_Detail_Tags;
+        private readonly GUIContent GC_COPY;
 
         private readonly GUIContent GC_LookMode_Page_MaxLeft;  // 界面内容 - 第一页
         private readonly GUIContent GC_LookMode_Page_Left;     // 界面内容 - 左边一页
@@ -65,25 +66,6 @@ namespace AIO.UEditor
         private ViewRect ViewDetails;    // 界面 - 详情界面
 
         private GenericMenu PageSizeMenu; // 资源展示模式 当前页数量选项
-
-        /// <summary>
-        ///     是否过滤 指定类型
-        /// </summary>
-        private static bool IsFilterTypes(int index, string assetPath, ICollection<string> displays)
-        {
-            if (index < 1) return true;
-            if (displays is null) return false;
-            var objectType                                   = AssetDatabase.GetMainAssetTypeAtPath(assetPath)?.FullName;
-            if (string.IsNullOrEmpty(objectType)) objectType = "Unknown";
-            var status                                       = 1L;
-            foreach (var display in displays)
-            {
-                if ((index & status) == status && objectType == display) return true;
-                status *= 2;
-            }
-
-            return false;
-        }
 
         #region Dependencies
 
@@ -153,13 +135,13 @@ namespace AIO.UEditor
             yield break;
         }
 
-        private bool IsFirstPackageResource(string guid)
+        private static bool IsFirstPackageResource(string guid)
         {
             if (string.IsNullOrEmpty(guid)) return false;
             return Config.EnableSequenceRecord && Config.SequenceRecord.ContainsGUID(guid);
         }
 
-        private void OnFirstPackageResource(AssetDataInfo data, bool isAdd)
+        private static void OnFirstPackageResource(AssetDataInfo data, bool isAdd)
         {
             if (isAdd)
             {
@@ -254,34 +236,23 @@ namespace AIO.UEditor
             UpdatePageSizeMenu();
         }
 
+        private readonly int[] PageSizeValues = { 25, 30, 40, 50 };
+
         private void UpdatePageSizeMenu()
         {
             PageSizeMenu = new GenericMenu();
-            PageSizeMenu.AddItem(new GUIContent("25"), PageValues.PageSize == 25, () =>
+            foreach (var size in PageSizeValues)
             {
-                PageValues.PageSize = 25;
-                UpdatePageSizeMenu();
-                TreeViewQueryAsset.Reload(PageValues);
-            });
-            PageSizeMenu.AddItem(new GUIContent("30"), PageValues.PageSize == 30, () =>
-            {
-                PageValues.PageSize = 30;
-                UpdatePageSizeMenu();
-                TreeViewQueryAsset.Reload(PageValues);
-            });
-            PageSizeMenu.AddItem(new GUIContent("40"), PageValues.PageSize == 40, () =>
-            {
-                PageValues.PageSize = 40;
-                UpdatePageSizeMenu();
-                TreeViewQueryAsset.Reload(PageValues);
-            });
-            PageSizeMenu.AddItem(new GUIContent("50"), PageValues.PageSize == 50, () =>
-            {
-                PageValues.PageSize = 50;
-                UpdatePageSizeMenu();
-                TreeViewQueryAsset.Reload(PageValues);
-            });
+                PageSizeMenu.AddItem(new GUIContent(size.ToString()), PageValues.PageSize == size, data =>
+                {
+                    PageValues.PageSize = (int)data;
+                    UpdatePageSizeMenu();
+                    TreeViewQueryAsset.Reload(PageValues);
+                }, size);
+            }
         }
+
+        #region IsFilter
 
         /// <summary>
         ///     是否过滤 收集器
@@ -289,7 +260,7 @@ namespace AIO.UEditor
         private static bool IsFilterCollectors(int index, string collectPath, IList<string> displays)
         {
             if (index < 1) return true;
-            if (displays is null) return false;
+            if (displays is null || displays.Count == 0) return false;
 
             if (displays.Count >= 31)
             {
@@ -322,13 +293,31 @@ namespace AIO.UEditor
         }
 
         /// <summary>
+        ///     是否过滤 指定类型
+        /// </summary>
+        private static bool IsFilterTypes(int index, AssetDataInfo data, ICollection<string> displays)
+        {
+            if (index < 1) return true;
+            if (displays is null || displays.Count == 0) return false;
+            var objectType = data.Type;
+            var status     = 1L;
+            foreach (var item in displays)
+            {
+                if ((index & status) == status && objectType == item) return true;
+                status *= 2;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         ///     是否过滤 指定标签
         /// </summary>
         private static bool IsFilterTags(int index, ICollection<string> tags, ICollection<string> displays)
         {
             if (index < 1) return true;
-            if (displays is null) return false;
-            if (tags is null) return false;
+            if (displays is null || displays.Count == 0) return false;
+            if (tags is null || tags.Count == 0) return false;
 
             var status = 1L;
             foreach (var display in displays)
@@ -339,6 +328,8 @@ namespace AIO.UEditor
 
             return false;
         }
+
+        #endregion
 
         /// <summary>
         ///     获取组显示名称
@@ -549,7 +540,7 @@ namespace AIO.UEditor
                 if (GUI.Button(rect, GC_LookMode_Page_MaxLeft, GEStyle.TEtoolbarbutton))
                 {
                     PageValues.PageIndex = 0;
-                    TreeViewQueryAsset.Reload();
+                    TreeViewQueryAsset.Reload(PageValues);
                 }
             }
 
@@ -560,14 +551,14 @@ namespace AIO.UEditor
                 if (GUI.Button(rect, GC_LookMode_Page_Left, GEStyle.TEtoolbarbutton))
                 {
                     PageValues.PageIndex -= 1;
-                    TreeViewQueryAsset.Reload();
+                    TreeViewQueryAsset.Reload(PageValues);
                 }
             }
 
             rect.x     += rect.width;
             rect.width =  40;
-            GUI.Label(rect, $"{PageValues.PageIndex + 1}/{PageValues.PageCount}", GEStyle.MeTimeLabel);
 
+            var temp = rect;
             using (new EditorGUI.DisabledScope(PageValues.PageIndex + 1 >= PageValues.PageCount))
             {
                 rect.x     += rect.width;
@@ -575,7 +566,7 @@ namespace AIO.UEditor
                 if (GUI.Button(rect, GC_LookMode_Page_Right, GEStyle.TEtoolbarbutton))
                 {
                     PageValues.PageIndex += 1;
-                    TreeViewQueryAsset.Reload();
+                    TreeViewQueryAsset.Reload(PageValues);
                 }
 
                 rect.x     += rect.width;
@@ -583,7 +574,7 @@ namespace AIO.UEditor
                 if (GUI.Button(rect, GC_LookMode_Page_MaxRight, GEStyle.TEtoolbarbutton))
                 {
                     PageValues.PageIndex = PageValues.PageCount - 1;
-                    TreeViewQueryAsset.Reload();
+                    TreeViewQueryAsset.Reload(PageValues);
                 }
             }
 
@@ -592,8 +583,9 @@ namespace AIO.UEditor
             if (GUI.Button(rect, GC_LookMode_Page_Size, GEStyle.TEtoolbarbutton))
             {
                 PageSizeMenu.ShowAsContext();
-                TreeViewQueryAsset.Reload();
             }
+
+            GUI.Label(temp, $"{PageValues.PageIndex + 1}/{PageValues.PageCount}", GEStyle.MeTimeLabel);
         }
 
         #endregion

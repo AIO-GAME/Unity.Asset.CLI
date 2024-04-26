@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -11,9 +8,12 @@ namespace AIO.UEditor
     public partial class AssetWindow
     {
         [LnkTools(Tooltip = "AIO 资源管理工具", IconResource = "Editor/Icon/Asset", ShowMode = ELnkShowMode.Toolbar)]
-        public static void OpenWindow() => EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
+        public static void OpenWindow() => EditorApplication.ExecuteMenuItem(MENU_WINDOW);
 
-        [MenuItem("AIO/Asset/清空运行时缓存")]
+        public const string MENU_ROOT   = "AIO/Asset/";
+        public const string MENU_WINDOW = MENU_ROOT + "Window";
+
+        [MenuItem(MENU_ROOT + "清空运行时缓存")]
         public static void ClearRuntimeCache()
         {
             var sandbox = Path.Combine(EHelper.Path.Project, ASConfig.GetOrCreate().RuntimeRootDirectory);
@@ -21,7 +21,7 @@ namespace AIO.UEditor
                 AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
         }
 
-        [MenuItem("AIO/Asset/清空构建时缓存")]
+        [MenuItem(MENU_ROOT + "清空构建时缓存")]
         public static void ClearBuildCache()
         {
             var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
@@ -32,7 +32,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     上传首包 FTP
         /// </summary>
-        public static async void UpdateUploadFirstPack(ASBuildConfig.FTPConfig config)
+        public static async void UpdateUploadFirstPack(AssetBuildConfig.FTPConfig config)
         {
             if (await config.IsExistRemoteFirstPack())
             {
@@ -91,7 +91,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     上传首包 Google Cloud
         /// </summary>
-        public static async void UpdateUploadFirstPack(ASBuildConfig.GCloudConfig config)
+        public static async void UpdateUploadFirstPack(AssetBuildConfig.GCloudConfig config)
         {
             await config.UploadFirstPack(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
         }

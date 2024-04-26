@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using AIO.UEngine;
 using UnityEditor;
@@ -35,7 +34,7 @@ namespace AIO.UEditor
         /// </summary>
         public Action<bool> OnChangedFold;
 
-        public void OP_Open()
+        private void OP_Open()
         {
             GUI.FocusControl(null);
             AssetPageEditCollect.OpenCollectItem(Item);
@@ -57,19 +56,20 @@ namespace AIO.UEditor
                 return;
             }
 
-            if (isNull) GUI.enabled = false;
-            cell.x -= 20;
-            if (GELayout.Button(cell, GC_OPEN, GEStyle.IconButton)) OP_Open();
-
-            cell.x     = rect.x + 5;
-            cell.width = 24;
-            if (GUI.Button(cell, Item.Folded ? GC_FOLDOUT.image : GC_FOLDOUT_ON.image, GEStyle.IconButton))
+            using (new EditorGUI.DisabledGroupScope(isNull))
             {
-                Item.Folded = !Item.Folded;
-                OnChangedFold?.Invoke(Item.Folded);
+                cell.x -= 20;
+                if (GELayout.Button(cell, GC_OPEN, GEStyle.IconButton)) OP_Open();
+
+                cell.x     = rect.x + 5;
+                cell.width = 24;
+                if (GUI.Button(cell, Item.Folded ? GC_FOLDOUT.image : GC_FOLDOUT_ON.image, GEStyle.IconButton))
+                {
+                    Item.Folded = !Item.Folded;
+                    OnChangedFold?.Invoke(Item.Folded);
+                }
             }
 
-            if (isNull) GUI.enabled = true;
 
             cell.y     -= 2;
             cell.x     += cell.width;
@@ -82,18 +82,19 @@ namespace AIO.UEditor
 
             if (Item.Folded) return;
 
-            if (isNull) GUI.enabled = false;
-            cell.x            += cell.width;
-            cell.width        =  200;
-            Item.AddressIndex =  EditorGUI.IntPopup(cell, Item.AddressIndex, AssetCollectSetting.GT_AddressDisplays, null, GEStyle.PreDropDown);
+            using (new EditorGUI.DisabledGroupScope(isNull))
+            {
+                cell.x            += cell.width;
+                cell.width        =  200;
+                Item.AddressIndex =  EditorGUI.IntPopup(cell, Item.AddressIndex, AssetCollectSetting.GT_AddressDisplays, null, GEStyle.PreDropDown);
 
-            cell.x             += cell.width;
-            Item.RulePackIndex =  EditorGUI.IntPopup(cell, Item.RulePackIndex, AssetCollectSetting.GT_PackDisplays, null, GEStyle.PreDropDown);
+                cell.x             += cell.width;
+                Item.RulePackIndex =  EditorGUI.IntPopup(cell, Item.RulePackIndex, AssetCollectSetting.GT_PackDisplays, null, GEStyle.PreDropDown);
 
-            cell.x        += cell.width;
-            cell.width    =  50;
-            Item.LoadType =  (EAssetLoadType)EditorGUI.EnumPopup(cell, Item.LoadType, GEStyle.PreDropDown);
-            if (isNull) GUI.enabled = true;
+                cell.x        += cell.width;
+                cell.width    =  50;
+                Item.LoadType =  (EAssetLoadType)EditorGUI.EnumPopup(cell, Item.LoadType, GEStyle.PreDropDown);
+            }
         }
 
         private void OnDrawBody1(Rect rect)

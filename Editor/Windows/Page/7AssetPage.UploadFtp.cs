@@ -6,9 +6,9 @@ namespace AIO.UEditor
     {
         private TreeViewUploadFtp TreeView;
 
-        public AssetPageUploadFtp() { TreeView = TreeViewUploadFtp.Create(ASBuildConfig.GetOrCreate().FTPConfigs); }
+        public AssetPageUploadFtp() { TreeView = TreeViewUploadFtp.Create(AssetBuildConfig.GetOrCreate().FTPConfigs); }
 
-        public void   Dispose() { ASBuildConfig.GetOrCreate().FTPConfigs = TreeView.Data; }
+        public void   Dispose() { AssetBuildConfig.GetOrCreate().FTPConfigs = TreeView.Data; }
         public string Title     => "上传FTP         [Ctrl + Number8]";
         public int    Order     => 8;
 

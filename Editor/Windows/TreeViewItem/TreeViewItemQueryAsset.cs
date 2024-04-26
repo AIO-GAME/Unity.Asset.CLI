@@ -1,7 +1,6 @@
 ﻿#region
 
 using System;
-using AIO.UEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -15,24 +14,20 @@ namespace AIO.UEditor
         /// <summary>
         ///     界面内容 - 首包 取消
         /// </summary>
-        private GUIContent GC_FP_Cancel = GEContent.NewSettingCustom("Editor/Icon/Setting/cancel", "从首包列表删除");
+        private static readonly GUIContent GC_FP_Cancel = GEContent.NewSettingCustom("Editor/Icon/Setting/cancel", "从首包列表删除");
 
         /// <summary>
         ///     界面内容 - 首包 确定
         /// </summary>
-        private GUIContent GC_FP_OK = GEContent.NewSettingCustom("Editor/Icon/Setting/add-to-list", "添加进入首包列表");
+        private static readonly GUIContent GC_FP_OK = GEContent.NewSettingCustom("Editor/Icon/Setting/add-to-list", "添加进入首包列表");
 
-        public AssetDataInfo data { get; private set; }
+        public AssetDataInfo data;
 
         public TreeViewItemQueryAsset(
-            int                         id,
-            AssetDataInfo               dataInfo,
-            Func<string, bool>          isFirstPackageResource,
-            Action<AssetDataInfo, bool> onFirstPackageResource) : base(id, 1)
+            int           id,
+            AssetDataInfo dataInfo) : base(id, 1)
         {
-            data                   = dataInfo;
-            IsFirstPackageResource = isFirstPackageResource;
-            OnFirstPackageResource = onFirstPackageResource;
+            data = dataInfo;
         }
 
         #region IGraphDraw
@@ -40,22 +35,41 @@ namespace AIO.UEditor
         /// <summary>
         ///    是否在首包中
         /// </summary>
-        private Func<string, bool> IsFirstPackageResource { get; set; }
+        public bool IsFirstPackageResource { get; set; }
 
         /// <summary>
         ///   添加或删除首包资源
         /// </summary>
-        private Action<AssetDataInfo, bool> OnFirstPackageResource { get; set; }
+        public Action<AssetDataInfo, bool> OnFirstPackageResource { get; set; }
 
-        public Action<int> Refresh;
+        public Action<int> Refresh { get; set; }
 
         public bool  AllowChangeExpandedState             => false;
         public bool  AllowRename                          => false;
         public float GetHeight()                          => 22;
         public Rect  GetRenameRect(Rect rowRect, int row) => rowRect;
 
+        bool ITVItemDraw.MatchSearch(string search)
+        {
+            if (string.IsNullOrEmpty(search)) return true;
+            return data.Address.Contains(search)
+                || data.AssetPath.Contains(search)
+                || data.Type.Contains(search);
+        }
+
         void ITVItemDraw.OnDraw(Rect cell, int col, ref RowGUIArgs args)
         {
+            if (string.IsNullOrEmpty(data.AssetPath))
+            {
+                if (col == 0)
+                {
+                    EditorGUI.DrawRect(args.rowRect, args.row % 2 == 0 ? TreeViewBasics.ColorAlternatingA : TreeViewBasics.ColorAlternatingB);
+                    if (args.selected) GUI.Box(args.rowRect, string.Empty, GEStyle.SelectionRect);
+                }
+
+                return;
+            }
+
             var rect = new Rect(cell.x + 10, cell.y, cell.width - 10, cell.height);
             switch (col)
             {
@@ -93,7 +107,7 @@ namespace AIO.UEditor
                     break;
                 case 5: // 是否在首包中
                     rect.x = cell.x + cell.width / 5 - 1;
-                    if (IsFirstPackageResource?.Invoke(data.GUID) ?? false)
+                    if (IsFirstPackageResource)
                     {
                         if (GUI.Button(rect, GC_FP_Cancel, GEStyle.IconButton))
                         {
@@ -116,14 +130,6 @@ namespace AIO.UEditor
 
                     break;
             }
-        }
-
-        bool ITVItemDraw.MatchSearch(string search)
-        {
-            if (string.IsNullOrEmpty(search)) return true;
-            return data.Address.Contains(search)
-                || data.AssetPath.Contains(search)
-                || data.Type.Contains(search);
         }
 
         #endregion

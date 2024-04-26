@@ -9,195 +9,6 @@ using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
-    public static class AssetCollectItemEx
-    {
-        /// <summary>
-        ///     获取收集器显示名称
-        /// </summary>
-        public static string[] GetDisPlayNames(this IEnumerable<AssetCollectItem> collectors)
-        {
-            return (from item in collectors
-                    where item.Type == EAssetCollectItemType.MainAssetCollector
-                    where !string.IsNullOrEmpty(item.CollectPath)
-                    select item.CollectPath).
-                   Distinct().
-                   ToArray();
-        }
-    }
-
-    partial class AssetCollectItem
-    {
-        /// <summary>
-        ///    是否启用
-        /// </summary>
-        public bool Enable = true;
-
-        /// <summary>
-        ///     是否折叠 True:折叠 False:展开
-        /// </summary>
-        public bool Folded;
-
-        /// <summary>
-        ///     收集器类型
-        /// </summary>
-        public EAssetCollectItemType Type;
-
-        /// <summary>
-        ///     资源标签 使用;分割
-        /// </summary>
-        public string Tags;
-
-        /// <summary>
-        ///     加载类型
-        /// </summary>
-        public EAssetLoadType LoadType = EAssetLoadType.Always;
-
-        /// <summary>
-        ///     收集器名称
-        /// </summary>
-        public string FileName;
-
-        /// <summary>
-        ///     资源GUID
-        /// </summary>
-        public string GUID;
-
-        /// <summary>
-        ///     收集器路径
-        /// </summary>
-        public string CollectPath;
-
-        /// <summary>
-        ///     自定义数据
-        /// </summary>
-        public string UserData;
-
-        /// <summary>
-        ///     定位规则
-        /// </summary>
-        [FormerlySerializedAs("Address")]
-        public int AddressIndex;
-
-        /// <summary>
-        ///     定位格式
-        /// </summary>
-        public EAssetLocationFormat LocationFormat;
-
-        /// <summary>
-        ///     是否有后缀
-        /// </summary>
-        public bool HasExtension;
-
-        /// <summary>
-        ///     打包规则
-        /// </summary>
-        public int RulePackIndex = 1;
-
-        /// <summary>
-        ///     资源包名称
-        /// </summary>
-        public string PackageName { get; internal set; }
-
-        /// <summary>
-        ///     资源组名称
-        /// </summary>
-        public string GroupName { get; internal set; }
-
-        #region Collect
-
-        /// <summary>
-        ///     收集规则(获取收集规则下标)
-        /// </summary>
-        public int RuleCollectIndex;
-
-        /// <summary>
-        ///     开启自定义收集规则
-        /// </summary>
-        public bool RuleUseCollectCustom;
-
-        /// <summary>
-        ///     收集规则 自定义
-        /// </summary>
-        public string RuleCollect;
-
-        #endregion
-
-        #region Filter
-
-        /// <summary>
-        ///     过滤规则(获取收集规则下标)
-        /// </summary>
-        public int RuleFilterIndex;
-
-        /// <summary>
-        ///     开启自定义过滤规则
-        /// </summary>
-        public bool RuleUseFilterCustom;
-
-        /// <summary>
-        ///     过滤规则 自定义
-        /// </summary>
-        public string RuleFilter;
-
-        #endregion
-    }
-
-    partial class AssetCollectItem
-    {
-        public bool IsValidate
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(CollectPath)) return false;
-                if (CollectPath.Contains("/Resources/") || CollectPath.EndsWith("Resources"))
-                {
-                    AssetSystem.LogWarningFormat("Resources 目录下的资源不允许打包 !!! 已自动过滤 !!! -> {0}", CollectPath);
-                    return false;
-                }
-
-                if (!AHelper.IO.Exists(FullPath)) return false;
-                return true;
-            }
-        }
-
-        /// <summary>
-        ///     收集器全路径
-        /// </summary>
-        public string FullPath => System.IO.Path.Combine(EHelper.Path.Project, CollectPath);
-
-        /// <summary>
-        ///     收集器路径
-        /// </summary>
-        public Object Path
-        {
-            get => _Path;
-            set
-            {
-                _Path = value;
-                UpdateData();
-            }
-        }
-
-        /// <summary>
-        ///     是否允许多线程收集
-        /// </summary>
-        public bool AllowThread => AssetCollectSetting.MapAddress?.GetValue(AddressIndex)?.AllowThread ?? false;
-
-        /// <summary>
-        ///     获取收集器标签
-        /// </summary>
-        public string[] AllTags
-        {
-            get
-            {
-                if (Type != EAssetCollectItemType.MainAssetCollector) return Array.Empty<string>();
-                if (string.IsNullOrEmpty(Tags)) return Array.Empty<string>();
-                if (!AHelper.IO.Exists(CollectPath)) return Array.Empty<string>();
-                return Tags.Split(';', ' ', ',');
-            }
-        }
-    }
-
     /// <summary>
     ///     收集器列表
     /// </summary>
@@ -225,6 +36,8 @@ namespace AIO.UEditor
         private Dictionary<string, AssetDataInfo> AssetDataInfos { get; set; } =
             new Dictionary<string, AssetDataInfo>();
 
+        public IReadOnlyDictionary<string, AssetDataInfo> DataInfos => AssetDataInfos;
+        
         /// <summary>
         ///     获取收集规则
         /// </summary>
@@ -243,7 +56,7 @@ namespace AIO.UEditor
             RuleFilters?.Clear();
             RuleCollects?.Clear();
             UpdateData();
-            if (_Path == null) AssetSystem.LogWarningFormat("收集器路径为空 !!! -> {0}", CollectPath);
+            if (!_Path) AssetSystem.LogWarningFormat("收集器路径为空 !!! -> {0}", CollectPath);
         }
 
         public bool Equals(AssetCollectItem x, AssetCollectItem y)
@@ -370,15 +183,9 @@ namespace AIO.UEditor
                 : string.Empty;
         }
 
-        public bool AssetExist(Object asset)
-        {
-            return AssetExist(AssetDatabase.GetAssetPath(asset));
-        }
+        public bool AssetExist(Object asset) { return AssetExist(AssetDatabase.GetAssetPath(asset)); }
 
-        public bool AssetExistByGUID(string guid)
-        {
-            return AssetExist(AssetDatabase.GUIDToAssetPath(guid));
-        }
+        public bool AssetExistByGUID(string guid) { return AssetExist(AssetDatabase.GUIDToAssetPath(guid)); }
 
         /// <summary>
         ///     是否存在指定资源
@@ -403,7 +210,7 @@ namespace AIO.UEditor
 
         public string GetAssetAddress(AssetRuleData data, bool pathToLower, bool hasExtension)
         {
-            var rule = AssetCollectSetting.MapAddress.GetValue(AddressIndex);
+            var rule    = AssetCollectSetting.MapAddress.GetValue(AddressIndex);
             var address = rule.GetAssetAddress(data);
             if (string.IsNullOrEmpty(address)) return string.Empty;
 
@@ -507,9 +314,10 @@ namespace AIO.UEditor
                     if (fileInfo.FullName.EndsWith(".meta")) continue;
                     data.Extension = fileInfo.Extension.TrimStart('.', ' ').ToLower();
                     data.AssetPath = fileInfo.FullName.Substring(
-                        len,
-                        fileInfo.FullName.Length - len - data.Extension.Length - 1
-                    ).Replace("\\", "/");
+                                                                 len,
+                                                                 fileInfo.FullName.Length - len - data.Extension.Length - 1
+                                                                )
+                                             .Replace("\\", "/");
                     if (!IsCollectAsset(data)) continue;
                     info.AssetPath = string.Concat(data.AssetPath, '.', data.Extension);
                     info.Extension = data.Extension;
@@ -548,20 +356,19 @@ namespace AIO.UEditor
         }
 
         public void CollectAssetAsync(
-            string                                    package,
-            string                                    group,
+            AssetCollectPackage                       package,
+            AssetCollectGroup                         group,
+            bool                                      toLower,
+            bool                                      hasExtension,
             Action<Dictionary<string, AssetDataInfo>> cb = null)
         {
             AssetDataInfos.Clear();
             if (!IsValidate) return;
             if (Type != EAssetCollectItemType.MainAssetCollector) return;
 
-            PackageName = package;
-            GroupName   = group;
+            PackageName = package.Name;
+            GroupName   = group.Name;
 
-            var tags = AssetCollectRoot.GetOrCreate().GetTags(PackageName, GroupName, CollectPath);
-            var toLower = ASConfig.GetOrCreate().LoadPathToLower;
-            var hasExtension = ASConfig.GetOrCreate().HasExtension;
             UpdateCollect();
             UpdateFilter();
 
@@ -572,9 +379,28 @@ namespace AIO.UEditor
 
             void Action()
             {
+                var tags = group.Tags;
                 CollectAsset(tags, toLower, hasExtension);
                 cb?.Invoke(AssetDataInfos);
             }
+        }
+
+        public void CollectAssetAsync(
+            AssetCollectPackage package,
+            AssetCollectGroup   group,
+            bool                toLower,
+            bool                hasExtension)
+        {
+            AssetDataInfos.Clear();
+            if (!IsValidate) return;
+            if (Type != EAssetCollectItemType.MainAssetCollector) return;
+
+            PackageName = package.Name;
+            GroupName   = group.Name;
+
+            UpdateCollect();
+            UpdateFilter();
+            CollectAsset(group.Tags, toLower, hasExtension);
         }
 
         public void UpdateData()

@@ -10,13 +10,13 @@ namespace AIO.UEditor
 {
     public class TreeViewItemBuildSetting : TreeViewItem, ITVItemDraw
     {
-        private ASBuildConfig    BuildConfig;
+        private AssetBuildConfig    BuildConfig;
         private AssetCollectRoot Data;
         private string[]         PackageNames;
         private string[]         Tags;
         private int              CurrentTagIndex;
 
-        public TreeViewItemBuildSetting(int id, string displayName, ASBuildConfig config) : base(id, 1, displayName)
+        public TreeViewItemBuildSetting(int id, string displayName, AssetBuildConfig config) : base(id, 1, displayName)
         {
             BuildConfig     = config;
             Data            = AssetCollectRoot.GetOrCreate();

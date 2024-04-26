@@ -7,7 +7,7 @@ namespace AIO.UEditor
 {
     public class TreeViewUploadGoogleCloud : TreeViewRowSingle
     {
-        public static TreeViewUploadGoogleCloud Create(ASBuildConfig.GCloudConfig[] list)
+        public static TreeViewUploadGoogleCloud Create(AssetBuildConfig.GCloudConfig[] list)
         {
             return new TreeViewUploadGoogleCloud(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
             {
@@ -15,13 +15,13 @@ namespace AIO.UEditor
             })), list);
         }
 
-        private TreeViewUploadGoogleCloud(TreeViewState state, MultiColumnHeader header, ASBuildConfig.GCloudConfig[] list) : base(state, header)
+        private TreeViewUploadGoogleCloud(TreeViewState state, MultiColumnHeader header, AssetBuildConfig.GCloudConfig[] list) : base(state, header)
         {
             showAlternatingRowBackgrounds = false;
             Data                          = list;
         }
 
-        public ASBuildConfig.GCloudConfig[] Data;
+        public AssetBuildConfig.GCloudConfig[] Data;
 
         protected override void OnBuildRows(TreeViewItem root)
         {
@@ -46,7 +46,7 @@ namespace AIO.UEditor
         {
             menu.AddItem(new GUIContent("新增配置"), false, () =>
             {
-                Data = Data.Add(new ASBuildConfig.GCloudConfig());
+                Data = Data.Add(new AssetBuildConfig.GCloudConfig());
                 Reload();
             });
         }
@@ -62,11 +62,12 @@ namespace AIO.UEditor
             });
         }
 
-        protected override void OnSorting(int col, bool ascending)
+        protected override bool OnSorting(int col, bool ascending)
         {
             Data = ascending
                 ? Data.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture))
                 : Data.Sort((a, b) => string.Compare(b.Name, a.Name, StringComparison.CurrentCulture));
+            return true;
         }
     }
 }

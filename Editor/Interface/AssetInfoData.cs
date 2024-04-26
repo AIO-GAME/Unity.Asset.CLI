@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 
@@ -9,6 +10,137 @@ namespace AIO
     /// </summary>
     public struct AssetDataInfo
     {
+        #region IComparer
+
+        public static readonly IComparer<AssetDataInfo> ComparerSize    = new XComparerSize();
+        public static readonly IComparer<AssetDataInfo> ComparerSizeAsc = new XComparerSize { Ascending = true };
+
+        private class XComparerSize : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+            public int  Compare(AssetDataInfo x, AssetDataInfo y) => Ascending ? x.Size.CompareTo(y.Size) : y.Size.CompareTo(x.Size);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerTime    = new XComparerTime();
+        public static readonly IComparer<AssetDataInfo> ComparerTimeAsc = new XComparerTime { Ascending = true };
+
+        private class XComparerTime : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) =>
+                Ascending ? x.LastWriteTime.CompareTo(y.LastWriteTime) : y.LastWriteTime.CompareTo(x.LastWriteTime);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerName    = new XComparerName();
+        public static readonly IComparer<AssetDataInfo> ComparerNameAsc = new XComparerName { Ascending = true };
+
+        private class XComparerName : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
+                ? string.Compare(x.Name, y.Name, StringComparison.CurrentCulture)
+                : string.Compare(y.Name, x.Name, StringComparison.CurrentCulture);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerType    = new XComparerType();
+        public static readonly IComparer<AssetDataInfo> ComparerTypeAsc = new XComparerType { Ascending = true };
+
+        private class XComparerType : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
+                ? string.Compare(x.Type, y.Type, StringComparison.CurrentCulture)
+                : string.Compare(y.Type, x.Type, StringComparison.CurrentCulture);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerGUID    = new XComparerGUID();
+        public static readonly IComparer<AssetDataInfo> ComparerGUIDAsc = new XComparerGUID { Ascending = true };
+
+        private class XComparerGUID : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
+                ? string.Compare(x.GUID, y.GUID, StringComparison.CurrentCulture)
+                : string.Compare(y.GUID, x.GUID, StringComparison.CurrentCulture);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerAddress    = new XComparerAddress();
+        public static readonly IComparer<AssetDataInfo> ComparerAddressAsc = new XComparerAddress { Ascending = true };
+
+        private class XComparerAddress : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
+                ? string.Compare(x.Address, y.Address, StringComparison.CurrentCulture)
+                : string.Compare(y.Address, x.Address, StringComparison.CurrentCulture);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerExtension    = new XComparerExtension();
+        public static readonly IComparer<AssetDataInfo> ComparerExtensionAsc = new XComparerExtension { Ascending = true };
+
+        private class XComparerExtension : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
+                ? string.Compare(x.Extension, y.Extension, StringComparison.CurrentCulture)
+                : string.Compare(y.Extension, x.Extension, StringComparison.CurrentCulture);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerAssetPath    = new XComparerAssetPath();
+        public static readonly IComparer<AssetDataInfo> ComparerAssetPathAsc = new XComparerAssetPath { Ascending = true };
+
+        private class XComparerAssetPath : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
+                ? string.Compare(x.AssetPath, y.AssetPath, StringComparison.CurrentCulture)
+                : string.Compare(y.AssetPath, x.AssetPath, StringComparison.CurrentCulture);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerCollectPath    = new XComparerCollectPath();
+        public static readonly IComparer<AssetDataInfo> ComparerCollectPathAsc = new XComparerCollectPath { Ascending = true };
+
+        private class XComparerCollectPath : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
+                ? string.Compare(x.CollectPath, y.CollectPath, StringComparison.CurrentCulture)
+                : string.Compare(y.CollectPath, x.CollectPath, StringComparison.CurrentCulture);
+        }
+
+        public static readonly IComparer<AssetDataInfo> ComparerTags    = new XComparerTags();
+        public static readonly IComparer<AssetDataInfo> ComparerTagsAsc = new XComparerTags { Ascending = true };
+
+        private class XComparerTags : IComparer<AssetDataInfo>
+        {
+            public bool Ascending;
+
+            public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
+                ? string.Compare(x.Tags, y.Tags, StringComparison.CurrentCulture)
+                : string.Compare(y.Tags, x.Tags, StringComparison.CurrentCulture);
+        }
+
+        #endregion
+
+        public static AssetDataInfo Empty = new AssetDataInfo
+        {
+            AssetPath   = string.Empty,
+            Address     = string.Empty,
+            Extension   = string.Empty,
+            Tags        = string.Empty,
+            CollectPath = string.Empty,
+            Group       = string.Empty,
+            Package     = string.Empty
+        };
+
         /// <summary>
         ///     Asset Path
         /// </summary>

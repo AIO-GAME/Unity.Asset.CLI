@@ -25,9 +25,9 @@ namespace AIO.UEditor
             showAlternatingRowBackgrounds = true;
         }
 
-        protected override void OnSorting(int col, bool ascending)
+        protected override bool OnSorting(int col, bool ascending)
         {
-            if (data is null) return;
+            if (data is null) return false;
             switch (col)
             {
                 case 0:
@@ -38,7 +38,7 @@ namespace AIO.UEditor
                     break;
             }
 
-            Reload();
+            return true;
         }
 
         protected override void OnBuildRows(TreeViewItem root)

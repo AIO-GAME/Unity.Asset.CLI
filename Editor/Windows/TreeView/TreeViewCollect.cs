@@ -36,13 +36,14 @@ namespace AIO.UEditor
 
         protected override void OnInitialize() { Config = AssetCollectRoot.GetOrCreate(); }
 
-        protected override void OnSorting(int columnIndex, bool ascending)
+        protected override bool OnSorting(int columnIndex, bool ascending)
         {
             var currentCollect = Config.CurrentCollect;
             Config.CurrentGroup.Sort(ascending);
             var index = Config.CurrentGroup.IndexOf(currentCollect);
             Config.CurrentCollectIndex = index;
             SetSelection(new[] { index });
+            return true;
         }
 
         protected override void OnDraw(Rect rect)
@@ -62,7 +63,7 @@ namespace AIO.UEditor
             {
                 root.AddChild(new TreeViewItemCollect(idxG, Config.CurrentGroup[idxG])
                 {
-                    OnChangedFold = fold => Reload()
+                    OnChangedFold = _ => Reload()
                 });
             }
         }

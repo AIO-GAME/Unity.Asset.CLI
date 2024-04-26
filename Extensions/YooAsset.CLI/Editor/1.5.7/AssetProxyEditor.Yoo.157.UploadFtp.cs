@@ -10,7 +10,7 @@ namespace AIO.UEditor.CLI
 {
     internal partial class AssetProxyEditor_Yoo_157
     {
-        private static async Task<bool> UploadFtpAsync(IEnumerable<AsUploadFtpParameter> parameters)
+        private static async Task<bool> UploadFtpAsync(IEnumerable<AssetUploadFtpParameter> parameters)
         {
             foreach (var parameter in parameters)
                 if (!await UploadFtpAsync(parameter))
@@ -22,7 +22,7 @@ namespace AIO.UEditor.CLI
         /// <summary>
         ///     上传到Ftp
         /// </summary>
-        private static async Task<bool> UploadFtpAsync(AsUploadFtpParameter parameter)
+        private static async Task<bool> UploadFtpAsync(AssetUploadFtpParameter parameter)
         {
             var localFull = parameter.RootPath;
             var handle = AHandle.FTP.Create(parameter.Server, parameter.Port, parameter.User, parameter.Pass,

@@ -7,8 +7,8 @@ namespace AIO.UEditor
     /// <summary>
     ///     ASBuildConfig
     /// </summary>
-    [CustomEditor(typeof(ASBuildConfig))]
-    public class ASBuildConfigEditor : AFInspector<ASBuildConfig>
+    [CustomEditor(typeof(AssetBuildConfig))]
+    public class ASBuildConfigEditor : AFInspector<AssetBuildConfig>
     {
         protected override void OnGUI()
         {
@@ -80,7 +80,7 @@ namespace AIO.UEditor
                 EditorGUILayout.LabelField("加密模式", GTOptions.Width(125));
                 using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
                 {
-                    Target.EncyptionClassName = EditorGUILayout.TextField(Target.EncyptionClassName);
+                    Target.EncryptionClassName = EditorGUILayout.TextField(Target.EncryptionClassName);
                 }
             }
 

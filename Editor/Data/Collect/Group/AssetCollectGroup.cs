@@ -1,40 +1,33 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
-    [Serializable]
+    [Serializable, Description("资源收集组")]
     public sealed partial class AssetCollectGroup
     {
-        /// <summary>
-        ///    是否启用
-        /// </summary>
+        [InspectorName("是否启用")]
         public bool Enable = true;
 
-        /// <summary>
-        ///     组名
-        /// </summary>
+        [InspectorName("组名称")]
         public string Name;
 
-        /// <summary>
-        ///     组描述
-        /// </summary>
+        [InspectorName("组描述")]
         public string Description;
 
-        /// <summary>
-        ///     资源标签 使用;分割
-        /// </summary>
+        /// <remarks>使用;分割</remarks>
         [FormerlySerializedAs("Tags")]
+        [InspectorName("资源标签")]
         public string Tag;
 
-        /// <summary>
-        ///     资源收集配置
-        /// </summary>
+        [InspectorName("资源收集器")]
         public AssetCollectItem[] Collectors;
 
         /// <summary>

@@ -22,9 +22,9 @@ namespace AIO.UEditor
         private readonly GUIContent GC_MENU_RENAME_DESC = new GUIContent("修改 : 描述");
         private readonly GUIContent GC_MENU_RENAME_NAME = new GUIContent("修改 : 包名");
         private readonly GUIContent GC_MENU_SET_MAIN    = new GUIContent("设为 : 默认包");
-        private readonly GUIContent GC_MENU_SET_PACKAGE = new GUIContent("设为 : 附加包");
 
-        private int              RenameIndex { get; set; } = -1;
+        private int RenameIndex { get; set; } = -1;
+
         private AssetCollectRoot Config;
         private TreeViewPackage(TreeViewState state, MultiColumnHeader header) : base(state, header) { }
 
@@ -36,15 +36,21 @@ namespace AIO.UEditor
             })));
         }
 
-        protected override void OnInitialize() { Config = AssetCollectRoot.GetOrCreate(); }
+        protected override void OnInitialize()
+        {
+            Config = AssetCollectRoot.GetOrCreate();
+            foreach (var group in Config.Where(package => package != null).SelectMany(package => package))
+                group?.Refresh();
+        }
 
-        protected override void OnSorting(int columnIndex, bool ascending)
+        protected override bool OnSorting(int columnIndex, bool ascending)
         {
             var temp = Config.CurrentPackage;
             Config.Sort(ascending);
             var index = Config.IndexOf(temp);
             Config.CurrentPackageIndex = index;
             SetSelection(new[] { index });
+            return true;
         }
 
         protected override void OnSelection(int id) { Config.CurrentPackageIndex = id; }

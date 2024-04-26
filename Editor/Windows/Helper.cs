@@ -39,7 +39,7 @@ namespace AIO.UEditor
             {
                 case AssetCollectRoot _:
                 case ASConfig _:
-                case ASBuildConfig _:
+                case AssetBuildConfig _:
                 case ConsoleWindowConfig _:
 #if SUPPORT_YOOASSET
                 case AssetBundleCollectorSetting _:

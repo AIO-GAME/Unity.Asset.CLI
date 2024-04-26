@@ -14,7 +14,7 @@ namespace AIO.UEditor.CLI
         /// <summary>
         ///     上传到GCloud 对比清单文件上传
         /// </summary>
-        private static async Task<bool> UploadGCloudExist(AsUploadGCloudParameter parameter)
+        private static async Task<bool> UploadGCloudExist(AssetUploadGCloudParameter parameter)
         {
             var location = parameter.LocalFullPath;
             var remotePath = parameter.RemoteRelative;
@@ -119,7 +119,7 @@ namespace AIO.UEditor.CLI
             return true;
         }
 
-        private static async Task<bool> UploadGCloudAsync(IEnumerable<AsUploadGCloudParameter> parameters)
+        private static async Task<bool> UploadGCloudAsync(IEnumerable<AssetUploadGCloudParameter> parameters)
         {
             foreach (var parameter in parameters)
                 if (!await UploadGCloudAsync(parameter))
@@ -131,7 +131,7 @@ namespace AIO.UEditor.CLI
         /// <summary>
         ///     上传到GCloud
         /// </summary>
-        private static async Task<bool> UploadGCloudAsync(AsUploadGCloudParameter parameter)
+        private static async Task<bool> UploadGCloudAsync(AssetUploadGCloudParameter parameter)
         {
             var localFull = parameter.LocalFullPath;
             var remotePath = parameter.RemoteRelative;

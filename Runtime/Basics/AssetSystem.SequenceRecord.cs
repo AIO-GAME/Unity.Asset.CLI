@@ -67,10 +67,7 @@ namespace AIO
             ///     设置资源包名
             /// </summary>
             /// <param name="packageName">资源包名</param>
-            public void SetPackageName(string packageName)
-            {
-                PackageName = packageName;
-            }
+            public void SetPackageName(string packageName) { PackageName = packageName; }
 
             /// <summary>
             ///     资源包寻址路径
@@ -86,10 +83,7 @@ namespace AIO
             ///     设置寻址路径
             /// </summary>
             /// <param name="guid">资源GUID</param>
-            public void SetGUID(string guid)
-            {
-                _GUID = guid;
-            }
+            public void SetGUID(string guid) { _GUID = guid; }
 
             /// <summary>
             ///     资源包寻址路径
@@ -119,9 +113,9 @@ namespace AIO
             /// <summary>
             ///     是否为空
             /// </summary>
-            public bool IsNull => string.IsNullOrEmpty(AssetPath) ||
-                                  string.IsNullOrEmpty(GUID);
-
+            public bool IsNull =>
+                string.IsNullOrEmpty(AssetPath) ||
+                string.IsNullOrEmpty(GUID);
 
             public override string ToString()
             {
@@ -138,12 +132,14 @@ namespace AIO
         {
             private const string FILE_NAME = "ASSETRECORD.json";
 
-            private List<SequenceRecord> Records;
+            private List<SequenceRecord>               Records;
+            private Dictionary<string, SequenceRecord> RecordCacheGuid;
 
             public SequenceRecordQueue(bool enable = false)
             {
-                Enable  = enable;
-                Records = new List<SequenceRecord>();
+                Enable          = enable;
+                Records         = new List<SequenceRecord>(8);
+                RecordCacheGuid = new Dictionary<string, SequenceRecord>(8);
             }
 
             /// <summary>
@@ -164,31 +160,25 @@ namespace AIO
 
             public void Add(SequenceRecord record)
             {
-                if (!Enable) return;
-                if (record.IsNull) return;
-                if (ContainsGUID(record.GUID)) return;
+                if (!Enable
+                 || record.IsNull
+                 || ContainsGUID(record.GUID)
+                   ) return;
+                RecordCacheGuid[record.GUID] = record;
                 Records.Add(record);
             }
 
             public void Clear()
             {
                 Records.Clear();
+                RecordCacheGuid.Clear();
             }
 
-            public bool Contains(SequenceRecord item)
-            {
-                return Records.Contains(item);
-            }
+            public bool Contains(SequenceRecord item) => RecordCacheGuid.ContainsKey(item.GUID);
 
-            public void CopyTo(SequenceRecord[] array, int arrayIndex)
-            {
-                Records.CopyTo(array, arrayIndex);
-            }
+            public void CopyTo(SequenceRecord[] array, int arrayIndex) { Records.CopyTo(array, arrayIndex); }
 
-            public bool Remove(SequenceRecord item)
-            {
-                return Records.Remove(item);
-            }
+            public bool Remove(SequenceRecord item) => RecordCacheGuid.Remove(item.GUID) && Records.Remove(item);
 
             public int  Count      => Records?.Count ?? 0;
             public bool IsReadOnly => false;
@@ -199,10 +189,7 @@ namespace AIO
                 return Records.GetEnumerator();
             }
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
 
             #endregion
 
@@ -223,25 +210,25 @@ namespace AIO
             /// </summary>
             public void UpdateLocal()
             {
-                Records = new List<SequenceRecord>();
+                Records.Clear();
+                RecordCacheGuid.Clear();
                 if (!File.Exists(LOCAL_PATH)) return;
-                var temp = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
-                if (temp == null) return;
-                if (temp.Count <= 0) return;
-                var dic = new Dictionary<string, SequenceRecord>();
-                foreach (var item in temp.Where(item => !string.IsNullOrEmpty(item.GUID))) dic[item.GUID] = item;
-
-                Records.AddRange(dic.Values);
+                var records = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
+                if (records == null || records.Count <= 0) return;
+                foreach (var record in
+                         from record in records
+                         where !string.IsNullOrEmpty(record.GUID)
+                         where !RecordCacheGuid.ContainsKey(record.GUID)
+                         select record)
+                    RecordCacheGuid[record.GUID] = record;
+                Records.AddRange(RecordCacheGuid.Values);
             }
 
             /// <summary>
             ///     是否存在本地序列记录
             /// </summary>
             /// <returns>Ture:存在</returns>
-            public bool ExistsLocal()
-            {
-                return File.Exists(LOCAL_PATH);
-            }
+            public bool ExistsLocal() { return File.Exists(LOCAL_PATH); }
 
             /// <summary>
             ///     下载序列记录
@@ -272,7 +259,7 @@ namespace AIO
             public void Save()
             {
                 if (Records is null) return;
-                var temp = new Dictionary<string, SequenceRecord>();
+                var temp                                                                                  = new Dictionary<string, SequenceRecord>();
                 foreach (var item in Records.Where(item => !temp.ContainsKey(item.GUID))) temp[item.GUID] = item;
                 Records.Clear();
                 Records.AddRange(temp.Values);
@@ -280,15 +267,9 @@ namespace AIO
                 AHelper.IO.WriteJsonUTF8(LOCAL_PATH, Records);
             }
 
-            public bool ContainsGUID(string guid)
-            {
-                return Records.Exists(record => record.GUID == guid);
-            }
+            public bool ContainsGUID(string guid) { return RecordCacheGuid.ContainsKey(guid); }
 
-            public bool ContainsAssetPath(string assetPath)
-            {
-                return Records.Exists(record => record.AssetPath == assetPath);
-            }
+            public bool ContainsAssetPath(string assetPath) { return Records.Exists(record => record.AssetPath == assetPath); }
 
             public bool ContainsAssetPath(string assetPath, string packageName)
             {
@@ -297,20 +278,15 @@ namespace AIO
 
             public bool RemoveGUID(string guid)
             {
-                return Records.RemoveAll(record => record.GUID == guid) > 0;
+                Records.RemoveAll(record => record.GUID == guid);
+                return RecordCacheGuid.Remove(guid);
             }
 
-            public bool RemoveAssetPath(string assetPath)
-            {
-                return Records.RemoveAll(record => record.AssetPath == assetPath) > 0;
-            }
+            public bool RemoveAssetPath(string assetPath) { return Records.RemoveAll(record => record.AssetPath == assetPath) > 0; }
 
             #region static
 
-            public static string GET_REMOTE_PATH(ASConfig config)
-            {
-                return GET_REMOTE_PATH(config.URL);
-            }
+            public static string GET_REMOTE_PATH(ASConfig config) { return GET_REMOTE_PATH(config.URL); }
 
             public static string GET_REMOTE_PATH(string URL)
             {

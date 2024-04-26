@@ -6,9 +6,9 @@ namespace AIO.UEditor
     {
         private TreeViewUploadGoogleCloud TreeViewUpload;
 
-        public AssetPageUploadGoogleCloud() { TreeViewUpload = TreeViewUploadGoogleCloud.Create(ASBuildConfig.GetOrCreate().GCloudConfigs); }
+        public AssetPageUploadGoogleCloud() { TreeViewUpload = TreeViewUploadGoogleCloud.Create(AssetBuildConfig.GetOrCreate().GCloudConfigs); }
 
-        public void   Dispose() { ASBuildConfig.GetOrCreate().GCloudConfigs = TreeViewUpload.Data; }
+        public void   Dispose() { AssetBuildConfig.GetOrCreate().GCloudConfigs = TreeViewUpload.Data; }
         public string Title     => "上传谷歌云  [Ctrl + Number7]";
         public int    Order     => 7;
 

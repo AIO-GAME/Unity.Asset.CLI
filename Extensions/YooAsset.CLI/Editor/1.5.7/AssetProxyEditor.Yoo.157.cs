@@ -72,7 +72,7 @@ namespace AIO.UEditor.CLI
         ///     Tips:
         ///     需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        public Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters)
+        public Task<bool> UploadGCloud(ICollection<AssetUploadGCloudParameter> parameters)
         {
             return UploadGCloudAsync(parameters);
         }
@@ -91,7 +91,7 @@ namespace AIO.UEditor.CLI
         /// <summary>
         ///     上传到Ftp
         /// </summary>
-        public async Task<bool> UploadFtp(ICollection<AsUploadFtpParameter> parameters)
+        public async Task<bool> UploadFtp(ICollection<AssetUploadFtpParameter> parameters)
         {
             return await UploadFtpAsync(parameters);
         }
@@ -101,7 +101,7 @@ namespace AIO.UEditor.CLI
         [MenuItem("YooAsset/Create Config")]
         public static void CreateConfig()
         {
-            CreateConfig157(Path.Combine(EHelper.Path.Project, "Bundles"), ASBuildConfig.GetOrCreate().MergeToLatest);
+            CreateConfig157(Path.Combine(EHelper.Path.Project, "Bundles"), AssetBuildConfig.GetOrCreate().MergeToLatest);
         }
 
         /// <summary>

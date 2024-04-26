@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace AIO.UEditor
 {
-    public class ASUploadParameter
+    public class AssetUploadParameter
     {
         /// <summary>
         ///     上传平台

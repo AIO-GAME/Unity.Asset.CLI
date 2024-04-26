@@ -108,13 +108,14 @@ namespace AIO.UEditor
             RenameIndex = -1;
         }
 
-        protected override void OnSorting(int columnIndex, bool ascending)
+        protected override bool OnSorting(int columnIndex, bool ascending)
         {
             var tempGroup = Config.CurrentGroup;
             Config.CurrentPackage.Sort(ascending);
             var index = Config.CurrentPackage.IndexOf(tempGroup);
             Config.CurrentGroupIndex = index;
             SetSelection(new[] { index });
+            return true;
         }
 
         protected override void OnBuildRows(TreeViewItem root)

@@ -4,7 +4,7 @@ namespace AIO.UEditor
 {
     public class TreeViewBuildSetting : TreeViewRowSingle
     {
-        private ASBuildConfig config;
+        private AssetBuildConfig config;
 
         public TreeViewBuildSetting(TreeViewState state, MultiColumnHeader header) : base(state, header)
         {
@@ -13,7 +13,7 @@ namespace AIO.UEditor
             MainColumnIndex               = 1;
         }
 
-        protected override void OnInitialize() { config = ASBuildConfig.GetOrCreate(); }
+        protected override void OnInitialize() { config = AssetBuildConfig.GetOrCreate(); }
 
         public static TreeViewBuildSetting Create(float width = 100, float min = 80, float max = 200)
         {

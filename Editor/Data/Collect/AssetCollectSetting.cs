@@ -11,13 +11,17 @@ namespace AIO.UEditor
 {
     public static class AssetCollectSetting
     {
-        private static DisplayList<IAssetRuleAddress> _MapAddress;
-        private static DisplayList<IAssetRuleFilter>  _MapCollectFilter;
-        private static DisplayList<IAssetRulePack>    _MapPacks;
+        private static DisplayList<IAssetRuleAddress> _MapAddress       { get; set; }
+        private static DisplayList<IAssetRuleFilter>  _MapCollectFilter { get; set; }
+        private static DisplayList<IAssetRulePack>    _MapPacks         { get; set; }
 
         private static string[] _CollectFilterDisplays { get; set; }
         private static string[] _PackDisplays          { get; set; }
         private static string[] _AddressDisplays       { get; set; }
+
+        private static GUIContent[] _GT_CollectFilterDisplays { get; set; }
+        private static GUIContent[] _GT_PackDisplays          { get; set; }
+        private static GUIContent[] _GT_AddressDisplays       { get; set; }
 
         public static string[] CollectFilterDisplays
         {
@@ -46,11 +50,7 @@ namespace AIO.UEditor
             }
         }
 
-        private static GUIContent[] _GT_CollectFilterDisplays { get; set; }
-        private static GUIContent[] _GT_PackDisplays          { get; set; }
-        private static GUIContent[] _GT_AddressDisplays       { get; set; }
-
-        public static GUIContent[] GT_GTCollectFilterDisplays
+        public static GUIContent[] GT_CollectFilterDisplays
         {
             get
             {
@@ -134,7 +134,6 @@ namespace AIO.UEditor
             }
         }
 
-
         /// <summary>
         ///     资源打包类型列表
         /// </summary>
@@ -150,8 +149,8 @@ namespace AIO.UEditor
         private static void Initialize()
         {
             var assetAddress = typeof(IAssetRuleAddress).FullName;
-            var assetFilter = typeof(IAssetRuleFilter).FullName;
-            var assetPack = typeof(IAssetRulePack).FullName;
+            var assetFilter  = typeof(IAssetRuleFilter).FullName;
+            var assetPack    = typeof(IAssetRulePack).FullName;
 
             if (_MapAddress is null) _MapAddress = new DisplayList<IAssetRuleAddress>();
             else _MapAddress.Clear();
@@ -170,12 +169,12 @@ namespace AIO.UEditor
                     if (type.IsAbstract || type.IsInterface || type.IsEnum) continue;
 
                     var isNullAddress = type.GetInterface(assetAddress) is null;
-                    var isNullFilter = type.GetInterface(assetFilter) is null;
-                    var isNullPack = type.GetInterface(assetPack) is null;
+                    var isNullFilter  = type.GetInterface(assetFilter) is null;
+                    var isNullPack    = type.GetInterface(assetPack) is null;
                     if (isNullAddress && isNullFilter && isNullPack) continue;
 
                     var instance = Activator.CreateInstance(type);
-                    var key = type.FullName ?? type.Name;
+                    var key      = type.FullName ?? type.Name;
                     if (!isNullAddress && instance is IAssetRuleAddress InstanceAddress)
                         _MapAddress.Add(key, InstanceAddress.DisplayAddressName, InstanceAddress);
 

@@ -8,7 +8,7 @@ namespace AIO.UEditor
 {
     public class TreeViewItemUploadGoogleCloud : TreeViewItem, ITVItemDraw
     {
-        public TreeViewItemUploadGoogleCloud(int id, ASBuildConfig.GCloudConfig config) : base(id, 1) { Config = config; }
+        public TreeViewItemUploadGoogleCloud(int id, AssetBuildConfig.GCloudConfig config) : base(id, 1) { Config = config; }
 
         #region ITVItemDraw
 
@@ -22,11 +22,11 @@ namespace AIO.UEditor
 
         private GUIContent                 GC_FOLDOUT    = GEContent.NewSetting("quanping-shouqi-xian", "收缩");
         private GUIContent                 GC_FOLDOUT_ON = GEContent.NewSetting("quanping-zhankai-xian", "展开");
-        public  ASBuildConfig.GCloudConfig Config;
+        public  AssetBuildConfig.GCloudConfig Config;
 
         #region Google Cloud
 
-        private static string GetItemDes(ASBuildConfig.GCloudConfig Config, int i)
+        private static string GetItemDes(AssetBuildConfig.GCloudConfig Config, int i)
         {
             var _builder = new StringBuilder();
             if (!Config.Folded && Config.isUploading) _builder.Append("[上传中 ... ]");

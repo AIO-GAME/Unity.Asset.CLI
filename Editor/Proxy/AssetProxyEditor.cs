@@ -55,7 +55,7 @@ namespace AIO.UEditor
         ///     上传到GCloud
         /// </summary>
         public static async Task<bool> UploadGCloud(
-            [ReadOnlyArray] ICollection<AsUploadGCloudParameter> parameters, bool isTips = false)
+            [ReadOnlyArray] ICollection<AssetUploadGCloudParameter> parameters, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -82,7 +82,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     上传到GCloud
         /// </summary>
-        public static async Task<bool> UploadGCloud(AsUploadGCloudParameter parameter, bool isTips = false)
+        public static async Task<bool> UploadGCloud(AssetUploadGCloudParameter parameter, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -106,7 +106,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     上传到Ftp
         /// </summary>
-        public static async Task<bool> UploadFtp(AsUploadFtpParameter parameter, bool isTips = false)
+        public static async Task<bool> UploadFtp(AssetUploadFtpParameter parameter, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -121,7 +121,7 @@ namespace AIO.UEditor
             return succeed;
         }
 
-        public static bool BuildArtAll(ASBuildConfig config, bool isTips = false)
+        public static bool BuildArtAll(AssetBuildConfig config, bool isTips = false)
         {
             var command = new AssetBuildCommand
             {
@@ -145,7 +145,7 @@ namespace AIO.UEditor
         /// </summary>
         /// <param name="config"></param>
         /// <param name="isTips"></param>
-        public static bool BuildArt(ASBuildConfig config, bool isTips = false)
+        public static bool BuildArt(AssetBuildConfig config, bool isTips = false)
         {
             var command = new AssetBuildCommand
             {

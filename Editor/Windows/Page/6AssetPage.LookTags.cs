@@ -81,7 +81,7 @@ namespace AIO.UEditor
                 if (EditorGUI.EndChangeCheck())
                 {
                     PageValues.Clear();
-                    PageValues.Add(Values.Where(data => !TagsModeDataFilter(data)));
+                    PageValues.Add(Values.Where(data => !FilterData(data)));
                     PageValues.PageIndex = 0;
                     TreeViewQueryAsset.ReloadAndSelect(0);
                 }
@@ -94,7 +94,7 @@ namespace AIO.UEditor
 
                 rect.x     += rect.width;
                 rect.width =  30;
-                if (GUI.Button(rect, GC_CLEAR, GEStyle.TEtoolbarbutton))
+                if (GUI.Button(rect, Instance.GC_CLEAR, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     TreeViewQueryAsset.searchString = string.Empty;
@@ -106,7 +106,7 @@ namespace AIO.UEditor
 
                 rect.x     = width - 30;
                 rect.width = 30;
-                if (GUI.Button(rect, GC_SAVE, GEStyle.TEtoolbarbutton))
+                if (GUI.Button(rect, Instance.GC_SAVE, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     Config.SequenceRecord.Save();
@@ -121,7 +121,7 @@ namespace AIO.UEditor
 
                 rect.x     -= rect.width;
                 rect.width =  30;
-                if (GUI.Button(rect, GC_REFRESH, GEStyle.TEtoolbarbutton))
+                if (GUI.Button(rect, Instance.GC_REFRESH, GEStyle.TEtoolbarbutton))
                 {
                     Instance.SelectAsset            = null;
                     TreeViewQueryAsset.searchString = string.Empty;
@@ -162,7 +162,7 @@ namespace AIO.UEditor
                 else
                 {
                     Instance.ViewDetails.IsShow   = false;
-                    Instance.ViewDetailList.width = rect.width - 10;
+                    Instance.ViewDetailList.width = rect.width - 5;
                 }
 
                 Instance.ViewDetailList.Draw(TreeViewQueryAsset.OnGUI, GEStyle.INThumbnailShadow);
@@ -180,16 +180,18 @@ namespace AIO.UEditor
                 PageValues.Clear();
                 PageValues.PageIndex = 0;
                 Values.Clear();
-                if (Data.Packages.Length == 0) return;
-                DisplayCollectors = new[]
-                {
-                    "ALL"
-                };
-                DisplayTypes = Array.Empty<string>();
-                DisplayTags  = Data.GetTags();
 
-                var listTypes = new List<string>();
-                var listItems = new List<AssetCollectItem>();
+                if (Data.Packages.Length == 0) return;
+
+                DisplayCollectors = new[] { "ALL" };
+                DisplayTypes      = Array.Empty<string>();
+                DisplayTags       = Data.GetTags();
+
+                var toLower      = Config.LoadPathToLower;
+                var hasExtension = Config.HasExtension;
+                var listTypes    = new List<string>();
+                var listItems    = new List<AssetCollectItem>();
+                var index        = 0;
                 foreach (var package in Data.Packages)
                 {
                     if (package.Groups is null) continue;
@@ -201,42 +203,52 @@ namespace AIO.UEditor
                         {
                             if (!flag && string.IsNullOrEmpty(collector.Tags)) continue;
                             listItems.Add(collector);
-                            collector.CollectAssetAsync(package.Name, group.Name, dic =>
-                            {
-                                Runner.StartCoroutine(() =>
-                                {
-                                    listTypes.AddRange(dic.Select(pair => pair.Value.Type));
-                                    DisplayTypes = listTypes.Distinct().ToArray();
-                                });
-                                foreach (var pair in dic)
-                                {
-                                    Values.Add(pair.Value);
-                                    if (TagsModeDataFilter(pair.Value)) continue;
-                                    PageValues.Add(pair.Value);
-                                }
-
-                                PageValues.PageIndex = PageValues.PageIndex;
-                                TreeViewQueryAsset.ReloadAndSelect(0);
-                            });
+                            if (collector.AllowThread)
+                                Runner.StartTask(() => Collect(package, group, collector));
+                            else
+                                Runner.StartCoroutine(() => Collect(package, group, collector));
                         }
                     }
                 }
 
                 DisplayCollectors = GetCollectorDisPlayNames(listItems.GetDisPlayNames());
                 if (DisplayCollectorsIndex < 0) DisplayCollectorsIndex = 0;
-                TreeViewQueryAsset.Reload();
+                return;
+
+                void Collect(AssetCollectPackage package, AssetCollectGroup group, AssetCollectItem item)
+                {
+                    item.CollectAssetAsync(package, group, toLower, hasExtension);
+                    Values.AddRange(item.DataInfos.Values);
+                    if (listItems.Count != ++index) return;
+                    Runner.StartCoroutine(() =>
+                    {
+                        listTypes.AddRange(Values.Where(dataInfo => !listTypes.Contains(dataInfo.Type)).Select(dataInfo => dataInfo.Type));
+                        Runner.StartTask(End);
+                    });
+                }
+
+                void End()
+                {
+                    DisplayTypes = listTypes.ToArray();
+                    lock (PageValues)
+                    {
+                        PageValues.Add(Values.Where(data => !FilterData(data)));
+                        PageValues.PageIndex = PageValues.PageIndex;
+                        Runner.StartCoroutine(() => { TreeViewQueryAsset.Reload(PageValues); });
+                    }
+                }
             }
 
             /// <summary>
             ///     标签模式 资源过滤器
             /// </summary>
-            private bool TagsModeDataFilter(AssetDataInfo data)
+            private bool FilterData(AssetDataInfo data)
             {
                 var filter = 0;
                 if (IsFilterCollectors(DisplayCollectorsIndex, data.CollectPath, DisplayCollectors))
                     filter++;
 
-                if (IsFilterTypes(DisplayTypeIndex, data.AssetPath, DisplayTypes))
+                if (IsFilterTypes(DisplayTypeIndex, data, DisplayTypes))
                     filter++;
 
                 if (IsFilterTags(DisplayTagsIndex, data.Tags.Split(';', ',', ' '), DisplayTags))
