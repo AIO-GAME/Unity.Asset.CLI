@@ -13,11 +13,11 @@ namespace AIO.UEditor
         private AssetCollectRoot Data;
         private ASConfig         Config;
         private GUIContent       GC_SAVE;
-        private GUIContent       GC_Select_ASConfig;
+        private GUIContent       GC_Select;
 
         public AssetPageEditConfig()
         {
-            GC_Select_ASConfig = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
+            GC_Select = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
             GC_SAVE            = GEContent.NewBuiltin("d_SaveAs", "保存");
             Data               = AssetCollectRoot.GetOrCreate();
             Config             = ASConfig.GetOrCreate();
@@ -38,7 +38,7 @@ namespace AIO.UEditor
             Data               = null;
             Config             = null;
             GC_SAVE            = null;
-            GC_Select_ASConfig = null;
+            GC_Select = null;
         }
 
         public string Title => "配置管理      [Ctrl + Number2]";
@@ -75,7 +75,7 @@ namespace AIO.UEditor
 
             rect.x     -= rect.width;
             rect.width =  30;
-            if (GUI.Button(rect, GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
+            if (GUI.Button(rect, GC_Select, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
                 Selection.activeObject = Config;

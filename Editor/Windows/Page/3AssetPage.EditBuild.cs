@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,18 +10,18 @@ namespace AIO.UEditor
     {
         int IAssetPage.    Order => 3;
         private GUIContent GC_REPORT;
-        private GUIContent GC_Select_ASConfig;
+        private GUIContent GC_Select;
         private GUIContent GC_SAVE;
 
         private DriveInfo            Disk;        // 磁盘信息
         private AssetCollectRoot     Data;        // 资源数据
-        private AssetBuildConfig        BuildConfig; // 构建配置
+        private AssetBuildConfig     BuildConfig; // 构建配置
         private TreeViewBuildSetting TreeViewBuildSetting;
 
         public AssetPageEditBuild()
         {
             GC_REPORT            = new GUIContent("报", "资源报告工具");
-            GC_Select_ASConfig   = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
+            GC_Select            = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
             GC_SAVE              = GEContent.NewBuiltin("d_SaveAs", "保存");
             TreeViewBuildSetting = TreeViewBuildSetting.Create();
             Data                 = AssetCollectRoot.GetOrCreate();
@@ -36,7 +37,7 @@ namespace AIO.UEditor
 
         #region IAssetWindow
 
-        string IAssetPage.Title => "构建模式      [Ctrl + Number6]";
+        string IAssetPage.Title => "构建模式      [Ctrl + Number3]";
 
         bool IAssetPage.Shortcut(Event evt)
         {
@@ -97,10 +98,10 @@ namespace AIO.UEditor
             }
 
             rect.x -= rect.width;
-            if (GUI.Button(rect, GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
+            if (GUI.Button(rect, GC_Select, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
-                Selection.activeObject = AssetBuildConfig.GetOrCreate();
+                Selection.activeObject = ASConfig.GetOrCreate();
             }
 
 #if SUPPORT_YOOASSET

@@ -5,9 +5,11 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = System.Diagnostics.Debug;
 
 namespace AIO.UEditor
 {
@@ -55,7 +57,8 @@ namespace AIO.UEditor
         ///     上传到GCloud
         /// </summary>
         public static async Task<bool> UploadGCloud(
-            [ReadOnlyArray] ICollection<AssetUploadGCloudParameter> parameters, bool isTips = false)
+            [ReadOnlyArray] ICollection<AssetUploadGCloudParameter> parameters,
+            bool                                                    isTips = false)
         {
             if (Editor is null)
             {
@@ -74,7 +77,7 @@ namespace AIO.UEditor
             }
 
             var succeed = await Editor.UploadGCloud(parameters);
-            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            var info    = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
@@ -96,9 +99,9 @@ namespace AIO.UEditor
             if (!string.IsNullOrEmpty(parameter.GCLOUD_PATH)) PrGCloud.Gcloud = parameter.GCLOUD_PATH;
             if (!string.IsNullOrEmpty(parameter.GSUTIL_PATH)) PrGCloud.Gsutil = parameter.GSUTIL_PATH;
 
-            var sw = Stopwatch.StartNew();
+            var sw      = Stopwatch.StartNew();
             var succeed = await Editor.UploadGCloud(new[] { parameter });
-            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            var info    = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
@@ -114,9 +117,9 @@ namespace AIO.UEditor
                 return false;
             }
 
-            var sw = Stopwatch.StartNew();
+            var sw      = Stopwatch.StartNew();
             var succeed = await Editor.UploadFtp(new[] { parameter });
-            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            var info    = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
@@ -135,7 +138,7 @@ namespace AIO.UEditor
                 CopyBuildInFileTags = config.FirstPackTag,
                 MergeToLatest       = config.MergeToLatest
             };
-            var array = AssetCollectRoot.GetOrCreate().GetNames();
+            var array                           = AssetCollectRoot.GetOrCreate().GetNames();
             if (config.BuildFirstPackage) array = array.Add(AssetSystem.TagsRecord);
             return BuildArtList(array, command, isTips);
         }
@@ -175,9 +178,9 @@ namespace AIO.UEditor
             }
 
             SaveScene();
-            var sw = Stopwatch.StartNew();
+            var sw         = Stopwatch.StartNew();
             var enumerable = packageNames as string[] ?? packageNames.ToArray();
-            var succeed = Editor.BuildArtList(enumerable, command);
+            var succeed    = Editor.BuildArtList(enumerable, command);
             var info =
                 $"构建 {string.Join(",", enumerable)} {(succeed ? "成功" : "失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("构建成功", info, "确定");
@@ -196,9 +199,9 @@ namespace AIO.UEditor
             }
 
             SaveScene();
-            var sw = Stopwatch.StartNew();
+            var sw      = Stopwatch.StartNew();
             var succeed = Editor.BuildArt(command);
-            var info = $"构建 {command.BuildPackage} {(succeed ? "成功" : "失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            var info    = $"构建 {command.BuildPackage} {(succeed ? "成功" : "失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("构建成功", info, "确定");
             return succeed;
         }
@@ -255,10 +258,10 @@ namespace AIO.UEditor
                 // 位置显示在屏幕中间
                 var temp = Screen.currentResolution;
                 position = new Rect(
-                    temp.width / 2f,
-                    temp.height / 2f,
-                    300,
-                    50);
+                                    temp.width / 2f,
+                                    temp.height / 2f,
+                                    300,
+                                    50);
             }
 
             private void OnGUI()

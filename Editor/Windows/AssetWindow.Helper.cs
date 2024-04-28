@@ -12,6 +12,7 @@ namespace AIO.UEditor
 
         public const string MENU_ROOT   = "AIO/Asset/";
         public const string MENU_WINDOW = MENU_ROOT + "Window";
+        public const string MENU_CONFIG = MENU_ROOT + "Config";
 
         [MenuItem(MENU_ROOT + "清空运行时缓存")]
         public static void ClearRuntimeCache()

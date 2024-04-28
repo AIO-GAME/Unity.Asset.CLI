@@ -262,7 +262,7 @@ namespace AIO.UEditor
                 if (IsFilterTypes(DisplayTypeIndex, data, TypeDisplays?.GetOrDefault(position, def))
                    ) filter++;
 
-                if (IsFilterTags(DisplayTagsIndex, data.Tags.Split(';', ',', ' '), TagDisplays?.GetOrDefault(position, def))
+                if (IsFilterTags(DisplayTagsIndex, data.Tags, TagDisplays?.GetOrDefault(position, def))
                    ) filter++;
 
                 return filter != 3;

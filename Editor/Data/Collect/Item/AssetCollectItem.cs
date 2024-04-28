@@ -303,7 +303,7 @@ namespace AIO.UEditor
                 CollectPath = data.CollectPath,
                 Package     = data.PackageName,
                 Group       = data.GroupName,
-                Tags        = data.Tags
+                Tag        = data.Tags
             };
 
             if (Directory.Exists(CollectPath)) // 判断Path是否为文件夹

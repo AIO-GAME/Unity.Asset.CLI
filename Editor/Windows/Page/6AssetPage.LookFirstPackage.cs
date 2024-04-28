@@ -13,8 +13,8 @@ namespace AIO.UEditor
         {
             #region IAssetPage
 
-            int IAssetPage.   Order => 5;
-            string IAssetPage.Title => "查询首包      [Ctrl + Number3]";
+            int IAssetPage.   Order => 6;
+            string IAssetPage.Title => "查询首包      [Ctrl + Number6]";
 
             void IAssetPage.EventMouseDown(in Event evt) { Instance.ViewDetailList.ContainsDragStretch(evt, ViewRect.DragStretchType.Horizontal); }
 
@@ -48,7 +48,7 @@ namespace AIO.UEditor
                 if (!Config.EnableSequenceRecord)
                 {
                     rect.width = 30;
-                    if (GUI.Button(rect, Instance.GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
+                    if (GUI.Button(rect, Instance.GC_Select, GEStyle.TEtoolbarbutton))
                     {
                         GUI.FocusControl(null);
                         Selection.activeObject = Config;
@@ -148,7 +148,7 @@ namespace AIO.UEditor
 
                 rect.x     -= rect.width;
                 rect.width =  30;
-                if (GUI.Button(rect, Instance.GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
+                if (GUI.Button(rect, Instance.GC_Select, GEStyle.TEtoolbarbutton))
                 {
                     GUI.FocusControl(null);
                     Selection.activeObject = Config;

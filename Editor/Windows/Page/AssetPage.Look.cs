@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using AIO.UEngine;
@@ -45,16 +46,16 @@ namespace AIO.UEditor
         private readonly GUIContent GC_OPEN_FOLDER;
         private readonly GUIContent GC_REFRESH;
         private readonly GUIContent GC_SAVE;
-
-        private readonly GUIContent GC_Select_ASConfig;
-        private readonly GUIContent GC_LookMode_Detail_IsSubAsset;
-        private readonly GUIContent GC_LookMode_Detail_Size;
-        private readonly GUIContent GC_LookMode_Detail_GUID;
-        private readonly GUIContent GC_LookMode_Detail_Type;
-        private readonly GUIContent GC_LookMode_Detail_Path;
-        private readonly GUIContent GC_LookMode_Detail_LastWriteTime;
-        private readonly GUIContent GC_LookMode_Detail_Tags;
         private readonly GUIContent GC_COPY;
+        private readonly GUIContent GC_Select;
+
+        private readonly GUIContent GC_Detail_IsSubAsset;
+        private readonly GUIContent GC_Detail_Size;
+        private readonly GUIContent GC_Detail_GUID;
+        private readonly GUIContent GC_Detail_Type;
+        private readonly GUIContent GC_Detail_Path;
+        private readonly GUIContent GC_Detail_LastWriteTime;
+        private readonly GUIContent GC_Detail_Tags;
 
         private readonly GUIContent GC_LookMode_Page_MaxLeft;  // 界面内容 - 第一页
         private readonly GUIContent GC_LookMode_Page_Left;     // 界面内容 - 左边一页
@@ -64,8 +65,6 @@ namespace AIO.UEditor
 
         private ViewRect ViewDetailList; // 界面 - 资源列表
         private ViewRect ViewDetails;    // 界面 - 详情界面
-
-        private GenericMenu PageSizeMenu; // 资源展示模式 当前页数量选项
 
         #region Dependencies
 
@@ -79,6 +78,7 @@ namespace AIO.UEditor
 
             public Object Object;
 
+            [Description("大小")]
             public long Size;
 
             public string Type
@@ -116,6 +116,7 @@ namespace AIO.UEditor
         private IEnumerator OnSelectionChangedRef()
         {
             Dependencies.Clear();
+            yield return Runner.WaitForSeconds(0.5f);
             var assetPath = SelectAssetDataInfo.AssetPath;
             foreach (var dependency in AssetDatabase.GetDependencies(assetPath))
             {
@@ -132,7 +133,6 @@ namespace AIO.UEditor
 
             SelectAsset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
             TreeViewDependencies.Reload(Dependencies.Values);
-            yield break;
         }
 
         private static bool IsFirstPackageResource(string guid)
@@ -188,23 +188,23 @@ namespace AIO.UEditor
             Data   = AssetCollectRoot.GetOrCreate();
             Values = new List<AssetDataInfo>();
 
-            GC_CLEAR           = GEContent.NewSetting("cancel", "清空");
-            GC_DEL             = GEContent.NewBuiltin("d_TreeEditor.Trash", "删除");
-            GC_DOWNLOAD        = GEContent.NewBuiltin("d_UnityEditor.ConsoleWindow", "下载");
-            GC_NET             = GEContent.NewBuiltin("d_preAudioLoopOff", "云端");
-            GC_OPEN_FOLDER     = GEContent.NewBuiltin("d_Folder Icon", "打开文件夹");
-            GC_REFRESH         = GEContent.NewBuiltin("d_Refresh", "刷新");
-            GC_SAVE            = GEContent.NewBuiltin("d_SaveAs", "保存");
-            GC_Select_ASConfig = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
-            GC_COPY            = GEContent.NewSetting("ic_copy", "复制资源路径");
+            GC_CLEAR       = GEContent.NewSetting("cancel", "清空");
+            GC_DEL         = GEContent.NewBuiltin("d_TreeEditor.Trash", "删除");
+            GC_DOWNLOAD    = GEContent.NewBuiltin("d_UnityEditor.ConsoleWindow", "下载");
+            GC_NET         = GEContent.NewBuiltin("d_preAudioLoopOff", "云端");
+            GC_OPEN_FOLDER = GEContent.NewBuiltin("d_Folder Icon", "打开文件夹");
+            GC_REFRESH     = GEContent.NewBuiltin("d_Refresh", "刷新");
+            GC_SAVE        = GEContent.NewBuiltin("d_SaveAs", "保存");
+            GC_Select      = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
+            GC_COPY        = GEContent.NewSetting("ic_copy", "复制资源路径");
 
-            GC_LookMode_Detail_IsSubAsset    = EditorGUIUtility.TrTextContent("是否被引用", "资源是否构成了其他资源的一部分？");
-            GC_LookMode_Detail_Size          = EditorGUIUtility.TrTextContent("资源大小", "文件大小");
-            GC_LookMode_Detail_GUID          = EditorGUIUtility.TrTextContent("GUID", "资源GUID");
-            GC_LookMode_Detail_Type          = EditorGUIUtility.TrTextContent("资源类型", "资源类型");
-            GC_LookMode_Detail_Path          = EditorGUIUtility.TrTextContent("资源路径", "资源文件路径");
-            GC_LookMode_Detail_LastWriteTime = EditorGUIUtility.TrTextContent("最后修改时间", "最后写入时间");
-            GC_LookMode_Detail_Tags          = EditorGUIUtility.TrTextContent("资源标签", "资源标签");
+            GC_Detail_IsSubAsset    = EditorGUIUtility.TrTextContent("是否被引用", "资源是否构成了其他资源的一部分？");
+            GC_Detail_Size          = EditorGUIUtility.TrTextContent("资源大小", "文件大小");
+            GC_Detail_GUID          = EditorGUIUtility.TrTextContent("GUID", "资源GUID");
+            GC_Detail_Type          = EditorGUIUtility.TrTextContent("资源类型", "资源类型");
+            GC_Detail_Path          = EditorGUIUtility.TrTextContent("资源路径", "资源文件路径");
+            GC_Detail_LastWriteTime = EditorGUIUtility.TrTextContent("最后修改时间", "最后写入时间");
+            GC_Detail_Tags          = EditorGUIUtility.TrTextContent("资源标签", "资源标签");
 
             GC_LookMode_Page_MaxLeft  = EditorGUIUtility.IconContent("d_scrollleft").SetTooltips("跳转到第一页");
             GC_LookMode_Page_Left     = EditorGUIUtility.IconContent("ArrowNavigationLeft").SetTooltips("上一页");
@@ -236,7 +236,10 @@ namespace AIO.UEditor
             UpdatePageSizeMenu();
         }
 
-        private readonly int[] PageSizeValues = { 25, 30, 40, 50 };
+        #region GenericMenu
+
+        private          GenericMenu PageSizeMenu;                        // 资源展示模式 当前页数量选项
+        private readonly int[]       PageSizeValues = { 25, 30, 40, 50 }; // 资源展示模式 当前页数量选项
 
         private void UpdatePageSizeMenu()
         {
@@ -251,6 +254,8 @@ namespace AIO.UEditor
                 }, size);
             }
         }
+
+        #endregion
 
         #region IsFilter
 
@@ -331,42 +336,6 @@ namespace AIO.UEditor
 
         #endregion
 
-        /// <summary>
-        ///     获取组显示名称
-        /// </summary>
-        private static string[] GetGroupDisPlayNames(ICollection<AssetCollectGroup> groups)
-        {
-            var page = groups.Count > 15;
-            return (from t in groups
-                    select t.Name
-                    into groupName
-                    where !string.IsNullOrEmpty(groupName)
-                    select page
-                        ? string.Concat(char.ToUpper(groupName[0]), '/', groupName)
-                        : groupName).ToArray();
-        }
-
-        private static string[] GetCollectorDisPlayNames(IList<string> collectors)
-        {
-            if (collectors.Count >= 31)
-            {
-                var temp = new string[collectors.Count + 1];
-                temp[0] = "All";
-                for (var index = 0; index < collectors.Count; index++) temp[index + 1] = collectors[index];
-                return temp;
-            }
-
-            if (collectors.Count > 15)
-                for (var index = 0; index < collectors.Count; index++)
-                    collectors[index] = string.Concat(char.ToUpper(collectors[index][0]), '/',
-                                                      collectors[index].Replace('/', '\\').TrimEnd('\\'));
-            else
-                for (var index = 0; index < collectors.Count; index++)
-                    collectors[index] = collectors[index].Replace('/', '\\').TrimEnd('\\');
-
-            return collectors.ToArray();
-        }
-
         #region OnDraw
 
         private void OnDrawAssetDetail(Rect rect)
@@ -402,7 +371,7 @@ namespace AIO.UEditor
                 cell.y     += cell.height;
                 cell.x     =  10;
                 cell.width =  100;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_IsSubAsset, GEStyle.HeaderLabel);
+                EditorGUI.LabelField(cell, GC_Detail_IsSubAsset, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -413,7 +382,7 @@ namespace AIO.UEditor
                 cell.y     += cell.height;
                 cell.x     =  10;
                 cell.width =  100;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_Size, GEStyle.HeaderLabel);
+                EditorGUI.LabelField(cell, GC_Detail_Size, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -424,7 +393,7 @@ namespace AIO.UEditor
                 cell.y     += cell.height;
                 cell.x     =  10;
                 cell.width =  100;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_GUID, GEStyle.HeaderLabel);
+                EditorGUI.LabelField(cell, GC_Detail_GUID, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -435,7 +404,7 @@ namespace AIO.UEditor
                 cell.y     += cell.height;
                 cell.x     =  10;
                 cell.width =  100;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_Type, GEStyle.HeaderLabel);
+                EditorGUI.LabelField(cell, GC_Detail_Type, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -446,7 +415,7 @@ namespace AIO.UEditor
                 cell.y     += cell.height;
                 cell.x     =  10;
                 cell.width =  100;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_Path, GEStyle.HeaderLabel);
+                EditorGUI.LabelField(cell, GC_Detail_Path, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
@@ -460,29 +429,29 @@ namespace AIO.UEditor
                 cell.y     += cell.height;
                 cell.x     =  10;
                 cell.width =  100;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_LastWriteTime, GEStyle.HeaderLabel);
+                EditorGUI.LabelField(cell, GC_Detail_LastWriteTime, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
                 EditorGUI.LabelField(cell, SelectAssetDataInfo.LastWriteTime.ToString("yyyy-MM-dd hh:mm:ss"));
             }
 
-            if (!string.IsNullOrEmpty(SelectAssetDataInfo.Tags))
+            if (!string.IsNullOrEmpty(SelectAssetDataInfo.Tag))
             {
                 cell.y     += cell.height;
                 cell.x     =  10;
                 cell.width =  100;
-                EditorGUI.LabelField(cell, GC_LookMode_Detail_Tags, GEStyle.HeaderLabel);
+                EditorGUI.LabelField(cell, GC_Detail_Tags, GEStyle.HeaderLabel);
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x - 16;
-                EditorGUI.LabelField(cell, SelectAssetDataInfo.Tags);
+                EditorGUI.LabelField(cell, SelectAssetDataInfo.Tag);
 
                 cell.x     += cell.width;
                 cell.width =  16;
                 if (GUI.Button(cell, GC_COPY, GEStyle.IconButton))
                 {
-                    GEHelper.CopyAction(SelectAssetDataInfo.Tags);
+                    GEHelper.CopyAction(SelectAssetDataInfo.Tag);
                 }
             }
 
@@ -589,5 +558,38 @@ namespace AIO.UEditor
         }
 
         #endregion
+
+        private static string[] GetGroupDisPlayNames(ICollection<AssetCollectGroup> groups)
+        {
+            var page = groups.Count > 15;
+            return (from t in groups
+                    select t.Name
+                    into groupName
+                    where !string.IsNullOrEmpty(groupName)
+                    select page
+                        ? string.Concat(char.ToUpper(groupName[0]), '/', groupName)
+                        : groupName).ToArray();
+        }
+
+        private static string[] GetCollectorDisPlayNames(IList<string> collectors)
+        {
+            if (collectors.Count >= 31)
+            {
+                var temp = new string[collectors.Count + 1];
+                temp[0] = "All";
+                for (var index = 0; index < collectors.Count; index++) temp[index + 1] = collectors[index];
+                return temp;
+            }
+
+            if (collectors.Count > 15)
+                for (var index = 0; index < collectors.Count; index++)
+                    collectors[index] = string.Concat(char.ToUpper(collectors[index][0]), '/',
+                                                      collectors[index].Replace('/', '\\').TrimEnd('\\'));
+            else
+                for (var index = 0; index < collectors.Count; index++)
+                    collectors[index] = collectors[index].Replace('/', '\\').TrimEnd('\\');
+
+            return collectors.ToArray();
+        }
     }
 }

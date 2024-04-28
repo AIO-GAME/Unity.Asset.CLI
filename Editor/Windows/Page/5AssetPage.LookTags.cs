@@ -12,7 +12,7 @@ namespace AIO.UEditor
         {
             #region IAssetPage
 
-            int IAssetPage.   Order => 6;
+            int IAssetPage.   Order => 5;
             string IAssetPage.Title => "查询标签      [Ctrl + Number5]";
 
             void IAssetPage.EventMouseDown(in Event evt) { Instance.ViewDetailList.ContainsDragStretch(evt, ViewRect.DragStretchType.Horizontal); }
@@ -87,7 +87,7 @@ namespace AIO.UEditor
                 }
 
                 rect.x     += rect.width + 3;
-                rect.width =  width - 30 - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190);
+                rect.width =  width - 30 - 30 - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190);
                 TreeViewQueryAsset.searchString = Values.Count > 300
                     ? EditorGUI.DelayedTextField(rect, TreeViewQueryAsset.searchString, GEStyle.SearchTextField)
                     : EditorGUI.TextField(rect, TreeViewQueryAsset.searchString, GEStyle.SearchTextField);
@@ -245,16 +245,9 @@ namespace AIO.UEditor
             private bool FilterData(AssetDataInfo data)
             {
                 var filter = 0;
-                if (IsFilterCollectors(DisplayCollectorsIndex, data.CollectPath, DisplayCollectors))
-                    filter++;
-
-                if (IsFilterTypes(DisplayTypeIndex, data, DisplayTypes))
-                    filter++;
-
-                if (IsFilterTags(DisplayTagsIndex, data.Tags.Split(';', ',', ' '), DisplayTags))
-                    filter++;
-
-
+                if (IsFilterCollectors(DisplayCollectorsIndex, data.CollectPath, DisplayCollectors)) filter++;
+                if (IsFilterTypes(DisplayTypeIndex, data, DisplayTypes)) filter++;
+                if (IsFilterTags(DisplayTagsIndex, data.Tags, DisplayTags)) filter++;
                 return filter != 3;
             }
         }

@@ -13,7 +13,7 @@ using YooAsset.Editor;
 namespace AIO.UEditor
 {
     [InitializeOnLoad]
-    public class ResInspectorUI
+    internal class ResInspectorUI
     {
         static ResInspectorUI()
         {
@@ -52,23 +52,23 @@ namespace AIO.UEditor
                     {
                         if (AssetCollectRoot.ObjToCollector(editor.target, out var result))
                         {
-                            GUI.enabled = false;
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.LabelField("包名", GUILayout.MaxWidth(65));
-                            EditorGUILayout.TextField(result.PackageName, GUILayout.MinWidth(30));
-                            GUILayout.EndHorizontal();
+                            using (new EditorGUI.DisabledScope(false))
+                            {
+                                GUILayout.BeginHorizontal();
+                                EditorGUILayout.LabelField("包名", GUILayout.MaxWidth(65));
+                                EditorGUILayout.TextField(result.PackageName, GUILayout.MinWidth(30));
+                                GUILayout.EndHorizontal();
 
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.LabelField("组名", GUILayout.MaxWidth(65));
-                            EditorGUILayout.TextField(result.GroupName, GUILayout.MinWidth(30));
-                            GUILayout.EndHorizontal();
+                                GUILayout.BeginHorizontal();
+                                EditorGUILayout.LabelField("组名", GUILayout.MaxWidth(65));
+                                EditorGUILayout.TextField(result.GroupName, GUILayout.MinWidth(30));
+                                GUILayout.EndHorizontal();
 
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.LabelField("收集模式", GUILayout.MaxWidth(65));
-                            result.Type = GELayout.Popup(result.Type, GEStyle.PreDropDown);
-                            GUILayout.EndHorizontal();
-
-                            GUI.enabled = true;
+                                GUILayout.BeginHorizontal();
+                                EditorGUILayout.LabelField("收集模式", GUILayout.MaxWidth(65));
+                                result.Type = GELayout.Popup(result.Type, GEStyle.PreDropDown);
+                                GUILayout.EndHorizontal();
+                            }
 
                             if (result.Type != EAssetCollectItemType.MainAssetCollector) return;
 
@@ -94,9 +94,8 @@ namespace AIO.UEditor
                             EditorGUILayout.LabelField("寻址命名", GUILayout.MaxWidth(65));
                             if (Config.LoadPathToLower)
                             {
-                                GUI.enabled           = false;
-                                result.LocationFormat = GELayout.Popup(EAssetLocationFormat.ToLower, GEStyle.PreDropDown);
-                                GUI.enabled           = true;
+                                using (new EditorGUI.DisabledScope(false))
+                                    result.LocationFormat = GELayout.Popup(EAssetLocationFormat.ToLower, GEStyle.PreDropDown);
                             }
                             else
                             {
@@ -105,9 +104,8 @@ namespace AIO.UEditor
 
                             if (Config.HasExtension)
                             {
-                                GUI.enabled         = false;
-                                result.HasExtension = GELayout.ToggleLeft("后缀", true, GTOptions.Width(42));
-                                GUI.enabled         = true;
+                                using (new EditorGUI.DisabledScope(false))
+                                    result.HasExtension = GELayout.ToggleLeft("后缀", true, GTOptions.Width(42));
                             }
                             else
                             {
@@ -141,11 +139,13 @@ namespace AIO.UEditor
         private static void DrawAddressPath(string value)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Address", GUILayout.MaxWidth(50));
-            GUI.enabled = false;
-            EditorGUILayout.TextField(value);
-            GUI.enabled = true;
-            if (GUILayout.Button("Copy", GUILayout.Width(43))) GEHelper.CopyAction(value);
+            GUILayout.Label("Address", GTOptions.MaxWidth(50));
+            using (new EditorGUI.DisabledScope(false))
+            {
+                EditorGUILayout.TextField(value);
+            }
+
+            if (GUILayout.Button("Copy", GTOptions.Width(43))) GEHelper.CopyAction(value);
             GUILayout.EndHorizontal();
         }
     }

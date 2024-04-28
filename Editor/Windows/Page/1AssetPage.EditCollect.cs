@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text;
+using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public partial class AssetPageEditCollect : IAssetPage
+    public class AssetPageEditCollect : IAssetPage
     {
         int IAssetPage.   Order => 1;
         string IAssetPage.Title => "编辑模式      [Ctrl + Number1]";
@@ -68,7 +69,7 @@ namespace AIO.UEditor
         private ViewRect ViewCollectorsList;
 
         private StringBuilder TempBuilder;
-        private GUIContent    GC_Select_ASConfig;
+        private GUIContent    GC_Select;
         private GUIContent    GC_MERGE;
         private GUIContent    GC_ToConvert;
         private GUIContent    GC_SAVE;
@@ -76,12 +77,12 @@ namespace AIO.UEditor
 
         public AssetPageEditCollect()
         {
-            GC_MERGE           = new GUIContent("合并配置", "合并当前资源包的所有组和收集器");
-            GC_ToConvert       = new GUIContent("转换配置", "转换为第三方配置文件");
-            GC_SAVE            = EditorGUIUtility.IconContent("d_SaveAs", "保存");
-            GC_REFRESH         = EditorGUIUtility.IconContent("Refresh", "刷新");
-            GC_Select_ASConfig = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
-            TempBuilder        = new StringBuilder();
+            GC_MERGE     = new GUIContent("合并配置", "合并当前资源包的所有组和收集器");
+            GC_ToConvert = new GUIContent("转换配置", "转换为第三方配置文件");
+            GC_SAVE      = EditorGUIUtility.IconContent("d_SaveAs", "保存");
+            GC_REFRESH   = EditorGUIUtility.IconContent("Refresh", "刷新");
+            GC_Select    = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
+            TempBuilder  = new StringBuilder();
 
             Data = AssetCollectRoot.GetOrCreate();
 
@@ -170,7 +171,7 @@ namespace AIO.UEditor
 
         void IAssetPage.OnDrawContent(Rect rect)
         {
-            ViewGroupList.y = ViewPackageList.y = ViewCollectorsList.y = rect.y;
+            ViewGroupList.y      = ViewPackageList.y         = ViewCollectorsList.y   = rect.y;
             ViewGroupList.height = ViewCollectorsList.height = ViewPackageList.height = rect.height;
 
             var temp = rect.width - ViewCollectorsList.MinWidth;
@@ -235,10 +236,10 @@ namespace AIO.UEditor
 
             rect.width =  30;
             rect.x     -= rect.width;
-            if (GUI.Button(rect, GC_Select_ASConfig, GEStyle.TEtoolbarbutton))
+            if (GUI.Button(rect, GC_Select, GEStyle.TEtoolbarbutton))
             {
                 GUI.FocusControl(null);
-                Selection.activeObject = AssetCollectRoot.GetOrCreate();
+                Selection.activeObject = ASConfig.GetOrCreate();
             }
 
             rect.width =  75;

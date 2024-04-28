@@ -124,8 +124,8 @@ namespace AIO
             public bool Ascending;
 
             public int Compare(AssetDataInfo x, AssetDataInfo y) => Ascending
-                ? string.Compare(x.Tags, y.Tags, StringComparison.CurrentCulture)
-                : string.Compare(y.Tags, x.Tags, StringComparison.CurrentCulture);
+                ? string.Compare(x.Tag, y.Tag, StringComparison.CurrentCulture)
+                : string.Compare(y.Tag, x.Tag, StringComparison.CurrentCulture);
         }
 
         #endregion
@@ -135,7 +135,7 @@ namespace AIO
             AssetPath   = string.Empty,
             Address     = string.Empty,
             Extension   = string.Empty,
-            Tags        = string.Empty,
+            Tag         = string.Empty,
             CollectPath = string.Empty,
             Group       = string.Empty,
             Package     = string.Empty
@@ -157,9 +157,14 @@ namespace AIO
         public string Extension;
 
         /// <summary>
+        ///     Asset Tag
+        /// </summary>
+        public string Tag;
+
+        /// <summary>
         ///     Asset Tags
         /// </summary>
-        public string Tags;
+        public string[] Tags => string.IsNullOrEmpty(Tag) ? Array.Empty<string>() : Tag.Split(';', ',', ' ');
 
         /// <summary>
         ///     Asset Collect Path

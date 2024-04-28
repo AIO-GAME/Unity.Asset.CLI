@@ -48,10 +48,9 @@ namespace AIO.UEditor
                         Pages.Add(page);
                     }
                 }
-
-                Pages.Sort((a, b) => b.Order.CompareTo(a.Order));
             }
 
+            Pages     = Pages.Sort((a, b) => a.Order.CompareTo(b.Order));
             PageNames = Pages.Select(p => p.Title).ToArray();
             PageIndex = 0;
         }

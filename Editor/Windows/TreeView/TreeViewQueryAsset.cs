@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
@@ -284,8 +285,8 @@ namespace AIO.UEditor
             menu.AddItem(new GUIContent("复制 : GUID"), false, () => { GUIUtility.systemCopyBuffer  = data.GUID; });
             menu.AddItem(new GUIContent("复制 : 资源类型"), false, () => { GUIUtility.systemCopyBuffer  = data.Type; });
 
-            if (!string.IsNullOrEmpty(data.Tags))
-                menu.AddItem(new GUIContent("复制 : 标签列表"), false, () => { GUIUtility.systemCopyBuffer = data.Tags; });
+            if (!string.IsNullOrEmpty(data.Tag))
+                menu.AddItem(new GUIContent("复制 : 标签列表"), false, () => { GUIUtility.systemCopyBuffer = data.Tag; });
 
             if (AssetWindow.IsOpenPage<AssetPageLook.FirstPackage>()) return;
             if (!ASConfig.GetOrCreate().EnableSequenceRecord) return;
