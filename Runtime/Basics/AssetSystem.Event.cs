@@ -1,29 +1,47 @@
-﻿namespace AIO
+﻿#region
+
+using System;
+
+#endregion
+
+namespace AIO
 {
     partial class AssetSystem
     {
+        internal static ASException _Exception;
+
         /// <summary>
-        /// 重置下载器
+        ///     系统初始化异常
+        /// </summary>
+        public static event Action<ASException> OnException;
+
+        /// <summary>
+        ///     重置下载器
         /// </summary>
         public static void ResetDownloadHandle()
         {
             HandleReset = true;
             if (DownloadHandle != null) DownloadHandle.Cancel();
             var temp = Proxy.GetLoadingHandle();
-            temp.Event.OnNetReachableCarrier = DownloadEvent.OnNetReachableCarrier;
-            temp.Event.OnWritePermissionNot = DownloadEvent.OnWritePermissionNot;
-            temp.Event.OnReadPermissionNot = DownloadEvent.OnReadPermissionNot;
-            temp.Event.OnDiskSpaceNotEnough = DownloadEvent.OnDiskSpaceNotEnough;
-            temp.Event.OnNetReachableNot = DownloadEvent.OnNetReachableNot;
-            temp.Event.OnProgress = DownloadEvent.OnProgress;
-            temp.Event.OnError = DownloadEvent.OnError;
-            temp.Event.OnComplete = DownloadEvent.OnComplete;
-            temp.Event.OnCancel = DownloadEvent.OnCancel;
-            temp.Event.OnBegin = DownloadEvent.OnBegin;
-            temp.Event.OnResume = DownloadEvent.OnResume;
-            temp.Event.OnPause = DownloadEvent.OnPause;
+            var dEvent = DownloadEvent;
+            if (dEvent != null)
+            {
+                temp.Event.OnNetReachableCarrier = dEvent.OnNetReachableCarrier;
+                temp.Event.OnWritePermissionNot  = dEvent.OnWritePermissionNot;
+                temp.Event.OnReadPermissionNot   = dEvent.OnReadPermissionNot;
+                temp.Event.OnDiskSpaceNotEnough  = dEvent.OnDiskSpaceNotEnough;
+                temp.Event.OnNetReachableNot     = dEvent.OnNetReachableNot;
+                temp.Event.OnProgress            = dEvent.OnProgress;
+                temp.Event.OnError               = dEvent.OnError;
+                temp.Event.OnComplete            = dEvent.OnComplete;
+                temp.Event.OnCancel              = dEvent.OnCancel;
+                temp.Event.OnBegin               = dEvent.OnBegin;
+                temp.Event.OnResume              = dEvent.OnResume;
+                temp.Event.OnPause               = dEvent.OnPause;
+            }
+
             DownloadHandle = temp;
-            StatusStop = false;
+            StatusStop     = false;
         }
     }
 }

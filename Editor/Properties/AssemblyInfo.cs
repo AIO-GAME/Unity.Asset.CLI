@@ -1,21 +1,24 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 using UnityEditor.PackageManager;
+
+[assembly: InternalsVisibleTo("AIO.CLI.YooAsset.Editor")]
 
 namespace AIO.UEditor
 {
     internal static class Setting
     {
         /// <summary>
-        /// 名称
+        ///     名称
         /// </summary>
         public const string Name = "AIO.Asset";
 
         /// <summary>
-        /// 版本
+        ///     版本
         /// </summary>
         public static string Version { get; private set; }
 
-        [AInit(mode: EInitAttrMode.Both, int.MaxValue)]
+        [AInit(EInitAttrMode.Both, int.MaxValue)]
         public static void Initialize()
         {
             var package = PackageInfo.FindForAssembly(typeof(Setting).Assembly);

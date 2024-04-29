@@ -10,24 +10,23 @@ namespace AIO.UEditor.CLI
 {
     internal partial class AssetProxyEditor_Yoo_157
     {
-        private static async Task<bool> UploadFtpAsync(IEnumerable<AsUploadFtpParameter> parameters)
+        private static async Task<bool> UploadFtpAsync(IEnumerable<AssetUploadFtpParameter> parameters)
         {
             foreach (var parameter in parameters)
-            {
-                if (!await UploadFtpAsync(parameter)) return false;
-            }
+                if (!await UploadFtpAsync(parameter))
+                    return false;
 
             return true;
         }
 
         /// <summary>
-        /// 上传到Ftp
+        ///     上传到Ftp
         /// </summary>
-        private static async Task<bool> UploadFtpAsync(AsUploadFtpParameter parameter)
+        private static async Task<bool> UploadFtpAsync(AssetUploadFtpParameter parameter)
         {
             var localFull = parameter.RootPath;
             var handle = AHandle.FTP.Create(parameter.Server, parameter.Port, parameter.User, parameter.Pass,
-                parameter.RemoteRelative);
+                                            parameter.RemoteRelative);
             await handle.InitAsync();
             EHelper.DisplayProgressBar("上传进度", $"开始上传资源 {handle.Absolute}", 0.1f);
 
@@ -104,14 +103,11 @@ namespace AIO.UEditor.CLI
                 var progress = new AProgressEvent
                 {
                     // OnComplete = report => { EHelper.DisplayDialog("结束", report.ToString(), "确定"); },
-                    OnError = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); },
-                    OnProgress = current =>
-                    {
-                        EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f);
-                    }
+                    OnError    = error => { EHelper.DisplayDialog("Error", $"上传失败 : {error}", "确定"); },
+                    OnProgress = current => { EHelper.DisplayProgressBar("上传进度", current.ToString(), current.Progress / 100f); }
                 };
                 EHelper.DisplayProgressBar("上传", $"[FTP] 远端版本清单不存在 : 准备开始上传资源 : {localFull} -> {handle.Absolute}",
-                    0.2f);
+                                           0.2f);
                 succeed = await handle.UploadDirAsync(localFull, progress);
             }
 
@@ -135,13 +131,11 @@ namespace AIO.UEditor.CLI
 
                     var data2 = data.Find(item => item.Name == parameter.PackageName);
                     if (data2 is null)
-                    {
                         data.Add(new AssetsPackageConfig
                         {
-                            Name = parameter.PackageName,
+                            Name    = parameter.PackageName,
                             Version = parameter.IsUploadLatest ? "Latest" : parameter.Version
                         });
-                    }
                     else data2.Version = parameter.IsUploadLatest ? "Latest" : parameter.Version;
 
                     versionContent = AHelper.Json.Serialize(data);
@@ -152,7 +146,7 @@ namespace AIO.UEditor.CLI
                     {
                         new AssetsPackageConfig
                         {
-                            Name = parameter.PackageName,
+                            Name    = parameter.PackageName,
                             Version = parameter.IsUploadLatest ? "Latest" : parameter.Version
                         }
                     });

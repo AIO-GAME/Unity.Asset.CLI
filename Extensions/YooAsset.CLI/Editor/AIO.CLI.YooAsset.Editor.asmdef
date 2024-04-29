@@ -1,42 +1,42 @@
 {
-    "name": "AIO.CLI.YooAsset.Editor",
-    "references": [
-        "YooAsset",
-        "YooAsset.Editor",
-        "AIO.Core.Editor",
-        "AIO.Core.Runtime",
-        "AIO.Asset.Editor",
-        "AIO.Asset.Runtime",
-        "UnityEditor.UI",
-        "UnityEngine.UI",
-        "UnityEditor.TestRunner",
-        "UnityEngine.TestRunner"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.tuyoogame.yooasset",
-            "expression": "",
-            "define": "SUPPORT_YOOASSET"
-        },
-        {
-            "name": "com.tuyoogame.yooasset",
-            "expression": "[1.5.7]",
-            "define": "SUPPORT_YOOASSET_157"
-        },
-        {
-            "name": "com.tuyoogame.yooasset",
-            "expression": "[2.1.0]",
-            "define": "SUPPORT_YOOASSET_210"
-        }
-    ],
-    "noEngineReferences": false
+  "name": "AIO.CLI.YooAsset.Editor",
+  "references": [
+    "YooAsset",
+    "YooAsset.Editor",
+    "AIO.Core.Editor",
+    "AIO.Core.Runtime",
+    "AIO.Asset.Editor",
+    "AIO.Asset.Runtime",
+    "UnityEditor.UI",
+    "UnityEngine.UI",
+    "UnityEditor.TestRunner",
+    "UnityEngine.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.tuyoogame.yooasset",
+      "expression": "",
+      "define": "SUPPORT_YOOASSET"
+    },
+    {
+      "name": "com.tuyoogame.yooasset",
+      "expression": "[1.5.7]",
+      "define": "SUPPORT_YOOASSET_157"
+    },
+    {
+      "name": "com.tuyoogame.yooasset",
+      "expression": "[2.1.0]",
+      "define": "SUPPORT_YOOASSET_210"
+    }
+  ],
+  "noEngineReferences": false
 }

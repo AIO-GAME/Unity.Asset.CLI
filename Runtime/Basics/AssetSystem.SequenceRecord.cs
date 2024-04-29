@@ -1,4 +1,7 @@
 ﻿#if UNITY_EDITOR
+
+#region
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,35 +13,142 @@ using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
 
+#endregion
+
 namespace AIO
 {
     partial class AssetSystem
     {
         /// <summary>
-        /// 获取序列记录
+        ///     获取序列记录
         /// </summary>
         /// <param name="record">记录</param>
         [DebuggerNonUserCode, DebuggerHidden, Conditional("UNITY_EDITOR")]
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
         public static void AddSequenceRecord(SequenceRecord record)
         {
             Parameter.SequenceRecord.Add(record);
             WhiteListLocal.Add(record.Location);
         }
 
+        #region Nested type: SequenceRecord
+
+        /// <summary>
+        ///     资源包记录序列
+        /// </summary>
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
+        public struct SequenceRecord
+        {
+            /// <summary>
+            ///     资源GUID Key
+            /// </summary>
+            public string GUID
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(_GUID)) _GUID = AssetDatabase.AssetPathToGUID(AssetPath);
+
+                    return _GUID;
+                }
+            }
+
+            private string _GUID;
+
+            /// <summary>
+            ///     资源包名
+            /// </summary>
+            public string PackageName;
+
+            /// <summary>
+            ///     设置资源包名
+            /// </summary>
+            /// <param name="packageName">资源包名</param>
+            public void SetPackageName(string packageName) { PackageName = packageName; }
+
+            /// <summary>
+            ///     资源包寻址路径
+            /// </summary>
+            /// <param name="assetPath">资源路径</param>
+            public void SetAssetPath(string assetPath)
+            {
+                AssetPath = assetPath;
+                _GUID     = string.Empty;
+            }
+
+            /// <summary>
+            ///     设置寻址路径
+            /// </summary>
+            /// <param name="guid">资源GUID</param>
+            public void SetGUID(string guid) { _GUID = guid; }
+
+            /// <summary>
+            ///     资源包寻址路径
+            /// </summary>
+            public string Location;
+
+            /// <summary>
+            ///     资源路径
+            /// </summary>
+            public string AssetPath;
+
+            /// <summary>
+            ///     记录时间
+            /// </summary>
+            public DateTime Time;
+
+            /// <summary>
+            ///     记录大小
+            /// </summary>
+            public long Bytes;
+
+            /// <summary>
+            ///     记录数量
+            /// </summary>
+            public int Count;
+
+            /// <summary>
+            ///     是否为空
+            /// </summary>
+            public bool IsNull =>
+                string.IsNullOrEmpty(AssetPath) ||
+                string.IsNullOrEmpty(GUID);
+
+            public override string ToString()
+            {
+                return
+                    $"[{Time}] {PackageName} - {Location} - {AssetPath} - {Bytes.ToConverseStringFileSize()} - {Count}";
+            }
+        }
+
+        #endregion
+
+        #region Nested type: SequenceRecordQueue
 
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
             private const string FILE_NAME = "ASSETRECORD.json";
 
-            private List<SequenceRecord> Records;
+            private List<SequenceRecord>               Records;
+            private Dictionary<string, SequenceRecord> RecordCacheGuid;
+
+            public SequenceRecordQueue(bool enable = false)
+            {
+                Enable          = enable;
+                Records         = new List<SequenceRecord>(8);
+                RecordCacheGuid = new Dictionary<string, SequenceRecord>(8);
+            }
 
             /// <summary>
-            /// 自动激活序列记录
+            ///     自动激活序列记录
             /// </summary>
             public bool Enable { get; }
 
             /// <summary>
-            /// 序列记录大小
+            ///     序列记录大小
             /// </summary>
             public long Size => Records?.Sum(record => record.Bytes) ?? 0;
 
@@ -46,49 +156,82 @@ namespace AIO
 
             public SequenceRecord this[string guid] => Records.Find(record => record.GUID == guid);
 
-            public SequenceRecordQueue(bool enable = false)
+            #region ICollection<SequenceRecord> Members
+
+            public void Add(SequenceRecord record)
             {
-                Enable = enable;
-                Records = new List<SequenceRecord>();
+                if (!Enable
+                 || record.IsNull
+                 || ContainsGUID(record.GUID)
+                   ) return;
+                RecordCacheGuid[record.GUID] = record;
+                Records.Add(record);
             }
 
+            public void Clear()
+            {
+                Records.Clear();
+                RecordCacheGuid.Clear();
+            }
+
+            public bool Contains(SequenceRecord item) => RecordCacheGuid.ContainsKey(item.GUID);
+
+            public void CopyTo(SequenceRecord[] array, int arrayIndex) { Records.CopyTo(array, arrayIndex); }
+
+            public bool Remove(SequenceRecord item) => RecordCacheGuid.Remove(item.GUID) && Records.Remove(item);
+
+            public int  Count      => Records?.Count ?? 0;
+            public bool IsReadOnly => false;
+
+            public IEnumerator<SequenceRecord> GetEnumerator()
+            {
+                if (Records is null) Records = new List<SequenceRecord>();
+                return Records.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+
+            #endregion
+
+            #region IDisposable Members
+
+            public async void Dispose()
+            {
+                if (Records is null) return;
+                if (Enable) await AHelper.IO.WriteJsonUTF8Async(LOCAL_PATH, Records);
+                Records.Clear();
+                Records = null;
+            }
+
+            #endregion
+
             /// <summary>
-            /// 更新本地序列记录
+            ///     更新本地序列记录
             /// </summary>
             public void UpdateLocal()
             {
-                Records = new List<SequenceRecord>();
+                Records.Clear();
+                RecordCacheGuid.Clear();
                 if (!File.Exists(LOCAL_PATH)) return;
-                var temp = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
-                if (temp == null) return;
-                if (temp.Count <= 0) return;
-                var dic = new Dictionary<string, SequenceRecord>();
-                foreach (var item in temp)
-                {
-                    if (string.IsNullOrEmpty(item.GUID))
-                    {
-                        if (string.IsNullOrEmpty(item.AssetPath)) continue;
-                        item.GUID = AssetDatabase.AssetPathToGUID(item.AssetPath);
-                    }
-
-                    if (string.IsNullOrEmpty(item.GUID)) continue;
-                    dic[item.GUID] = item;
-                }
-
-                Records.AddRange(dic.Values);
+                var records = AHelper.IO.ReadJsonUTF8<List<SequenceRecord>>(LOCAL_PATH);
+                if (records == null || records.Count <= 0) return;
+                foreach (var record in
+                         from record in records
+                         where !string.IsNullOrEmpty(record.GUID)
+                         where !RecordCacheGuid.ContainsKey(record.GUID)
+                         select record)
+                    RecordCacheGuid[record.GUID] = record;
+                Records.AddRange(RecordCacheGuid.Values);
             }
 
             /// <summary>
-            /// 是否存在本地序列记录
+            ///     是否存在本地序列记录
             /// </summary>
             /// <returns>Ture:存在</returns>
-            public bool ExistsLocal()
-            {
-                return File.Exists(LOCAL_PATH);
-            }
+            public bool ExistsLocal() { return File.Exists(LOCAL_PATH); }
 
             /// <summary>
-            /// 下载序列记录
+            ///     下载序列记录
             /// </summary>
             public Task DownloadTask(string URL)
             {
@@ -97,7 +240,7 @@ namespace AIO
             }
 
             /// <summary>
-            /// 下载序列记录
+            ///     下载序列记录
             /// </summary>
             public IEnumerator DownloadCo(string URL)
             {
@@ -111,12 +254,12 @@ namespace AIO
             }
 
             /// <summary>
-            /// 保存序列记录
+            ///     保存序列记录
             /// </summary>
             public void Save()
             {
                 if (Records is null) return;
-                var temp = new Dictionary<string, SequenceRecord>();
+                var temp                                                                                  = new Dictionary<string, SequenceRecord>();
                 foreach (var item in Records.Where(item => !temp.ContainsKey(item.GUID))) temp[item.GUID] = item;
                 Records.Clear();
                 Records.AddRange(temp.Values);
@@ -124,87 +267,26 @@ namespace AIO
                 AHelper.IO.WriteJsonUTF8(LOCAL_PATH, Records);
             }
 
-            public async void Dispose()
-            {
-                if (Records is null) return;
-                if (Enable) await AHelper.IO.WriteJsonUTF8Async(LOCAL_PATH, Records);
-                Records.Clear();
-                Records = null;
-            }
+            public bool ContainsGUID(string guid) { return RecordCacheGuid.ContainsKey(guid); }
 
-            public void Add(SequenceRecord record)
-            {
-                if (!Enable) return;
-                if (record is null) return;
-                if (ContainsGUID(record.GUID)) return;
-                Records.Add(record);
-            }
-
-            public void Clear()
-            {
-                Records.Clear();
-            }
-
-            public bool Contains(SequenceRecord item)
-            {
-                return Records.Contains(item);
-            }
-
-            public bool ContainsGUID(string guid)
-            {
-                return Records.Exists(record => record.GUID == guid);
-            }
-
-            public bool ContainsAssetPath(string assetPath)
-            {
-                return Records.Exists(record => record.AssetPath == assetPath);
-            }
+            public bool ContainsAssetPath(string assetPath) { return Records.Exists(record => record.AssetPath == assetPath); }
 
             public bool ContainsAssetPath(string assetPath, string packageName)
             {
                 return Records.Exists(record => record.AssetPath == assetPath && record.PackageName == packageName);
             }
 
-            public void CopyTo(SequenceRecord[] array, int arrayIndex)
-            {
-                Records.CopyTo(array, arrayIndex);
-            }
-
             public bool RemoveGUID(string guid)
             {
-                return Records.RemoveAll(record => record.GUID == guid) > 0;
+                Records.RemoveAll(record => record.GUID == guid);
+                return RecordCacheGuid.Remove(guid);
             }
 
-            public bool RemoveAssetPath(string assetPath)
-            {
-                return Records.RemoveAll(record => record.AssetPath == assetPath) > 0;
-            }
-
-            public bool Remove(SequenceRecord item)
-            {
-                return Records.Remove(item);
-            }
-
-            public int Count => Records?.Count ?? 0;
-            public bool IsReadOnly => false;
-
-            public IEnumerator<SequenceRecord> GetEnumerator()
-            {
-                if (Records is null) Records = new List<SequenceRecord>();
-                return Records.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            public bool RemoveAssetPath(string assetPath) { return Records.RemoveAll(record => record.AssetPath == assetPath) > 0; }
 
             #region static
 
-            public static string GET_REMOTE_PATH(ASConfig config)
-            {
-                return GET_REMOTE_PATH(config.URL);
-            }
+            public static string GET_REMOTE_PATH(ASConfig config) { return GET_REMOTE_PATH(config.URL); }
 
             public static string GET_REMOTE_PATH(string URL)
             {
@@ -214,7 +296,7 @@ namespace AIO
             }
 
             /// <summary>
-            /// 序列记录路径
+            ///     序列记录路径
             /// </summary>
             public static string LOCAL_PATH
             {
@@ -223,7 +305,7 @@ namespace AIO
                     var root =
 #if UNITY_EDITOR
                         Path.Combine(Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')),
-                            "Bundles", "Version");
+                                     "Bundles", "Version");
 #else
                         Path.Combine(Application.persistentDataPath, Parameter.RuntimeRootDirectory, "Version");
 #endif
@@ -235,52 +317,7 @@ namespace AIO
             #endregion
         }
 
-        /// <summary>
-        /// 资源包记录序列
-        /// </summary>
-        public class SequenceRecord
-        {
-            /// <summary>
-            /// 资源GUID Key
-            /// </summary>
-            public string GUID;
-
-            /// <summary>
-            /// 资源包名
-            /// </summary>
-            public string PackageName;
-
-            /// <summary>
-            /// 资源包寻址路径
-            /// </summary>
-            public string Location;
-
-            /// <summary>
-            /// 资源路径
-            /// </summary>
-            public string AssetPath;
-
-            /// <summary>
-            /// 记录时间
-            /// </summary>
-            public DateTime Time;
-
-            /// <summary>
-            /// 记录大小
-            /// </summary>
-            public long Bytes;
-
-            /// <summary>
-            /// 记录数量
-            /// </summary>
-            public int Count;
-
-            public override string ToString()
-            {
-                return
-                    $"[{Time}] {PackageName} - {Location} - {AssetPath} - {Bytes.ToConverseStringFileSize()} - {Count}";
-            }
-        }
+        #endregion
     }
 }
 #endif

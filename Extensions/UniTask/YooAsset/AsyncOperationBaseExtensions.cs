@@ -1,5 +1,4 @@
 #if UNITASK_YOOASSET_SUPPORT && UNITASK_SUPPORT
-
 using System;
 using YooAsset;
 using static Cysharp.Threading.Tasks.Internal.Error;

@@ -5,10 +5,12 @@ using YooAsset;
 namespace AIO.UEngine.YooAsset
 {
     /// <summary>
-    /// 内置文件查询服务类
+    ///     内置文件查询服务类
     /// </summary>
     public class ResolverQueryServices : IBuildinQueryServices
     {
+        #region IBuildinQueryServices Members
+
         public bool QueryStreamingAssets(string packageName, string fileName)
         {
 #if UNITY_WEBGL
@@ -18,6 +20,8 @@ namespace AIO.UEngine.YooAsset
 #endif
             return File.Exists(path);
         }
+
+        #endregion
     }
 }
 #endif

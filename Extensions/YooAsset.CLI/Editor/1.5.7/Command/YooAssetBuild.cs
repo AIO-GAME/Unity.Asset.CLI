@@ -9,22 +9,27 @@ using UnityEditor;
 using UnityEngine;
 using YooAsset;
 using YooAsset.Editor;
+using YBuildResult = YooAsset.Editor.BuildResult;
 
 namespace AIO.UEditor.CLI
 {
     /// <summary>
-    ///  Yoo Asset
+    ///     Yoo Asset
     /// </summary>
     public static class YooAssetBuild
     {
+        private const string Manifest = "Manifest.json";
+
         public static void ArtBuild()
         {
             var cmd = Argument.ResolverCustomCur<UnityArgsCommand>();
             var args = cmd.executeMethod;
             var buildArgs = Argument.ResolverCustom<AssetBuildCommand>(args);
-
-            if (string.IsNullOrEmpty(buildArgs.BuildPackage)) throw new ArgumentNullException($"构建包: 名称不能为 NULL");
-            if (string.IsNullOrEmpty(buildArgs.PackageVersion)) throw new ArgumentNullException($"构建包: 版本不能为 NULL");
+            Lang.Tr.Current = Application.systemLanguage;
+            if (string.IsNullOrEmpty(buildArgs.BuildPackage))
+                throw new ArgumentNullException(Lang.Tr.Get("Build package: The name cannot be NULL"));
+            if (string.IsNullOrEmpty(buildArgs.PackageVersion))
+                throw new ArgumentNullException(Lang.Tr.Get("Build package: The version cannot be NULL"));
 
             if (string.IsNullOrEmpty(buildArgs.OutputRoot))
                 buildArgs.OutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
@@ -61,11 +66,11 @@ namespace AIO.UEditor.CLI
         {
             if (string.IsNullOrEmpty(EncryptionClassName)) return new EncryptionNone();
             return (from item in EditorTools.GetAssignableTypes(typeof(IEncryptionServices))
-                where item.FullName == EncryptionClassName
-                select (IEncryptionServices)Activator.CreateInstance(item)).FirstOrDefault();
+                    where item.FullName == EncryptionClassName
+                    select (IEncryptionServices)Activator.CreateInstance(item)).FirstOrDefault();
         }
 
-        public static BuildResult ArtBuild(AssetBuildCommand command)
+        public static YBuildResult ArtBuild(AssetBuildCommand command)
         {
             YooAsset.Editor.EBuildPipeline buildPipeline;
             switch (command.BuildPipeline)
@@ -93,64 +98,67 @@ namespace AIO.UEditor.CLI
                         command.BuildPackage);
                     if (Directory.Exists(target))
                     {
-                        var dirs = Directory.GetDirectories(target)
-                            .Where(directory => !directory.EndsWith("Simulate") && !directory.EndsWith("OutputCache"))
-                            .ToArray();
+                        var dirs = Directory.GetDirectories(target).
+                                             Where(directory =>
+                                                       !directory.EndsWith("Simulate") &&
+                                                       !directory.EndsWith("OutputCache")).
+                                             ToArray();
                         if (dirs.Length > 0)
                         {
                             // 如果为增量更新 则判断是否需要清理缓存 
                             buildMode = YooAsset.Editor.EBuildMode.IncrementalBuild;
-                            var cleanCacheNum = ASBuildConfig.GetOrCreate().AutoCleanCacheNum;
+                            var cleanCacheNum = AssetBuildConfig.GetOrCreate().AutoCleanCacheNumber;
                             if (dirs.Length >= cleanCacheNum)
                             {
-                                var caches = dirs.SortQuick((s, t) =>
+                                var caches = dirs.Sort((s, t) => // 如果缓存数量大于等于设置的缓存数量 则清理缓存 缓存清理机制为删除最早的缓存
                                 {
-                                    // 如果缓存数量大于等于设置的缓存数量 则清理缓存 缓存清理机制为删除最早的缓存
                                     var st = Directory.GetCreationTimeUtc(s);
                                     var tt = Directory.GetCreationTimeUtc(t);
                                     var result = tt.CompareTo(st);
                                     if (result == 0) // 如果时间相同 则比较名称
-                                    {
                                         result = string.Compare(
                                             Path.GetFileName(s),
                                             Path.GetFileName(t),
                                             StringComparison.CurrentCulture);
-                                    }
 
                                     return result;
                                 });
 
                                 for (var index = 0; index < dirs.Length - cleanCacheNum + 1; index++)
-                                {
                                     Directory.Delete(caches[index], true);
-                                }
                             }
                         }
-                        else buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
+                        else
+                        {
+                            buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
+                        }
                     }
-                    else buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
+                    else
+                    {
+                        buildMode = YooAsset.Editor.EBuildMode.ForceRebuild;
+                    }
 
                     break;
                 case EBuildMode.DryRunBuild:
                     buildMode = YooAsset.Editor.EBuildMode.DryRunBuild;
                     break;
                 case EBuildMode.SimulateBuild:
-                    buildMode = YooAsset.Editor.EBuildMode.SimulateBuild;
+                    buildMode              = YooAsset.Editor.EBuildMode.SimulateBuild;
                     command.PackageVersion = "Simulate";
                     break;
             }
 
             var buildParameters = new BuildParameters
             {
-                BuildTarget = command.ActiveTarget,
-                BuildPipeline = buildPipeline,
-                BuildMode = buildMode,
-                PackageName = command.BuildPackage,
-                SharedPackRule = new ZeroRedundancySharedPackRule(),
-                CopyBuildinFileTags = command.CopyBuildInFileTags,
+                BuildTarget          = command.ActiveTarget,
+                BuildPipeline        = buildPipeline,
+                BuildMode            = buildMode,
+                PackageName          = command.BuildPackage,
+                SharedPackRule       = new ZeroRedundancySharedPackRule(),
+                CopyBuildinFileTags  = command.CopyBuildInFileTags,
                 VerifyBuildingResult = command.VerifyBuildingResult,
-                PackageVersion = command.PackageVersion,
-                BuildOutputRoot = command.OutputRoot,
+                PackageVersion       = command.PackageVersion,
+                BuildOutputRoot      = command.OutputRoot,
                 StreamingAssetsRoot = Path.Combine(
                     Application.streamingAssetsPath,
                     ASConfig.GetOrCreate().RuntimeRootDirectory),
@@ -190,12 +198,10 @@ namespace AIO.UEditor.CLI
             buildParameters.EncryptionServices = CreateEncryptionServicesInstance(command.EncyptionClassName);
 
             if (command.BuildPipeline == EBuildPipeline.ScriptableBuildPipeline)
-            {
                 buildParameters.SBPParameters = new BuildParameters.SBPBuildParameters
                 {
                     WriteLinkXML = true
                 };
-            }
 
             Debug.Log(AHelper.Json.Serialize(buildParameters));
 
@@ -217,10 +223,8 @@ namespace AIO.UEditor.CLI
             return buildResult;
         }
 
-        private const string Manifest = "Manifest.json";
-
         /// <summary>
-        /// 生成清单文件
+        ///     生成清单文件
         /// </summary>
         /// <param name="dir">目标路径</param>
         /// <param name="isAgain">重新生成</param>
@@ -233,9 +237,9 @@ namespace AIO.UEditor.CLI
                 return;
             }
 
-            var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories)
-                .Where(filePath => filePath != Manifest)
-                .ToDictionary(filePath => filePath, filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
+            var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories).
+                                    Where(filePath => filePath != Manifest).ToDictionary(filePath => filePath,
+                                                                                         filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
             hashtable.Remove("OutputCache");
             hashtable.Remove("OutputCache.manifest");
 
@@ -253,14 +257,14 @@ namespace AIO.UEditor.CLI
         }
 
         /// <summary>
-        /// 对比清单文件
+        ///     对比清单文件
         /// </summary>
         /// <param name="current">当前清单</param>
         /// <param name="target">对比清单</param>
         /// <returns>
-        /// [Item1 : 新增文件列表]
-        /// [Item2 : 删除文件列表]
-        /// [Item3 : 修改文件列表]
+        ///     [Item1 : 新增文件列表]
+        ///     [Item2 : 删除文件列表]
+        ///     [Item3 : 修改文件列表]
         /// </returns>
         public static Tuple<
                 IDictionary<string, string>,
@@ -278,9 +282,8 @@ namespace AIO.UEditor.CLI
 
             var delete = new Dictionary<string, string>(); // 删除
             var change = new Dictionary<string, string>(); // 修改
-            var add = current
-                .Where(item => !target.ContainsKey(item.Key))
-                .ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
+            var add = current.Where(item => !target.ContainsKey(item.Key)).
+                              ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
 
             foreach (var item in target) // 遍历最新版本清单
             {
@@ -291,9 +294,7 @@ namespace AIO.UEditor.CLI
                 }
 
                 if (current[item.Key] != item.Value) // 修改
-                {
                     change.Add(item.Key, current[item.Key]);
-                }
             }
 
             return Tuple.Create<
@@ -304,14 +305,14 @@ namespace AIO.UEditor.CLI
         }
 
         /// <summary>
-        /// 对比清单文件
+        ///     对比清单文件
         /// </summary>
         /// <param name="currentPath">当前清单文件夹</param>
         /// <param name="latestPath">最新清单文件夹</param>
         /// <returns>
-        /// [Item1 : 新增文件列表]
-        /// [Item2 : 删除文件列表]
-        /// [Item3 : 修改文件列表]
+        ///     [Item1 : 新增文件列表]
+        ///     [Item2 : 删除文件列表]
+        ///     [Item3 : 修改文件列表]
         /// </returns>
         public static Tuple<
                 IDictionary<string, string>,
@@ -377,7 +378,7 @@ namespace AIO.UEditor.CLI
         }
 
         /// <summary>
-        /// 合并到最新版本
+        ///     合并到最新版本
         /// </summary>
         /// <param name="rootPath">根目录</param>
         /// <param name="version">版本号</param>
@@ -394,7 +395,7 @@ namespace AIO.UEditor.CLI
                 AHelper.IO.DeleteFile(Path.Combine(latestPath, "OutputCache"));
                 AHelper.IO.DeleteFile(Path.Combine(latestPath, "OutputCache.manifest"));
                 AHelper.IO.DeleteFile(Path.Combine(latestPath,
-                    $"BuildReport_{Path.GetFileName(rootPath)}_{version}.json"));
+                                                   $"BuildReport_{Path.GetFileName(rootPath)}_{version}.json"));
                 return;
             }
 

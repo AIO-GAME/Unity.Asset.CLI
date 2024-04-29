@@ -14,22 +14,13 @@ using YooAsset;
 namespace AIO.UEngine.YooAsset
 {
     [IgnoreConsoleJump(true)]
-    public partial class Proxy : AssetProxy
+    public partial class Proxy : ASProxy
     {
-        public override IEnumerator InitializeCO()
-        {
-            Initialize_Internal();
-            foreach (var operation in InitializationOperations) yield return operation;
-        }
+        private static Proxy Instance;
 
-        public override async Task InitializeTask()
+        public Proxy()
         {
-            Initialize_Internal();
-#if UNITY_WEBGL
-            foreach (var operation in InitializationOperations) await operation;
-#else
-            await Task.WhenAll(InitializationOperations.Select(operation => operation.Task));
-#endif
+            Instance = this;
         }
 
         public override void Dispose()
@@ -65,6 +56,18 @@ namespace AIO.UEngine.YooAsset
         public override bool CheckLocationValid(string location)
         {
             return Dic.Values.Any(asset => asset.CheckLocationValid(location));
+        }
+
+        public bool CheckLocationValid(string location, out string assetPath)
+        {
+            foreach (var asset in Dic.Values.Where(asset => asset.CheckLocationValid(location)))
+            {
+                assetPath = asset.GetAssetInfo(location).AssetPath;
+                return true;
+            }
+
+            assetPath = string.Empty;
+            return false;
         }
 
         public override IASNetLoading GetLoadingHandle()

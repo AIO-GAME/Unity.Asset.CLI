@@ -19,11 +19,11 @@ namespace AIO.UEngine.YooAsset
         {
             var initParameters = new EditorSimulateModeParameters
             {
-                LoadingMaxTimeSlice = LoadingMaxTimeSlice,
-                DecryptionServices = DecryptionServices,
+                LoadingMaxTimeSlice      = LoadingMaxTimeSlice,
+                DecryptionServices       = DecryptionServices,
                 SimulateManifestFilePath = string.Empty,
-                BuildinRootDirectory = string.Empty,
-                SandboxRootDirectory = string.Empty
+                BuildinRootDirectory     = string.Empty,
+                SandboxRootDirectory     = string.Empty
             };
             return initParameters;
         }

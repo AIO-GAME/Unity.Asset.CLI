@@ -1,0 +1,148 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" linePragmas="true" visibility="public"#>
+<#@ output extension=".cs" encoding="utf-8" #>
+<#@ import namespace="System"#>
+<#@ import namespace="System.Collections"#>
+<#@ import namespace="System.Collections.Generic" #>
+<#
+    var types = new Dictionary<string, (string, bool)[]>();
+    types["Audio"] = new (string, bool)[] // 音频
+    {
+        ("mixer", true),
+        ("mpeg", false),
+        ("aac", false), 
+        ("wmv", false),
+        ("wma", false),
+        ("mp3", false),
+        ("ogg", false), 
+        ("flac", false),
+    };
+    types["Font"] = new (string, bool)[] // 字体
+    {
+        ("ttf", false),
+        ("otf", false),
+        ("fon", false),
+        ("fnt", false),
+    };
+    types["Text"] = new (string, bool)[] // 文本
+    {
+        ("lua", true),
+        ("json", true),
+        ("xml", true),
+        ("bytes", true),
+        ("txt", false),
+        ("csv", false),
+        ("yaml", false),
+        ("asset", false),
+        ("md", false),
+    };
+    types["Texture"] = new (string, bool)[] // 纹理
+    {
+        ("png", true),
+        ("jpg", true),
+        ("spriteAtlas",true),
+        ("jpeg", false),
+        ("tga", false),
+        ("bmp", false),
+        ("psd", false),
+        ("gif", false),
+        ("hdr", false),
+        ("pic", false),
+        ("pvr", false),
+        ("dds", false),
+        ("pkm", false),
+        ("ktx", false),
+        ("astc", false),
+        ("webp", false),
+        ("svg", false),
+        ("exr", false),
+        ("tiff", false),
+    };
+    types["Scene"] = new (string, bool)[] // 场景
+    {   
+        ("unity", false),
+    };
+    types["Material"] = new (string, bool)[] // 材质
+    {   
+        ("mat", false),
+    };
+    types["Shader"] = new (string, bool)[] // 着色器
+    {   
+        ("shader", false),
+        ("shadervariants", false),
+    };
+    types["Prefab"] = new (string, bool)[] // 预制体
+    {   
+        ("prefab", false),
+    };
+    types["Model"] = new (string, bool)[] // 模型
+    {   
+        ("fbx", false),
+    };    
+    types["Terrain"] = new (string, bool)[] // 地形
+    {   
+        ("terrain", false),
+    };
+#>
+
+/*|✩ - - - - - |||
+|||✩ Date:     ||| -> Automatic Generate
+|||✩ - - - - - |*/
+
+namespace AIO.UEditor
+{
+    partial class RuleCollect
+    {
+<#
+        var index = 0;
+        foreach (var type in types)
+        {
+            index++;
+            var typeName = type.Key;
+            var extensions = type.Value;
+#>
+        #region Nested type: Collect <#= typeName #>
+
+        private struct Collect<#= typeName #> : AIO.UEditor.IAssetRuleFilter
+        {
+            public string DisplayFilterName => "<#= typeName #>/default";
+            public int DisplayIndex => <#= index #>00;
+            public bool IsCollectAsset(AssetRuleData data)
+            {
+<#
+            for (int i = 0; i < extensions.Length; i++)
+            {
+#>
+                <#= i == 0 ? "return" : "    ||" #> data.Extension.ToLower() == "<#= extensions[i].Item1.ToLower() #>" 
+<#
+            }
+#>
+                    ;
+            }
+        }
+
+<#
+            for (int i = 0; i < extensions.Length; i++)
+            {
+                if (!extensions[i].Item2) continue;
+#>
+        #region Nested type: Collect <#= typeName #> <#= extensions[i].Item1.ToUpper() #>
+
+        private struct Collect<#= typeName #><#= extensions[i].Item1.ToUpper() #> : AIO.UEditor.IAssetRuleFilter
+        {
+            public string DisplayFilterName => "<#= typeName #>/*.<#= extensions[i].Item1.ToLower() #>";
+            public int DisplayIndex => <#= index * 100 + i #>;
+            public bool IsCollectAsset(AssetRuleData data) => data.Extension.ToLower() == "<#= extensions[i].Item1.ToLower() #>";
+        }
+
+        #endregion
+
+<#
+            }
+#>
+        #endregion
+
+<#
+        }
+#>
+    }
+}

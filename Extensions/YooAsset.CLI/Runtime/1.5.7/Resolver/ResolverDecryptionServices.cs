@@ -6,10 +6,12 @@ using YooAsset;
 namespace AIO.UEngine.YooAsset
 {
     /// <summary>
-    /// 资源文件解密服务类
+    ///     资源文件解密服务类
     /// </summary>
     public class ResolverDecryptionServices : IDecryptionServices
     {
+        #region IDecryptionServices Members
+
         public ulong LoadFromFileOffset(DecryptFileInfo fileInfo)
         {
             return 32;
@@ -29,6 +31,8 @@ namespace AIO.UEngine.YooAsset
         {
             return 1024;
         }
+
+        #endregion
     }
 }
 #endif

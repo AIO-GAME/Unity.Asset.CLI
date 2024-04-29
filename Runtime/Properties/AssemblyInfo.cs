@@ -1,6 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿#region
+
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine.Scripting;
+
+#endregion
 
 [assembly: Preserve]
 #if UNITY_2018_3_OR_NEWER

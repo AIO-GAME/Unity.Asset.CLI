@@ -2,22 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = System.Diagnostics.Debug;
 
 namespace AIO.UEditor
 {
     /// <summary>
-    /// 资源 代理 编辑器
+    ///     资源 代理 编辑器
     /// </summary>
     public static class AssetProxyEditor
     {
         private static IAssetProxyEditor Editor;
 
-        [AInit(mode: EInitAttrMode.Both, int.MaxValue)]
+        [AInit(EInitAttrMode.Both, int.MaxValue)]
         public static void Initialize()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -34,7 +37,7 @@ namespace AIO.UEditor
         }
 
         /// <summary>
-        /// 创建配置
+        ///     创建配置
         /// </summary>
         /// <param name="BundlesDir">资源构建目录</param>
         /// <param name="MergeToLatest">是否合并为latest版本</param>
@@ -50,8 +53,12 @@ namespace AIO.UEditor
             Editor.CreateConfig(BundlesDir, MergeToLatest);
         }
 
-        public static async Task<bool> UploadGCloud(ICollection<AsUploadGCloudParameter> parameters,
-            bool isTips = false)
+        /// <summary>
+        ///     上传到GCloud
+        /// </summary>
+        public static async Task<bool> UploadGCloud(
+            [ReadOnlyArray] ICollection<AssetUploadGCloudParameter> parameters,
+            bool                                                    isTips = false)
         {
             if (Editor is null)
             {
@@ -70,15 +77,15 @@ namespace AIO.UEditor
             }
 
             var succeed = await Editor.UploadGCloud(parameters);
-            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            var info    = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
 
         /// <summary>
-        /// 上传到GCloud
+        ///     上传到GCloud
         /// </summary>
-        public static async Task<bool> UploadGCloud(AsUploadGCloudParameter parameter, bool isTips = false)
+        public static async Task<bool> UploadGCloud(AssetUploadGCloudParameter parameter, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -92,18 +99,17 @@ namespace AIO.UEditor
             if (!string.IsNullOrEmpty(parameter.GCLOUD_PATH)) PrGCloud.Gcloud = parameter.GCLOUD_PATH;
             if (!string.IsNullOrEmpty(parameter.GSUTIL_PATH)) PrGCloud.Gsutil = parameter.GSUTIL_PATH;
 
-            var sw = Stopwatch.StartNew();
+            var sw      = Stopwatch.StartNew();
             var succeed = await Editor.UploadGCloud(new[] { parameter });
-            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            var info    = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
 
-
         /// <summary>
-        /// 上传到Ftp
+        ///     上传到Ftp
         /// </summary>
-        public static async Task<bool> UploadFtp(AsUploadFtpParameter parameter, bool isTips = false)
+        public static async Task<bool> UploadFtp(AssetUploadFtpParameter parameter, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -111,60 +117,59 @@ namespace AIO.UEditor
                 return false;
             }
 
-            var sw = Stopwatch.StartNew();
+            var sw      = Stopwatch.StartNew();
             var succeed = await Editor.UploadFtp(new[] { parameter });
-            var info = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            var info    = $"{(succeed ? "资源上传完成" : "资源上传失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("消息", info, "确定");
             return succeed;
         }
 
-        public static bool BuildArtAll(ASBuildConfig config, bool isTips = false)
+        public static bool BuildArtAll(AssetBuildConfig config, bool isTips = false)
         {
             var command = new AssetBuildCommand
             {
-                PackageVersion = config.BuildVersion,
-                BuildPackage = config.PackageName,
-                CompressOption = config.CompressedMode,
-                ActiveTarget = config.BuildTarget,
-                BuildPipeline = config.BuildPipeline,
-                OutputRoot = config.BuildOutputPath,
-                BuildMode = config.BuildMode,
+                PackageVersion      = config.BuildVersion,
+                BuildPackage        = config.PackageName,
+                CompressOption      = config.CompressedMode,
+                ActiveTarget        = config.BuildTarget,
+                BuildPipeline       = config.BuildPipeline,
+                OutputRoot          = config.BuildOutputPath,
+                BuildMode           = config.BuildMode,
                 CopyBuildInFileTags = config.FirstPackTag,
-                MergeToLatest = config.MergeToLatest,
+                MergeToLatest       = config.MergeToLatest
             };
-            var array = AssetCollectRoot.GetOrCreate().GetPackageNames();
+            var array                           = AssetCollectRoot.GetOrCreate().GetNames();
             if (config.BuildFirstPackage) array = array.Add(AssetSystem.TagsRecord);
             return BuildArtList(array, command, isTips);
         }
 
         /// <summary>
-        /// 构建资源
+        ///     构建资源
         /// </summary>
         /// <param name="config"></param>
         /// <param name="isTips"></param>
-        public static bool BuildArt(ASBuildConfig config, bool isTips = false)
+        public static bool BuildArt(AssetBuildConfig config, bool isTips = false)
         {
             var command = new AssetBuildCommand
             {
-                PackageVersion = config.BuildVersion,
-                BuildPackage = config.PackageName,
-                CompressOption = config.CompressedMode,
-                ActiveTarget = config.BuildTarget,
-                BuildPipeline = config.BuildPipeline,
-                OutputRoot = config.BuildOutputPath,
-                BuildMode = config.BuildMode,
+                PackageVersion      = config.BuildVersion,
+                BuildPackage        = config.PackageName,
+                CompressOption      = config.CompressedMode,
+                ActiveTarget        = config.BuildTarget,
+                BuildPipeline       = config.BuildPipeline,
+                OutputRoot          = config.BuildOutputPath,
+                BuildMode           = config.BuildMode,
                 CopyBuildInFileTags = config.FirstPackTag,
-                MergeToLatest = config.MergeToLatest,
+                MergeToLatest       = config.MergeToLatest
             };
             if (config.BuildFirstPackage) command.BuildPackage = AssetSystem.TagsRecord;
             return BuildArt(command, isTips);
         }
 
         /// <summary>
-        /// 构建所有资源
+        ///     构建所有资源
         /// </summary>
-        public static bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command,
-            bool isTips = false)
+        public static bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command, bool isTips = false)
         {
             if (Editor is null)
             {
@@ -173,15 +178,18 @@ namespace AIO.UEditor
             }
 
             SaveScene();
-            var sw = Stopwatch.StartNew();
+            var sw         = Stopwatch.StartNew();
             var enumerable = packageNames as string[] ?? packageNames.ToArray();
-            var succeed = Editor.BuildArtList(enumerable, command);
+            var succeed    = Editor.BuildArtList(enumerable, command);
             var info =
                 $"构建 {string.Join(",", enumerable)} {(succeed ? "成功" : "失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("构建成功", info, "确定");
             return succeed;
         }
 
+        /// <summary>
+        ///    构建资源
+        /// </summary>
         public static bool BuildArt(AssetBuildCommand command, bool isTips = false)
         {
             if (Editor is null)
@@ -191,15 +199,15 @@ namespace AIO.UEditor
             }
 
             SaveScene();
-            var sw = Stopwatch.StartNew();
+            var sw      = Stopwatch.StartNew();
             var succeed = Editor.BuildArt(command);
-            var info = $"构建 {command.BuildPackage} {(succeed ? "成功" : "失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
+            var info    = $"构建 {command.BuildPackage} {(succeed ? "成功" : "失败")} 一共耗时 : {sw.Elapsed.TotalSeconds:F2} 秒";
             EHelper.DisplayDialog("构建成功", info, "确定");
             return succeed;
         }
 
         /// <summary>
-        /// 转换配置
+        ///     转换配置
         /// </summary>
         /// <param name="config">配饰文件</param>
         /// <param name="ignoreTips">忽略提示</param>
@@ -216,6 +224,9 @@ namespace AIO.UEditor
             Editor.ConvertConfig(config);
         }
 
+        /// <summary>
+        ///    保存场景
+        /// </summary>
         private static void SaveScene()
         {
             var currentScene = SceneManager.GetSceneAt(0);
@@ -227,14 +238,19 @@ namespace AIO.UEditor
                 EditorSceneManager.SaveScene(scene);
         }
 
+        private static void TipsInstall()
+        {
+            var window = ScriptableObject.CreateInstance<InstallPopup>();
+            window.titleContent = new GUIContent("提示");
+            window.ShowUtility();
+            window.Focus();
+        }
+
+        #region Nested type: InstallPopup
+
         private class InstallPopup : EditorWindow
         {
-            private enum Types
-            {
-                [InspectorName("YooAsset [Latest]")] YooAsset,
-            }
-
-            private bool isCN;
+            private bool  isCN;
             private Types type;
 
             private void Awake()
@@ -242,10 +258,10 @@ namespace AIO.UEditor
                 // 位置显示在屏幕中间
                 var temp = Screen.currentResolution;
                 position = new Rect(
-                    temp.width / 2f,
-                    temp.height / 2f,
-                    300,
-                    50);
+                                    temp.width / 2f,
+                                    temp.height / 2f,
+                                    300,
+                                    50);
             }
 
             private void OnGUI()
@@ -270,14 +286,14 @@ namespace AIO.UEditor
                     Close();
                 }
             }
+
+            private enum Types
+            {
+                [InspectorName("YooAsset [Latest]")]
+                YooAsset
+            }
         }
 
-        private static void TipsInstall()
-        {
-            var window = ScriptableObject.CreateInstance<InstallPopup>();
-            window.titleContent = new GUIContent("提示");
-            window.ShowUtility();
-            window.Focus();
-        }
+        #endregion
     }
 }

@@ -4,7 +4,7 @@ using UnityEditor;
 namespace AIO.UEditor.CLI
 {
     /// <summary>
-    /// LnkTool
+    ///     LnkTool
     /// </summary>
     public static class LnkToolYooAsset
     {

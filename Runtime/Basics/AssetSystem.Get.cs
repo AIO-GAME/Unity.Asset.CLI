@@ -1,15 +1,28 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+
+#endregion
 
 namespace AIO
 {
     partial class AssetSystem
     {
         /// <summary>
-        /// 获取指定标签资源可寻址列表
+        ///    获取资源包配置
+        /// </summary>
+        /// <returns></returns>
+        public static string GetPackageVersionDefault()
+        {
+            return Proxy.GetPackageVersionDefault();
+        }
+        
+        /// <summary>
+        ///     获取指定标签资源可寻址列表
         /// </summary>
         /// <param name="tag">资源标签</param>
         /// <returns>寻址列表</returns>
@@ -19,7 +32,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 根据资源标签获取资源信息
+        ///     根据资源标签获取资源信息
         /// </summary>
         /// <param name="tag">资源标签</param>
         /// <param name="tags">资源标签</param>
@@ -29,7 +42,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 获取指定标签资源可寻址列表
+        ///     获取指定标签资源可寻址列表
         /// </summary>
         /// <param name="tags">资源标签</param>
         /// <returns>寻址列表</returns>
@@ -39,7 +52,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 获取是否有读取权限
+        ///     获取是否有读取权限
         /// </summary>
         public static bool GetHasReadPermission()
         {
@@ -66,7 +79,7 @@ namespace AIO
         }
 
         /// <summary>
-        /// 获取是否有写入权限
+        ///     获取是否有写入权限
         /// </summary>
         public static bool GetHasWritePermission()
         {
@@ -103,7 +116,7 @@ namespace AIO
 #endif
 
         /// <summary>
-        /// 获取可用磁盘空间
+        ///     获取可用磁盘空间
         /// </summary>
         /// <returns>剩余空间字节数</returns>
         public static long GetAvailableDiskSpace()

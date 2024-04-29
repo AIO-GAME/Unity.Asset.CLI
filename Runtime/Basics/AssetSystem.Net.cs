@@ -11,25 +11,28 @@ namespace AIO
     partial class AssetSystem
     {
         /// <summary>
-        /// 检测网络请求
+        ///     检测网络请求
         /// </summary>
         /// <returns>Ture:成功 False:异常</returns>
-        private static bool LoadCheckNet(UnityWebRequest operation)
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
+        internal static bool LoadCheckNet(UnityWebRequest operation)
         {
 #if UNITY_2020_1_OR_NEWER
             switch (operation.result)
             {
                 case UnityWebRequest.Result.InProgress:
-                    LogException($"{ERROR_NET}请求正在进行中 -> {operation.url} {operation.error}");
+                    LogException($"请求正在进行中 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.ConnectionError:
-                    LogException($"{ERROR_NET}无法连接到服务器 -> {operation.url} {operation.error}");
+                    LogException($"无法连接到服务器 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.ProtocolError:
-                    LogException($"{ERROR_NET}服务器返回响应错误 -> {operation.url} {operation.error}");
+                    LogException($"服务器返回响应错误 -> {operation.url} {operation.error}");
                     return false;
                 case UnityWebRequest.Result.DataProcessingError:
-                    LogException($"{ERROR_NET}数据处理异常 -> {operation.url} {operation.error}");
+                    LogException($"数据处理异常 -> {operation.url} {operation.error}");
                     return false;
             }
 
@@ -65,8 +68,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerTexture.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerTexture.GetContent(uwr)
+                               : null);
             }
         }
 
@@ -83,8 +86,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
-                    : null);
+                               ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
+                               : null);
             }
         }
 
@@ -99,8 +102,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? uwr.downloadHandler.text
-                    : string.Empty);
+                               ? uwr.downloadHandler.text
+                               : string.Empty);
             }
         }
 
@@ -115,8 +118,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? uwr.downloadHandler.data
-                    : Array.Empty<byte>());
+                               ? uwr.downloadHandler.data
+                               : Array.Empty<byte>());
             }
         }
 
@@ -132,8 +135,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerAudioClip.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerAudioClip.GetContent(uwr)
+                               : null);
             }
         }
 
@@ -148,8 +151,8 @@ namespace AIO
             {
                 await uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerAssetBundle.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerAssetBundle.GetContent(uwr)
+                               : null);
             }
         }
 
@@ -160,7 +163,7 @@ namespace AIO
         #region CO
 
         /// <summary>
-        /// 网上加载图片
+        ///     网上加载图片
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>
@@ -170,13 +173,13 @@ namespace AIO
             {
                 yield return uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerTexture.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerTexture.GetContent(uwr)
+                               : null);
             }
         }
 
         /// <summary>
-        /// 网上加载精灵
+        ///     网上加载精灵
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="rect">矩形</param>
@@ -188,13 +191,13 @@ namespace AIO
             {
                 yield return uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
-                    : null);
+                               ? Sprite.Create(DownloadHandlerTexture.GetContent(uwr), rect, pivot)
+                               : null);
             }
         }
 
         /// <summary>
-        /// 网上加载AB
+        ///     网上加载AB
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>
@@ -204,13 +207,13 @@ namespace AIO
             {
                 yield return uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerAssetBundle.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerAssetBundle.GetContent(uwr)
+                               : null);
             }
         }
 
         /// <summary>
-        /// 网上加载音频
+        ///     网上加载音频
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="audioType">音频类型</param>
@@ -221,13 +224,13 @@ namespace AIO
             {
                 yield return uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? DownloadHandlerAudioClip.GetContent(uwr)
-                    : null);
+                               ? DownloadHandlerAudioClip.GetContent(uwr)
+                               : null);
             }
         }
 
         /// <summary>
-        /// 网上加载文本
+        ///     网上加载文本
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>
@@ -237,13 +240,13 @@ namespace AIO
             {
                 yield return uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? uwr.downloadHandler.text
-                    : string.Empty);
+                               ? uwr.downloadHandler.text
+                               : string.Empty);
             }
         }
 
         /// <summary>
-        /// 网上加载流数据
+        ///     网上加载流数据
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>
@@ -253,8 +256,8 @@ namespace AIO
             {
                 yield return uwr.SendWebRequest();
                 cb?.Invoke(LoadCheckNet(uwr)
-                    ? uwr.downloadHandler.data
-                    : Array.Empty<byte>());
+                               ? uwr.downloadHandler.data
+                               : Array.Empty<byte>());
             }
         }
 

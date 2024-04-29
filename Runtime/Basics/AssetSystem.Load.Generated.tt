@@ -21,14 +21,13 @@
 #>
 
 /*|✩ - - - - - |||
-|||✩ Author:   ||| -> xi nan
 |||✩ Date:     ||| -> Automatic Generate
-|||✩ Document: ||| ->
 |||✩ - - - - - |*/
 
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -47,43 +46,47 @@ namespace AIO
         /// 同步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
         public static <#= typeName #> Load<#= aliasName #>(string location)
-        {
-            return Proxy.LoadAssetSync<<#= typeName #>>(SettingToLocalPath(location));
-        }
+            => Proxy.LoadAssetTask<<#= typeName #>>(location, typeof(<#= typeName #>)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> cb)
-        {
-            cb.Invoke(await Proxy.LoadAssetTask<<#= typeName #>>(SettingToLocalPath(location)));
-        }
+        /// <param name="completed">回调</param>
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
+        public static async void Load<#= aliasName #>(string location, Action<<#= typeName #>> completed)
+            => await Proxy.LoadAssetTask<<#= typeName #>>(location, typeof(<#= typeName #>), completed);
 
         /// <summary>
         /// 异步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static Task<<#= typeName #>> Load<#= aliasName #>Task(string location)
-        {
-            return Proxy.LoadAssetTask<<#= typeName #>>(SettingToLocalPath(location));
-        }
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
+        public static ILoaderHandle<<#= typeName #>> Load<#= aliasName #>Task(string location)
+            =>  Proxy.LoadAssetTask<<#= typeName #>>(location, typeof(<#= typeName #>));
 
         /// <summary>
-        /// 异步回调加载 <see cref="<#= typeName #>"/>
+        /// 异步加载 <see cref="<#= typeName #>"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        /// <param name="cb">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden]
-        public static IEnumerator Load<#= aliasName #>CO(string location, Action<<#= typeName #>> cb)
-        {
-            return Proxy.LoadAssetCO(SettingToLocalPath(location), cb);
-        }
+        /// <param name="completed">回调</param>
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+#if UNITY_2022_1_OR_NEWER
+        [HideInCallstack]
+#endif
+        public static ILoaderHandle<<#= typeName #>> Load<#= aliasName #>Task(string location, Action<<#= typeName #>> completed)
+            =>  Proxy.LoadAssetTask<<#= typeName #>>(location, typeof(<#= typeName #>), completed);
 
        #endregion
 

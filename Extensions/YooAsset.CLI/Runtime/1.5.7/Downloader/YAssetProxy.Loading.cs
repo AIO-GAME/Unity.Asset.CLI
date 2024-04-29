@@ -15,13 +15,15 @@ namespace AIO.UEngine.YooAsset
 
     partial class Proxy
     {
+        private static readonly AProgress Progress = new AProgress();
+
         private static void WaitNotReachable(AssetInfo location)
         {
             if (AssetSystem.DownloadEvent.OnNetReachableNot is null)
                 throw new Exception("NetReachableNot is null");
 
-            Progress.State = EProgressState.Fail;
-            Progress.TotalValue = DownloaderOperations[location.AssetPath].TotalDownloadBytes;
+            Progress.State        = EProgressState.Fail;
+            Progress.TotalValue   = DownloaderOperations[location.AssetPath].TotalDownloadBytes;
             Progress.CurrentValue = DownloaderOperations[location.AssetPath].CurrentDownloadBytes;
             AssetSystem.DownloadEvent.OnNetReachableNot.Invoke(Progress);
         }
@@ -32,9 +34,9 @@ namespace AIO.UEngine.YooAsset
                 throw new Exception($"OnNetReachableCarrier is null => {location.AssetPath} loading fail");
 
             AssetSystem.StatusStop = true;
-            Progress.State = EProgressState.Pause;
-            Progress.TotalValue = DownloaderOperations[location.AssetPath].TotalDownloadBytes;
-            Progress.CurrentValue = DownloaderOperations[location.AssetPath].CurrentDownloadBytes;
+            Progress.State         = EProgressState.Pause;
+            Progress.TotalValue    = DownloaderOperations[location.AssetPath].TotalDownloadBytes;
+            Progress.CurrentValue  = DownloaderOperations[location.AssetPath].CurrentDownloadBytes;
             AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(Progress, AllowReachableCarrier);
         }
 
@@ -77,13 +79,11 @@ namespace AIO.UEngine.YooAsset
             DownloaderOperations.Remove(location.AssetPath);
         }
 
-        private static AProgress Progress = new AProgress();
-
         private static void AllowReachableCarrier()
         {
             AssetSystem.AllowReachableCarrier = true;
-            AssetSystem.StatusStop = false;
-            AssetSystem.HandleReset = false;
+            AssetSystem.StatusStop            = false;
+            AssetSystem.HandleReset           = false;
         }
 
         private static IEnumerator WaitCO(DownloaderOperation operation, AssetInfo location)
@@ -124,6 +124,7 @@ namespace AIO.UEngine.YooAsset
                 loading.RegisterEvent(location, operation);
         }
 
+
         private static DownloaderOperation CreateDownloaderOperation(ResPackage package, AssetInfo location)
         {
             return DownloaderOperations.TryGetValue(location.AssetPath, out var operation)
@@ -131,18 +132,23 @@ namespace AIO.UEngine.YooAsset
                 : package.CreateBundleDownloader(location);
         }
 
+
         [Conditional("UNITY_EDITOR")]
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+#endif
         private static void AddSequenceRecord(ResPackage package, AssetInfo location)
         {
 #if UNITY_EDITOR
             if (!AssetSystem.Parameter.EnableSequenceRecord) return;
-            AssetSystem.AddSequenceRecord(new AssetSystem.SequenceRecord
+            var record = new AssetSystem.SequenceRecord
             {
-                GUID = AssetDatabase.AssetPathToGUID(location.AssetPath),
                 PackageName = package.PackageName,
-                Location = location.Address,
-                AssetPath = location.AssetPath,
-            });
+                Location    = location.Address,
+                AssetPath   = location.AssetPath
+            };
+            record.SetGUID(AssetDatabase.AssetPathToGUID(location.AssetPath));
+            AssetSystem.AddSequenceRecord(record);
 #endif
         }
     }

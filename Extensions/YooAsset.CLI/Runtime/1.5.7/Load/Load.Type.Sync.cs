@@ -7,31 +7,8 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
-        private static bool LoadCheckOPSync(OperationHandleBase operation)
+        private ResPackage AutoGetPackageSync(string location)
         {
-            if (!operation.IsValid)
-            {
-                AssetSystem.LogError("操作句柄失效 -> {0}", operation.LastError);
-                return false;
-            }
-
-            if (operation.Status == EOperationStatus.Failed)
-            {
-                AssetSystem.LogError("资源加载失败 -> {0}", operation.LastError);
-                return false;
-            }
-
-            return true;
-        }
-
-        private ResPackage GetAutoPackageSync(string location)
-        {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
-            {
-                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
-                return null;
-            }
-
             PackageDebug(LoadType.Sync, location);
             foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
@@ -52,14 +29,8 @@ namespace AIO.UEngine.YooAsset
             return null;
         }
 
-        private ResPackage GetAutoPackageSync(string packageName, string location)
+        private ResPackage AutoGetPackageSync(string packageName, string location)
         {
-            if (location.EndsWith("/") || location.EndsWith("\\"))
-            {
-                AssetSystem.LogException($"资源查找失败 [auto : {location}]");
-                return null;
-            }
-
             PackageDebug(LoadType.Sync, packageName, location);
             if (!Dic.TryGetValue(packageName, out var package))
             {

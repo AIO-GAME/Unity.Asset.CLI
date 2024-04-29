@@ -6,17 +6,17 @@ namespace AIO.UEngine.YooAsset
     internal class YAParametersRemote : YAssetParameters
     {
         /// <summary>
-        /// 内置资源查询服务接口
+        ///     内置资源查询服务接口
         /// </summary>
         public IBuildinQueryServices QueryServices { get; set; }
 
         /// <summary>
-        /// 远端资源地址查询服务类
+        ///     远端资源地址查询服务类
         /// </summary>
         public IRemoteServices RemoteServices { get; set; }
 
         /// <summary>
-        /// 分发资源查询服务接口
+        ///     分发资源查询服务接口
         /// </summary>
         public IDeliveryQueryServices DeliveryQueryServices { get; set; }
 
@@ -54,14 +54,14 @@ namespace AIO.UEngine.YooAsset
         {
             var initParameters = new HostPlayModeParameters
             {
-                DecryptionServices = DecryptionServices,
-                LoadingMaxTimeSlice = LoadingMaxTimeSlice,
+                DecryptionServices     = DecryptionServices,
+                LoadingMaxTimeSlice    = LoadingMaxTimeSlice,
                 DownloadFailedTryAgain = DownloadFailedTryAgain,
-                BuildinQueryServices = QueryServices,
-                DeliveryQueryServices = DeliveryQueryServices,
-                BuildinRootDirectory = BuildInRootDirectory,
-                SandboxRootDirectory = SandboxRootDirectory,
-                RemoteServices = RemoteServices
+                BuildinQueryServices   = QueryServices,
+                DeliveryQueryServices  = DeliveryQueryServices,
+                BuildinRootDirectory   = BuildInRootDirectory,
+                SandboxRootDirectory   = SandboxRootDirectory,
+                RemoteServices         = RemoteServices
             };
             return initParameters;
         }

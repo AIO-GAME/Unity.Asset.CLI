@@ -1,23 +1,21 @@
 ﻿#if SUPPORT_YOOASSET
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
-    /// <summary>
-    /// YAssetProxy_Get
-    /// </summary>
     partial class Proxy
     {
-        public override ICollection<string> GetAddressByTag(IEnumerable<string> tags)
+        public override string[] GetAddressByTag(IEnumerable<string> tags)
         {
             return GetAssetInfosByTag(tags).Select(info => info.Address).ToArray();
         }
 
         /// <summary>
-        /// 获取本地包裹的版本信息
+        ///     获取本地包裹的版本信息
         /// </summary>
         public string GetPackageVersion(string packageName)
         {
@@ -30,11 +28,12 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 获取资源信息列表
+        ///     获取资源信息列表
         /// </summary>
         /// <param name="tag">资源标签</param>
         private IEnumerable<AssetInfo> GetAssetInfosByTag(IEnumerable<string> tag)
         {
+            if (tag is null) return Array.Empty<AssetInfo>();
             var list = new List<AssetInfo>();
             var tags = tag.ToArray();
             foreach (var asset in Dic.Values) list.AddRange(asset.GetAssetInfos(tags));
@@ -42,7 +41,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 获取资源信息列表
+        ///     获取资源信息列表
         /// </summary>
         /// <param name="name">包名</param>
         /// <param name="tag">资源标签</param>
@@ -52,7 +51,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 获取资源信息列表
+        ///     获取资源信息列表
         /// </summary>
         /// <param name="name">包名</param>
         /// <param name="tags">资源标签列表</param>
@@ -62,7 +61,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 获取资源信息
+        ///     获取资源信息
         /// </summary>
         /// <param name="name">包名</param>
         /// <param name="location">资源的定位地址</param>
@@ -72,7 +71,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <summary>
-        /// 获取资源信息列表
+        ///     获取资源信息列表
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         private AssetInfo GetAssetInfoByAddress(string location)
