@@ -28,8 +28,8 @@ namespace AIO.UEditor
 
         private static TreeViewDependencies TreeViewDependencies;
 
-        private static volatile PageList<AssetDataInfo> PageValues; // 当前页资源列表
-        private static volatile List<AssetDataInfo>     Values;     // 当前所有资源
+        private static PageList<AssetDataInfo> PageValues; // 当前页资源列表
+        private static List<AssetDataInfo>     Values;     // 当前所有资源
 
         private static string[] DisplayPackages;   // 列表:包
         private static string[] DisplayTags;       // 列表:标签
