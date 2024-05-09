@@ -22,13 +22,14 @@ namespace AIO.UEditor
 
         #endregion
 
-        private static AssetCollectRoot     Data;   // 资源数据
-        private static ASConfig             Config; // 配置文件
-        private static TreeViewQueryAsset   TreeViewQueryAsset;
+        private static AssetCollectRoot   Data;   // 资源数据
+        private static ASConfig           Config; // 配置文件
+        private static TreeViewQueryAsset TreeViewQueryAsset;
+
         private static TreeViewDependencies TreeViewDependencies;
 
-        private static PageList<AssetDataInfo> PageValues; // 当前页资源列表
-        private static List<AssetDataInfo>     Values;     // 当前所有资源
+        private static volatile PageList<AssetDataInfo> PageValues; // 当前页资源列表
+        private static volatile List<AssetDataInfo>     Values;     // 当前所有资源
 
         private static string[] DisplayPackages;   // 列表:包
         private static string[] DisplayTags;       // 列表:标签
@@ -231,7 +232,7 @@ namespace AIO.UEditor
                 TreeViewQueryAsset.OnSingleSelectionChanged += OnQueryAsseChanged;
             }
 
-
+            ControlID            = GUIUtility.GetControlID(FocusType.Passive).ToString();
             TreeViewDependencies = TreeViewDependencies.Create(Dependencies.Values);
             UpdatePageSizeMenu();
         }
@@ -256,6 +257,45 @@ namespace AIO.UEditor
         }
 
         #endregion
+
+        private static string ControlID;
+
+        private static void SearchAssetText(Rect rect)
+        {
+            rect.y      += 2;
+            rect.height -= 2;
+
+            using (new GUI.GroupScope(rect, GEStyle.ToolbarSeachTextField))
+            {
+                var cell = new Rect(12, -1, rect.width, rect.height + 1);
+                if (!string.IsNullOrEmpty(TreeViewQueryAsset.searchString)) cell.width -= cell.x + 15;
+                else cell.width                                                        -= cell.x;
+                EditorGUIUtility.AddCursorRect(cell, MouseCursor.Text);
+                GUI.SetNextControlName(ControlID);
+                TreeViewQueryAsset.searchString = GUI.TextField(cell, TreeViewQueryAsset.searchString, GEStyle.MiniBoldLabel);
+
+                // 按下 Ctrl + F 时，自动聚焦到搜索框
+                if (Event.current != null && Event.current.keyCode == KeyCode.F && (Event.current.control || Event.current.command))
+                {
+                    Debug.Log("Focus");
+                    EditorGUIUtility.editingTextField = true;
+                    GUI.FocusControl(ControlID);
+                    Event.current.Use();
+                }
+
+                if (string.IsNullOrEmpty(TreeViewQueryAsset.searchString)) return;
+
+                cell.width  = 15;
+                cell.y      = 0;
+                cell.x      = rect.width - cell.width;
+                cell.height = rect.height;
+                EditorGUIUtility.AddCursorRect(cell, MouseCursor.Arrow);
+                if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSeachCancelButton)) return;
+
+                GUI.FocusControl(null);
+                TreeViewQueryAsset.searchString = string.Empty;
+            }
+        }
 
         #region IsFilter
 

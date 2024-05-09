@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -28,7 +29,7 @@ namespace AIO.UEditor
             }
 
             bool IAssetPage.Shortcut(Event evt) =>
-                evt.control && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Keypad6 || evt.keyCode == KeyCode.Alpha6);
+                evt.control && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Keypad5 || evt.keyCode == KeyCode.Alpha5);
 
             public void Dispose() { DisplayPackages = null; }
 
@@ -80,27 +81,22 @@ namespace AIO.UEditor
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    PageValues.Clear();
-                    PageValues.Add(Values.Where(data => !FilterData(data)));
-                    PageValues.PageIndex = 0;
+                    lock (PageValues)
+                    {
+                        PageValues.Clear();
+                        PageValues.Add(Values.Where(data => !FilterData(data)));
+                        PageValues.PageIndex = 0;
+                    }
+
                     TreeViewQueryAsset.ReloadAndSelect(0);
                 }
 
+                rect.x += rect.width + 3;
+
+                rect.width = width - 30 - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190) - 3;
+                SearchAssetText(rect);
+
                 rect.x     += rect.width + 3;
-                rect.width =  width - 30 - 30 - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190);
-                TreeViewQueryAsset.searchString = Values.Count > 300
-                    ? EditorGUI.DelayedTextField(rect, TreeViewQueryAsset.searchString, GEStyle.SearchTextField)
-                    : EditorGUI.TextField(rect, TreeViewQueryAsset.searchString, GEStyle.SearchTextField);
-
-                rect.x     += rect.width;
-                rect.width =  30;
-                if (GUI.Button(rect, Instance.GC_CLEAR, GEStyle.TEtoolbarbutton))
-                {
-                    GUI.FocusControl(null);
-                    TreeViewQueryAsset.searchString = string.Empty;
-                }
-
-                rect.x     += rect.width;
                 rect.width =  190;
                 Instance.OnDrawPageSetting(rect);
 
@@ -175,11 +171,15 @@ namespace AIO.UEditor
             public void UpdateData()
             {
                 GUI.FocusControl(null);
-                Instance.SelectAsset = null;
+                Instance.SelectAsset            = null;
+                TreeViewQueryAsset.searchString = string.Empty;
+                lock (PageValues)
+                {
+                    PageValues.Clear();
+                    PageValues.PageIndex = 0;
+                }
 
-                PageValues.Clear();
-                PageValues.PageIndex = 0;
-                Values.Clear();
+                lock (Values) Values.Clear();
 
                 if (Data.Packages.Length == 0) return;
 
@@ -218,11 +218,11 @@ namespace AIO.UEditor
                 void Collect(AssetCollectPackage package, AssetCollectGroup group, AssetCollectItem item)
                 {
                     item.CollectAssetAsync(package, group, toLower, hasExtension);
-                    Values.AddRange(item.DataInfos.Values);
+                    lock (Values) Values.AddRange(item.DataInfos.Values);
                     if (listItems.Count != ++index) return;
                     Runner.StartCoroutine(() =>
                     {
-                        listTypes.AddRange(Values.Where(dataInfo => !listTypes.Contains(dataInfo.Type)).Select(dataInfo => dataInfo.Type));
+                        lock (Values) listTypes.AddRange(Values.Where(dataInfo => !listTypes.Contains(dataInfo.Type)).Select(dataInfo => dataInfo.Type));
                         Runner.StartTask(End);
                     });
                 }
@@ -242,7 +242,7 @@ namespace AIO.UEditor
             /// <summary>
             ///     标签模式 资源过滤器
             /// </summary>
-            private bool FilterData(AssetDataInfo data)
+            private static bool FilterData(AssetDataInfo data)
             {
                 var filter = 0;
                 if (IsFilterCollectors(DisplayCollectorsIndex, data.CollectPath, DisplayCollectors)) filter++;

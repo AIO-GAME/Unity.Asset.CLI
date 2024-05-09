@@ -29,12 +29,13 @@ namespace AIO.UEditor
             }
 
             bool IAssetPage.Shortcut(Event evt) =>
-                evt.control && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Keypad5 || evt.keyCode == KeyCode.Alpha5);
+                evt.control && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Keypad6 || evt.keyCode == KeyCode.Alpha6);
 
             #endregion
 
             public void UpdateData()
             {
+                TreeViewQueryAsset.searchString = string.Empty;
                 if (!Config.EnableSequenceRecord) return;
                 if (Config.SequenceRecord.ExistsLocal()) Config.SequenceRecord.UpdateLocal();
                 UpdateDataAll();
@@ -115,17 +116,9 @@ namespace AIO.UEditor
                     }
                 }
 
-                rect.x                          += rect.width + 3;
-                rect.width                      =  width - 30 - 30 - 30 - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190);
-                TreeViewQueryAsset.searchString =  GUI.TextField(rect, TreeViewQueryAsset.searchString, GEStyle.SearchTextField);
-
-                rect.x     += rect.width;
-                rect.width =  30;
-                if (GUI.Button(rect, Instance.GC_CLEAR, GEStyle.TEtoolbarbutton))
-                {
-                    GUI.FocusControl(null);
-                    TreeViewQueryAsset.searchString = string.Empty;
-                }
+                rect.x     += rect.width + 3;
+                rect.width =  width - 30 - 30 - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190);
+                SearchAssetText(rect);
 
                 rect.x     += rect.width;
                 rect.width =  190;

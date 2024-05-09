@@ -49,13 +49,9 @@ namespace AIO.UEditor
         public float GetHeight()                          => 22;
         public Rect  GetRenameRect(Rect rowRect, int row) => rowRect;
 
-        bool ITVItemDraw.MatchSearch(string search)
-        {
-            if (string.IsNullOrEmpty(search)) return true;
-            return data.Address.Contains(search)
-                || data.AssetPath.Contains(search)
-                || data.Type.Contains(search);
-        }
+        bool ITVItemDraw.MatchSearch(string search) => (!string.IsNullOrEmpty(data.Address) && data.Address.Contains(search))
+                                                    || (!string.IsNullOrEmpty(data.AssetPath) && data.AssetPath.Contains(search))
+                                                    || (!string.IsNullOrEmpty(data.Type) && data.Type.Contains(search));
 
         void ITVItemDraw.OnDraw(Rect cell, int col, ref RowGUIArgs args)
         {
