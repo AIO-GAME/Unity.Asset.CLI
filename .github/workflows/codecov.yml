@@ -17,11 +17,8 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v4
 
-        - name: Setup Node.js
-          uses: ./.github/actions/setup-node
-
         # TODO: cross fork PR will not trigger this action
         - name: 🧬 Report coverage
-          uses: codecov/codecov-action@v3
+          uses: codecov/codecov-action@v4.0.1
           env:
               CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
