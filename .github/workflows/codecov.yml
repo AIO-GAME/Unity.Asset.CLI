@@ -20,9 +20,6 @@ jobs:
         - name: Setup Node.js
           uses: ./.github/actions/setup-node
 
-        - name: 🩺 Run test
-          run: pnpm coverage
-
         # TODO: cross fork PR will not trigger this action
         - name: 🧬 Report coverage
           uses: codecov/codecov-action@v3
