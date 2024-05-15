@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Jobs.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 
@@ -163,18 +166,8 @@ namespace AIO.UEditor
                 }
 
                 rect.x     += rect.width + 3;
-                rect.width =  width - 30 - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190);
-                TreeViewQueryAsset.searchString = DataDic[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Count > 300
-                    ? EditorGUI.DelayedTextField(rect, TreeViewQueryAsset.searchString, GEStyle.SearchTextField)
-                    : EditorGUI.TextField(rect, TreeViewQueryAsset.searchString, GEStyle.SearchTextField);
-
-                rect.x     += rect.width;
-                rect.width =  30;
-                if (GUI.Button(rect, Instance.GC_CLEAR, GEStyle.TEtoolbarbutton))
-                {
-                    GUI.FocusControl(null);
-                    TreeViewQueryAsset.searchString = string.Empty;
-                }
+                rect.width =  width - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190);
+                SearchAssetText(rect);
 
                 rect.x     += rect.width;
                 rect.width =  190;
@@ -270,6 +263,7 @@ namespace AIO.UEditor
 
             public void UpdateData()
             {
+                TreeViewQueryAsset.searchString = string.Empty;
                 GUI.FocusControl(null);
                 if (!Data.IsValidCollect()) return;
 

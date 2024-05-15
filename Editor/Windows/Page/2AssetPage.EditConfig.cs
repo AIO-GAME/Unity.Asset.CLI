@@ -18,9 +18,9 @@ namespace AIO.UEditor
         public AssetPageEditConfig()
         {
             GC_Select = GEContent.NewSetting("ic_Eyes", "选择资源配置文件");
-            GC_SAVE            = GEContent.NewBuiltin("d_SaveAs", "保存");
-            Data               = AssetCollectRoot.GetOrCreate();
-            Config             = ASConfig.GetOrCreate();
+            GC_SAVE   = GEContent.NewBuiltin("d_SaveAs", "保存");
+            Data      = AssetCollectRoot.GetOrCreate();
+            Config    = ASConfig.GetOrCreate();
 
 
             ViewConfig = new ViewRect(550, 1)
@@ -35,9 +35,9 @@ namespace AIO.UEditor
 
         public void Dispose()
         {
-            Data               = null;
-            Config             = null;
-            GC_SAVE            = null;
+            Data      = null;
+            Config    = null;
+            GC_SAVE   = null;
             GC_Select = null;
         }
 
@@ -299,116 +299,115 @@ namespace AIO.UEditor
                 cell.y     += cell.height;
                 cell.x     =  rect.x + 10;
                 cell.width =  rect.width - cell.x;
-                GUI.Label(cell,
+                GUI.Label(cell, string.Format("运行时 : {0}/{1}",
 #if UNITY_ANDROID
-                          $"运行时 : Application.persistentDataPath/{Config.RuntimeRootDirectory}"
+                                              "Application.persistentDataPath"
 #elif UNITY_STANDALONE_WIN
-                          $"运行时 : Application.streamingAssetsPath/{Config.RuntimeRootDirectory}"
+                                              "Application.streamingAssetsPath"
 #elif UNITY_IPHONE || UNITY_IOS
-                          $"运行时 : Application.persistentDataPath/{Config.RuntimeRootDirectory}"
+                                              "Application.persistentDataPath"
 #elif UNITY_WEBGL
-                          $"运行时 : Application.persistentDataPath/{Config.RuntimeRootDirectory}"
+                                              "Application.persistentDataPath"
+#else
+                                              "Not Support"
 #endif
-                        , GEStyle.HeaderLabel);
+                                            , Config.RuntimeRootDirectory), GEStyle.HeaderLabel);
             }
-
-            if (string.IsNullOrEmpty(Config.RuntimeRootDirectory)) GUI.enabled = false;
-
-            switch (Config.ASMode)
+            using (new EditorGUI.DisabledGroupScope(string.IsNullOrEmpty(Config.RuntimeRootDirectory)))
             {
-                case EASMode.Remote:
+                switch (Config.ASMode)
                 {
+                    case EASMode.Remote:
                     {
-                        cell.y     += cell.height;
-                        cell.x     =  rect.x + 10;
-                        cell.width =  150;
-                        GUI.Label(cell, "远端资源地址", GEStyle.HeaderLabel);
-                    }
-                    using (new EditorGUI.DisabledGroupScope(string.IsNullOrEmpty(Config.URL)))
-                    {
-                        cell.width = 100;
-                        cell.x     = rect.width - cell.width;
-                        if (GUI.Button(cell, "跳转首包清单", GEStyle.toolbarbutton))
-                        {
-                            AssetWindow.OpenPage<AssetPageLook.FirstPackage>();
-                            GUI.FocusControl(null);
-                        }
-
-                        cell.width =  100;
-                        cell.x     -= cell.width;
-                        if (GUI.Button(cell, "打开远端网页", GEStyle.toolbarbutton))
-                        {
-                            Application.OpenURL(Config.URL);
-                            GUI.FocusControl(null);
-                        }
-                    }
-
-                    {
-                        cell.y      += cell.height;
-                        cell.x      =  rect.x + 10;
-                        cell.width  =  rect.width - cell.x;
-                        cell.height =  50;
-                        Config.URL  =  GUI.TextArea(cell, Config.URL);
-                    }
-
-                    {
-                        cell.y      += cell.height;
-                        cell.x      =  rect.x + 10;
-                        cell.width  =  150;
-                        cell.height =  20;
-                        GUI.Label(cell, "下载失败尝试次数", GEStyle.HeaderLabel);
-                        cell.x                        += cell.width;
-                        cell.width                    =  rect.width - cell.x;
-                        Config.DownloadFailedTryAgain =  EditorGUI.IntSlider(cell, Config.DownloadFailedTryAgain, 3, 36);
-                    }
-
-                    {
-                        cell.y     += cell.height;
-                        cell.x     =  rect.x + 10;
-                        cell.width =  150;
-                        GUI.Label(cell, "资源加载的最大数量", GEStyle.HeaderLabel);
-                        cell.x                     += cell.width;
-                        cell.width                 =  rect.width - cell.x;
-                        Config.LoadingMaxTimeSlice =  EditorGUI.IntSlider(cell, Config.LoadingMaxTimeSlice, 144, 8192);
-                    }
-
-                    {
-                        cell.y     += cell.height;
-                        cell.x     =  rect.x + 10;
-                        cell.width =  150;
-                        GUI.Label(cell, "请求超时时间", GEStyle.HeaderLabel);
-                        cell.x         += cell.width;
-                        cell.width     =  rect.width - cell.x;
-                        Config.Timeout =  EditorGUI.IntSlider(cell, Config.Timeout, 3, 180);
-                    }
-
-                    if (string.IsNullOrEmpty(Config.URL)) GUI.enabled = true;
-                    break;
-                }
-                default:
-                    using (new EditorGUI.DisabledGroupScope(false))
-                    {
-                        cell.y     += cell.height;
-                        cell.x     =  rect.x + 10;
-                        cell.width =  150;
-                        GUI.Label(cell, "资源包配置", GEStyle.HeaderLabel);
-                        foreach (var config in Config.Packages)
                         {
                             cell.y     += cell.height;
                             cell.x     =  rect.x + 10;
-                            cell.width =  rect.width - 20 - cell.x;
-                            GUI.Label(cell, config.Name, GEStyle.HeaderLabel);
-
-                            cell.x           += cell.width;
-                            cell.width       =  20;
-                            config.IsDefault =  GUI.Toggle(cell, config.IsDefault, "");
+                            cell.width =  150;
+                            GUI.Label(cell, "远端资源地址", GEStyle.HeaderLabel);
                         }
+                        using (new EditorGUI.DisabledGroupScope(string.IsNullOrEmpty(Config.URL)))
+                        {
+                            cell.width = 100;
+                            cell.x     = rect.width - cell.width;
+                            if (GUI.Button(cell, "跳转首包清单", GEStyle.toolbarbutton))
+                            {
+                                AssetWindow.OpenPage<AssetPageLook.FirstPackage>();
+                                GUI.FocusControl(null);
+                            }
+
+                            cell.width =  100;
+                            cell.x     -= cell.width;
+                            if (GUI.Button(cell, "打开远端网页", GEStyle.toolbarbutton))
+                            {
+                                Application.OpenURL(Config.URL);
+                                GUI.FocusControl(null);
+                            }
+                        }
+
+                        {
+                            cell.y      += cell.height;
+                            cell.x      =  rect.x + 10;
+                            cell.width  =  rect.width - cell.x;
+                            cell.height =  50;
+                            Config.URL  =  GUI.TextArea(cell, Config.URL);
+                        }
+
+                        {
+                            cell.y      += cell.height;
+                            cell.x      =  rect.x + 10;
+                            cell.width  =  150;
+                            cell.height =  20;
+                            GUI.Label(cell, "下载失败尝试次数", GEStyle.HeaderLabel);
+                            cell.x                        += cell.width;
+                            cell.width                    =  rect.width - cell.x;
+                            Config.DownloadFailedTryAgain =  EditorGUI.IntSlider(cell, Config.DownloadFailedTryAgain, 3, 36);
+                        }
+
+                        {
+                            cell.y     += cell.height;
+                            cell.x     =  rect.x + 10;
+                            cell.width =  150;
+                            GUI.Label(cell, "资源加载的最大数量", GEStyle.HeaderLabel);
+                            cell.x                     += cell.width;
+                            cell.width                 =  rect.width - cell.x;
+                            Config.LoadingMaxTimeSlice =  EditorGUI.IntSlider(cell, Config.LoadingMaxTimeSlice, 144, 8192);
+                        }
+
+                        {
+                            cell.y     += cell.height;
+                            cell.x     =  rect.x + 10;
+                            cell.width =  150;
+                            GUI.Label(cell, "请求超时时间", GEStyle.HeaderLabel);
+                            cell.x         += cell.width;
+                            cell.width     =  rect.width - cell.x;
+                            Config.Timeout =  EditorGUI.IntSlider(cell, Config.Timeout, 3, 180);
+                        }
+
+                        break;
                     }
+                    default:
+                        using (new EditorGUI.DisabledGroupScope(true))
+                        {
+                            cell.y     += cell.height;
+                            cell.x     =  rect.x + 10;
+                            cell.width =  150;
+                            GUI.Label(cell, "资源包配置", GEStyle.HeaderLabel);
+                            foreach (var config in Config.Packages)
+                            {
+                                cell.y     += cell.height;
+                                cell.x     =  rect.x + 10;
+                                cell.width =  rect.width - 20 - cell.x;
+                                GUI.Label(cell, config.Name, GEStyle.HeaderLabel);
 
-                    break;
+                                cell.x           += cell.width;
+                                cell.width       =  20;
+                                config.IsDefault =  GUI.Toggle(cell, config.IsDefault, "");
+                            }
+                        }
+
+                        break;
+                }
             }
-
-            if (string.IsNullOrEmpty(Config.RuntimeRootDirectory)) GUI.enabled = true;
         }
     }
 }

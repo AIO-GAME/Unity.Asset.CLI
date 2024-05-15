@@ -282,7 +282,7 @@ namespace AIO
         private long _size;
 
         [NonSerialized]
-        private string _type;
+        internal string _type;
 
         [NonSerialized]
         private string _guid;
