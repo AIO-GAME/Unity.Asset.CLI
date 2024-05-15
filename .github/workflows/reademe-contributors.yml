@@ -3,7 +3,7 @@ on:
     branches:
       - main
 
-name: Generate a list of contributors
+name: 🧪 CI Generate a list of contributors
 
 jobs:
   contrib-readme-en-job:
