@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if SUPPORT_YOOASSET
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -92,3 +93,4 @@ namespace AIO.UEngine.YooAsset
         }
     }
 }
+#endif

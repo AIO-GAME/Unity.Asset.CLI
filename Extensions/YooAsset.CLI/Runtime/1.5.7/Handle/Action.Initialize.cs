@@ -3,7 +3,7 @@
 |*|Date:       |*| 2024-04-11
 |*|E-Mail:     |*| xinansky99@gmail.com
 |*|============|*/
-
+#if SUPPORT_YOOASSET
 using System.Collections;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -59,3 +59,4 @@ namespace AIO.UEngine.YooAsset
         }
     }
 }
+#endif

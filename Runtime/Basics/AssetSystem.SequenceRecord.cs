@@ -12,7 +12,9 @@ using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
-
+#if UNITY_2022_1_OR_NEWER
+using Unity.Profiling;
+#endif
 #endregion
 
 namespace AIO

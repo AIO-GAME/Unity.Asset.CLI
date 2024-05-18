@@ -54,7 +54,8 @@ namespace AIO.UEditor
                     CurrentPackageIndex = 0;
                     return null;
                 }
-                else if (CurrentPackageIndex < 0)
+
+                if (CurrentPackageIndex < 0)
                     CurrentPackageIndex = 0;
                 else if (Packages.Length <= CurrentPackageIndex)
                     CurrentPackageIndex = Packages.Length - 1;
@@ -67,6 +68,7 @@ namespace AIO.UEditor
         {
             get
             {
+                if (CurrentPackage is null) return null;
                 if (CurrentPackage.Groups is null || CurrentPackage.Groups.Length == 0)
                 {
                     CurrentPackage.Groups = Array.Empty<AssetCollectGroup>();
