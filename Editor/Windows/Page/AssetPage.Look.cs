@@ -267,7 +267,7 @@ namespace AIO.UEditor
         {
             rect.y      += 2;
             rect.height -= 2;
-#if UNITY_2022_1_OR_NEWER
+#if UNITY_2021_1_OR_NEWER
             using (new GUI.GroupScope(rect, GEStyle.ToolbarSearchField))
 #else
             using (new GUI.GroupScope(rect, GEStyle.ToolbarSeachTextField))
@@ -296,7 +296,7 @@ namespace AIO.UEditor
                 cell.x      = rect.width - cell.width;
                 cell.height = rect.height;
                 EditorGUIUtility.AddCursorRect(cell, MouseCursor.Arrow);
-#if UNITY_2022_1_OR_NEWER
+#if UNITY_2021_1_OR_NEWER
                 if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSearchCancelButton)) return;
 #else
              if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSeachCancelButton)) return;
