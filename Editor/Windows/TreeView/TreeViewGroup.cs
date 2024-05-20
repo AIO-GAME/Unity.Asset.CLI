@@ -45,7 +45,10 @@ namespace AIO.UEditor
             if (Config.Count == 0) return;
             if (Config.CurrentPackage is null) return;
             if (Config.CurrentPackage.Count != 0) return;
-            if (GELayout.Button(rect.center, new Vector2(100, 30), "创建资源组")) OP_CreateGroup();
+            if (GELayout.Button(rect.center, new Vector2(100, 30), "创建资源组"))
+            {
+                OP_CreateGroup();
+            }
         }
 
         protected override void OnEventKeyDown(Event evt, TreeViewItem item)
@@ -139,6 +142,7 @@ namespace AIO.UEditor
         protected override void OnContextClicked(GenericMenu menu, TreeViewItem item)
         {
             if (!Config.CurrentPackage.Enable) return;
+            if (Config.CurrentPackage.Count <= item.id) return;
             if (Config.CurrentPackage[item.id].Enable)
             {
                 menu.AddItem(GC_MENU_ADD, false, OP_AddCollect, item);
@@ -198,8 +202,7 @@ namespace AIO.UEditor
             switch (obj)
             {
                 case TreeViewItem item:
-                    if (EditorUtility.DisplayDialog(
-                                                    "删除资源组",
+                    if (EditorUtility.DisplayDialog("删除资源组",
                                                     $"是否删除资源组 : {Config.CurrentPackage[item.id].Name}",
                                                     "确定", "取消"))
                     {
@@ -217,10 +220,10 @@ namespace AIO.UEditor
             Config.CurrentPackage.Add(new AssetCollectGroup
             {
                 Name        = GetOnlyName("Group"),
-                Description = "新建资源组",
+                Description = "New Group",
                 Collectors  = Array.Empty<AssetCollectItem>()
             });
-            ReloadAndSelect(Config.CurrentPackage.Count);
+            Reload();
         }
 
         private void OP_RenameGroupName(object obj)

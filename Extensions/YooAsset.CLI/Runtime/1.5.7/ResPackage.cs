@@ -46,10 +46,7 @@ namespace AIO.UEngine.YooAsset
 
         #region IDisposable Members
 
-        public void Dispose()
-        {
-            Package.ForceUnloadAllAssets();
-        }
+        public void Dispose() { Package.ForceUnloadAllAssets(); }
 
         #endregion
 
@@ -80,13 +77,9 @@ namespace AIO.UEngine.YooAsset
                 {
                     if (parameters.Parameters is HostPlayModeParameters parameter)
                     {
-                        if (parameter.RemoteServices is null)
-                        {
-                            AssetSystem.ExceptionEvent(ASException.SettingConfigInitializeFailure);
-                            return null;
-                        }
-
-                        return Package.InitializeAsync(parameter);
+                        if (!(parameter.RemoteServices is null)) return Package.InitializeAsync(parameter);
+                        AssetSystem.ExceptionEvent(ASException.SettingConfigInitializeFailure);
+                        return null;
                     }
 
                     break;
@@ -95,13 +88,9 @@ namespace AIO.UEngine.YooAsset
                 {
                     if (parameters.Parameters is WebPlayModeParameters parameter)
                     {
-                        if (parameter.RemoteServices is null)
-                        {
-                            AssetSystem.ExceptionEvent(ASException.SettingConfigInitializeFailure);
-                            return null;
-                        }
-
-                        return Package.InitializeAsync(parameter);
+                        if (!(parameter.RemoteServices is null)) return Package.InitializeAsync(parameter);
+                        AssetSystem.ExceptionEvent(ASException.SettingConfigInitializeFailure);
+                        return null;
                     }
 
                     break;
@@ -118,9 +107,8 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         public UpdatePackageVersionOperation UpdatePackageVersionAsync()
         {
-            return Package.UpdatePackageVersionAsync(
-                AssetSystem.Parameter.AppendTimeTicks,
-                AssetSystem.Parameter.Timeout);
+            return Package.UpdatePackageVersionAsync(AssetSystem.Parameter.AppendTimeTicks,
+                                                     AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
@@ -129,10 +117,9 @@ namespace AIO.UEngine.YooAsset
         /// <param name="version">更新的包裹版本</param>
         public UpdatePackageManifestOperation UpdatePackageManifestAsync(string version)
         {
-            return Package.UpdatePackageManifestAsync(
-                version,
-                AssetSystem.Parameter.AutoSaveVersion,
-                AssetSystem.Parameter.Timeout);
+            return Package.UpdatePackageManifestAsync(version,
+                                                      AssetSystem.Parameter.AutoSaveVersion,
+                                                      AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
@@ -147,26 +134,17 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         ///     清理包裹未使用的缓存文件
         /// </summary>
-        public ClearUnusedCacheFilesOperation ClearUnusedCacheFilesAsync()
-        {
-            return Package.ClearUnusedCacheFilesAsync();
-        }
+        public ClearUnusedCacheFilesOperation ClearUnusedCacheFilesAsync() { return Package.ClearUnusedCacheFilesAsync(); }
 
         /// <summary>
         ///     清理包裹本地所有的缓存文件
         /// </summary>
-        public ClearAllCacheFilesOperation ClearAllCacheFilesAsync()
-        {
-            return Package.ClearAllCacheFilesAsync();
-        }
+        public ClearAllCacheFilesOperation ClearAllCacheFilesAsync() { return Package.ClearAllCacheFilesAsync(); }
 
         /// <summary>
         ///     获取本地包裹的版本信息
         /// </summary>
-        public string GetPackageVersion()
-        {
-            return Package?.GetPackageVersion();
-        }
+        public string GetPackageVersion() { return Package?.GetPackageVersion(); }
 
         /// <summary>
         ///     资源回收（卸载引用计数为零的资源）
@@ -209,37 +187,25 @@ namespace AIO.UEngine.YooAsset
         ///     获取资源信息列表
         /// </summary>
         /// <param name="tag">资源标签</param>
-        public AssetInfo[] GetAssetInfos(string tag)
-        {
-            return Package.GetAssetInfos(tag);
-        }
+        public AssetInfo[] GetAssetInfos(string tag) { return Package.GetAssetInfos(tag); }
 
         /// <summary>
         ///     获取资源信息列表
         /// </summary>
         /// <param name="tags">资源标签列表</param>
-        public AssetInfo[] GetAssetInfos(string[] tags)
-        {
-            return Package.GetAssetInfos(tags);
-        }
+        public AssetInfo[] GetAssetInfos(string[] tags) { return Package.GetAssetInfos(tags); }
 
         /// <summary>
         ///     获取资源信息
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        public AssetInfo GetAssetInfo(string location)
-        {
-            return Package.GetAssetInfo(location);
-        }
+        public AssetInfo GetAssetInfo(string location) { return Package.GetAssetInfo(location); }
 
         /// <summary>
         ///     检查资源定位地址是否有效
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        public bool CheckLocationValid(string location)
-        {
-            return Package.CheckLocationValid(location);
-        }
+        public bool CheckLocationValid(string location) { return Package.CheckLocationValid(location); }
 
         #endregion
 
@@ -249,37 +215,25 @@ namespace AIO.UEngine.YooAsset
         ///     同步加载原生文件
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        public RawFileOperationHandle LoadRawFileSync(AssetInfo assetInfo)
-        {
-            return Package.LoadRawFileSync(assetInfo);
-        }
+        public RawFileOperationHandle LoadRawFileSync(AssetInfo assetInfo) { return Package.LoadRawFileSync(assetInfo); }
 
         /// <summary>
         ///     同步加载原生文件
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        public RawFileOperationHandle LoadRawFileSync(string location)
-        {
-            return Package.LoadRawFileSync(location);
-        }
+        public RawFileOperationHandle LoadRawFileSync(string location) { return Package.LoadRawFileSync(location); }
 
         /// <summary>
         ///     异步加载原生文件
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        public RawFileOperationHandle LoadRawFileAsync(AssetInfo assetInfo)
-        {
-            return Package.LoadRawFileAsync(assetInfo);
-        }
+        public RawFileOperationHandle LoadRawFileAsync(AssetInfo assetInfo) { return Package.LoadRawFileAsync(assetInfo); }
 
         /// <summary>
         ///     异步加载原生文件
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        public RawFileOperationHandle LoadRawFileAsync(string location)
-        {
-            return Package.LoadRawFileAsync(location);
-        }
+        public RawFileOperationHandle LoadRawFileAsync(string location) { return Package.LoadRawFileAsync(location); }
 
         #endregion
 
@@ -325,10 +279,7 @@ namespace AIO.UEngine.YooAsset
         ///     同步加载资源对象
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        public AssetOperationHandle LoadAssetSync(AssetInfo assetInfo)
-        {
-            return Package.LoadAssetSync(assetInfo);
-        }
+        public AssetOperationHandle LoadAssetSync(AssetInfo assetInfo) { return Package.LoadAssetSync(assetInfo); }
 
         /// <summary>
         ///     同步加载资源对象
@@ -346,20 +297,13 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
-        public AssetOperationHandle LoadAssetSync(string location, Type type)
-        {
-            return Package.LoadAssetSync(location, type);
-        }
-
+        public AssetOperationHandle LoadAssetSync(string location, Type type) { return Package.LoadAssetSync(location, type); }
 
         /// <summary>
         ///     异步加载资源对象
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        public AssetOperationHandle LoadAssetAsync(AssetInfo assetInfo)
-        {
-            return Package.LoadAssetAsync(assetInfo);
-        }
+        public AssetOperationHandle LoadAssetAsync(AssetInfo assetInfo) { return Package.LoadAssetAsync(assetInfo); }
 
         /// <summary>
         ///     异步加载资源对象
@@ -377,10 +321,7 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">资源类型</param>
-        public AssetOperationHandle LoadAssetAsync(string location, Type type)
-        {
-            return Package.LoadAssetAsync(location, type);
-        }
+        public AssetOperationHandle LoadAssetAsync(string location, Type type) { return Package.LoadAssetAsync(location, type); }
 
         #endregion
 
@@ -390,10 +331,7 @@ namespace AIO.UEngine.YooAsset
         ///     同步加载子资源对象
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        public SubAssetsOperationHandle LoadSubAssetsSync(AssetInfo assetInfo)
-        {
-            return Package.LoadSubAssetsSync(assetInfo);
-        }
+        public SubAssetsOperationHandle LoadSubAssetsSync(AssetInfo assetInfo) { return Package.LoadSubAssetsSync(assetInfo); }
 
         /// <summary>
         ///     同步加载子资源对象
@@ -411,20 +349,13 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
-        public SubAssetsOperationHandle LoadSubAssetsSync(string location, Type type)
-        {
-            return Package.LoadSubAssetsSync(location, type);
-        }
-
+        public SubAssetsOperationHandle LoadSubAssetsSync(string location, Type type) { return Package.LoadSubAssetsSync(location, type); }
 
         /// <summary>
         ///     异步加载子资源对象
         /// </summary>
         /// <param name="assetInfo">资源信息</param>
-        public SubAssetsOperationHandle LoadSubAssetsAsync(AssetInfo assetInfo)
-        {
-            return Package.LoadSubAssetsAsync(assetInfo);
-        }
+        public SubAssetsOperationHandle LoadSubAssetsAsync(AssetInfo assetInfo) { return Package.LoadSubAssetsAsync(assetInfo); }
 
         /// <summary>
         ///     异步加载子资源对象
@@ -442,10 +373,7 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
-        public SubAssetsOperationHandle LoadSubAssetsAsync(string location, Type type)
-        {
-            return Package.LoadSubAssetsAsync(location, type);
-        }
+        public SubAssetsOperationHandle LoadSubAssetsAsync(string location, Type type) { return Package.LoadSubAssetsAsync(location, type); }
 
         #endregion
 
@@ -481,9 +409,9 @@ namespace AIO.UEngine.YooAsset
         public ResourceDownloaderOperation CreateResourceDownloader()
         {
             return Package.CreateResourceDownloader(
-                AssetSystem.Parameter.LoadingMaxTimeSlice,
-                AssetSystem.Parameter.DownloadFailedTryAgain,
-                AssetSystem.Parameter.Timeout);
+                                                    AssetSystem.Parameter.LoadingMaxTimeSlice,
+                                                    AssetSystem.Parameter.DownloadFailedTryAgain,
+                                                    AssetSystem.Parameter.Timeout);
         }
 
         /// <summary>
@@ -531,7 +459,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnPacker(string[] tags, int unpackingMaxNumber,
+        public ResourceUnpackerOperation CreateResourceUnPacker(string[] tags,
+                                                                int      unpackingMaxNumber,
                                                                 int      failedTryAgain)
         {
             return Package.CreateResourceUnpacker(tags, unpackingMaxNumber, failedTryAgain);
@@ -543,7 +472,8 @@ namespace AIO.UEngine.YooAsset
         /// <param name="tags">资源标签列表</param>
         /// <param name="unpackingMaxNumber">同时解压的最大文件数</param>
         /// <param name="failedTryAgain">解压失败的重试次数</param>
-        public ResourceUnpackerOperation CreateResourceUnPacker(IEnumerable<string> tags, int unpackingMaxNumber,
+        public ResourceUnpackerOperation CreateResourceUnPacker(IEnumerable<string> tags,
+                                                                int                 unpackingMaxNumber,
                                                                 int                 failedTryAgain)
         {
             return Package.CreateResourceUnpacker(tags.ToArray(), unpackingMaxNumber, failedTryAgain);

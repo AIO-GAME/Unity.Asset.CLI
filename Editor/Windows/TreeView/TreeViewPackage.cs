@@ -134,7 +134,8 @@ namespace AIO.UEditor
 
         protected override void OnContextClicked(GenericMenu menu, TreeViewItem item)
         {
-            var index = item.id - 1;
+            var index = item.id;
+            if (Config.Count <= index) return;
             if (Config[index].Enable)
             {
                 menu.AddItem(GC_MENU_ADD_GROUP, false, CreateGroup, item);
@@ -142,20 +143,18 @@ namespace AIO.UEditor
                 menu.AddItem(GC_MENU_RENAME_DESC, false, OP_RenameDescription, item);
             }
 
-            if (!Config[index].Default)
+            if (Config[index].Default) return;
+            if (Config[index].Enable)
             {
-                if (Config[index].Enable)
-                {
-                    menu.AddItem(GC_MENU_SET_MAIN, false, ChangeDefPackage, item);
-                    menu.AddItem(GC_MENU_DISABLE, false, ChangeEnable, item);
-                }
-                else
-                {
-                    menu.AddItem(GC_MENU_ENABLE, false, ChangeEnable, item);
-                }
-
-                menu.AddItem(GC_MENU_DELETE, false, OP_DeletePackages, item.id);
+                menu.AddItem(GC_MENU_SET_MAIN, false, ChangeDefPackage, item);
+                menu.AddItem(GC_MENU_DISABLE, false, ChangeEnable, item);
             }
+            else
+            {
+                menu.AddItem(GC_MENU_ENABLE, false, ChangeEnable, item);
+            }
+
+            menu.AddItem(GC_MENU_DELETE, false, OP_DeletePackages, item.id);
         }
 
         #endregion
@@ -216,14 +215,14 @@ namespace AIO.UEditor
 
         private void OP_CreatePackage()
         {
-            var package = new AssetCollectPackage
+            Config.Add(new AssetCollectPackage
             {
-                Name   = GetOnlyName("Package"),
-                Enable = true,
-                Groups = Array.Empty<AssetCollectGroup>()
-            };
-            Config.Add(package);
-            ReloadAndSelect(Config.Count);
+                Name        = GetOnlyName("Package"),
+                Enable      = true,
+                Description = string.Empty,
+                Groups      = Array.Empty<AssetCollectGroup>()
+            });
+            Reload();
         }
 
         private void CreateGroup(object obj)
@@ -260,13 +259,12 @@ namespace AIO.UEditor
                         return;
                     }
 
-                    if (EditorUtility.DisplayDialog(
-                                                    "删除",
-                                                    $"确定是否删除 {Config[index - 1].Name} 资源包? 【删除后不可恢复】",
+                    if (EditorUtility.DisplayDialog("删除",
+                                                    $"确定是否删除 {Config[index].Name} 资源包? 【删除后不可恢复】",
                                                     "确定", "取消"))
                     {
-                        Config.RemoveAt(index - 1);
-                        ReloadAndSelect(Config.CurrentPackageIndex--);
+                        Config.RemoveAt(index);
+                        ReloadAndSelect(--Config.CurrentPackageIndex);
                     }
 
                     GUI.FocusControl(null);
@@ -315,7 +313,10 @@ namespace AIO.UEditor
         {
             if (Config is null) return;
             if (Config.Count != 0) return;
-            if (GELayout.Button(rect.center, new Vector2(100, 30), "创建资源包")) OP_CreatePackage();
+            if (GELayout.Button(rect.center, new Vector2(100, 30), "创建资源包"))
+            {
+                OP_CreatePackage();
+            }
         }
 
         #endregion

@@ -29,10 +29,16 @@ namespace AIO.UEditor
         {
             get
             {
-                if (CurrentGroup.Collectors is null || CurrentGroup.Collectors.Length == 0)
+                if (CurrentGroup.Collectors is null )
                 {
                     CurrentGroup.Collectors = Array.Empty<AssetCollectItem>();
                     CurrentCollectIndex     = -1;
+                    return CurrentGroup.Collectors[0];
+                }
+
+                if (CurrentGroup.Collectors.Length == 0)
+                {
+                    CurrentCollectIndex = -1;
                     return null;
                 }
 
@@ -48,10 +54,16 @@ namespace AIO.UEditor
         {
             get
             {
-                if (Packages is null || Packages.Length == 0)
+                if (Packages is null)
                 {
                     Packages            = Array.Empty<AssetCollectPackage>();
-                    CurrentPackageIndex = 0;
+                    CurrentPackageIndex = -1;
+                    return null;
+                }
+
+                if (Packages.Length == 0)
+                {
+                    CurrentPackageIndex = -1;
                     return null;
                 }
 
@@ -69,10 +81,16 @@ namespace AIO.UEditor
             get
             {
                 if (CurrentPackage is null) return null;
-                if (CurrentPackage.Groups is null || CurrentPackage.Groups.Length == 0)
+                if (CurrentPackage.Groups is null)
                 {
                     CurrentPackage.Groups = Array.Empty<AssetCollectGroup>();
-                    CurrentGroupIndex     = 0;
+                    CurrentGroupIndex     = -1;
+                    return null;
+                }
+
+                if (CurrentPackage.Groups.Length == 0)
+                {
+                    CurrentGroupIndex = -1;
                     return null;
                 }
 

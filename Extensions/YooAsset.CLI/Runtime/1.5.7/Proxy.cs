@@ -1,8 +1,6 @@
 ﻿#if SUPPORT_YOOASSET
 
-using System.Collections;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine.Scripting;
 using YooAsset;
 
@@ -18,10 +16,7 @@ namespace AIO.UEngine.YooAsset
     {
         private static Proxy Instance;
 
-        public Proxy()
-        {
-            Instance = this;
-        }
+        public Proxy() { Instance = this; }
 
         public override void Dispose()
         {
@@ -38,10 +33,7 @@ namespace AIO.UEngine.YooAsset
             YooAssets.Destroy();
         }
 
-        public override bool AlreadyLoad(string location)
-        {
-            return ReferenceOPHandle.ContainsKey(location);
-        }
+        public override bool AlreadyLoad(string location) { return ReferenceOPHandle.ContainsKey(location); }
 
         public override bool CheckNeedDownloadFromRemote(string location)
         {
@@ -53,10 +45,7 @@ namespace AIO.UEngine.YooAsset
             ).FirstOrDefault();
         }
 
-        public override bool CheckLocationValid(string location)
-        {
-            return Dic.Values.Any(asset => asset.CheckLocationValid(location));
-        }
+        public override bool CheckLocationValid(string location) { return Dic.Values.Any(asset => asset.CheckLocationValid(location)); }
 
         public bool CheckLocationValid(string location, out string assetPath)
         {
@@ -70,10 +59,7 @@ namespace AIO.UEngine.YooAsset
             return false;
         }
 
-        public override IASNetLoading GetLoadingHandle()
-        {
-            return new LoadingInfo();
-        }
+        public override IASNetLoading GetLoadingHandle() { return new LoadingInfo(); }
     }
 }
 #endif

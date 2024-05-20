@@ -1,6 +1,4 @@
-﻿using AIO.UEngine;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEditor;
 
 namespace AIO.UEditor
 {
@@ -10,8 +8,9 @@ namespace AIO.UEditor
     [CustomEditor(typeof(AssetBuildConfig))]
     public class ASBuildConfigEditor : AFInspector<AssetBuildConfig>
     {
-        private            AssetConfigCommonEditor editor;
-        protected override void                    OnHeaderGUI() { editor.OnHeaderGUI(); }
+        private AssetConfigCommonEditor editor;
+
+        protected override void OnHeaderGUI() { editor.OnHeaderGUI(); }
 
         protected override void Awake() { editor = new AssetConfigCommonEditor(); }
 

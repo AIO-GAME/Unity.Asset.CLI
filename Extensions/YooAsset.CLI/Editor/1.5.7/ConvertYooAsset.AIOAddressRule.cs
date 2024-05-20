@@ -35,8 +35,8 @@ namespace AIO.UEditor.CLI
             string IAddressRule.GetAssetAddress(AddressRuleData data)
             {
                 if (Application.isPlaying) return Rule.GetAssetAddress(data);
-                if (!data.UserData.Contains('_')) return "Error : Rule mismatch";
-                var info = data.UserData.SplitOnce('_');
+                if (!data.UserData.Contains('#')) return "Error : Rule mismatch";
+                var info = data.UserData.SplitOnce('#');
                 var collector = Instance.GetByName(info.Item1, info.Item2, data.CollectPath);
                 if (collector is null) return "Error : Not found collector";
                 if (!Collectors.ContainsKey(collector))
@@ -75,8 +75,8 @@ namespace AIO.UEditor.CLI
 
             string IAddressRule.GetAssetAddress(AddressRuleData data)
             {
-                if (!data.GroupName.Contains('_')) return "Error : Rule mismatch";
-                var info = data.GroupName.SplitOnce('_');
+                if (!data.GroupName.Contains('#')) return "Error : Rule mismatch";
+                var info = data.GroupName.SplitOnce('#');
                 var collector = Instance.GetByName(info.Item1, info.Item2, data.CollectPath);
                 if (collector is null) return "Error : Not found collector";
                 if (!Collectors.ContainsKey(collector))

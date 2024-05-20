@@ -19,10 +19,16 @@ namespace AIO.UEditor
         public TreeViewItemBuildSetting(int id, string displayName, AssetBuildConfig config) : base(id, 1, displayName)
         {
             if (config is null) return;
-            BuildConfig     = config;
-            Data            = AssetCollectRoot.GetOrCreate();
-            PackageNames    = Data.GetNames();
-            Tags            = Data.Tags;
+            BuildConfig  = config;
+            Data         = AssetCollectRoot.GetOrCreate();
+            PackageNames = Data.GetNames();
+            Tags         = Data.Tags;
+            if (Tags is null || Tags.Length == 0)
+            {
+                CurrentTagIndex = 0;
+                return;
+            }
+
             CurrentTagIndex = Tags is null ? 0 : Tags.Select((t, i) => BuildConfig.FirstPackTag?.Contains(t) ?? false ? 1 << i : 0).Aggregate((a, b) => a | b);
         }
 
@@ -71,8 +77,8 @@ namespace AIO.UEditor
                         var sandbox = Path.Combine(BuildConfig.BuildOutputPath);
                         if (Directory.Exists(sandbox)
                          && EditorUtility.DisplayDialog(
-                                "清空缓存", "确定清空缓存?\n-----------------------\n清空缓存代表着\n之后每个资源包\n第一次构建必定是强制构建模式",
-                                "确定", "取消")
+                                                        "清空缓存", "确定清空缓存?\n-----------------------\n清空缓存代表着\n之后每个资源包\n第一次构建必定是强制构建模式",
+                                                        "确定", "取消")
                            ) AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
                     }
 

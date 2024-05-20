@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
-using UnityEditor.Compilation;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
@@ -158,6 +157,7 @@ namespace AIO.UEditor
             if (PageValues is null || PageValues.Count == 0) return;
             var index = 0;
             var size  = 0L;
+            PageValues.PageIndex = PageValues.PageIndex;
             if (IsFirstPackageResource is null)
             {
                 foreach (var info in PageValues.CurrentPageValues)

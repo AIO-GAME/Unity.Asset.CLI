@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using AIO.UEngine;
 using UnityEditor;
-using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
@@ -37,7 +34,7 @@ namespace AIO.UEditor
             new Dictionary<string, AssetDataInfo>();
 
         public IReadOnlyDictionary<string, AssetDataInfo> DataInfos => AssetDataInfos;
-        
+
         /// <summary>
         ///     获取收集规则
         /// </summary>
@@ -303,7 +300,7 @@ namespace AIO.UEditor
                 CollectPath = data.CollectPath,
                 Package     = data.PackageName,
                 Group       = data.GroupName,
-                Tag        = data.Tags
+                Tag         = data.Tags
             };
 
             if (Directory.Exists(CollectPath)) // 判断Path是否为文件夹
@@ -360,7 +357,7 @@ namespace AIO.UEditor
             AssetCollectGroup                         group,
             bool                                      toLower,
             bool                                      hasExtension,
-            Action<Dictionary<string, AssetDataInfo>> cb = null)
+            Action<Dictionary<string, AssetDataInfo>> cb)
         {
             AssetDataInfos.Clear();
             if (!IsValidate) return;

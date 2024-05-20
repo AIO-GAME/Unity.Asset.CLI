@@ -15,10 +15,7 @@ namespace AIO.UEditor.CLI
 
         private static AssetCollectRoot _Instance;
 
-        static ConvertYooAsset()
-        {
-            Collectors = new Dictionary<AssetCollectItem, bool>();
-        }
+        static ConvertYooAsset() { Collectors = new Dictionary<AssetCollectItem, bool>(); }
 
         private static AssetCollectRoot Instance
         {
@@ -33,30 +30,27 @@ namespace AIO.UEditor.CLI
         {
             return packages is null
                 ? Array.Empty<AssetBundleCollectorPackage>()
-                : packages.Where(package => package != null).
-                           Where(package => package.Groups != null).
-                           Where(package => package.Groups.Length > 0).
-                           Select(Convert);
+                : packages.Where(package => package != null)
+                          .Where(package => package.Groups != null)
+                          .Where(package => package.Groups.Length > 0)
+                          .Select(Convert);
         }
 
         private static IEnumerable<AssetBundleCollectorGroup> Convert(IEnumerable<AssetCollectGroup> groups)
         {
             return groups is null
                 ? Array.Empty<AssetBundleCollectorGroup>()
-                : groups.Where(group => group != null).
-                         Where(group => group.Collectors != null).
-                         Where(group => group.Collectors.Length > 0).
-                         Select(Convert);
+                : groups.Where(group => group != null).Where(group => group.Collectors != null).Where(group => group.Collectors.Length > 0).Select(Convert);
         }
 
         private static IEnumerable<AssetBundleCollector> Convert(IEnumerable<AssetCollectItem> collects)
         {
             return collects is null
                 ? Array.Empty<AssetBundleCollector>()
-                : collects.Where(collect => collect != null).
-                           Where(collect => !string.IsNullOrEmpty(collect.CollectPath)).
-                           Where(collect => File.Exists(collect.CollectPath) || Directory.Exists(collect.CollectPath)).
-                           Select(Convert);
+                : collects.Where(collect => collect != null)
+                          .Where(collect => !string.IsNullOrEmpty(collect.CollectPath))
+                          .Where(collect => File.Exists(collect.CollectPath) || Directory.Exists(collect.CollectPath))
+                          .Select(Convert);
         }
 
         private static AssetBundleCollectorPackage Convert(AssetCollectPackage package)
@@ -140,7 +134,7 @@ namespace AIO.UEditor.CLI
         {
             foreach (var package in Convert(asset.Packages))
             {
-                foreach (var group in package.Groups) group.GroupName = $"{package.PackageName}_{group.GroupName}";
+                foreach (var group in package.Groups) group.GroupName = $"{package.PackageName}#{group.GroupName}";
 
                 AssetBundleCollectorSettingData.Setting.Packages.Add(package);
             }
@@ -213,7 +207,7 @@ namespace AIO.UEditor.CLI
                 {
                     if (group.Collectors is null) continue;
                     foreach (var collector in group.Collectors
-                                                    // .Where(item => item.CollectorType == ECollectorType.MainAssetCollector)
+                                                   // .Where(item => item.CollectorType == ECollectorType.MainAssetCollector)
                                                    .Where(item => !recordGroup.Collectors.Exists(match =>
                                                                                                      match.CollectorGUID == item.CollectorGUID)))
                         recordGroup.Collectors.Add(new AssetBundleCollector

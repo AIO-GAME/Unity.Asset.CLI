@@ -6,9 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using AIO.UEditor;
 using UnityEngine;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -17,7 +15,8 @@ using UnityEditor;
 
 namespace AIO.UEngine
 {
-    [Description("资源系统配置"), Serializable, HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
+    [Description("资源系统配置"), Serializable,
+     HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
     public class ASConfig : ScriptableObject
     {
         /// <summary>
@@ -104,8 +103,8 @@ namespace AIO.UEngine
         /// <param name="fileName">文件名</param>
         /// <param name="package">包名</param>
         /// <param name="version">版本</param>
-        public string GetRemoteURL(string fileName, string package, string version)
-            => Path.Combine(URL, AssetSystem.PlatformNameStr, package, version, fileName);
+        public string GetRemoteURL(string fileName, string package, string version) =>
+            Path.Combine(URL, AssetSystem.PlatformNameStr, package, version, fileName);
 
         /// <summary>
         ///     检查配置
@@ -165,10 +164,7 @@ namespace AIO.UEngine
         private static ASConfig instance;
 #endif
 
-        private static ASConfig GetResource()
-        {
-            return Resources.LoadAll<ASConfig>(nameof(ASConfig)).FirstOrDefault(item => !(item is null));
-        }
+        private static ASConfig GetResource() { return Resources.LoadAll<ASConfig>(nameof(ASConfig)).FirstOrDefault(item => !(item is null)); }
 
 #if UNITY_EDITOR
         [InitializeOnLoadMethod]
@@ -181,17 +177,20 @@ namespace AIO.UEngine
         private static void EditorQuit(PlayModeStateChange value)
         {
             if (value != PlayModeStateChange.EnteredPlayMode) return;
-            var config = GetOrCreate();
-            if (!Application.isPlaying || config.ASMode != EASMode.Editor) return;
+            if (!Application.isPlaying) return;
 
-            var root = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true).
-                            GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)?.
-                            Invoke(null, Array.Empty<object>());
+            var config = GetOrCreate();
+            if (config.ASMode != EASMode.Editor) return;
+
+            var root = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true)
+                           .GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
+                           ?.Invoke(null, Array.Empty<object>());
             if (root is null) throw new Exception("Not found AssetCollectRoot.asset ! Please create it !");
 
-            Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true).
-                 GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)?.
-                 Invoke(null, new[] { root, false });
+            Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true)
+                .GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
+                ?.Invoke(null, new[] { root, false });
+            EditorApplication.playModeStateChanged -= EditorQuit;
         }
 #endif
 
@@ -203,9 +202,9 @@ namespace AIO.UEngine
 #if UNITY_EDITOR
             if (!instance)
             {
-                foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new[] { "Assets" }).
-                                                   Select(AssetDatabase.GUIDToAssetPath).
-                                                   Select(AssetDatabase.LoadAssetAtPath<ASConfig>))
+                foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new[] { "Assets" })
+                                                  .Select(AssetDatabase.GUIDToAssetPath)
+                                                  .Select(AssetDatabase.LoadAssetAtPath<ASConfig>))
                     if (item)
                     {
                         instance = item;

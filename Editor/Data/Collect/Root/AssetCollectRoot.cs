@@ -99,7 +99,7 @@ namespace AIO.UEditor
         {
             if (string.IsNullOrEmpty(packageName)) return;
             var collectors = new List<AssetCollectItem>();
-            var tags = new List<string>();
+            var tags       = new List<string>();
             foreach (var package in Packages)
             {
                 if (packageName != package.Name) continue;
@@ -140,9 +140,7 @@ namespace AIO.UEditor
         public AssetCollectPackage GetByName(string packageName)
         {
             if (string.IsNullOrEmpty(packageName)) return null;
-            return Packages.
-                   Where(package => !(package is null)).
-                   FirstOrDefault(package => package.Name == packageName);
+            return Packages.Where(package => !(package is null)).FirstOrDefault(package => package.Name == packageName);
         }
 
         /// <summary>
@@ -155,12 +153,10 @@ namespace AIO.UEditor
         {
             if (string.IsNullOrEmpty(packageName)) return null;
             if (string.IsNullOrEmpty(groupName)) return null;
-            return Packages.
-                   Where(package => !(package is null)).
-                   FirstOrDefault(package => package.Name == packageName)?.
-                   Groups.
-                   Where(group => !(group is null)).
-                   FirstOrDefault(group => group.Name == groupName);
+            return Packages.Where(package => !(package is null))
+                           .FirstOrDefault(package => package.Name == packageName)
+                           ?.Groups.Where(group => !(group is null))
+                           .FirstOrDefault(group => group.Name == groupName);
         }
 
         /// <summary>
@@ -175,21 +171,15 @@ namespace AIO.UEditor
             if (string.IsNullOrEmpty(packageName)) return null;
             if (string.IsNullOrEmpty(groupName)) return null;
             if (string.IsNullOrEmpty(collectPath)) return null;
-            return Packages.
-                   Where(package => !(package is null)).
-                   FirstOrDefault(package => package.Name == packageName)?.
-                   Groups.
-                   Where(group => !(group is null)).
-                   FirstOrDefault(group => group.Name == groupName)?.
-                   Collectors.
-                   Where(collect => !(collect is null)).
-                   FirstOrDefault(collect => collect.CollectPath == collectPath);
+            return Packages.Where(package => !(package is null))
+                           .FirstOrDefault(package => package.Name == packageName)
+                           ?.Groups.Where(group => !(group is null))
+                           .FirstOrDefault(group => group.Name == groupName)
+                           ?.Collectors.Where(collect => !(collect is null))
+                           .FirstOrDefault(collect => collect.CollectPath == collectPath);
         }
 
-        public string[] GetNames()
-        {
-            return Packages?.Select(package => package.Name).ToArray();
-        }
+        public string[] GetNames() { return Packages?.Select(package => package.Name).ToArray(); }
 
         public void Save()
         {
@@ -203,9 +193,24 @@ namespace AIO.UEditor
             EditorUtility.SetDirty(this);
         }
 
-        private void OnDisable()
+        private void OnDisable() { Save(); }
+
+        public void Foldout(bool isFolded = true)
         {
-            Save();
+            if (Packages is null) return;
+            foreach (var package in Packages)
+            {
+                if (package?.Groups is null) continue;
+                foreach (var group in package.Groups)
+                {
+                    if (group?.Collectors is null) continue;
+                    foreach (var collector in group.Collectors)
+                    {
+                        if (collector is null) continue;
+                        collector.Folded = isFolded;
+                    }
+                }
+            }
         }
 
         #region GetTags
@@ -234,9 +239,7 @@ namespace AIO.UEditor
                     if (group.Collectors is null) group.Collectors = Array.Empty<AssetCollectItem>();
                     if (group.Collectors.Length == 0) continue;
 
-                    list.AddRange(group.Collectors.
-                                        Where(collect => !string.IsNullOrEmpty(collect.Tags)).
-                                        SelectMany(collect => collect.Tags.Split(';')));
+                    list.AddRange(group.Collectors.Where(collect => !string.IsNullOrEmpty(collect.Tags)).SelectMany(collect => collect.Tags.Split(';')));
 
                     if (string.IsNullOrEmpty(group.Tag)) continue;
                     list.AddRange(group.Tag.Split(';'));
@@ -319,23 +322,5 @@ namespace AIO.UEditor
         }
 
         #endregion
-
-        public void Foldout(bool isFolded = true)
-        {
-            if (Packages is null) return;
-            foreach (var package in Packages)
-            {
-                if (package?.Groups is null) continue;
-                foreach (var group in package.Groups)
-                {
-                    if (group?.Collectors is null) continue;
-                    foreach (var collector in group.Collectors)
-                    {
-                        if (collector is null) continue;
-                        collector.Folded = isFolded;
-                    }
-                }
-            }
-        }
     }
 }

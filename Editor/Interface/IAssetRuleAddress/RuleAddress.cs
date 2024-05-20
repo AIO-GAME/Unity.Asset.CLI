@@ -25,8 +25,9 @@ namespace AIO.UEditor
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return string.Concat(
-                    Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath)
-                ).Replace('\\', '/');
+                                     Path.GetFileName(data.CollectPath), '/', Path.GetFileName(data.AssetPath)
+                                    )
+                             .Replace('\\', '/');
             }
 
             #endregion
@@ -47,8 +48,8 @@ namespace AIO.UEditor
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 return data.AssetPath.Substring(
-                                data.CollectPath.Replace('\\', '/').LastIndexOf('/') + 1).
-                            Replace('\\', '/');
+                                                data.CollectPath.Replace('\\', '/').LastIndexOf('/') + 1)
+                           .Replace('\\', '/');
             }
 
             #endregion
@@ -66,10 +67,7 @@ namespace AIO.UEditor
 
             public string DisplayAddressName => "寻址路径 = 资源文件名";
 
-            string IAddressRule.GetAssetAddress(AssetRuleData data)
-            {
-                return Path.GetFileName(data.AssetPath).Replace('\\', '/');
-            }
+            string IAddressRule.GetAssetAddress(AssetRuleData data) { return Path.GetFileName(data.AssetPath).Replace('\\', '/'); }
 
             #endregion
         }
@@ -91,8 +89,8 @@ namespace AIO.UEditor
                 if (string.IsNullOrEmpty(data.AssetPath)) throw new ArgumentNullException(nameof(data.AssetPath));
                 if (string.IsNullOrEmpty(data.GroupName)) throw new ArgumentNullException(nameof(data.GroupName));
                 return Path.Combine(Path.GetFileName(data.GroupName),
-                                    Path.GetFileName(data.AssetPath)).
-                            Replace('\\', '/');
+                                    Path.GetFileName(data.AssetPath))
+                           .Replace('\\', '/');
             }
 
             #endregion
@@ -112,9 +110,7 @@ namespace AIO.UEditor
 
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
-                return data.AssetPath.
-                            Replace('\\', '/').
-                            Replace(data.CollectPath.Replace('\\', '/'), data.GroupName);
+                return data.AssetPath.Replace('\\', '/').Replace(data.CollectPath.Replace('\\', '/'), data.GroupName);
             }
 
             #endregion
@@ -135,7 +131,7 @@ namespace AIO.UEditor
             string IAddressRule.GetAssetAddress(AssetRuleData data)
             {
                 var path = string.Concat(data.AssetPath, '.', data.Extension);
-                var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
+                var obj  = AssetDatabase.LoadAssetAtPath<Object>(path);
                 if (obj) return obj.GetInstanceID().ToString();
                 AssetSystem.LogException($"异常资源: {path}");
                 return string.Empty;
@@ -150,8 +146,6 @@ namespace AIO.UEditor
 
         private class AddressRuleRootRelative : IAddressRule
         {
-            #region IAddressRule Members
-
             public bool AllowThread => true;
 
             public string DisplayAddressName => "寻址路径 = 资源文件相对Asset路径";
@@ -160,8 +154,6 @@ namespace AIO.UEditor
             {
                 return data.AssetPath.Replace('\\', '/');
             }
-
-            #endregion
         }
 
         #endregion
@@ -170,8 +162,6 @@ namespace AIO.UEditor
 
         private class AddressRuleUserDataFileName : IAddressRule
         {
-            #region IAddressRule Members
-
             public bool AllowThread => true;
 
             public string DisplayAddressName => "寻址路径 = 自定义根路径 + 资源文件名";
@@ -182,8 +172,6 @@ namespace AIO.UEditor
                     ? Path.GetFileName(data.AssetPath)
                     : string.Concat(data.UserData, '/', Path.GetFileName(data.AssetPath)).Replace('\\', '/');
             }
-
-            #endregion
         }
 
         #endregion

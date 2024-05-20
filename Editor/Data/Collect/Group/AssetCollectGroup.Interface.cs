@@ -25,8 +25,13 @@ namespace AIO.UEditor
         /// <returns>迭代器</returns>
         public IEnumerator<AssetCollectItem> GetEnumerator()
         {
-            if (Collectors is null) Collectors = Array.Empty<AssetCollectItem>();
-            return ((IEnumerable<AssetCollectItem>)Collectors).GetEnumerator();
+            if (Collectors is null)
+            {
+                Collectors = Array.Empty<AssetCollectItem>();
+                yield break;
+            }
+
+            foreach (var collect in Collectors) yield return collect;
         }
 
         public int IndexOf(AssetCollectItem item)
@@ -50,7 +55,7 @@ namespace AIO.UEditor
             if (Collectors is null) Collectors = new AssetCollectItem[index + 1];
             if (Collectors.Length <= index)
             {
-                var temp = new AssetCollectItem[index + 1];
+                var temp                                            = new AssetCollectItem[index + 1];
                 for (var i = 0; i < Collectors.Length; i++) temp[i] = Collectors[i];
                 Collectors = temp;
             }
@@ -64,14 +69,11 @@ namespace AIO.UEditor
             Collectors = Collectors.RemoveAt(index);
         }
 
-        public void Add(AssetCollectItem item)
-            => Collectors = Collectors is null ? new[] { item } : Collectors.Add(item);
+        public void Add(AssetCollectItem item) => Collectors = Collectors is null ? new[] { item } : Collectors.Add(item);
 
-        public void Clear()
-            => Collectors = Array.Empty<AssetCollectItem>();
+        public void Clear() => Collectors = Array.Empty<AssetCollectItem>();
 
-        public bool Contains(AssetCollectItem item)
-            => IndexOf(item) != -1;
+        public bool Contains(AssetCollectItem item) => IndexOf(item) != -1;
 
         public void CopyTo(AssetCollectItem[] array, int arrayIndex)
         {
@@ -128,29 +130,21 @@ namespace AIO.UEditor
         int ICollection<AssetCollectItem>. Count      => Count;
         bool ICollection<AssetCollectItem>.IsReadOnly => false;
 
-        int IList<AssetCollectItem>.IndexOf(AssetCollectItem item)
-            => IndexOf(item);
+        int IList<AssetCollectItem>.IndexOf(AssetCollectItem item) => IndexOf(item);
 
-        void ICollection<AssetCollectItem>.Add(AssetCollectItem item)
-            => Add(item);
+        void ICollection<AssetCollectItem>.Add(AssetCollectItem item) => Add(item);
 
-        void ICollection<AssetCollectItem>.Clear()
-            => Clear();
+        void ICollection<AssetCollectItem>.Clear() => Clear();
 
-        bool ICollection<AssetCollectItem>.Contains(AssetCollectItem item)
-            => Contains(item);
+        bool ICollection<AssetCollectItem>.Contains(AssetCollectItem item) => Contains(item);
 
-        void ICollection<AssetCollectItem>.CopyTo(AssetCollectItem[] array, int arrayIndex)
-            => CopyTo(array, arrayIndex);
+        void ICollection<AssetCollectItem>.CopyTo(AssetCollectItem[] array, int arrayIndex) => CopyTo(array, arrayIndex);
 
-        void IList<AssetCollectItem>.Insert(int index, AssetCollectItem item)
-            => Insert(index, item);
+        void IList<AssetCollectItem>.Insert(int index, AssetCollectItem item) => Insert(index, item);
 
-        bool ICollection<AssetCollectItem>.Remove(AssetCollectItem item)
-            => Remove(item);
+        bool ICollection<AssetCollectItem>.Remove(AssetCollectItem item) => Remove(item);
 
-        void IList<AssetCollectItem>.RemoveAt(int index)
-            => RemoveAt(index);
+        void IList<AssetCollectItem>.RemoveAt(int index) => RemoveAt(index);
 
         #endregion
     }

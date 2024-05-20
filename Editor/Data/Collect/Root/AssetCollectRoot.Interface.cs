@@ -49,7 +49,7 @@ namespace AIO.UEditor
             if (Packages is null) Packages = new AssetCollectPackage[index + 1];
             if (Packages.Length <= index)
             {
-                var temp = new AssetCollectPackage[index + 1];
+                var temp                                          = new AssetCollectPackage[index + 1];
                 for (var i = 0; i < Packages.Length; i++) temp[i] = Packages[i];
                 Packages = temp;
             }
@@ -63,17 +63,13 @@ namespace AIO.UEditor
             Packages = Packages.RemoveAt(index);
         }
 
-        public void Add(AssetCollectPackage item)
-            => Packages = Packages is null ? new[] { item } : Packages.Add(item);
+        public void Add(AssetCollectPackage item) => Packages = Packages is null ? new[] { item } : Packages.Add(item);
 
-        public void Clear()
-            => Packages = Array.Empty<AssetCollectPackage>();
+        public void Clear() => Packages = Array.Empty<AssetCollectPackage>();
 
-        public bool Contains(AssetCollectPackage item)
-            => IndexOf(item) != -1;
+        public bool Contains(AssetCollectPackage item) => IndexOf(item) != -1;
 
-        public IEnumerator<AssetCollectPackage> GetEnumerator()
-            => ((IEnumerable<AssetCollectPackage>)Packages).GetEnumerator();
+        public IEnumerator<AssetCollectPackage> GetEnumerator() => ((IEnumerable<AssetCollectPackage>)Packages).GetEnumerator();
 
         public void CopyTo(AssetCollectPackage[] array, int arrayIndex)
         {

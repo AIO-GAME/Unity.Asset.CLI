@@ -5,15 +5,9 @@ namespace AIO.UEngine.YooAsset
 {
     internal sealed class YAParametersEditor : YAssetParameters
     {
-        public YAParametersEditor() : base(EPlayMode.EditorSimulateMode)
-        {
-            Parameters = GetParameters();
-        }
+        public YAParametersEditor() : base(EPlayMode.EditorSimulateMode) { Parameters = GetParameters(); }
 
-        public YAParametersEditor(ASConfig mode) : base(EPlayMode.EditorSimulateMode, mode)
-        {
-            Parameters = GetParameters();
-        }
+        public YAParametersEditor(ASConfig mode) : base(EPlayMode.EditorSimulateMode, mode) { Parameters = GetParameters(); }
 
         protected override InitializeParameters GetParameters()
         {

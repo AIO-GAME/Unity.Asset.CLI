@@ -11,10 +11,7 @@ namespace AIO.UEngine.YooAsset
             LoadingMaxTimeSlice    = config.LoadingMaxTimeSlice;
         }
 
-        protected YAssetParameters(EPlayMode mode)
-        {
-            Mode = mode;
-        }
+        protected YAssetParameters(EPlayMode mode) { Mode = mode; }
 
         /// <summary>
         ///     文件解密服务接口
@@ -54,10 +51,7 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         public int DownloadFailedTryAgain { get; set; } = 10;
 
-        public void UpdateParameters()
-        {
-            Parameters = GetParameters();
-        }
+        public void UpdateParameters() { Parameters = GetParameters(); }
 
         /// <summary>
         ///     获取参数
