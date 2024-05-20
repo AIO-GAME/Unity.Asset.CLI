@@ -97,7 +97,7 @@ namespace AIO.UEditor
                 {
                     if (Config.All(package => package.Name != args.newName))
                     {
-                        var package = Config[args.itemID - 1];
+                        var package = Config[args.itemID];
                         if (package.Name == args.originalName)
                             package.Name = args.newName;
                         Reload();
@@ -111,7 +111,7 @@ namespace AIO.UEditor
                 }
                 case 2: // 重命名描述
                 {
-                    var package = Config[args.itemID - 1];
+                    var package = Config[args.itemID];
                     package.Description = args.newName;
                     Reload();
                     break;

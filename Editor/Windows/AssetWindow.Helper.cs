@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using AIO.UEngine;
 using UnityEditor;
@@ -95,6 +96,27 @@ namespace AIO.UEditor
         public static async void UpdateUploadFirstPack(AssetBuildConfig.GCloudConfig config)
         {
             await config.UploadFirstPack(AssetSystem.SequenceRecordQueue.LOCAL_PATH);
+        }
+
+        [InitializeOnLoadMethod]
+        private static void Initialize()
+        {
+            EditorApplication.playModeStateChanged -= EditorQuit;
+            EditorApplication.playModeStateChanged += EditorQuit;
+        }
+
+        private static void EditorQuit(PlayModeStateChange value)
+        {
+            if (value != PlayModeStateChange.EnteredPlayMode) return;
+            if (!Application.isPlaying) return;
+
+            var config = ASConfig.GetOrCreate();
+            if (config.ASMode != EASMode.Editor) return;
+
+            var root = AssetCollectRoot.GetOrCreate();
+            if (root is null) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
+            AssetProxyEditor.ConvertConfig(root, false);
+            EditorApplication.playModeStateChanged -= EditorQuit;
         }
     }
 }

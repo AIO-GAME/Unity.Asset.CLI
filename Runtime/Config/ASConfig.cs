@@ -5,13 +5,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
+
+#endregion
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
-#endregion
 
 namespace AIO.UEngine
 {
@@ -165,34 +165,6 @@ namespace AIO.UEngine
 #endif
 
         private static ASConfig GetResource() { return Resources.LoadAll<ASConfig>(nameof(ASConfig)).FirstOrDefault(item => !(item is null)); }
-
-#if UNITY_EDITOR
-        [InitializeOnLoadMethod]
-        private static void Initialize()
-        {
-            EditorApplication.playModeStateChanged -= EditorQuit;
-            EditorApplication.playModeStateChanged += EditorQuit;
-        }
-
-        private static void EditorQuit(PlayModeStateChange value)
-        {
-            if (value != PlayModeStateChange.EnteredPlayMode) return;
-            if (!Application.isPlaying) return;
-
-            var config = GetOrCreate();
-            if (config.ASMode != EASMode.Editor) return;
-
-            var root = Type.GetType("AIO.UEditor.AssetCollectRoot, AIO.Asset.Editor", true)
-                           .GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public)
-                           ?.Invoke(null, Array.Empty<object>());
-            if (root is null) throw new Exception("Not found AssetCollectRoot.asset ! Please create it !");
-
-            Type.GetType("AIO.UEditor.AssetProxyEditor, AIO.Asset.Editor", true)
-                .GetMethod("ConvertConfig", BindingFlags.Static | BindingFlags.Public)
-                ?.Invoke(null, new[] { root, false });
-            EditorApplication.playModeStateChanged -= EditorQuit;
-        }
-#endif
 
         /// <summary>
         ///     获取本地资源包地址
