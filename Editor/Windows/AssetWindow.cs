@@ -14,7 +14,8 @@ namespace AIO.UEditor
                 Group = "Tools",
                 Menu = MENU_WINDOW,
                 MinSizeHeight = 650,
-                MinSizeWidth = 1200
+                MinSizeWidth = 1200,
+                Dock = new[] { "Type.GetType(\"GameView, UnityEditor\")" }
             )]
     public partial class AssetWindow : GraphicWindow
     {
@@ -27,6 +28,7 @@ namespace AIO.UEditor
         {
             Selection.activeObject = AssetCollectRoot.GetOrCreate();
             Instance               = this;
+            // 窗口内联进入GameView
         }
 
         protected override void OnActivation()

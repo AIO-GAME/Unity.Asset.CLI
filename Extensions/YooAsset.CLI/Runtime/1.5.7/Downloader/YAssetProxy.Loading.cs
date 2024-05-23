@@ -70,12 +70,11 @@ namespace AIO.UEngine.YooAsset
             }
 
             if (AssetSystem.HandleReset) return;
-            if (!DownloaderOperations.ContainsKey(location.AssetPath)) return;
-            if (DownloaderOperations[location.AssetPath].Status == EOperationStatus.Failed) return;
-            DownloaderOperations[location.AssetPath].BeginDownload();
-            await DownloaderOperations[location.AssetPath].Task;
-            if (AssetSystem.DownloadHandle is LoadingInfo loading)
-                loading.RegisterEvent(location, DownloaderOperations[location.AssetPath]);
+            if (!DownloaderOperations.TryGetValue(location.AssetPath, out var downloader)) return;
+            if (downloader.Status == EOperationStatus.Failed) return;
+            downloader.BeginDownload();
+            await downloader.Task;
+            if (AssetSystem.DownloadHandle is LoadingInfo loading) loading.RegisterEvent(location, downloader);
             DownloaderOperations.Remove(location.AssetPath);
         }
 
@@ -124,14 +123,12 @@ namespace AIO.UEngine.YooAsset
                 loading.RegisterEvent(location, operation);
         }
 
-
         private static DownloaderOperation CreateDownloaderOperation(ResPackage package, AssetInfo location)
         {
             return DownloaderOperations.TryGetValue(location.AssetPath, out var operation)
                 ? operation
                 : package.CreateBundleDownloader(location);
         }
-
 
         [Conditional("UNITY_EDITOR")]
 #if UNITY_2022_1_OR_NEWER
