@@ -20,15 +20,9 @@ namespace AIO.UEngine.YooAsset
         /// </summary>
         public IDeliveryQueryServices DeliveryQueryServices { get; set; }
 
-        public YAParametersRemote() : base(MODE)
-        {
-            Parameters = GetParameters();
-        }
+        public YAParametersRemote() : base(MODE) { Parameters = GetParameters(); }
 
-        public YAParametersRemote(ASConfig config) : base(MODE, config)
-        {
-            Parameters = GetParameters();
-        }
+        public YAParametersRemote(ASConfig config) : base(MODE, config) { Parameters = GetParameters(); }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         private const EPlayMode MODE = EPlayMode.WebPlayMode;

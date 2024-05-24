@@ -5,11 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using UnityEditor;
-using UnityEditor.Compilation;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = System.Diagnostics.Debug;
 
 namespace AIO.UEditor
 {

@@ -100,6 +100,7 @@ namespace AIO.UEditor
         protected override void OnContextClicked(GenericMenu menu, TreeViewItem item)
         {
             if (!Config.CurrentGroup.Enable) return;
+            if (Config.CurrentGroup.Count <= item.id) return;
             if (!(item is TreeViewItemCollect collect)) return;
             if (collect.Item.Enable)
             {

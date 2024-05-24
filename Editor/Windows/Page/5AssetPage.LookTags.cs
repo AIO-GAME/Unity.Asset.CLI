@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace AIO.UEditor
@@ -177,6 +176,8 @@ namespace AIO.UEditor
                 {
                     PageValues.Clear();
                     PageValues.PageIndex = 0;
+                    TreeViewQueryAsset.Reload(PageValues);
+                    TreeViewQueryAsset.Select(0);
                 }
 
                 lock (Values) Values.Clear();
@@ -233,8 +234,14 @@ namespace AIO.UEditor
                     lock (PageValues)
                     {
                         PageValues.Add(Values.Where(data => !FilterData(data)));
-                        PageValues.PageIndex = PageValues.PageIndex;
-                        Runner.StartCoroutine(() => { TreeViewQueryAsset.Reload(PageValues); });
+                        Runner.StartCoroutine(() =>
+                        {
+                            lock (PageValues)
+                            {
+                                PageValues.PageIndex = PageValues.PageIndex;
+                                TreeViewQueryAsset.Reload(PageValues);
+                            }
+                        });
                     }
                 }
             }

@@ -14,7 +14,8 @@ namespace AIO.UEditor
                 Group = "Tools",
                 Menu = MENU_WINDOW,
                 MinSizeHeight = 650,
-                MinSizeWidth = 1200
+                MinSizeWidth = 1200,
+                Dock = new[] { "Type.GetType(\"GameView, UnityEditor\")" }
             )]
     public partial class AssetWindow : GraphicWindow
     {
@@ -25,14 +26,15 @@ namespace AIO.UEditor
 
         protected override void OnAwake()
         {
-            Instance               = this;
             Selection.activeObject = AssetCollectRoot.GetOrCreate();
+            Instance               = this;
+            // 窗口内联进入GameView
         }
 
         protected override void OnActivation()
         {
-            Instance               = this;
             Selection.activeObject = AssetCollectRoot.GetOrCreate();
+            Instance               = this;
 
             if (Pages is null)
             {
@@ -114,7 +116,17 @@ namespace AIO.UEditor
 
         #region Page
 
-        private IAssetPage        CurrentPage => Pages[PageIndex];
+        private IAssetPage CurrentPage
+        {
+            get => Pages[PageIndex];
+            set
+            {
+                var index = Pages.IndexOf(value);
+                if (index == -1) return;
+                PageIndex = index;
+            }
+        }
+
         private IList<IAssetPage> Pages;
         private string[]          PageNames;
         private int               _PageIndex = -1;
@@ -127,17 +139,21 @@ namespace AIO.UEditor
             get => _PageIndex;
             set
             {
-                if (value < 0 || value >= Pages.Count || value == _PageIndex) return;
+                if (value < 0 || value == _PageIndex) return;
                 _PageIndex = value;
-                Pages[PageIndex]?.UpdateData();
+                Pages[_PageIndex]?.UpdateData();
             }
         }
 
         public static T OpenPage<T>() where T : IAssetPage
         {
-            if (!Instance) EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
+            if (!Instance)
+            {
+                EditorApplication.ExecuteMenuItem(MENU_WINDOW);
+                return default;
+            }
+
             Instance.PageIndex = Instance.Pages.IndexOf(Instance.Pages.FirstOrDefault(p => p is T));
-            if (Instance.PageIndex == -1) throw new Exception($"未找到页面 {typeof(T).Name}");
             return (T)Instance.Pages[Instance.PageIndex];
         }
 

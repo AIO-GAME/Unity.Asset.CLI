@@ -10,7 +10,7 @@ namespace AIO.UEditor
 {
     public class TreeViewItemBuildSetting : TreeViewItem, ITVItemDraw
     {
-        private AssetBuildConfig    BuildConfig;
+        private AssetBuildConfig BuildConfig;
         private AssetCollectRoot Data;
         private string[]         PackageNames;
         private string[]         Tags;
@@ -18,11 +18,18 @@ namespace AIO.UEditor
 
         public TreeViewItemBuildSetting(int id, string displayName, AssetBuildConfig config) : base(id, 1, displayName)
         {
-            BuildConfig     = config;
-            Data            = AssetCollectRoot.GetOrCreate();
-            PackageNames    = Data.GetNames();
-            Tags            = Data.Tags;
-            CurrentTagIndex = Tags is null ? 0 : Tags.Select((t, i) => BuildConfig.FirstPackTag.Contains(t) ? 1 << i : 0).Aggregate((a, b) => a | b);
+            if (config is null) return;
+            BuildConfig  = config;
+            Data         = AssetCollectRoot.GetOrCreate();
+            PackageNames = Data.GetNames();
+            Tags         = Data.Tags;
+            if (Tags is null || Tags.Length == 0)
+            {
+                CurrentTagIndex = 0;
+                return;
+            }
+
+            CurrentTagIndex = Tags is null ? 0 : Tags.Select((t, i) => BuildConfig.FirstPackTag?.Contains(t) ?? false ? 1 << i : 0).Aggregate((a, b) => a | b);
         }
 
         public bool  AllowChangeExpandedState             => false;

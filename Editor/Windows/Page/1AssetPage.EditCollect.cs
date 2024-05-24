@@ -161,7 +161,6 @@ namespace AIO.UEditor
                         break;
                     }
                 }
-
                 AssetWindow.OpenPage<AssetPageLook.Collect>();
                 return;
             }

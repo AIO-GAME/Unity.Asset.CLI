@@ -16,8 +16,8 @@ namespace AIO.UEditor.CLI
 
             public PackRuleResult GetPackRuleResult(PackRuleData data)
             {
-                if (!data.GroupName.Contains('_')) throw new Exception("Error : Rule mismatch");
-                var info = data.GroupName.SplitOnce('_');
+                if (!data.GroupName.Contains('#')) throw new Exception("Error : Rule mismatch");
+                var info      = data.GroupName.SplitOnce('#');
                 var collector = Instance.GetByName(info.Item1, info.Item2, data.CollectPath);
                 if (collector is null) throw new Exception("Error : Not found collector");
                 if (!Collectors.ContainsKey(collector))
@@ -37,17 +37,13 @@ namespace AIO.UEditor.CLI
                     Extension   = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
                 };
                 infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
-                var rule = collector.GetPackRule();
+                var rule   = collector.GetPackRule();
                 var result = rule.GetPackRuleResult(infoData);
-                return new PackRuleResult(
-                    result.BundleName.Replace("#", "_"),
-                    result.BundleExtension);
+                return new PackRuleResult(result.BundleName.Replace("#", "_"),
+                                          result.BundleExtension);
             }
 
-            public bool IsRawFilePackRule()
-            {
-                return false;
-            }
+            public bool IsRawFilePackRule() { return false; }
 
             #endregion
         }
@@ -61,8 +57,8 @@ namespace AIO.UEditor.CLI
 
             public PackRuleResult GetPackRuleResult(PackRuleData data)
             {
-                if (!data.GroupName.Contains('_')) throw new Exception("Error : Rule mismatch");
-                var info = data.GroupName.SplitOnce('_');
+                if (!data.GroupName.Contains('#')) throw new Exception("Error : Rule mismatch");
+                var info      = data.GroupName.SplitOnce('#');
                 var collector = Instance.GetByName(info.Item1, info.Item2, data.CollectPath);
                 if (collector is null) throw new Exception("Error : Not found collector");
                 if (!Collectors.ContainsKey(collector))
@@ -82,17 +78,14 @@ namespace AIO.UEditor.CLI
                     Extension   = Path.GetExtension(data.AssetPath).Replace(".", "").ToLower()
                 };
                 infoData.AssetPath = data.AssetPath.Substring(0, data.AssetPath.Length - infoData.Extension.Length - 1);
-                var rule = collector.GetPackRule();
+                var rule   = collector.GetPackRule();
                 var result = rule.GetPackRuleResult(infoData);
                 return new PackRuleResult(
-                    result.BundleName.Replace("#", "_"),
-                    result.BundleExtension);
+                                          result.BundleName.Replace("#", "_"),
+                                          result.BundleExtension);
             }
 
-            public bool IsRawFilePackRule()
-            {
-                return true;
-            }
+            public bool IsRawFilePackRule() { return true; }
 
             #endregion
         }

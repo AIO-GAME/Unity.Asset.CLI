@@ -8,15 +8,9 @@ namespace AIO.UEngine.YooAsset
     /// </summary>
     internal class YAParametersLocal : YAssetParameters
     {
-        public YAParametersLocal() : base(EPlayMode.OfflinePlayMode)
-        {
-            Parameters = GetParameters();
-        }
+        public YAParametersLocal() : base(EPlayMode.OfflinePlayMode) { Parameters = GetParameters(); }
 
-        public YAParametersLocal(ASConfig config) : base(EPlayMode.OfflinePlayMode, config)
-        {
-            Parameters = GetParameters();
-        }
+        public YAParametersLocal(ASConfig config) : base(EPlayMode.OfflinePlayMode, config) { Parameters = GetParameters(); }
 
         protected sealed override InitializeParameters GetParameters()
         {

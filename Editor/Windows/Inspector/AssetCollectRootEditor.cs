@@ -8,8 +8,9 @@ namespace AIO.UEditor
     [CustomEditor(typeof(AssetCollectRoot))]
     public class AssetCollectRootEditor : AFInspector<AssetCollectRoot>
     {
-        private            AssetConfigCommonEditor editor;
-        protected override void                    OnHeaderGUI() { editor.OnHeaderGUI(); }
+        private AssetConfigCommonEditor editor;
+
+        protected override void OnHeaderGUI() { editor.OnHeaderGUI(); }
 
         protected override void Awake() { editor = new AssetConfigCommonEditor(); }
 

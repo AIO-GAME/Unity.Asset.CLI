@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if SUPPORT_YOOASSET
+using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
@@ -363,3 +364,4 @@ namespace AIO.UEngine.YooAsset
         }
     }
 }
+#endif

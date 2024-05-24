@@ -1,20 +1,22 @@
+using System;
+using System.IO;
+using System.Linq;
+using AIO.UEngine;
+using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
 namespace AIO.UEditor
 {
-    using System;
-    using System.IO;
-    using AIO.UEngine;
-    using UnityEditor;
-    using UnityEngine;
-    using System.Linq;
-    using MessageType = UnityEditor.MessageType;
-    using Object = UnityEngine.Object;
+    using MessageType = MessageType;
+    using Object = Object;
 
     public class AssetConfigCommonEditor
     {
         private GUILayoutOption OptionLabelWidth_100;
-        private GUIStyle        GSValue      => GEStyle.toolbarbutton;
-        private GUIStyle        GSBackground => GEStyle.TEToolbar;
 
+        private GUIStyle   GSValue      => GEStyle.toolbarbutton;
+        private GUIStyle   GSBackground => GEStyle.TEToolbar;
         private GUIContent HeaderContent;
         private Texture2D  HeaderIcon;
 

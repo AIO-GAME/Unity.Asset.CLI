@@ -1,12 +1,6 @@
 ﻿#if SUPPORT_YOOASSET
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using UnityEngine.Networking;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -87,7 +81,7 @@ namespace AIO.UEngine.YooAsset
             if (IsInitialize) return;
 
 #if UNITY_WEBGL // 此处为了适配WX小游戏，因为WX小游戏不支持WebGL缓存
-                YooAssets.SetCacheSystemDisableCacheOnWebGL();
+            YooAssets.SetCacheSystemDisableCacheOnWebGL();
 #endif
 
             YooAssets.Initialize(new YALogger());
@@ -100,7 +94,7 @@ namespace AIO.UEngine.YooAsset
             }
 
             if (EventParameter is null) EventParameter = GetParameter;
-            var capacity = AssetSystem.PackageConfigs.Count;
+            var capacity                               = AssetSystem.PackageConfigs.Count;
             InitializationOperations = new List<InitializationOperation>(capacity);
             ReferenceOPHandle        = new Dictionary<string, OperationHandleBase>();
             DownloaderOperations     = new Dictionary<string, DownloaderOperation>(64);

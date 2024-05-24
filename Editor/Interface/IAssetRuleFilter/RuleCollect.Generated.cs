@@ -3,6 +3,8 @@
 |||✩ Date:     ||| -> Automatic Generate
 |||✩ - - - - - |*/
 
+using UnityEngine;
+
 namespace AIO.UEditor
 {
     partial class RuleCollect

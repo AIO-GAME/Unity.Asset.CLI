@@ -62,10 +62,9 @@ namespace AIO.UEditor
                         continue;
                     }
 
-                    dictionary.AddRange(group.Collectors.
-                                              Where(collect => !string.IsNullOrEmpty(collect.Tags)).
-                                              SelectMany(collect => collect.Tags.Split(';', ' ', ','))
-                    );
+                    dictionary.AddRange(group.Collectors.Where(collect => !string.IsNullOrEmpty(collect.Tags))
+                                             .SelectMany(collect => collect.Tags.Split(';', ' ', ','))
+                                       );
                 }
 
                 return dictionary.Distinct().ToArray();
@@ -85,7 +84,5 @@ namespace AIO.UEditor
         }
 
         public override int GetHashCode() => (this as IEqualityComparer<AssetCollectPackage>).GetHashCode(this);
-
-
     }
 }

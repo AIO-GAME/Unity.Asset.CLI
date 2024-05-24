@@ -15,7 +15,10 @@ namespace AIO.UEditor
     {
         #region Instance
 
-        static AssetPageLook() { _Instance = new AssetPageLook(); }
+        static AssetPageLook()
+        {
+            _Instance = new AssetPageLook();
+        }
 
         private static AssetPageLook _Instance;
         private static AssetPageLook Instance => _Instance ?? (_Instance = new AssetPageLook());
@@ -264,8 +267,11 @@ namespace AIO.UEditor
         {
             rect.y      += 2;
             rect.height -= 2;
-
+#if UNITY_2021_1_OR_NEWER
+            using (new GUI.GroupScope(rect, GEStyle.SearchTextField))
+#else
             using (new GUI.GroupScope(rect, GEStyle.ToolbarSeachTextField))
+#endif
             {
                 var cell = new Rect(12, -1, rect.width, rect.height + 1);
                 if (!string.IsNullOrEmpty(TreeViewQueryAsset.searchString)) cell.width -= cell.x + 15;
@@ -290,7 +296,11 @@ namespace AIO.UEditor
                 cell.x      = rect.width - cell.width;
                 cell.height = rect.height;
                 EditorGUIUtility.AddCursorRect(cell, MouseCursor.Arrow);
-                if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSeachCancelButton)) return;
+#if UNITY_2021_1_OR_NEWER
+                if (!GUI.Button(cell, GUIContent.none, GEStyle.SearchCancelButton)) return;
+#else
+             if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSeachCancelButton)) return;
+#endif
 
                 GUI.FocusControl(null);
                 TreeViewQueryAsset.searchString = string.Empty;
@@ -345,7 +355,7 @@ namespace AIO.UEditor
             if (index < 1) return true;
             if (displays is null || displays.Count == 0) return false;
             var objectType = data.Type;
-            var status     = 1L;
+            var status = 1L;
             foreach (var item in displays)
             {
                 if ((index & status) == status && objectType == item) return true;

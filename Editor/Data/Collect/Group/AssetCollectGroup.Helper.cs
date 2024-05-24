@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEngine.Serialization;
-using Object = UnityEngine.Object;
 
 namespace AIO.UEditor
 {
@@ -49,8 +45,7 @@ namespace AIO.UEditor
             }
 
             var guid = AssetDatabase.AssetPathToGUID(collectPath);
-            return Collectors.Where(collectItem => collectItem != null).
-                              FirstOrDefault(collectItem => collectItem.GUID == guid);
+            return Collectors.Where(collectItem => collectItem != null).FirstOrDefault(collectItem => collectItem.GUID == guid);
         }
 
         /// <param name="guid">收集器资源路径GUID</param>
@@ -63,8 +58,7 @@ namespace AIO.UEditor
                 return null;
             }
 
-            return Collectors.Where(collectItem => collectItem != null).
-                              FirstOrDefault(collectItem => collectItem.GUID == guid);
+            return Collectors.Where(collectItem => collectItem != null).FirstOrDefault(collectItem => collectItem.GUID == guid);
         }
     }
 }

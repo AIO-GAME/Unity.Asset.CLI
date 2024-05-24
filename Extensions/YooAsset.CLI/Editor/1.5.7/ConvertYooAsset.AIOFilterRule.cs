@@ -40,10 +40,9 @@ namespace AIO.UEditor.CLI
             public bool IsCollectAsset(FilterRuleData data)
             {
                 if (Application.isPlaying) return Rule.IsCollectAsset(data);
-                if (Instance is null || !data.UserData.Contains('_')) return false;
-                var info = data.UserData.SplitOnce('_');
-                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.
-                                         GetByPath(data.CollectPath);
+                if (Instance is null || !data.UserData.Contains('#')) return false;
+                var info      = data.UserData.SplitOnce('#');
+                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.GetByPath(data.CollectPath);
                 if (collector is null) return false;
 
                 var mode = Config.ASMode;
@@ -102,19 +101,18 @@ namespace AIO.UEditor.CLI
 
             public bool IsCollectAsset(FilterRuleData data)
             {
-                if (Instance is null || !data.GroupName.Contains('_')) return false;
-                var info = data.GroupName.SplitOnce('_');
+                if (Instance is null || !data.GroupName.Contains('#')) return false;
+                var info = data.GroupName.SplitOnce('#');
 
                 if (!Application.isPlaying &&
-                    Config.EnableSequenceRecord &&
-                    Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1))
+                    (Config.EnableSequenceRecord &&
+                     Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1)))
                     return false;
 
-                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.
-                                         GetByPath(data.CollectPath);
+                var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.GetByPath(data.CollectPath);
                 if (collector is null) return false;
 
-                var mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : ASConfig.GetOrCreate().ASMode;
+                var mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : Config.ASMode;
                 if (mode == EASMode.Editor &&
                     collector.LoadType == EAssetLoadType.Runtime)
                     return false;

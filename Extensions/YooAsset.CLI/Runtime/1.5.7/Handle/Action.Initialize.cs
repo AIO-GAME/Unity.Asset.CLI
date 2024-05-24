@@ -1,9 +1,4 @@
-﻿/*|============|*|
-|*|Author:     |*| Star fire
-|*|Date:       |*| 2024-04-11
-|*|E-Mail:     |*| xinansky99@gmail.com
-|*|============|*/
-
+﻿#if SUPPORT_YOOASSET
 using System.Collections;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,10 +9,7 @@ namespace AIO.UEngine.YooAsset
     partial class Proxy
     {
         /// <inheritdoc />
-        public override IOperationAction<bool> Initialize()
-        {
-            return new ActionInitialize();
-        }
+        public override IOperationAction<bool> Initialize() { return new ActionInitialize(); }
 
         private class ActionInitialize : OperationAction<bool>
         {
@@ -59,3 +51,4 @@ namespace AIO.UEngine.YooAsset
         }
     }
 }
+#endif

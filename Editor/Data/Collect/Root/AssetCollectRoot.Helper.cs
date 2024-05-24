@@ -126,7 +126,7 @@ namespace AIO.UEditor
 
             _Instance          = CreateInstance<AssetCollectRoot>();
             _Instance.Packages = Array.Empty<AssetCollectPackage>();
-            AssetDatabase.CreateAsset(_Instance, "Assets/Editor/AssetCollectRoot.asset");
+            AssetDatabase.CreateAsset(_Instance, $"Assets/Editor/{nameof(AssetCollectRoot)}.asset");
             AssetDatabase.SaveAssets();
             return _Instance;
         }

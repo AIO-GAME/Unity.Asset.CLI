@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Collections;
-using Unity.Jobs;
-using Unity.Jobs.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 
@@ -186,6 +183,7 @@ namespace AIO.UEditor
 
             private void UpdateDataCollector(int packageIndex, int groupIndex)
             {
+                PageValues.Clear();
                 var i = packageIndex;
                 var j = groupIndex;
                 if (Data.Count <= i
@@ -209,7 +207,7 @@ namespace AIO.UEditor
 
                 var count = Data.Packages[i].Groups[j].Collectors.Length;
                 var index = 0;
-
+             
                 foreach (var item in Data.Packages[i].Groups[j].Collectors)
                 {
                     if (item.AllowThread)
@@ -217,7 +215,7 @@ namespace AIO.UEditor
                     else
                         Runner.StartCoroutine(() => Collect(item));
                 }
-
+                TreeViewQueryAsset.Reload(PageValues);
                 return;
 
                 void Collect(AssetCollectItem item)
