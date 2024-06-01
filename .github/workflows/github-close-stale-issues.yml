@@ -12,9 +12,9 @@
 #    Abandoned Issues and Pull Request".
 #   https://igorwiese.com/images/papers/Paper_BotSE_19.pdf
 
-name: GitHub - Close stale issues
+name: 🧪 GitHub - Close stale issues
 on:
-  schedule: [cron: "50 0 * * 1"] # run weekly Monday 00:50 UTC
+  schedule: [ cron: "50 0 * * 1" ] # run weekly Monday 00:50 UTC
   workflow_dispatch:
 jobs:
   job-close-stale-issues:
@@ -33,7 +33,7 @@ jobs:
           days-before-stale: 90
           days-before-close: 30
           stale-issue-message: 'This issue is stale because it has been open for 90 days with no activity. Please remove the stale label or add a comment or this issue will be closed in 30 days.'
-          stale-pr-message:       'This PR is stale because it has been open for 90 days with no activity. Please remove the stale label or add a comment or this PR will be closed in 30 days.'
+          stale-pr-message: 'This PR is stale because it has been open for 90 days with no activity. Please remove the stale label or add a comment or this PR will be closed in 30 days.'
           close-issue-message: 'This issue was closed because it has been stalled for 30 days with no activity. Please feel free to reopen.'
-          close-pr-message:       'This PR was closed because it has been stalled for 30 days with no activity. Please feel free to reopen.'
+          close-pr-message: 'This PR was closed because it has been stalled for 30 days with no activity. Please feel free to reopen.'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
