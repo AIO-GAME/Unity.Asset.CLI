@@ -26,10 +26,6 @@ jobs:
           fetch-depth: 0 # 拉请求分析需要完整的历史记录
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2024.1
-        with:
-          qodana_version: '2024.1'
-          qodana_command: 'scan'
-          qodana_options: '--report-format=github'
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
