@@ -21,13 +21,10 @@ namespace AIO.UEditor
         [AInit(EInitAttrMode.Both, int.MaxValue)]
         public static void Initialize()
         {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(assembly => assembly.GetName().Name.EndsWith("Editor")))
             {
-                if (!assembly.GetName().Name.Contains("Editor")) continue;
-                foreach (var type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract).Where(type => typeof(IAssetProxyEditor).IsAssignableFrom(type)))
                 {
-                    if (type.IsAbstract) continue;
-                    if (!typeof(IAssetProxyEditor).IsAssignableFrom(type)) continue;
                     Editor = (IAssetProxyEditor)Activator.CreateInstance(type);
                     break;
                 }
@@ -54,9 +51,7 @@ namespace AIO.UEditor
         /// <summary>
         ///     上传到GCloud
         /// </summary>
-        public static async Task<bool> UploadGCloud(
-            [ReadOnlyArray] ICollection<AssetUploadGCloudParameter> parameters,
-            bool                                                    isTips = false)
+        public static async Task<bool> UploadGCloud([ReadOnlyArray] ICollection<AssetUploadGCloudParameter> parameters, bool isTips = false)
         {
             if (Editor is null)
             {

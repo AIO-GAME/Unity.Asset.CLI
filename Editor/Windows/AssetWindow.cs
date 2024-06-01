@@ -90,7 +90,7 @@ namespace AIO.UEditor
                 CurrentPage?.OnDrawContent(DrawRect);
             }
 
-            DrawVersion(Setting.Version);
+            DrawVersion(AssetsEditorSetting.Version);
             OnOpenEvent();
         }
 

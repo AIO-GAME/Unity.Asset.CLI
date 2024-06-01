@@ -18,6 +18,7 @@ namespace AIO.UEditor
     {
         static ResInspectorUI()
         {
+            if (!AssetsEditorSetting.ShowInspectorAddress) return;
             Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
             Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
         }
@@ -45,8 +46,14 @@ namespace AIO.UEditor
 #endif
         };
 
-        private static void OnPostHeaderGUI(Editor editor)
+        internal static void OnPostHeaderGUI(Editor editor)
         {
+            if (!AssetsEditorSetting.ShowInspectorAddress)
+            {
+                Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
+                return;
+            }
+
             if (editor.targets == null) return;
             if (editor.targets.Length != 1) return;
             if (WhiteList.Contains(editor.target.GetType().FullName)) return; // 判断资源类型

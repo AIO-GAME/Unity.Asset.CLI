@@ -57,7 +57,7 @@ namespace AIO.UEditor
 
         protected override void OnBuildRows(TreeViewItem root)
         {
-            if (Config) return;
+            if (!Config) return;
             var isDefault = false;
             for (var idxP = 0; idxP < Config.Count; idxP++)
             {
