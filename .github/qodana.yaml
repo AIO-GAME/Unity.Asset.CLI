@@ -4,7 +4,9 @@
 #-------------------------------------------------------------------------------#
 version: "1.0"
 linter: jetbrains/qodana-dotnet:2023.3
-
+include:
+  - name: CheckDependencyLicenses
+    
 #Specify IDE code to run analysis without container (Applied in CI/CD pipeline)
 ide: QDNET
 

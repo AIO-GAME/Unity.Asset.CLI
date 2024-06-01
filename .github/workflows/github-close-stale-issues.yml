@@ -32,8 +32,28 @@ jobs:
           exempt-issue-labels: 'blocker,bug,enhancement,help wanted,regression'
           days-before-stale: 90
           days-before-close: 30
-          stale-issue-message: 'This issue is stale because it has been open for 90 days with no activity. Please remove the stale label or add a comment or this issue will be closed in 30 days.'
-          stale-pr-message: 'This PR is stale because it has been open for 90 days with no activity. Please remove the stale label or add a comment or this PR will be closed in 30 days.'
-          close-issue-message: 'This issue was closed because it has been stalled for 30 days with no activity. Please feel free to reopen.'
-          close-pr-message: 'This PR was closed because it has been stalled for 30 days with no activity. Please feel free to reopen.'
+          stale-issue-message: |
+            ### English
+            This issue is stale because it has been open for 90 days with no activity. 
+            Please remove the stale label or add a comment or this issue will be closed in 30 days.
+            ### 中文
+            此问题已经打开了90天没有活动，因此已经过时。
+            请删除过时标签或添加评论，否则此问题将在30天内关闭。
+          stale-pr-message: |
+            ### English
+            This PR is stale because it has been open for 90 days with no activity. 
+            Please remove the stale label or add a comment or this PR will be closed in 30 days.
+            ### 中文
+            此拉取请求已经打开了90天没有活动，因此已经过时。
+            请删除过时标签或添加评论，否则此拉取请求将在30天内关闭。
+          close-issue-message: |
+            ### English
+            This issue was closed because it has been stale for 30 days with no activity. Please feel free to reopen.
+            ### 中文
+            此问题已经过时30天没有活动，因此已经关闭。请随时重新打开。
+          close-pr-message: |
+            ### English
+            This PR was closed because it has been stale for 30 days with no activity. Please feel free to reopen.
+            ### 中文
+            此拉取请求已经过时30天没有活动，因此已经关闭。请随时重新打开.
           repo-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,10 +1,8 @@
+name: 🧪 CI Generate a list of contributors
 on:
   push:
     branches:
       - main
-
-name: 🧪 CI Generate a list of contributors
-
 jobs:
   contrib-readme-en-job:
     runs-on: ubuntu-latest
