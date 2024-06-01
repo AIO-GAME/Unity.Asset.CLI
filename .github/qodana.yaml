@@ -3,6 +3,7 @@
 #             https://www.jetbrains.com/help/qodana/qodana-yaml.html            #
 #-------------------------------------------------------------------------------#
 version: "1.0"
+linter: jetbrains/qodana-dotnet:2023.3
 
 #Specify IDE code to run analysis without container (Applied in CI/CD pipeline)
 ide: QDNET
@@ -17,12 +18,12 @@ profile:
 
 #Disable inspections
 exclude:
- - name: All
-   paths:
-     - "Resources/Editor"
-     - "*.meta"
-     - "*.asmdef"
-     - "*.tt"
+  - name: All
+    paths:
+      - "Resources/Editor"
+      - "*.meta"
+      - "*.asmdef"
+      - "*.tt"
 
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
 #bootstrap: sh ./prepare-qodana.sh

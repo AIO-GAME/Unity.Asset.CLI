@@ -5,22 +5,24 @@
 *.git
 *.vscode
 
+# 编译器
+.git/
+.vs/
+.gradle/
+.idea/
+.vscode/
+.consulo/
+
 !*.dll.meta
 !*.asset.meta
 !*.asmdef.meta
 !*.cs.meta
 
-.git/
-.vs/
-.idea/
-.gradle/
-.consulo/
 [Bb]uild/
 [Bb]uilds/
 [Tt]emp/
 [Oo]bj/
 [Ll]ogs/
 [Bb]in/
-[Oo]bj/
 [Pp]ackages/
 [Vv]env/
