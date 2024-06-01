@@ -132,7 +132,6 @@ namespace AIO
             return Awaiter;
         }
 
-
         protected async Task OnAwaiter2()
         {
             await Proxy.UpdatePackagesTask(Config);
@@ -170,10 +169,7 @@ namespace AIO
             if (!IsValidate) throw new Exception("Initialize Error");
         }
 
-        protected override void OnReset()
-        {
-            IsValidate = !AssetSystem.IsInitialized;
-        }
+        protected override void OnReset() { IsValidate = !AssetSystem.IsInitialized; }
 
         private T        Proxy;
         private ASConfig Config;
@@ -193,7 +189,7 @@ namespace AIO
                 return;
             }
 
-            if (config is null)
+            if (!config)
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigIsNull);
                 IsValidate = false;

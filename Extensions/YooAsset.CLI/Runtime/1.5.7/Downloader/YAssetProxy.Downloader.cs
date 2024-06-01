@@ -116,23 +116,21 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 CurrentValue = CurrentValueDict.Sum(pair => pair.Value);
-                var endValue = TotalValue - CurrentValue;
+                var endValue  = TotalValue - CurrentValue;
                 var diskSpace = AssetSystem.GetAvailableDiskSpace();
                 if (diskSpace < endValue) // 检查磁盘空间是否足够
                 {
                     State = EProgressState.Fail;
                     if (OnDiskSpaceNotEnough is null)
                         throw new SystemException(
-                            $"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
+                                                  $"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
                     AssetSystem.LogException(
-                        $"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
+                                             $"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
                     OnDiskSpaceNotEnough.Invoke(Report);
                     return false;
                 }
 
-                foreach (var pair in ResourceDownloaderOperations.ToArray().Where(pair =>
-                                                                                      pair.Value.Status !=
-                                                                                      EOperationStatus.Succeed))
+                foreach (var pair in ResourceDownloaderOperations.ToArray().Where(pair => pair.Value.Status != EOperationStatus.Succeed))
                 {
                     pair.Value.OnStartDownloadFileCallback = OnStartDownloadFileCallback;
                     pair.Value.OnDownloadProgressCallback  = OnUpdateProgress;
@@ -140,8 +138,10 @@ namespace AIO.UEngine.YooAsset
                     continue;
 
                     void OnUpdateProgress(
-                        int  totalDownloadCount, int  currentDownloadCount,
-                        long totalDownloadBytes, long currentDownloadBytes)
+                        int  totalDownloadCount,
+                        int  currentDownloadCount,
+                        long totalDownloadBytes,
+                        long currentDownloadBytes)
                     {
                         if (State != EProgressState.Running) return;
                         switch (Application.internetReachability)
@@ -182,7 +182,8 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 foreach (var operation in ResourceDownloaderOperations.Values.Where(
-                             operation => !operation.IsDone || operation.Status != EOperationStatus.Succeed))
+                                                                                    operation => !operation.IsDone
+                                                                                              || operation.Status != EOperationStatus.Succeed))
                 {
                     while (State != EProgressState.Running)
                         switch (State)
@@ -228,7 +229,8 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 foreach (var operation in ResourceDownloaderOperations.Values.Where(
-                             operation => !operation.IsDone || operation.Status != EOperationStatus.Succeed))
+                                                                                    operation => !operation.IsDone
+                                                                                              || operation.Status != EOperationStatus.Succeed))
                 {
                     while (State != EProgressState.Running)
                         switch (State)
@@ -493,10 +495,7 @@ namespace AIO.UEngine.YooAsset
             private List<string> DownloadTags = new List<string>();
             private bool         DownloadAll;
 
-            public void CollectNeedAll()
-            {
-                DownloadAll = true;
-            }
+            public void CollectNeedAll() { DownloadAll = true; }
 
             public void CollectNeedTag(params string[] tags)
             {

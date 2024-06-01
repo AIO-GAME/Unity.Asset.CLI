@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-
 namespace AIO
 {
     [StructLayout(LayoutKind.Auto)]
@@ -26,10 +25,11 @@ namespace AIO
 
         #region Constructor
 
-        protected LoaderHandle() { }
+        protected LoaderHandle() { AssetPath = string.Empty; }
 
         protected LoaderHandle(string location)
         {
+            AssetPath = string.Empty;
             if (string.IsNullOrEmpty(location))
             {
                 IsDone     = true;
@@ -64,10 +64,7 @@ namespace AIO
             Completed += onCompleted;
         }
 
-        protected LoaderHandle(string location, Type type) : this(location)
-        {
-            AssetType = type;
-        }
+        protected LoaderHandle(string location, Type type) : this(location) { AssetType = type; }
 
         #endregion
 

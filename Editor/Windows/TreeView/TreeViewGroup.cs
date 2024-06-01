@@ -41,7 +41,7 @@ namespace AIO.UEditor
 
         protected override void OnDraw(Rect rect)
         {
-            if (Config is null) return;
+            if (!Config) return;
             if (Config.Count == 0) return;
             if (Config.CurrentPackage is null) return;
             if (Config.CurrentPackage.Count != 0) return;

@@ -207,7 +207,7 @@ namespace AIO.UEditor
 
                 var count = Data.Packages[i].Groups[j].Collectors.Length;
                 var index = 0;
-             
+
                 foreach (var item in Data.Packages[i].Groups[j].Collectors)
                 {
                     if (item.AllowThread)
@@ -215,6 +215,7 @@ namespace AIO.UEditor
                     else
                         Runner.StartCoroutine(() => Collect(item));
                 }
+
                 TreeViewQueryAsset.Reload(PageValues);
                 return;
 

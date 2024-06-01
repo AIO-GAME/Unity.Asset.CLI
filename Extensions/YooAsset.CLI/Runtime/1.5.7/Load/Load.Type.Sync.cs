@@ -1,7 +1,6 @@
 ﻿#if SUPPORT_YOOASSET
 
 using System.Linq;
-using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
@@ -48,7 +47,7 @@ namespace AIO.UEngine.YooAsset
             if (!package.CheckLocationValid(location))
             {
                 AssetSystem.LogException(
-                    $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+                                         $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
                 return null;
             }
 

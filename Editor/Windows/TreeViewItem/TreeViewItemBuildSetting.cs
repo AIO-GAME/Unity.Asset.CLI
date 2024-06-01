@@ -18,7 +18,7 @@ namespace AIO.UEditor
 
         public TreeViewItemBuildSetting(int id, string displayName, AssetBuildConfig config) : base(id, 1, displayName)
         {
-            if (config is null) return;
+            if (!config) return;
             BuildConfig  = config;
             Data         = AssetCollectRoot.GetOrCreate();
             PackageNames = Data.GetNames();

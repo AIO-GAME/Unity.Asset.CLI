@@ -101,19 +101,19 @@ namespace AIO.UEditor
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
+            EditorQuit();
             EditorApplication.playModeStateChanged -= EditorQuit;
             EditorApplication.playModeStateChanged += EditorQuit;
         }
 
         // Unity 第一次进入 Editor 模式时，将 AssetCollectRoot 转换为 AssetProxy
-        [InitializeOnLoadMethod]
         private static void EditorQuit()
         {
             var config = ASConfig.GetOrCreate();
             if (config.ASMode != EASMode.Editor) return;
 
             var root = AssetCollectRoot.GetOrCreate();
-            if (root is null) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
+            if (!root) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
             AssetProxyEditor.ConvertConfig(root, false);
             EditorApplication.playModeStateChanged -= EditorQuit;
         }
@@ -127,7 +127,7 @@ namespace AIO.UEditor
             if (config.ASMode != EASMode.Editor) return;
 
             var root = AssetCollectRoot.GetOrCreate();
-            if (root is null) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
+            if (!root) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
             AssetProxyEditor.ConvertConfig(root, false);
             EditorApplication.playModeStateChanged -= EditorQuit;
         }

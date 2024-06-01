@@ -34,7 +34,8 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-                Result = operation.InstantiateSync(parent);           IsDone = true;
+                Result = operation.InstantiateSync(parent);
+                IsDone = true;
             }
 
             #endregion
@@ -74,10 +75,7 @@ namespace AIO.UEngine.YooAsset
 
             #region Task
 
-            private void OnCompletedTaskGeneric()
-            {
-                Result = AwaiterGeneric.GetResult();
-            }
+            private void OnCompletedTaskGeneric() { Result = AwaiterGeneric.GetResult(); }
 
             private TaskAwaiter<GameObject> AwaiterGeneric;
 

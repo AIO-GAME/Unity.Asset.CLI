@@ -39,16 +39,15 @@ namespace AIO.UEditor
             if (Pages is null)
             {
                 Pages = new List<IAssetPage>();
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (var type in from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                                     where assembly.FullName.Contains("Editor")
+                                     from type in assembly.GetTypes()
+                                     where !type.IsAbstract && !type.IsInterface
+                                     where typeof(IAssetPage).IsAssignableFrom(type)
+                                     select type)
                 {
-                    if (!assembly.FullName.Contains("Editor")) continue;
-                    foreach (var type in assembly.GetTypes())
-                    {
-                        if (type.IsAbstract || type.IsInterface) continue;
-                        if (!typeof(IAssetPage).IsAssignableFrom(type)) continue;
-                        if (!(Activator.CreateInstance(type) is IAssetPage page)) continue;
-                        Pages.Add(page);
-                    }
+                    if (!(Activator.CreateInstance(type) is IAssetPage page)) continue;
+                    Pages.Add(page);
                 }
             }
 
@@ -145,7 +144,8 @@ namespace AIO.UEditor
             }
         }
 
-        public static T OpenPage<T>() where T : IAssetPage
+        public static T OpenPage<T>()
+        where T : IAssetPage
         {
             if (!Instance)
             {
@@ -157,7 +157,8 @@ namespace AIO.UEditor
             return (T)Instance.Pages[Instance.PageIndex];
         }
 
-        public static bool IsOpenPage<T>() where T : IAssetPage
+        public static bool IsOpenPage<T>()
+        where T : IAssetPage
         {
             if (!Instance) return false;
             return Instance.Pages[Instance.PageIndex] is T;

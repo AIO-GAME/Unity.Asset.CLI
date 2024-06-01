@@ -22,15 +22,9 @@ namespace AIO.UEditor.CLI
         public string Scopes  => Ghost.YooAsset.Scopes;
         public string Name    => Ghost.YooAsset.Name;
 
-        public bool CreateConfig(string bundlesDir, bool mergeToLatest)
-        {
-            return CreateConfig157(bundlesDir, mergeToLatest);
-        }
+        public bool CreateConfig(string bundlesDir, bool mergeToLatest) { return CreateConfig157(bundlesDir, mergeToLatest); }
 
-        public bool ConvertConfig(AssetCollectRoot config)
-        {
-            return ConvertYooAsset.Convert(config);
-        }
+        public bool ConvertConfig(AssetCollectRoot config) { return ConvertYooAsset.Convert(config); }
 
         public bool BuildArtList(IEnumerable<string> packageNames, AssetBuildCommand command)
         {
@@ -72,10 +66,7 @@ namespace AIO.UEditor.CLI
         ///     Tips:
         ///     需要本地保留一份原始清单 否则会覆盖远端最新的清单文件 导致无法对比
         /// </summary>
-        public Task<bool> UploadGCloud(ICollection<AssetUploadGCloudParameter> parameters)
-        {
-            return UploadGCloudAsync(parameters);
-        }
+        public Task<bool> UploadGCloud(ICollection<AssetUploadGCloudParameter> parameters) { return UploadGCloudAsync(parameters); }
 
         // [LnkTools(IconResource = "Editor/Icon/App/Microsoft")]
         // public static async void Test()
@@ -91,18 +82,12 @@ namespace AIO.UEditor.CLI
         /// <summary>
         ///     上传到Ftp
         /// </summary>
-        public async Task<bool> UploadFtp(ICollection<AssetUploadFtpParameter> parameters)
-        {
-            return await UploadFtpAsync(parameters);
-        }
+        public async Task<bool> UploadFtp(ICollection<AssetUploadFtpParameter> parameters) { return await UploadFtpAsync(parameters); }
 
         #endregion
 
         [MenuItem("YooAsset/Create Config")]
-        public static void CreateConfig()
-        {
-            CreateConfig157(Path.Combine(EHelper.Path.Project, "Bundles"), AssetBuildConfig.GetOrCreate().MergeToLatest);
-        }
+        public static void CreateConfig() { CreateConfig157(Path.Combine(EHelper.Path.Project, "Bundles"), AssetBuildConfig.GetOrCreate().MergeToLatest); }
 
         /// <summary>
         ///     创建配置
@@ -121,12 +106,12 @@ namespace AIO.UEditor.CLI
             if (!Directory.Exists(BundlesConfigDir)) Directory.CreateDirectory(BundlesConfigDir);
 
             var BundlesInfo = new DirectoryInfo(BundlesDir);
-            var Versions = new List<DirectoryInfo>();
-            var TableDic = new Dictionary<BuildTarget, Dictionary<string, AssetsPackageConfig>>();
+            var Versions    = new List<DirectoryInfo>();
+            var TableDic    = new Dictionary<BuildTarget, Dictionary<string, AssetsPackageConfig>>();
 
-            foreach (var PlatformInfo in BundlesInfo.GetDirectories("*", SearchOption.TopDirectoryOnly))
+            foreach (var PlatformInfo in BundlesInfo.GetDirectories("*", SearchOption.TopDirectoryOnly)
+                                                    .Where(PlatformInfo => !PlatformInfo.Name.StartsWith("Version")))
             {
-                if (PlatformInfo.Name.StartsWith("Version")) continue;
                 switch (PlatformInfo.Name)
                 {
                     case nameof(BuildTarget.Android):
@@ -144,10 +129,10 @@ namespace AIO.UEditor.CLI
                                                                                                     SearchOption.TopDirectoryOnly))
                 {
                     Versions.Clear();
-                    Versions.AddRange(PackageInfo.GetDirectories("*", SearchOption.TopDirectoryOnly).
-                                                  Where(VersionInfo => !VersionInfo.Name.EndsWith("OutputCache")).
-                                                  Where(VersionInfo => !VersionInfo.Name.EndsWith("Latest")).
-                                                  Where(VersionInfo => !VersionInfo.Name.EndsWith("Simulate")));
+                    Versions.AddRange(PackageInfo.GetDirectories("*", SearchOption.TopDirectoryOnly)
+                                                 .Where(VersionInfo => !VersionInfo.Name.EndsWith("OutputCache"))
+                                                 .Where(VersionInfo => !VersionInfo.Name.EndsWith("Latest"))
+                                                 .Where(VersionInfo => !VersionInfo.Name.EndsWith("Simulate")));
 
                     if (Versions.Count <= 0) continue;
                     if (Enum.TryParse<BuildTarget>(PlatformInfo.Name, out var enums))
@@ -164,9 +149,11 @@ namespace AIO.UEditor.CLI
                                                                                 $"BuildReport_{PackageInfo.Name}_{last.Name}.json"));
                         if (table is null) continue;
 
-                        switch (table.Cast<DictionaryEntry>().
-                                      FirstOrDefault(entry => entry.Key.ToString() == "Summary").Value?
-                                     .To<JObject>()?
+                        switch (table.Cast<DictionaryEntry>()
+                                     .FirstOrDefault(entry => entry.Key.ToString() == "Summary")
+                                     .Value?
+                                     .To<JObject>()
+                                     ?
                                      .Value<int>("CompressOption"))
                         {
                             case (int)ECompressOption.LZMA:
@@ -189,9 +176,9 @@ namespace AIO.UEditor.CLI
 
             foreach (var pair in TableDic.Where(hashtable => hashtable.Value.Count > 0))
                 AHelper.IO.WriteJsonUTF8(
-                    Path.Combine(BundlesConfigDir, string.Concat(pair.Key.ToString(), ".json")),
-                    pair.Value.Values.ToArray()
-                );
+                                         Path.Combine(BundlesConfigDir, string.Concat(pair.Key.ToString(), ".json")),
+                                         pair.Value.Values.ToArray()
+                                        );
 
             return true;
         }

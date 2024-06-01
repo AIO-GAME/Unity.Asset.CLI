@@ -39,7 +39,7 @@ namespace AIO
         public static void LogWarningFormat(string format, params object[] args)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif
@@ -54,7 +54,7 @@ namespace AIO
         public static void LogWarning(string message)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif
@@ -76,7 +76,7 @@ namespace AIO
         public static void LogException(Exception exception)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif
@@ -98,7 +98,7 @@ namespace AIO
         public static void LogException(string exception)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif
@@ -117,7 +117,7 @@ namespace AIO
         public static void LogExceptionFormat(string format, params object[] args)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif
@@ -139,7 +139,7 @@ namespace AIO
         public static void Log(string message)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif
@@ -158,7 +158,7 @@ namespace AIO
         public static void LogFormat(string format, params object[] args)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif
@@ -180,7 +180,7 @@ namespace AIO
         public static void LogError(string message)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif
@@ -199,7 +199,7 @@ namespace AIO
         public static void LogErrorFormat(string format, params object[] args)
         {
 #if UNITY_EDITOR
-            if (Parameter is null || Parameter.OutputLog)
+            if (!Parameter || Parameter.OutputLog)
 #else
             if (Parameter.OutputLog)
 #endif

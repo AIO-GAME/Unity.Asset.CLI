@@ -48,7 +48,7 @@ namespace AIO.UEditor
 
         protected override void OnDraw(Rect rect)
         {
-            if (Config is null) return;
+            if (!Config) return;
             if (Config.Count == 0) return;
             if (Config.CurrentPackage is null) return;
             if (Config.CurrentPackage.Count == 0) return;
@@ -59,11 +59,12 @@ namespace AIO.UEditor
 
         protected override void OnBuildRows(TreeViewItem root)
         {
-            for (var idxG = 0; idxG < Config?.CurrentGroup?.Count; idxG++)
+            if (!Config) return;
+            for (var idxG = 0; idxG < Config.CurrentGroup?.Count; idxG++)
             {
                 root.AddChild(new TreeViewItemCollect(idxG, Config.CurrentGroup[idxG])
                 {
-                    OnChangedFold = _ => Reload()
+                    OnChangedFold = _ => Reload(),
                 });
             }
         }

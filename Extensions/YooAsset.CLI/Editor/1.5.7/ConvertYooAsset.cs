@@ -21,7 +21,7 @@ namespace AIO.UEditor.CLI
         {
             get
             {
-                if (_Instance is null) _Instance = AssetCollectRoot.GetOrCreate();
+                if (!_Instance) _Instance = AssetCollectRoot.GetOrCreate();
                 return _Instance;
             }
         }

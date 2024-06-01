@@ -1,4 +1,4 @@
-﻿#region
+﻿#region namespace
 
 using System;
 using System.Collections;
@@ -10,24 +10,15 @@ namespace AIO
 {
     internal class ASDownloaderEmpty : AOperation, IASDownloader
     {
-        public ASDownloaderEmpty(DownlandAssetEvent dEvent)
-        {
-            Event = dEvent;
-        }
+        public ASDownloaderEmpty(DownlandAssetEvent dEvent) { Event = dEvent; }
 
         #region IASDownloader Members
 
         public bool Flow => false;
 
-        public void CollectNeedAll()
-        {
-            AssetSystem.WhiteAll = true;
-        }
+        public void CollectNeedAll() { AssetSystem.WhiteAll = true; }
 
-        public void CollectNeedTag(params string[] tags)
-        {
-            AssetSystem.AddWhite(AssetSystem.GetAddressByTag(tags));
-        }
+        public void CollectNeedTag(params string[] tags) { AssetSystem.AddWhite(AssetSystem.GetAddressByTag(tags)); }
 
         Action IProgressEvent.                              OnBegin               { get; set; }
         Action<Exception> IProgressEvent.                   OnError               { get; set; }
@@ -44,10 +35,7 @@ namespace AIO
 
         #endregion
 
-        protected override void OnWait()
-        {
-            Event.OnComplete?.Invoke(Report);
-        }
+        protected override void OnWait() { Event.OnComplete?.Invoke(Report); }
 
         protected override Task OnWaitAsync()
         {

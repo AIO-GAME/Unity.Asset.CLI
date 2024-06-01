@@ -15,7 +15,6 @@ namespace AIO
         public Type   AssetType { get; protected set; }
         object IOperationList.this[int index] => Result[index];
 
-
         #region IOperationList
 
         event Action<object[]> IOperationList.Completed
@@ -32,13 +31,14 @@ namespace AIO
 
         #region Constructor
 
-        protected LoaderHandleList() { }
+        protected LoaderHandleList() { AssetPath = string.Empty; }
 
         protected LoaderHandleList(string location)
         {
-            Address  = location;
-            IsDone   = false;
-            Progress = 0;
+            AssetPath = string.Empty;
+            Address   = location;
+            IsDone    = false;
+            Progress  = 0;
         }
 
         protected LoaderHandleList(string location, Action<TObject[]> onCompleted) : this(location)
@@ -53,10 +53,7 @@ namespace AIO
             Completed += onCompleted;
         }
 
-        protected LoaderHandleList(string location, Type type) : this(location)
-        {
-            AssetType = type;
-        }
+        protected LoaderHandleList(string location, Type type) : this(location) { AssetType = type; }
 
         #endregion
     }

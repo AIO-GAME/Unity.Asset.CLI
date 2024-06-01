@@ -26,6 +26,6 @@ namespace AIO.UEngine
         ///     本地模式
         /// </summary>
         [InspectorName("本地模式")]
-        Local
+        Local,
     }
 }

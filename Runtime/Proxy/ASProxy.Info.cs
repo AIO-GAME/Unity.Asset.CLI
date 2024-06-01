@@ -13,7 +13,7 @@ namespace AIO.UEngine
         ///     获取下载器
         /// </summary>
         /// <returns></returns>
-        public abstract IASDownloader GetDownloader(DownlandAssetEvent progress = default);
+        public abstract IASDownloader GetDownloader(DownlandAssetEvent progress = default(DownlandAssetEvent));
 
         #region 资源信息
 

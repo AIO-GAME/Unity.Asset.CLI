@@ -70,8 +70,7 @@ namespace AIO.UEditor.CLI
             Commond.BuildPipeline = EBuildPipeline.BuiltinBuildPipeline;
 #endif
 
-            YooAssetPackages = AssetBundleCollectorSettingData.Setting.Packages.Select(package => package.PackageName).
-                                                               ToArray();
+            YooAssetPackages    = AssetBundleCollectorSettingData.Setting.Packages.Select(package => package.PackageName).ToArray();
             YooAssetEncryptions = EditorTools.GetAssignableTypes(typeof(IEncryptionServices));
             YooAssetEncryptions.Insert(0, null);
             YooAssetEncryptionsName = new string[YooAssetEncryptions.Count];
@@ -166,10 +165,9 @@ namespace AIO.UEditor.CLI
                 GELayout.Label("项目导出工程路径", GTOptions.Width(true));
 
                 EngineeringPathPath[BuildTarget].VersionIndex = GELayout.Popup(
-                    EngineeringPathPath[BuildTarget].
-                        VersionIndex,
-                    YooAssetUnityArgs.Versions,
-                    GTOptions.Width(50));
+                                                                               EngineeringPathPath[BuildTarget].VersionIndex,
+                                                                               YooAssetUnityArgs.Versions,
+                                                                               GTOptions.Width(50));
 
                 if (GELayout.Button("Select", GTOptions.Width(50)))
                 {
@@ -188,8 +186,7 @@ namespace AIO.UEditor.CLI
             using (GELayout.VHorizontal())
             {
                 EngineeringPathPath[BuildTarget].OutputRoot = GELayout.Field(
-                    EngineeringPathPath[BuildTarget].
-                        OutputRoot);
+                                                                             EngineeringPathPath[BuildTarget].OutputRoot);
             }
         }
 
@@ -209,8 +206,7 @@ namespace AIO.UEditor.CLI
 
             if (!EngineeringPathPath.ContainsKey(BuildTarget))
                 EngineeringPathPath.Add(BuildTarget, new YooAssetUnityArgs(BuildTarget));
-            BuildInFilePlatform = Path.Combine(Commond.OutputRoot, BuildTarget.ToString()).
-                                       Replace('/', Path.DirectorySeparatorChar);
+            BuildInFilePlatform    = Path.Combine(Commond.OutputRoot, BuildTarget.ToString()).Replace('/', Path.DirectorySeparatorChar);
             YooAssetPackageNames   = AHelper.IO.GetDirsName(BuildInFilePlatform).ToList();
             Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 
@@ -218,10 +214,7 @@ namespace AIO.UEditor.CLI
             EHelper.Prefs.SaveJson(nameof(YooAssetBuildCommand), Commond);
         }
 
-        protected override void OnDrawRight(Rect rect)
-        {
-            OnDrawRight(rect.width / 2, rect.width / 4);
-        }
+        protected override void OnDrawRight(Rect rect) { OnDrawRight(rect.width / 2, rect.width / 4); }
 
         public void OnDrawRight(float widthHalf, float widthQuarter)
         {
@@ -254,10 +247,10 @@ namespace AIO.UEditor.CLI
                         if (GELayout.Button("组合资源包\n目标工程", 100, 25))
                         {
                             var dic = YooAssetPackageTarget.ToDictionary(
-                                target => target,
-                                target =>
-                                    YooAssetPackageVersionTarget[target]
-                                        [YooAssetPackageTargetIndex[target]]);
+                                                                         target => target,
+                                                                         target =>
+                                                                             YooAssetPackageVersionTarget[target]
+                                                                                 [YooAssetPackageTargetIndex[target]]);
                             EngineeringPathPath[BuildTarget].BuiltUp(BuildTarget, BuildInFilePlatform, dic);
                             Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                         }
@@ -276,9 +269,7 @@ namespace AIO.UEditor.CLI
                     OnProgress = progress =>
                     {
                         if (EditorUtility.DisplayCancelableProgressBar("Upload FTP", progress.ToString(),
-                                                                       progress.Progress / 100f))
-                        {
-                        }
+                                                                       progress.Progress / 100f)) { }
                     },
                     OnError = error =>
                     {
@@ -329,8 +320,8 @@ namespace AIO.UEditor.CLI
 
                 if (GELayout.Button("Link", GTOptions.Width(50), GTOptions.Height(25)))
                 {
-                    var source = Commond.OutputRoot.Trim('/', '\\');
-                    var target = LocalStoragePath.Trim('/', '\\');
+                    var       source   = Commond.OutputRoot.Trim('/', '\\');
+                    var       target   = LocalStoragePath.Trim('/', '\\');
                     IExecutor executor = null;
                     if (AHelper.IO.ExistsDir(target))
                         executor = PrPlatform.Folder.Del(target);
@@ -366,10 +357,10 @@ namespace AIO.UEditor.CLI
                 if (GELayout.Button("Pack", GTOptions.Width(50), GTOptions.Height(25)))
                 {
                     var dic = YooAssetPackageTarget.ToDictionary(
-                        target => target,
-                        target =>
-                            YooAssetPackageVersionTarget[target]
-                                [YooAssetPackageTargetIndex[target]]);
+                                                                 target => target,
+                                                                 target =>
+                                                                     YooAssetPackageVersionTarget[target]
+                                                                         [YooAssetPackageTargetIndex[target]]);
                     EngineeringPathPath[BuildTarget].BuiltUpToStreamingAssets(BuildTarget, BuildInFilePlatform, dic);
                     Commond.PackageVersion = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
                     return;
@@ -386,8 +377,7 @@ namespace AIO.UEditor.CLI
                         {
                             var package = Path.Combine(BuildInFilePlatform,
                                                        YooAssetPackageNames[YooAssetPackageIndex]);
-                            var list = AHelper.IO.GetDirsName(package).Where(file => !file.StartsWith("OutputCache")).
-                                               ToList();
+                            var list = AHelper.IO.GetDirsName(package).Where(file => !file.StartsWith("OutputCache")).ToList();
                             YooAssetPackageVersionTarget.Add(YooAssetPackageNames[YooAssetPackageIndex], list);
                         }
 
@@ -412,8 +402,7 @@ namespace AIO.UEditor.CLI
                         {
                             if (GELayout.Button(YooAssetPackageTarget[j], GTOptions.Width(150)))
                             {
-                                PrPlatform.Open.Path(Path.Combine(BuildInFilePlatform, YooAssetPackageTarget[j])).
-                                           Async();
+                                PrPlatform.Open.Path(Path.Combine(BuildInFilePlatform, YooAssetPackageTarget[j])).Async();
                                 return;
                             }
 
@@ -446,6 +435,5 @@ namespace AIO.UEditor.CLI
         }
     }
 }
-
 
 #endif

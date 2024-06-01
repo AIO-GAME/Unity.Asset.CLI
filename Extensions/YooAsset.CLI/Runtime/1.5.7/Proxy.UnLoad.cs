@@ -97,27 +97,25 @@ namespace AIO.UEngine.YooAsset
 
         private static void ReleaseOperationHandle(OperationHandleBase operation)
         {
-            if (operation.IsValid)
-                switch (operation)
-                {
-                    case AllAssetsOperationHandle handle:
-                        handle.Dispose();
-                        break;
-                    case RawFileOperationHandle handle:
-                        handle.Dispose();
-                        break;
-                    case SubAssetsOperationHandle handle:
-                        handle.Dispose();
-                        break;
-                    case AssetOperationHandle handle:
-                        handle.Dispose();
-                        break;
-                    case SceneOperationHandle handle:
-                        if (!handle.IsMainScene()) handle.UnloadAsync();
-                        break;
-                }
-
-            operation = null; // 释放引用
+            if (!operation.IsValid) return;
+            switch (operation)
+            {
+                case AllAssetsOperationHandle handle:
+                    handle.Dispose();
+                    break;
+                case RawFileOperationHandle handle:
+                    handle.Dispose();
+                    break;
+                case SubAssetsOperationHandle handle:
+                    handle.Dispose();
+                    break;
+                case AssetOperationHandle handle:
+                    handle.Dispose();
+                    break;
+                case SceneOperationHandle handle:
+                    if (!handle.IsMainScene()) handle.UnloadAsync();
+                    break;
+            }
         }
     }
 }

@@ -15,10 +15,7 @@ namespace AIO.UEditor
     {
         #region Instance
 
-        static AssetPageLook()
-        {
-            _Instance = new AssetPageLook();
-        }
+        static AssetPageLook() { _Instance = new AssetPageLook(); }
 
         private static AssetPageLook _Instance;
         private static AssetPageLook Instance => _Instance ?? (_Instance = new AssetPageLook());
@@ -90,7 +87,7 @@ namespace AIO.UEditor
                 get
                 {
                     if (string.IsNullOrEmpty(_Type)) return _Type;
-                    _Type = Object is null ? "Unknown" : Object.GetType().FullName;
+                    _Type = !Object ? "Unknown" : Object.GetType().FullName;
                     return _Type;
                 }
             }
@@ -299,7 +296,7 @@ namespace AIO.UEditor
 #if UNITY_2021_1_OR_NEWER
                 if (!GUI.Button(cell, GUIContent.none, GEStyle.SearchCancelButton)) return;
 #else
-             if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSeachCancelButton)) return;
+                if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSeachCancelButton)) return;
 #endif
 
                 GUI.FocusControl(null);
@@ -355,7 +352,7 @@ namespace AIO.UEditor
             if (index < 1) return true;
             if (displays is null || displays.Count == 0) return false;
             var objectType = data.Type;
-            var status = 1L;
+            var status     = 1L;
             foreach (var item in displays)
             {
                 if ((index & status) == status && objectType == item) return true;
