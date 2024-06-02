@@ -18,34 +18,22 @@ namespace AIO.UEngine.YooAsset
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
-            public void Log(string message)
-            {
-                AssetSystem.Log(message);
-            }
+            public void Log(string message) { AssetSystem.Log(message); }
 #if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
-            public void Warning(string message)
-            {
-                AssetSystem.LogWarning(message);
-            }
+            public void Warning(string message) { AssetSystem.LogWarning(message); }
 #if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
-            public void Error(string message)
-            {
-                AssetSystem.LogError(message);
-            }
+            public void Error(string message) { AssetSystem.LogError(message); }
 #if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
-            public void Exception(Exception exception)
-            {
-                AssetSystem.LogException(exception);
-            }
+            public void Exception(Exception exception) { AssetSystem.LogException(exception); }
         }
 
         private enum LoadType
@@ -63,8 +51,8 @@ namespace AIO.UEngine.YooAsset
         {
             return (from asset in Dic.Values
                     where asset.CheckLocationValid(location)
-                    select asset.GetAssetInfo(location)).
-                   FirstOrDefault()?.AssetPath;
+                    select asset.GetAssetInfo(location)).FirstOrDefault()
+                                                        ?.AssetPath;
         }
 
 #if UNITY_2022_1_OR_NEWER

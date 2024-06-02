@@ -37,7 +37,7 @@ namespace AIO.UEngine
         [DebuggerNonUserCode, DebuggerHidden]
         public virtual void HandleFree(IList<string> locations)
         {
-            for (var index = 0; index < locations.Count; index++) HandleFree(locations[index]);
+            foreach (var location in locations) HandleFree(location);
         }
 
         /// <summary>

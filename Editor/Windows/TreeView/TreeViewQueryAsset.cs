@@ -372,7 +372,7 @@ namespace AIO.UEditor
                     InvokeSelectionChanged(0);
                     break;
                 }
-                case KeyCode.RightArrow: // 数字键盘 左键 
+                case KeyCode.RightArrow: // 数字键盘 左键
                 {
                     if (PageValues.PageCount <= 1) return;
                     PageValues.PageIndex = PageValues.PageIndex < PageValues.PageCount - 1 ? PageValues.PageIndex + 1 : 0;

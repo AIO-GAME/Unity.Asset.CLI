@@ -22,8 +22,8 @@ namespace AIO.UEditor.CLI
 
         public static void ArtBuild()
         {
-            var cmd = Argument.ResolverCustomCur<UnityArgsCommand>();
-            var args = cmd.executeMethod;
+            var cmd       = Argument.ResolverCustomCur<UnityArgsCommand>();
+            var args      = cmd.executeMethod;
             var buildArgs = Argument.ResolverCustom<AssetBuildCommand>(args);
             Lang.Tr.Current = Application.systemLanguage;
             if (string.IsNullOrEmpty(buildArgs.BuildPackage))
@@ -93,33 +93,31 @@ namespace AIO.UEditor.CLI
                     break;
                 case EBuildMode.IncrementalBuild:
                     var target = Path.Combine(
-                        command.OutputRoot,
-                        command.ActiveTarget.ToString(),
-                        command.BuildPackage);
+                                              command.OutputRoot,
+                                              command.ActiveTarget.ToString(),
+                                              command.BuildPackage);
                     if (Directory.Exists(target))
                     {
-                        var dirs = Directory.GetDirectories(target).
-                                             Where(directory =>
-                                                       !directory.EndsWith("Simulate") &&
-                                                       !directory.EndsWith("OutputCache")).
-                                             ToArray();
+                        var dirs = Directory.GetDirectories(target)
+                                            .Where(directory => !directory.EndsWith("Simulate") && !directory.EndsWith("OutputCache"))
+                                            .ToArray();
                         if (dirs.Length > 0)
                         {
-                            // 如果为增量更新 则判断是否需要清理缓存 
+                            // 如果为增量更新 则判断是否需要清理缓存
                             buildMode = YooAsset.Editor.EBuildMode.IncrementalBuild;
                             var cleanCacheNum = AssetBuildConfig.GetOrCreate().AutoCleanCacheNumber;
                             if (dirs.Length >= cleanCacheNum)
                             {
                                 var caches = dirs.Sort((s, t) => // 如果缓存数量大于等于设置的缓存数量 则清理缓存 缓存清理机制为删除最早的缓存
                                 {
-                                    var st = Directory.GetCreationTimeUtc(s);
-                                    var tt = Directory.GetCreationTimeUtc(t);
+                                    var st     = Directory.GetCreationTimeUtc(s);
+                                    var tt     = Directory.GetCreationTimeUtc(t);
                                     var result = tt.CompareTo(st);
                                     if (result == 0) // 如果时间相同 则比较名称
                                         result = string.Compare(
-                                            Path.GetFileName(s),
-                                            Path.GetFileName(t),
-                                            StringComparison.CurrentCulture);
+                                                                Path.GetFileName(s),
+                                                                Path.GetFileName(t),
+                                                                StringComparison.CurrentCulture);
 
                                     return result;
                                 });
@@ -160,8 +158,8 @@ namespace AIO.UEditor.CLI
                 PackageVersion       = command.PackageVersion,
                 BuildOutputRoot      = command.OutputRoot,
                 StreamingAssetsRoot = Path.Combine(
-                    Application.streamingAssetsPath,
-                    ASConfig.GetOrCreate().RuntimeRootDirectory),
+                                                   Application.streamingAssetsPath,
+                                                   ASConfig.GetOrCreate().RuntimeRootDirectory),
                 DisableWriteTypeTree = false
             };
             switch (command.OutputNameStyle)
@@ -205,14 +203,14 @@ namespace AIO.UEditor.CLI
 
             Debug.Log(AHelper.Json.Serialize(buildParameters));
 
-            var builder = new AssetBundleBuilder();
+            var builder     = new AssetBundleBuilder();
             var buildResult = builder.Run(buildParameters);
             if (buildResult.Success)
             {
                 var output = Path.Combine(
-                    buildParameters.BuildOutputRoot,
-                    buildParameters.BuildTarget.ToString(),
-                    buildParameters.PackageName);
+                                          buildParameters.BuildOutputRoot,
+                                          buildParameters.BuildTarget.ToString(),
+                                          buildParameters.PackageName);
 
                 if (command.MergeToLatest) MergeToLatest(output, buildParameters.PackageVersion);
                 else ManifestGenerate(Path.Combine(output, buildParameters.PackageVersion));
@@ -237,20 +235,21 @@ namespace AIO.UEditor.CLI
                 return;
             }
 
-            var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories).
-                                    Where(filePath => filePath != Manifest).ToDictionary(filePath => filePath,
-                                                                                         filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
+            var hashtable = AHelper.IO.GetFilesRelative(dir, "*.*", SearchOption.AllDirectories)
+                                   .Where(filePath => filePath != Manifest)
+                                   .ToDictionary(filePath => filePath,
+                                                 filePath => AHelper.IO.GetFileMD5(Path.Combine(dir, filePath)));
             hashtable.Remove("OutputCache");
             hashtable.Remove("OutputCache.manifest");
 
-            var versionName = dir.Replace("\\", "/");
+            var versionName      = dir.Replace("\\", "/");
             var versionNameIndex = versionName.LastIndexOf('/');
-            var version = versionName.Substring(versionNameIndex + 1);
+            var version          = versionName.Substring(versionNameIndex + 1);
 
-            var packageName = dir.PathGetLastFloder().Replace("\\", "/");
+            var packageName      = dir.PathGetLastFloder().Replace("\\", "/");
             var packageNameIndex = packageName.LastIndexOf('/');
-            var package = packageName.Substring(packageNameIndex + 1);
-            var key = $"PackageManifest_{package}.version";
+            var package          = packageName.Substring(packageNameIndex + 1);
+            var key              = $"PackageManifest_{package}.version";
             hashtable.Remove($"BuildReport_{package}_{version}.json");
             hashtable[key] = AHelper.IO.GetFileMD5(Path.Combine(dir, key));
             AHelper.IO.WriteJson(manifestPath, hashtable.Sort());
@@ -280,10 +279,9 @@ namespace AIO.UEditor.CLI
             target.Remove("OutputCache");
             target.Remove("OutputCache.manifest");
 
-            var delete = new Dictionary<string, string>(); // 删除
-            var change = new Dictionary<string, string>(); // 修改
-            var add = current.Where(item => !target.ContainsKey(item.Key)).
-                              ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
+            var delete = new Dictionary<string, string>();                                                                                              // 删除
+            var change = new Dictionary<string, string>();                                                                                              // 修改
+            var add    = current.Where(item => !target.ContainsKey(item.Key)).ToDictionary(item => item.Key.ToString(), item => item.Value.ToString()); // 新增
 
             foreach (var item in target) // 遍历最新版本清单
             {
@@ -321,13 +319,13 @@ namespace AIO.UEditor.CLI
             ComparisonManifest(string currentPath, string latestPath)
         {
             var current = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(currentPath, Manifest));
-            var latest = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(latestPath, Manifest));
+            var latest  = AHelper.IO.ReadJson<Dictionary<string, string>>(Path.Combine(latestPath, Manifest));
             return ComparisonManifest(current, latest);
         }
 
         private static void MergeToLatestExe(string currentPath, string latestPath, string latestManifestPath)
         {
-            var tuple = ComparisonManifest(currentPath, latestPath);
+            var tuple  = ComparisonManifest(currentPath, latestPath);
             var latest = AHelper.IO.ReadJson<Dictionary<string, string>>(latestManifestPath);
 
             foreach (var pair in tuple.Item2) // 删除

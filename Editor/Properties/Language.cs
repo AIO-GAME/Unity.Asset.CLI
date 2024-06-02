@@ -16,10 +16,7 @@ namespace AIO.UEditor
             remove => FindValueList.Remove(value);
         }
 
-        static Lang()
-        {
-            Tr = new Lang((SystemLanguage)PlayerPrefs.GetInt("AIO.UEditor.Language", (int)Application.systemLanguage));
-        }
+        static Lang() { Tr = new Lang((SystemLanguage)PlayerPrefs.GetInt("AIO.UEditor.Language", (int)Application.systemLanguage)); }
 
         public static Lang Tr { get; private set; }
 
@@ -35,15 +32,9 @@ namespace AIO.UEditor
 
         private static List<Func<SystemLanguage, string, string>> FindValueList = new List<Func<SystemLanguage, string, string>>();
 
-        private Lang()
-        {
-            Current = Application.systemLanguage;
-        }
+        private Lang() { Current = Application.systemLanguage; }
 
-        private Lang(SystemLanguage language)
-        {
-            Current = language;
-        }
+        private Lang(SystemLanguage language) { Current = language; }
 
         private Dictionary<SystemLanguage, Dictionary<string, string>> Tables = new Dictionary<SystemLanguage, Dictionary<string, string>>();
 

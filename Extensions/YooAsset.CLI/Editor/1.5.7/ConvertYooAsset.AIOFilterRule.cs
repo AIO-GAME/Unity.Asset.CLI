@@ -20,7 +20,7 @@ namespace AIO.UEditor.CLI
             {
                 get
                 {
-                    if (_Config is null) _Config = ASConfig.GetOrCreate();
+                    if (!_Config) _Config = ASConfig.GetOrCreate();
                     return _Config;
                 }
             }
@@ -40,7 +40,7 @@ namespace AIO.UEditor.CLI
             public bool IsCollectAsset(FilterRuleData data)
             {
                 if (Application.isPlaying) return Rule.IsCollectAsset(data);
-                if (Instance is null || !data.UserData.Contains('#')) return false;
+                if (!Instance || !data.UserData.Contains('#')) return false;
                 var info      = data.UserData.SplitOnce('#');
                 var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.GetByPath(data.CollectPath);
                 if (collector is null) return false;
@@ -92,7 +92,7 @@ namespace AIO.UEditor.CLI
             {
                 get
                 {
-                    if (_Config is null) _Config = ASConfig.GetOrCreate();
+                    if (!_Config) _Config = ASConfig.GetOrCreate();
                     return _Config;
                 }
             }
@@ -101,13 +101,13 @@ namespace AIO.UEditor.CLI
 
             public bool IsCollectAsset(FilterRuleData data)
             {
-                if (Instance is null || !data.GroupName.Contains('#')) return false;
+                if (!Instance || !data.GroupName.Contains('#')) return false;
                 var info = data.GroupName.SplitOnce('#');
 
                 if (!Application.isPlaying &&
-                    (Config.EnableSequenceRecord &&
-                     Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1)))
-                    return false;
+                    Config.EnableSequenceRecord &&
+                    Config.SequenceRecord.ContainsAssetPath(data.AssetPath, info.Item1)
+                   ) return false;
 
                 var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.GetByPath(data.CollectPath);
                 if (collector is null) return false;

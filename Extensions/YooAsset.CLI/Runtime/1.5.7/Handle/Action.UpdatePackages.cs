@@ -63,8 +63,8 @@ namespace AIO.UEngine.YooAsset
             return true;
         }
 
-        private static string GetPackageManifestVersionUrl(ASConfig config, AssetsPackageConfig item)
-            => $"{config.URL}/{AssetSystem.PlatformNameStr}/{item.Name}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
+        private static string GetPackageManifestVersionUrl(ASConfig config, AssetsPackageConfig item) =>
+            $"{config.URL}/{AssetSystem.PlatformNameStr}/{item.Name}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
 
         /// <summary>
         ///     更新资源包列表
@@ -77,7 +77,7 @@ namespace AIO.UEngine.YooAsset
                 return false;
             }
 
-            var remote = config.FullURL;
+            var    remote = config.FullURL;
             string content;
             try
             {
@@ -95,7 +95,7 @@ namespace AIO.UEngine.YooAsset
             {
                 item.IsLatest = item.Version == "Latest"; // 如果使用Latest则认为是最新版本 同时需要获取最新版本号
                 if (!item.IsLatest) continue;
-                var url = GetPackageManifestVersionUrl(config, item);
+                var url  = GetPackageManifestVersionUrl(config, item);
                 var temp = AHelper.HTTP.Get(url);
                 if (string.IsNullOrEmpty(temp))
                 {
@@ -123,7 +123,7 @@ namespace AIO.UEngine.YooAsset
                 return false;
             }
 
-            var remote = $"{config.URL}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
+            var    remote = $"{config.URL}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
             string content;
             try
             {
@@ -142,7 +142,7 @@ namespace AIO.UEngine.YooAsset
             {
                 item.IsLatest = item.Version == "Latest"; // 如果使用Latest则认为是最新版本 同时需要获取最新版本号
                 if (!item.IsLatest) continue;
-                var url = GetPackageManifestVersionUrl(config, item);
+                var url  = GetPackageManifestVersionUrl(config, item);
                 var temp = await AHelper.HTTP.GetAsync(url);
                 if (string.IsNullOrEmpty(temp))
                 {
@@ -163,8 +163,8 @@ namespace AIO.UEngine.YooAsset
 
         private static bool UpdatePackagesEditor(ASConfig config)
         {
-            var assembly = Assembly.Load("AIO.Asset.Editor");
-            var type = assembly.GetType("AIO.UEditor.AssetCollectRoot", true);
+            var assembly    = Assembly.Load("AIO.Asset.Editor");
+            var type        = assembly.GetType("AIO.UEditor.AssetCollectRoot", true);
             var getOrCreate = type.GetMethod("GetOrCreate", BindingFlags.Static | BindingFlags.Public);
             var collectRoot = getOrCreate?.Invoke(null, new object[] { });
             if (collectRoot is null)
@@ -173,18 +173,14 @@ namespace AIO.UEngine.YooAsset
                 return false;
             }
 
-            var packages = type.
-                           GetField("Packages", BindingFlags.Instance | BindingFlags.Public)?.
-                           GetValue(collectRoot);
+            var packages = type.GetField("Packages", BindingFlags.Instance | BindingFlags.Public)?.GetValue(collectRoot);
             if (!(packages is Array array))
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 return false;
             }
 
-            var fieldInfo = assembly.
-                            GetType("AIO.UEditor.AssetCollectPackage", true).
-                            GetField("Name", BindingFlags.Instance | BindingFlags.Public);
+            var fieldInfo = assembly.GetType("AIO.UEditor.AssetCollectPackage", true).GetField("Name", BindingFlags.Instance | BindingFlags.Public);
             if (fieldInfo is null)
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
@@ -215,7 +211,7 @@ namespace AIO.UEngine.YooAsset
         private static bool UpdatePackagesLocal(ASConfig config)
         {
             config.Packages = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(
-                $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
+                                                                             $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
             if (config.Packages is null)
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
@@ -234,7 +230,7 @@ namespace AIO.UEngine.YooAsset
                 yield break;
             }
 
-            var remote = config.FullURL;
+            var remote  = config.FullURL;
             var content = string.Empty;
             using (var uwr = UnityWebRequest.Get(remote))
             {
@@ -276,7 +272,6 @@ namespace AIO.UEngine.YooAsset
 
             cb.Invoke(true);
         }
-
 
         private class ActionUpdatePackages : OperationAction<bool>
         {
@@ -335,7 +330,6 @@ namespace AIO.UEngine.YooAsset
 
                 InvokeOnCompleted();
             }
-
 
             /// <inheritdoc />
             protected override void CreateSync()

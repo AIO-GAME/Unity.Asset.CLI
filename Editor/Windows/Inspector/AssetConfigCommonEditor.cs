@@ -156,7 +156,7 @@ namespace AIO.UEditor
                         if (GUILayout.Button("打开", GEStyle.toolbarbuttonRight))
                         {
                             AssetWindow.OpenPage<AssetPageEditBuild>();
-                            EditorApplication.ExecuteMenuItem("AIO/Window/Asset");
+                            EditorApplication.ExecuteMenuItem(AssetWindow.MENU_WINDOW);
                         }
 
                         if (GUILayout.Button("构建", GEStyle.toolbarbutton)) AssetProxyEditor.BuildArt(ABConfig);

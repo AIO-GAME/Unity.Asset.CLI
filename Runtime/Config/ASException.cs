@@ -80,6 +80,6 @@ ASConfig 为空！请检查实现或输入实例！
         [Description(@"
 [EN:Configuration initialization failed]
 [CN:配置初始化失败]")]
-        SettingConfigInitializeFailure
+        SettingConfigInitializeFailure,
     }
 }

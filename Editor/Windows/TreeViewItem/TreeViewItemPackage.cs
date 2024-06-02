@@ -13,10 +13,10 @@ namespace AIO.UEditor
         public TreeViewItemPackage(int id, AssetCollectPackage package) : base(id, 1, package.Name) { Package = package; }
 
         private static Texture _Icon;
-        private static Texture Icon => _Icon ?? (_Icon = Resources.Load<Texture>("Editor/Icon/Color/-school-bag"));
+        private static Texture Icon => _Icon ? _Icon : _Icon = Resources.Load<Texture>("Editor/Icon/Color/-school-bag");
 
         private static Texture _MainIcon;
-        private static Texture MainIcon => _MainIcon ?? (_MainIcon = Resources.Load<Texture>("Editor/Icon/Color/-briefcase"));
+        private static Texture MainIcon => _MainIcon ? _MainIcon : _MainIcon = Resources.Load<Texture>("Editor/Icon/Color/-briefcase");
 
         public AssetCollectPackage Package { get; }
 

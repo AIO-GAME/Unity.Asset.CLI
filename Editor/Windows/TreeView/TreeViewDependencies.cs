@@ -30,7 +30,9 @@ namespace AIO.UEditor
             switch (col)
             {
                 case 0:
-                    data = ascending ? data.OrderBy(x => x.Object?.name) : data.OrderByDescending(x => x.Object?.name);
+                    data = ascending
+                        ? data.OrderBy(x => x.Object ? x.Object.name : null)
+                        : data.OrderByDescending(x => x.Object ? x.Object.name : null);
                     break;
                 case 1:
                     data = ascending ? data.OrderBy(x => x.Size) : data.OrderByDescending(x => x.Size);

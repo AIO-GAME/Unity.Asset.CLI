@@ -1,22 +1,17 @@
-﻿#region
-
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using UnityEngine;
-
-#endregion
-
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace AIO.UEngine
 {
-    [Description("资源系统配置"), Serializable,
-     HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
+    using System;
+    using System.ComponentModel;
+    using System.IO;
+    using System.Linq;
+    using UnityEngine;
+
+    [Description("资源系统配置"), Serializable]
+    [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
     public class ASConfig : ScriptableObject
     {
         /// <summary>
@@ -53,7 +48,7 @@ namespace AIO.UEngine
         /// <summary>
         ///    全局 可寻址路径全部包含扩展名
         /// </summary>
-        public bool HasExtension = false;
+        public bool HasExtension;
 #endif
 
         /// <summary>
@@ -164,7 +159,7 @@ namespace AIO.UEngine
         private static ASConfig instance;
 #endif
 
-        private static ASConfig GetResource() { return Resources.LoadAll<ASConfig>(nameof(ASConfig)).FirstOrDefault(item => !(item is null)); }
+        private static ASConfig GetResource() { return Resources.LoadAll<ASConfig>(nameof(ASConfig)).FirstOrDefault(item => item); }
 
         /// <summary>
         ///     获取本地资源包地址
@@ -174,14 +169,15 @@ namespace AIO.UEngine
 #if UNITY_EDITOR
             if (!instance)
             {
-                foreach (var item in AssetDatabase.FindAssets("t:ASConfig", new[] { "Assets" })
-                                                  .Select(AssetDatabase.GUIDToAssetPath)
-                                                  .Select(AssetDatabase.LoadAssetAtPath<ASConfig>))
-                    if (item)
-                    {
-                        instance = item;
-                        break;
-                    }
+                foreach (var item in AssetDatabase
+                                     .FindAssets("t:ASConfig", new[] { "Assets", })
+                                     .Select(AssetDatabase.GUIDToAssetPath)
+                                     .Select(AssetDatabase.LoadAssetAtPath<ASConfig>)
+                                     .Where(item => item))
+                {
+                    instance = item;
+                    break;
+                }
 
                 if (!instance)
                 {
@@ -261,7 +257,6 @@ namespace AIO.UEngine
             return config;
         }
 
-        [Conditional("UNITY_EDITOR")]
         public void Save()
         {
             if (Equals(null)) return;

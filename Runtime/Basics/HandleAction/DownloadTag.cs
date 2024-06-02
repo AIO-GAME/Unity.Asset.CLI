@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#region namespace
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,6 +8,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AIO.UEngine;
+
+#endregion
 
 namespace AIO
 {
@@ -32,10 +36,7 @@ namespace AIO
         /// </summary>
         private IASDownloader downloader;
 
-        protected override void OnDispose()
-        {
-            downloader = null;
-        }
+        protected override void OnDispose() { downloader = null; }
 
         protected override void CreateSync()
         {
@@ -135,7 +136,7 @@ namespace AIO
         ///     获取下载器
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IASDownloader GetDownloader(DownlandAssetEvent assetEvent = default)
+        public static IASDownloader GetDownloader(DownlandAssetEvent assetEvent = default(DownlandAssetEvent))
         {
             return Parameter.ASMode != EASMode.Remote
                 ? new ASDownloaderEmpty(assetEvent)
@@ -191,18 +192,12 @@ namespace AIO
         ///     预下载全部远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IOperationAction DownloadAll(DownlandAssetEvent assetEvent = default)
-        {
-            return new OperationDownloadTag(true, assetEvent);
-        }
+        public static IOperationAction DownloadAll(DownlandAssetEvent assetEvent = default) { return new OperationDownloadTag(true, assetEvent); }
 
         /// <summary>
         ///     动态下载远端资源
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static IOperationAction DownloadHeader(DownlandAssetEvent assetEvent = default)
-        {
-            return new OperationDownloadTag(false, assetEvent);
-        }
+        public static IOperationAction DownloadHeader(DownlandAssetEvent assetEvent = default) { return new OperationDownloadTag(false, assetEvent); }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -15,10 +16,7 @@ namespace AIO.UEditor
     {
         #region Instance
 
-        static AssetPageLook()
-        {
-            _Instance = new AssetPageLook();
-        }
+        static AssetPageLook() { _Instance = new AssetPageLook(); }
 
         private static AssetPageLook _Instance;
         private static AssetPageLook Instance => _Instance ?? (_Instance = new AssetPageLook());
@@ -90,7 +88,7 @@ namespace AIO.UEditor
                 get
                 {
                     if (string.IsNullOrEmpty(_Type)) return _Type;
-                    _Type = Object is null ? "Unknown" : Object.GetType().FullName;
+                    _Type = !Object ? "Unknown" : Object.GetType().FullName;
                     return _Type;
                 }
             }
@@ -104,7 +102,9 @@ namespace AIO.UEditor
 
         private readonly Dictionary<string, DependenciesInfo> Dependencies = new Dictionary<string, DependenciesInfo>(); // 依赖资源
 
-        private void OnQueryAsseChanged(int id)
+        private int TempIndex;
+
+        private async void OnQueryAsseChanged(int id)
         {
             Runner.StopCoroutine(OnSelectionChangedRef);
             if (id < 0)
@@ -114,28 +114,31 @@ namespace AIO.UEditor
             }
 
             SelectAssetDataInfo = PageValues.CurrentPageValues[id];
+            Dependencies.Clear();
+            TempIndex = id;
+            await Task.Delay(500);
+            if (TempIndex != id) return;
             Runner.StartCoroutine(OnSelectionChangedRef);
         }
 
         private IEnumerator OnSelectionChangedRef()
         {
-            Dependencies.Clear();
-            yield return Runner.WaitForSeconds(0.5f);
+            yield return Runner.YieldReturn;
             var assetPath = SelectAssetDataInfo.AssetPath;
             foreach (var dependency in AssetDatabase.GetDependencies(assetPath))
             {
                 if (assetPath == dependency) continue;
                 if (Dependencies.ContainsKey(dependency)) continue;
-                var info = new DependenciesInfo
-                {
-                    AssetPath = dependency, Object = AssetDatabase.LoadAssetAtPath<Object>(dependency)
-                };
-                if (!info.Object) continue;
-                DependenciesSize += info.Size = new FileInfo(dependency).Length;
-                Dependencies.Add(dependency, info);
+                var obj = AssetDatabase.LoadAssetAtPath<Object>(dependency);
+                if (!obj) continue;
+                var info = new DependenciesInfo { AssetPath = dependency, Object = obj, Size = new FileInfo(dependency).Length };
+                DependenciesSize         += info.Size;
+                Dependencies[dependency] =  info;
+                yield return Runner.YieldReturn;
             }
 
             SelectAsset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+            yield return Runner.YieldReturn;
             TreeViewDependencies.Reload(Dependencies.Values);
         }
 
@@ -299,7 +302,7 @@ namespace AIO.UEditor
 #if UNITY_2021_1_OR_NEWER
                 if (!GUI.Button(cell, GUIContent.none, GEStyle.SearchCancelButton)) return;
 #else
-             if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSeachCancelButton)) return;
+                if (!GUI.Button(cell, GUIContent.none, GEStyle.ToolbarSeachCancelButton)) return;
 #endif
 
                 GUI.FocusControl(null);
@@ -355,7 +358,7 @@ namespace AIO.UEditor
             if (index < 1) return true;
             if (displays is null || displays.Count == 0) return false;
             var objectType = data.Type;
-            var status = 1L;
+            var status     = 1L;
             foreach (var item in displays)
             {
                 if ((index & status) == status && objectType == item) return true;
@@ -425,7 +428,7 @@ namespace AIO.UEditor
 
                 cell.x     += cell.width;
                 cell.width =  rect.width - cell.x;
-                EditorGUI.LabelField(cell, $"{AssetDatabase.IsSubAsset(SelectAsset)}");
+                EditorGUI.LabelField(cell, SelectAsset ? $"{AssetDatabase.IsSubAsset(SelectAsset)}" : "false");
             }
 
             {
@@ -612,13 +615,10 @@ namespace AIO.UEditor
         private static string[] GetGroupDisPlayNames(ICollection<AssetCollectGroup> groups)
         {
             var page = groups.Count > 15;
-            return (from t in groups
-                    select t.Name
-                    into groupName
-                    where !string.IsNullOrEmpty(groupName)
-                    select page
-                        ? string.Concat(char.ToUpper(groupName[0]), '/', groupName)
-                        : groupName).ToArray();
+            return groups.Select(t => t.Name)
+                         .Where(groupName => !string.IsNullOrEmpty(groupName))
+                         .Select(groupName => page ? string.Concat(char.ToUpper(groupName[0]), '/', groupName) : groupName)
+                         .ToArray();
         }
 
         private static string[] GetCollectorDisPlayNames(IList<string> collectors)
@@ -633,8 +633,7 @@ namespace AIO.UEditor
 
             if (collectors.Count > 15)
                 for (var index = 0; index < collectors.Count; index++)
-                    collectors[index] = string.Concat(char.ToUpper(collectors[index][0]), '/',
-                                                      collectors[index].Replace('/', '\\').TrimEnd('\\'));
+                    collectors[index] = string.Concat(char.ToUpper(collectors[index][0]), '/', collectors[index].Replace('/', '\\').TrimEnd('\\'));
             else
                 for (var index = 0; index < collectors.Count; index++)
                     collectors[index] = collectors[index].Replace('/', '\\').TrimEnd('\\');

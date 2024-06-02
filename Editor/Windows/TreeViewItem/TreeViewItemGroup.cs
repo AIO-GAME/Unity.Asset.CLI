@@ -14,7 +14,7 @@ namespace AIO.UEditor
 
         public TreeViewItemGroup(int id, AssetCollectGroup group) : base(id, 2, group.Name) { Group = group; }
 
-        private static Texture Icon => _Icon ?? (_Icon = Resources.Load<Texture>("Editor/Icon/Color/-tutorial-"));
+        private static Texture Icon => _Icon ? _Icon : _Icon = Resources.Load<Texture>("Editor/Icon/Color/-tutorial-");
 
         public AssetCollectGroup Group { get; }
 

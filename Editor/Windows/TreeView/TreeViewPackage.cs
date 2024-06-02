@@ -57,8 +57,9 @@ namespace AIO.UEditor
 
         protected override void OnBuildRows(TreeViewItem root)
         {
+            if (!Config) return;
             var isDefault = false;
-            for (var idxP = 0; idxP < Config?.Count; idxP++)
+            for (var idxP = 0; idxP < Config.Count; idxP++)
             {
                 root.AddChild(new TreeViewItemPackage(idxP, Config[idxP]));
                 if (!Config[idxP].Default) continue;
@@ -67,7 +68,7 @@ namespace AIO.UEditor
                 else isDefault                      = true;
             }
 
-            if (!isDefault && Config?.Count > 0) Config[0].Default = true;
+            if (!isDefault && Config.Count > 0) Config[0].Default = true;
         }
 
         #region 工具方法
@@ -311,7 +312,7 @@ namespace AIO.UEditor
 
         protected override void OnDraw(Rect rect)
         {
-            if (Config is null) return;
+            if (!Config) return;
             if (Config.Count != 0) return;
             if (GELayout.Button(rect.center, new Vector2(100, 30), "创建资源包"))
             {

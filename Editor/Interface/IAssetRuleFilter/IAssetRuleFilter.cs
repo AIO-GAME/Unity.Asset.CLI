@@ -11,7 +11,7 @@
         ///    显示顺序
         /// </summary>
         int DisplayIndex { get; }
-        
+
         /// <summary>
         ///     验证资源是否符合规则
         /// </summary>

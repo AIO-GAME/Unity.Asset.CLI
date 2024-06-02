@@ -1,4 +1,4 @@
-﻿#region
+﻿#region namespace
 
 using System;
 using UnityEngine;

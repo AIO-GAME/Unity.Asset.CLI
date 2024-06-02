@@ -48,38 +48,31 @@ namespace AIO.UEngine.YooAsset
         /// <param name="isForce">是否强制回收</param>
         public void UnloadUnusedAssets(string packageName, bool isForce = false)
         {
-            if (Dic.TryGetValue(packageName, out var value))
-            {
-                if (isForce)
-                    value.Package.ForceUnloadAllAssets();
-                else
-                    Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
-                    {
-                        value.Package.UnloadUnusedAssets();
-                        AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), packageName);
-                    }));
-            }
+            if (!Dic.TryGetValue(packageName, out var value)) return;
+            if (isForce) value.Package.ForceUnloadAllAssets();
+            else
+                Runner.StartCoroutine(UnloadUnusedAssetsCo, (Action<AsyncOperation>)delegate
+                {
+                    value.Package.UnloadUnusedAssets();
+                    AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), packageName);
+                });
         }
 
         public override void UnloadUnusedAssets(bool isForce = false)
         {
-            foreach (var key in ReferenceOPHandle.Keys.ToArray())
-            {
-                var temp = ReferenceOPHandle[key];
-                if (temp.IsValid) continue;
-                var status = temp.Status;
-                if (status == EOperationStatus.Succeed || status == EOperationStatus.Processing) continue;
-                ReferenceOPHandle.Remove(key);
-            }
-
             if (isForce)
             {
                 ReferenceOPHandle.Clear();
-                foreach (var value in Dic.Values)
-                    value.Package.ForceUnloadAllAssets();
+                Dic.Values.ToList().ForEach(value => value.Package.ForceUnloadAllAssets());
             }
             else
             {
+                ReferenceOPHandle.Where(pair => !pair.Value.IsValid)
+                                 .Where(pair => pair.Value.Status != EOperationStatus.Succeed)
+                                 .Where(pair => pair.Value.Status != EOperationStatus.Processing)
+                                 .Select(pair => pair.Key)
+                                 .ToList()
+                                 .ForEach(item => ReferenceOPHandle.Remove(item));
                 Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
                 {
                     foreach (var value in Dic.Values)
@@ -97,27 +90,25 @@ namespace AIO.UEngine.YooAsset
 
         private static void ReleaseOperationHandle(OperationHandleBase operation)
         {
-            if (operation.IsValid)
-                switch (operation)
-                {
-                    case AllAssetsOperationHandle handle:
-                        handle.Dispose();
-                        break;
-                    case RawFileOperationHandle handle:
-                        handle.Dispose();
-                        break;
-                    case SubAssetsOperationHandle handle:
-                        handle.Dispose();
-                        break;
-                    case AssetOperationHandle handle:
-                        handle.Dispose();
-                        break;
-                    case SceneOperationHandle handle:
-                        if (!handle.IsMainScene()) handle.UnloadAsync();
-                        break;
-                }
-
-            operation = null; // 释放引用
+            if (!operation.IsValid) return;
+            switch (operation)
+            {
+                case AllAssetsOperationHandle handle:
+                    handle.Dispose();
+                    break;
+                case RawFileOperationHandle handle:
+                    handle.Dispose();
+                    break;
+                case SubAssetsOperationHandle handle:
+                    handle.Dispose();
+                    break;
+                case AssetOperationHandle handle:
+                    handle.Dispose();
+                    break;
+                case SceneOperationHandle handle:
+                    if (!handle.IsMainScene()) handle.UnloadAsync();
+                    break;
+            }
         }
     }
 }

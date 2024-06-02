@@ -6,16 +6,15 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
-    public partial class AssetWindow
+    partial class AssetWindow
     {
         [LnkTools(Tooltip = "AIO 资源管理工具", IconResource = "Editor/Icon/Asset", ShowMode = ELnkShowMode.Toolbar)]
         public static void OpenWindow() => EditorApplication.ExecuteMenuItem(MENU_WINDOW);
 
-        public const string MENU_ROOT   = "AIO/Asset/";
-        public const string MENU_WINDOW = MENU_ROOT + "Window";
-        public const string MENU_CONFIG = MENU_ROOT + "Config";
+        public const string MENU_WINDOW = AssetsEditorSetting.MENU_ROOT + "Window";
+        public const string MENU_CONFIG = AssetsEditorSetting.MENU_ROOT + "Config";
 
-        [MenuItem(MENU_ROOT + "清空运行时缓存")]
+        [MenuItem(AssetsEditorSetting.MENU_ROOT + "清空运行时缓存")]
         public static void ClearRuntimeCache()
         {
             var sandbox = Path.Combine(EHelper.Path.Project, ASConfig.GetOrCreate().RuntimeRootDirectory);
@@ -23,7 +22,7 @@ namespace AIO.UEditor
                 AHelper.IO.DeleteDir(sandbox, SearchOption.AllDirectories, true);
         }
 
-        [MenuItem(MENU_ROOT + "清空构建时缓存")]
+        [MenuItem(AssetsEditorSetting.MENU_ROOT + "清空构建时缓存")]
         public static void ClearBuildCache()
         {
             var sandbox = Path.Combine(EHelper.Path.Project, "Bundles");
@@ -101,25 +100,38 @@ namespace AIO.UEditor
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
+            if (!AssetsEditorSetting.AutoConversionConfig) return;
+            EditorQuit();
             EditorApplication.playModeStateChanged -= EditorQuit;
             EditorApplication.playModeStateChanged += EditorQuit;
         }
 
         // Unity 第一次进入 Editor 模式时，将 AssetCollectRoot 转换为 AssetProxy
-        [InitializeOnLoadMethod]
         private static void EditorQuit()
         {
+            if (!AssetsEditorSetting.AutoConversionConfig)
+            {
+                EditorApplication.playModeStateChanged -= EditorQuit;
+                return;
+            }
+
             var config = ASConfig.GetOrCreate();
             if (config.ASMode != EASMode.Editor) return;
 
             var root = AssetCollectRoot.GetOrCreate();
-            if (root is null) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
+            if (!root) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
             AssetProxyEditor.ConvertConfig(root, false);
             EditorApplication.playModeStateChanged -= EditorQuit;
         }
 
         private static void EditorQuit(PlayModeStateChange value)
         {
+            if (!AssetsEditorSetting.AutoConversionConfig)
+            {
+                EditorApplication.playModeStateChanged -= EditorQuit;
+                return;
+            }
+
             if (value != PlayModeStateChange.EnteredPlayMode) return;
             if (!Application.isPlaying) return;
 
@@ -127,7 +139,7 @@ namespace AIO.UEditor
             if (config.ASMode != EASMode.Editor) return;
 
             var root = AssetCollectRoot.GetOrCreate();
-            if (root is null) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
+            if (!root) throw new Exception($"Not found {nameof(AssetCollectRoot)}.asset ! Please create it !");
             AssetProxyEditor.ConvertConfig(root, false);
             EditorApplication.playModeStateChanged -= EditorQuit;
         }

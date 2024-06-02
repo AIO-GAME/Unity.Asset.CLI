@@ -69,6 +69,6 @@ namespace AIO.UEngine
         ///     下载进度
         /// </summary>
         [Description("下载进度")]
-        HotUpdateDownloadFinish
+        HotUpdateDownloadFinish,
     }
 }

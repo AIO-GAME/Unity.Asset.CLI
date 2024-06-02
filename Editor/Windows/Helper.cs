@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using System.Collections.Generic;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace AIO.UEditor
     {
         static ResInspectorUI()
         {
+            if (!AssetsEditorSetting.ShowInspectorAddress) return;
             Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
             Editor.finishedDefaultHeaderGUI += OnPostHeaderGUI;
         }
@@ -32,99 +34,103 @@ namespace AIO.UEditor
 
         private static ASConfig _Config;
 
-        private static void OnPostHeaderGUI(Editor editor)
+        private static readonly List<string> WhiteList = new List<string>
         {
-            if (editor.targets.Length != 1) return;
-            switch (editor.target)
-            {
-                case AssetCollectRoot _:
-                case ASConfig _:
-                case AssetBuildConfig _:
-                case ConsoleWindowConfig _:
+            typeof(AssetCollectRoot).FullName,
+            typeof(ASConfig).FullName,
+            typeof(AssetBuildConfig).FullName,
+            typeof(ConsoleWindowConfig).FullName,
 #if SUPPORT_YOOASSET
-                case AssetBundleCollectorSetting _:
-                case ShaderVariantCollectorSetting _:
+            typeof(AssetBundleCollectorSetting).FullName,
+            typeof(ShaderVariantCollectorSetting).FullName,
 #endif
-                    return;
-                default:
+        };
 
-                    try
+        internal static void OnPostHeaderGUI(Editor editor)
+        {
+            if (!AssetsEditorSetting.ShowInspectorAddress)
+            {
+                Editor.finishedDefaultHeaderGUI -= OnPostHeaderGUI;
+                return;
+            }
+
+            if (editor.targets == null) return;
+            if (editor.targets.Length != 1) return;
+            if (WhiteList.Contains(editor.target.GetType().FullName)) return; // 判断资源类型
+            try
+            {
+                if (AssetCollectRoot.ObjToCollector(editor.target, out var result))
+                {
+                    using (new EditorGUI.DisabledScope(false))
                     {
-                        if (AssetCollectRoot.ObjToCollector(editor.target, out var result))
-                        {
-                            using (new EditorGUI.DisabledScope(false))
-                            {
-                                GUILayout.BeginHorizontal();
-                                EditorGUILayout.LabelField("包名", GUILayout.MaxWidth(65));
-                                EditorGUILayout.TextField(result.PackageName, GUILayout.MinWidth(30));
-                                GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("包名", GUILayout.MaxWidth(65));
+                        EditorGUILayout.TextField(result.PackageName, GUILayout.MinWidth(30));
+                        GUILayout.EndHorizontal();
 
-                                GUILayout.BeginHorizontal();
-                                EditorGUILayout.LabelField("组名", GUILayout.MaxWidth(65));
-                                EditorGUILayout.TextField(result.GroupName, GUILayout.MinWidth(30));
-                                GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("组名", GUILayout.MaxWidth(65));
+                        EditorGUILayout.TextField(result.GroupName, GUILayout.MinWidth(30));
+                        GUILayout.EndHorizontal();
 
-                                GUILayout.BeginHorizontal();
-                                EditorGUILayout.LabelField("收集模式", GUILayout.MaxWidth(65));
-                                result.Type = GELayout.Popup(result.Type, GEStyle.PreDropDown);
-                                GUILayout.EndHorizontal();
-                            }
-
-                            if (result.Type != EAssetCollectItemType.MainAssetCollector) return;
-
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.LabelField("寻址规则", GUILayout.MaxWidth(65));
-                            result.AddressIndex = GELayout.Popup(result.AddressIndex, AssetCollectSetting.MapAddress.Displays,
-                                                                 GEStyle.PreDropDown);
-                            GUILayout.EndHorizontal();
-
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.LabelField("打包规则", GUILayout.MaxWidth(65));
-                            result.RulePackIndex = GELayout.Popup(result.RulePackIndex, AssetCollectSetting.MapPacks.Displays,
-                                                                  GEStyle.PreDropDown);
-                            GUILayout.EndHorizontal();
-
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.LabelField("打包模式", GUILayout.MaxWidth(65));
-                            result.LoadType = GELayout.Popup(result.LoadType, GEStyle.PreDropDown);
-                            GUILayout.EndHorizontal();
-
-
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.LabelField("寻址命名", GUILayout.MaxWidth(65));
-                            if (Config.LoadPathToLower)
-                            {
-                                using (new EditorGUI.DisabledScope(false))
-                                    result.LocationFormat = GELayout.Popup(EAssetLocationFormat.ToLower, GEStyle.PreDropDown);
-                            }
-                            else
-                            {
-                                result.LocationFormat = GELayout.Popup(result.LocationFormat, GEStyle.PreDropDown);
-                            }
-
-                            if (Config.HasExtension)
-                            {
-                                using (new EditorGUI.DisabledScope(false))
-                                    result.HasExtension = GELayout.ToggleLeft("后缀", true, GTOptions.Width(42));
-                            }
-                            else
-                            {
-                                result.HasExtension = GELayout.ToggleLeft("后缀", result.HasExtension, GTOptions.Width(42));
-                            }
-
-                            GUILayout.EndHorizontal();
-                        }
-                        else
-                        {
-                            ShowRulePath(AssetCollectRoot.ObjToAddress(editor.target, Config.LoadPathToLower, Config.HasExtension));
-                        }
-                    }
-                    catch
-                    {
-                        // ignored
+                        GUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("收集模式", GUILayout.MaxWidth(65));
+                        result.Type = GELayout.Popup(result.Type, GEStyle.PreDropDown);
+                        GUILayout.EndHorizontal();
                     }
 
-                    break;
+                    if (result.Type != EAssetCollectItemType.MainAssetCollector) return;
+
+                    GUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("寻址规则", GUILayout.MaxWidth(65));
+                    result.AddressIndex = GELayout.Popup(result.AddressIndex, AssetCollectSetting.MapAddress.Displays,
+                                                         GEStyle.PreDropDown);
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("打包规则", GUILayout.MaxWidth(65));
+                    result.RulePackIndex = GELayout.Popup(result.RulePackIndex, AssetCollectSetting.MapPacks.Displays,
+                                                          GEStyle.PreDropDown);
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("打包模式", GUILayout.MaxWidth(65));
+                    result.LoadType = GELayout.Popup(result.LoadType, GEStyle.PreDropDown);
+                    GUILayout.EndHorizontal();
+
+
+                    GUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("寻址命名", GUILayout.MaxWidth(65));
+                    if (Config.LoadPathToLower)
+                    {
+                        using (new EditorGUI.DisabledScope(false))
+                            result.LocationFormat = GELayout.Popup(EAssetLocationFormat.ToLower, GEStyle.PreDropDown);
+                    }
+                    else
+                    {
+                        result.LocationFormat = GELayout.Popup(result.LocationFormat, GEStyle.PreDropDown);
+                    }
+
+                    if (Config.HasExtension)
+                    {
+                        using (new EditorGUI.DisabledScope(false))
+                            result.HasExtension = GELayout.ToggleLeft("后缀", true, GTOptions.Width(42));
+                    }
+                    else
+                    {
+                        result.HasExtension = GELayout.ToggleLeft("后缀", result.HasExtension, GTOptions.Width(42));
+                    }
+
+                    GUILayout.EndHorizontal();
+                }
+                else
+                {
+                    ShowRulePath(AssetCollectRoot.ObjToAddress(editor.target, Config.LoadPathToLower, Config.HasExtension));
+                }
+            }
+            catch
+            {
+                // ignored
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using Object = UnityEngine.Object;
 
@@ -114,11 +115,11 @@ namespace AIO.UEditor
             var objects = EHelper.IO.GetScriptableObjects<AssetCollectRoot>();
             if (objects != null && objects.Length > 0)
             {
-                foreach (var asset in objects)
+                foreach (var asset in objects.Where(asset => asset))
                 {
-                    if (asset is null) continue;
                     if (asset.Packages is null)
                         asset.Packages = Array.Empty<AssetCollectPackage>();
+
                     _Instance = asset;
                     return _Instance;
                 }
@@ -138,11 +139,12 @@ namespace AIO.UEditor
         /// <param name="isLower">是否小写</param>
         /// <param name="hasExtension">是否包含后缀</param>
         /// <param name="limitPackage">限制包名 只查找指定包资源 空则忽略</param>
-        /// <returns>
-        ///     Item1 包名
-        ///     Item2 组名
-        ///     Item3 可寻址路径
-        /// </returns>
+        /// <returns> <code>
+        /// var result = AssetCollectRoot.AssetToAddress();
+        /// result.Item1 包名
+        /// result.Item2 组名
+        /// result.Item3 可寻址路径
+        /// </code> </returns>
         public static Tuple<string, string, string> AssetToAddress(string assetPath, bool isLower, bool hasExtension, string limitPackage = "")
         {
             if (IsNoAssetPath(assetPath)) return Empty;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
@@ -64,28 +65,25 @@ namespace AIO.UEditor
         /// </summary>
         public static AssetBuildConfig GetOrCreate()
         {
-            if (_instance is null)
-            {
-                var objects = EHelper.IO.GetScriptableObjects<AssetBuildConfig>();
-                if (objects != null && objects.Length > 0)
-                    foreach (var asset in objects)
-                    {
-                        if (asset is null) continue;
-                        if (string.IsNullOrEmpty(asset.BuildOutputPath))
-                            asset.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
+            if (_instance != null) return _instance;
 
-                        _instance = asset;
-                        break;
-                    }
-
-                if (_instance is null)
+            var objects = EHelper.IO.GetScriptableObjects<AssetBuildConfig>();
+            if (objects != null && objects.Length > 0)
+                foreach (var asset in objects.Where(asset => asset))
                 {
-                    _instance                 = CreateInstance<AssetBuildConfig>();
-                    _instance.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
-                    AssetDatabase.CreateAsset(_instance, "Assets/Editor/ASBuildConfig.asset");
-                    AssetDatabase.SaveAssets();
+                    if (string.IsNullOrEmpty(asset.BuildOutputPath))
+                        asset.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
+
+                    _instance = asset;
+                    break;
                 }
-            }
+
+            if (_instance) return _instance;
+
+            _instance                 = CreateInstance<AssetBuildConfig>();
+            _instance.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
+            AssetDatabase.CreateAsset(_instance, "Assets/Editor/ASBuildConfig.asset");
+            AssetDatabase.SaveAssets();
 
             return _instance;
         }

@@ -16,7 +16,7 @@ namespace AIO.UEngine
         LZMA,
 
         [InspectorName("LZ4")]
-        LZ4
+        LZ4,
     }
 
     [Serializable]
@@ -52,9 +52,6 @@ namespace AIO.UEngine
         /// </summary>
         public bool IsLatest { get; set; }
 
-        public override string ToString()
-        {
-            return $"Name : {Name} , Version : {Version} , IsDefault : {IsDefault} , CompressMode : {CompressMode}";
-        }
+        public override string ToString() { return $"Name : {Name} , Version : {Version} , IsDefault : {IsDefault} , CompressMode : {CompressMode}"; }
     }
 }
