@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -43,11 +44,11 @@ namespace AIO.UEditor
 
             #endregion
 
-            private Dictionary<string, string[]>                DisplayGroupNames;
-            private Dictionary<(int, int), string[]>            CollectorDisplays;
-            private Dictionary<(int, int), string[]>            TypeDisplays;
-            private Dictionary<(int, int), string[]>            TagDisplays;
-            private Dictionary<(int, int), List<AssetDataInfo>> DataDic;
+            private Dictionary<string, string[]>                         DisplayGroupNames;
+            private Dictionary<(int, int), string[]>                     CollectorDisplays;
+            private Dictionary<(int, int), string[]>                     TypeDisplays;
+            private Dictionary<(int, int), string[]>                     TagDisplays;
+            private Dictionary<(int, int), ConcurrentBag<AssetDataInfo>> DataDic;
 
             public void OnDrawHeader(Rect rect)
             {
@@ -193,27 +194,30 @@ namespace AIO.UEditor
                  || Data.Packages[i].Count <= j
                    ) return;
 
-                var key = (i, j);
-                DisplayGroupNames[DisplayPackages[i]] = GetGroupDisPlayNames(Data.Packages[i].Groups);
-                TagDisplays[key]                      = Data.Packages[i].Groups[j].Tags;
-                CollectorDisplays[key]                = GetCollectorDisPlayNames(Data.Packages[i].Groups[j].Collectors.GetDisPlayNames());
+                var key     = (i, j);
+                var package = Data.Packages[i];
+                var group   = package.Groups[j];
+
+                DisplayGroupNames[DisplayPackages[i]] = GetGroupDisPlayNames(package.Groups);
+                TagDisplays[key]                      = group.Tags;
+                CollectorDisplays[key]                = GetCollectorDisPlayNames(group.Collectors.GetDisPlayNames());
                 DisplayCollectorsIndex                = 0;
-                DataDic[key]                          = new List<AssetDataInfo>();
+                DataDic[key]                          = new ConcurrentBag<AssetDataInfo>();
                 TypeDisplays[(i, j)]                  = Array.Empty<string>();
 
                 var toLower      = Config.LoadPathToLower;
                 var hasExtension = Config.HasExtension;
-                var listTypes    = new List<string>();
+                var listTypes    = new ConcurrentBag<string>();
 
-                var count = Data.Packages[i].Groups[j].Collectors.Length;
+                var count = group.Collectors.Length;
                 var index = 0;
 
-                foreach (var item in Data.Packages[i].Groups[j].Collectors)
+                foreach (var item in group.Collectors)
                 {
                     if (item.AllowThread)
-                        Runner.StartTask(() => Collect(item));
+                        Runner.StartTask(Collect, item);
                     else
-                        Runner.StartCoroutine(() => Collect(item));
+                        Runner.StartCoroutine(Collect, item);
                 }
 
                 TreeViewQueryAsset.Reload(PageValues);
@@ -221,19 +225,30 @@ namespace AIO.UEditor
 
                 void Collect(AssetCollectItem item)
                 {
-                    item.CollectAssetAsync(Data.Packages[i], Data.Packages[i].Groups[j], toLower, hasExtension);
-                    DataDic[(i, j)].AddRange(item.DataInfos.Values);
-                    if (count != ++index) return;
-                    Runner.StartCoroutine(() =>
+                    item.CollectAssetAsync(package, group, toLower, hasExtension);
+                    foreach (var variable in item.DataInfos.Values)
                     {
-                        listTypes.AddRange(DataDic[(i, j)].Where(dataInfo => !listTypes.Contains(dataInfo.Type)).Select(dataInfo => dataInfo.Type));
-                        Runner.StartTask(End);
-                    });
+                        DataDic[(i, j)].Add(variable);
+                    }
+
+                    if (count != ++index) return;
+
+                    Runner.StartCoroutine(UpdateType, item);
+                    Runner.StartTask(End);
+                }
+
+                void UpdateType(AssetCollectItem item)
+                {
+                    foreach (var type in item.DataInfos.Values.Select(dataInfo => dataInfo.Type))
+                    {
+                        listTypes.Add(type);
+                    }
+
+                    TypeDisplays[(i, j)] = listTypes.Distinct().ToArray();
                 }
 
                 void End()
                 {
-                    TypeDisplays[(i, j)] = listTypes.ToArray();
                     lock (PageValues)
                     {
                         PageValues.Add(DataDic[(i, j)].Where(data => !FilterData(data)));
@@ -273,7 +288,7 @@ namespace AIO.UEditor
                 if (TagDisplays is null) TagDisplays             = new Dictionary<(int, int), string[]>();
                 if (TypeDisplays is null) TypeDisplays           = new Dictionary<(int, int), string[]>();
                 if (DisplayGroupNames is null) DisplayGroupNames = new Dictionary<string, string[]>();
-                if (DataDic is null) DataDic                     = new Dictionary<(int, int), List<AssetDataInfo>>();
+                if (DataDic is null) DataDic                     = new Dictionary<(int, int), ConcurrentBag<AssetDataInfo>>();
 
                 PageValues.Clear();
                 PageValues.PageIndex = 0;
