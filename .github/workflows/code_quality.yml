@@ -18,7 +18,7 @@ jobs:
       pull-requests: write
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}  # 检查实际的pull请求提交，而不是合并提交
           fetch-depth: 0 # 拉请求分析需要完整的历史记录
