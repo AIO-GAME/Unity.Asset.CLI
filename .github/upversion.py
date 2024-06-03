@@ -10,9 +10,10 @@ import requests
 def get_latest_github_tag(repo_url) -> str:
     # 从仓库 URL 提取用户和仓库名称
     repo_path = repo_url.split("https://github.com/")[1].replace(".git", "")
+    print(f"Fetching tags from {repo_path}")
     api_url = f"https://api.github.com/repos/{repo_path}/tags"
 
-    response = requests.get(api_url)
+    response = requests.get(api_url, timeout=10)
 
     if response.status_code == 200:
         tags = response.json()
@@ -80,9 +81,8 @@ def delete_folder(folder_path) -> None:
         print(exp)
 
 
-def read_current_branch() -> str:
+def read_current_branch() -> str:  # 判断当前分支
     branches = os.popen("git branch").read().split("\n")
-    # 判断当前分支
     for branch in branches:
         if branch.startswith("*"):
             return branch.replace("* ", "")
@@ -91,14 +91,13 @@ def read_current_branch() -> str:
 def read_current_version() -> str:
     subprocess.run(['git', 'fetch', '--tags'], check=True)
     tags = os.popen("git tag").read().split("\n")
-    # 所有标签去掉空字符串 -preview标签去掉preview 然后按照version排序
-    tags = sorted([tag.replace("-preview", "") for tag in tags if tag], key=lambda x: tuple(map(int, x.split("."))))
+    # 所有标签去掉空字符串 -preview标签去掉preview 然后按照version排序 1.2.3-preview -> 1.3.0-preview
+    tags = sorted([tag.replace("-preview", "") for tag in tags if tag], key=lambda x: list(map(int, x.split("."))))
     return tags[-1]
 
 
 # 切换上一级目录
 os.chdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-# subprocess.run(['cd', '..'], check=True, shell=True)
 current_path = os.getcwd()
 print("当前路径: " + current_path)
 
@@ -137,6 +136,7 @@ for step_description, step_function in tqdm(steps, desc="检查标签"):
     step_function()
 
 version = read_current_version()  # 读取当前版本号
+print("当前版本号: " + version)
 # 递增版本号
 version_list = version.split(".")
 if is_preview:
@@ -149,12 +149,12 @@ new_version = ".".join(version_list)
 with open("package.json", "r+") as f:
     package = json.load(f)
     current_version = package["version"]
-    package["relatedPackages"]["com.aio.package"] = get_latest_github_tag('https://github.com/AIO-GAME/Common.git')
     package["version"] = new_version
+    package["relatedPackages"]["com.aio.package"] = get_latest_github_tag('https://github.com/AIO-GAME/Common.git')
     f.seek(0)
     json.dump(package, f, indent=2)
-    print("写入新版本号成功: {0} -> {1}".format(current_version, new_version))
-    print("写入依赖版本号成功: {0}".format(package["relatedPackages"]["com.aio.package"]))
+    print("写入配置: 版本号 {0} -> {1}".format(current_version, new_version))
+    print("写入配置: 依赖库 {0} -> {1}".format("com.aio.package", package["relatedPackages"]["com.aio.package"]))
     f.close()
 
 # 上传到远程仓库 捕获异常
@@ -164,9 +164,9 @@ if current_version != new_version:
         subprocess.run(['git', 'add', 'package.json'], check=True)
         subprocess.run(['git', 'commit', '-m', f"✨ up version {current_branch} -> {new_version}"], check=True)
         subprocess.run(['git', 'push', 'origin', current_branch], check=True)
-        print("上传到远程仓库({0})成功".format(current_branch))
+        print("推送仓库: ({0})成功".format(current_branch))
     except Exception as e:
-        print("上传到远程仓库({0})失败".format(current_branch))
+        print("推送仓库: ({0})失败".format(current_branch))
         print(e)
 
 steps = [
