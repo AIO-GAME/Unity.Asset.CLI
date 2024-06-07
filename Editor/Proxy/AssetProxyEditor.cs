@@ -145,15 +145,16 @@ namespace AIO.UEditor
         {
             var command = new AssetBuildCommand
             {
-                PackageVersion      = config.BuildVersion,
-                BuildPackage        = config.PackageName,
-                CompressOption      = config.CompressedMode,
-                ActiveTarget        = config.BuildTarget,
-                BuildPipeline       = config.BuildPipeline,
-                OutputRoot          = config.BuildOutputPath,
-                BuildMode           = config.BuildMode,
-                CopyBuildInFileTags = config.FirstPackTag,
-                MergeToLatest       = config.MergeToLatest
+                PackageVersion          = config.BuildVersion,
+                BuildPackage            = config.PackageName,
+                CompressOption          = config.CompressedMode,
+                ActiveTarget            = config.BuildTarget,
+                BuildPipeline           = config.BuildPipeline,
+                OutputRoot              = config.BuildOutputPath,
+                BuildMode               = config.BuildMode,
+                CopyBuildInFileTags     = config.FirstPackTag,
+                MergeToLatest           = config.MergeToLatest,
+                ExportToStreamingAssets = config.ExportToStreamingAssets,
             };
             if (config.BuildFirstPackage) command.BuildPackage = AssetSystem.TagsRecord;
             return BuildArt(command, isTips);

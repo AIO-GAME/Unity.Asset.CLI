@@ -75,6 +75,11 @@ namespace AIO.UEditor
         /// </summary>
         public const string C_MERGE_TO_LATEST = PREFIX + nameof(MergeToLatest);
 
+        /// <summary>
+        ///    导出至StreamingAssets
+        /// </summary>
+        public const string C_EXPORT_TO_STREAMING_ASSETS = PREFIX + nameof(ExportToStreamingAssets);
+        
         [Argument(C_ACTIVE_TARGET, EArgLabel.Enum)]
         public BuildTarget ActiveTarget = BuildTarget.Android;
 
@@ -102,6 +107,9 @@ namespace AIO.UEditor
         [Argument(C_MERGE_TO_LATEST, EArgLabel.Bool)]
         public bool MergeToLatest = false;
 
+        [Argument(C_EXPORT_TO_STREAMING_ASSETS, EArgLabel.Bool)]
+        public bool ExportToStreamingAssets = false;
+        
         [Argument(C_OUTPUT_NAME_STYLE, EArgLabel.Enum)]
         public EOutputNameStyle OutputNameStyle = EOutputNameStyle.BundleName_HashName;
 

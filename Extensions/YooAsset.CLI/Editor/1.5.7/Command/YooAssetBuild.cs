@@ -58,7 +58,6 @@ namespace AIO.UEditor.CLI
             if (Enum.IsDefined(typeof(EBuildMode), buildArgs.BuildMode))
                 buildArgs.BuildMode = EBuildMode.ForceRebuild;
 
-
             ArtBuild(buildArgs);
         }
 
@@ -157,9 +156,7 @@ namespace AIO.UEditor.CLI
                 VerifyBuildingResult = command.VerifyBuildingResult,
                 PackageVersion       = command.PackageVersion,
                 BuildOutputRoot      = command.OutputRoot,
-                StreamingAssetsRoot = Path.Combine(
-                                                   Application.streamingAssetsPath,
-                                                   ASConfig.GetOrCreate().RuntimeRootDirectory),
+                StreamingAssetsRoot  = Path.Combine(Application.streamingAssetsPath, ASConfig.GetOrCreate().RuntimeRootDirectory),
                 DisableWriteTypeTree = false
             };
             switch (command.OutputNameStyle)
@@ -207,15 +204,27 @@ namespace AIO.UEditor.CLI
             var buildResult = builder.Run(buildParameters);
             if (buildResult.Success)
             {
-                var output = Path.Combine(
-                                          buildParameters.BuildOutputRoot,
-                                          buildParameters.BuildTarget.ToString(),
-                                          buildParameters.PackageName);
+                var output = Path.Combine
+                    (buildParameters.BuildOutputRoot,
+                     buildParameters.BuildTarget.ToString(),
+                     buildParameters.PackageName);
 
                 if (command.MergeToLatest) MergeToLatest(output, buildParameters.PackageVersion);
                 else ManifestGenerate(Path.Combine(output, buildParameters.PackageVersion));
 
                 AssetProxyEditor.CreateConfig(buildParameters.BuildOutputRoot, command.MergeToLatest);
+
+                if (command.ExportToStreamingAssets)
+                {
+                    output = Path.Combine(output, buildParameters.PackageVersion);
+                    var streamingAssets = Path.Combine(buildParameters.StreamingAssetsRoot, buildParameters.PackageName);
+                    AHelper.IO.DeleteDir(streamingAssets, SearchOption.AllDirectories, true);
+                    AHelper.IO.CopyDirAll(output, streamingAssets, true);
+                    AHelper.IO.DeleteFile(Path.Combine(streamingAssets, "OutputCache"));
+                    AHelper.IO.DeleteFile(Path.Combine(streamingAssets, "OutputCache.manifest"));
+                    AHelper.IO.DeleteFile(Path.Combine(streamingAssets, "Manifest.json"));
+                    AHelper.IO.DeleteFile(Path.Combine(streamingAssets, $"BuildReport_{buildParameters.PackageName}_{buildParameters.PackageVersion}.json"));
+                }
             }
 
             return buildResult;

@@ -210,8 +210,14 @@ namespace AIO.UEngine.YooAsset
 #endif
         private static bool UpdatePackagesLocal(ASConfig config)
         {
-            config.Packages = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(
-                                                                             $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
+            var temp =
+                AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>($"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
+            if (temp != null)
+            {
+                config.Packages = temp;
+                return true;
+            }
+
             if (config.Packages is null)
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
@@ -285,9 +291,6 @@ namespace AIO.UEngine.YooAsset
                 TaskAwaiter<bool> Awaiter;
                 switch (config.ASMode)
                 {
-                    case EASMode.Local:
-                        Awaiter = Task.FromResult(UpdatePackagesLocal(config)).GetAwaiter();
-                        break;
                     case EASMode.Remote:
                         Awaiter = UpdatePackagesRemoteTask(config).GetAwaiter();
                         break;
@@ -296,6 +299,9 @@ namespace AIO.UEngine.YooAsset
                         Awaiter = Task.FromResult(UpdatePackagesEditor(config)).GetAwaiter();
                         break;
 #endif
+                    case EASMode.Local:
+                        Awaiter = Task.FromResult(UpdatePackagesLocal(config)).GetAwaiter();
+                        break;
                     default:
                         AssetSystem.ExceptionEvent(ASException.NoSupportEASMode);
                         Awaiter = Task.FromResult(false).GetAwaiter();
@@ -311,9 +317,6 @@ namespace AIO.UEngine.YooAsset
             {
                 switch (config.ASMode)
                 {
-                    case EASMode.Local:
-                        Result = UpdatePackagesLocal(config);
-                        break;
                     case EASMode.Remote:
                         yield return UpdatePackagesRemoteCoroutine(config, b => Result = b);
                         break;
@@ -322,6 +325,9 @@ namespace AIO.UEngine.YooAsset
                         Result = UpdatePackagesEditor(config);
                         break;
 #endif
+                    case EASMode.Local:
+                        Result = UpdatePackagesLocal(config);
+                        break;
                     default:
                         Result = false;
                         AssetSystem.ExceptionEvent(ASException.NoSupportEASMode);
@@ -336,9 +342,6 @@ namespace AIO.UEngine.YooAsset
             {
                 switch (config.ASMode)
                 {
-                    case EASMode.Local:
-                        Result = UpdatePackagesLocal(config);
-                        break;
                     case EASMode.Remote:
                         Result = UpdatePackagesRemoteSync(config);
                         break;
@@ -347,6 +350,9 @@ namespace AIO.UEngine.YooAsset
                         Result = UpdatePackagesEditor(config);
                         break;
 #endif
+                    case EASMode.Local:
+                        Result = UpdatePackagesLocal(config);
+                        break;
                     default:
                         Result = false;
                         AssetSystem.ExceptionEvent(ASException.NoSupportEASMode);
