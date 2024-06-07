@@ -57,10 +57,9 @@ namespace AIO.UEditor
 
         void IAssetPage.UpdateData()
         {
-            // 获取当前文件磁盘剩余空间
             try
             {
-                Disk = new DriveInfo(EHelper.Path.Project);
+                Disk = new DriveInfo(EHelper.Path.Project); // 获取当前文件磁盘剩余空间
             }
             catch (Exception)
             {
