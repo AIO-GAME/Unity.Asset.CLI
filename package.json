@@ -2,7 +2,7 @@
   "name": "com.aio.cli.asset",
   "displayName": "AIO Unity CLI Asset",
   "description": "unity3d resources management system.",
-  "version": "1.1.9-preview",
+  "version": "1.1.10-preview",
   "unity": "2019.4",
   "category": "Runtime",
   "unityRelease": "0f1",
@@ -15,7 +15,7 @@
     "url": "https://github.com/AIO-GAME/Unity.Asset.CLI.git"
   },
   "relatedPackages": {
-    "com.aio.package": "1.0.41-preview"
+    "com.aio.package": "1.0.45-preview"
   },
   "keywords": [
     "Asset",
