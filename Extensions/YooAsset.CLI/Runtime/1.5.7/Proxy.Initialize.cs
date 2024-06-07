@@ -58,14 +58,15 @@ namespace AIO.UEngine.YooAsset
                     };
 #endif
                     break;
-                case EASMode.Local:
-                    parameter = new YAParametersLocal(AssetSystem.Parameter);
-                    break;
+
                 case EASMode.Editor: // 编辑器模式
 #if UNITY_EDITOR
                     parameter = new YAParametersEditor(AssetSystem.Parameter);
                     break;
 #endif
+                case EASMode.Local:
+                    parameter = new YAParametersLocal(AssetSystem.Parameter);
+                    break;
                 default:
                     AssetSystem.ExceptionEvent(ASException.NoSupportEASMode);
                     return null;

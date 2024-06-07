@@ -249,6 +249,13 @@ namespace AIO.UEditor
 
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                     {
+                        EditorGUILayout.LabelField("导至StreamingAssets", GTOptions.Width(125));
+                        if (GUILayout.Button(ABConfig.ExportToStreamingAssets ? "已启用" : "已禁用", GEStyle.toolbarbutton))
+                            ABConfig.ExportToStreamingAssets = !ABConfig.ExportToStreamingAssets;
+                    }
+
+                    using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
+                    {
                         EditorGUILayout.LabelField("自动清理缓存数量", GTOptions.Width(125));
                         using (new EditorGUILayout.HorizontalScope(GEStyle.toolbarbutton))
                         {

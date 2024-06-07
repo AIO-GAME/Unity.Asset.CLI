@@ -42,6 +42,9 @@ namespace AIO.UEditor
         [InspectorName("验证构建结果")]
         public bool ValidateBuild;
 
+        [InspectorName("导至StreamingAssets")]
+        public bool ExportToStreamingAssets;
+
         [InspectorName("构建结果输出路径")]
         public string BuildOutputPath;
 

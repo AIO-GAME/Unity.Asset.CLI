@@ -204,6 +204,14 @@ namespace AIO.UEditor
 
                 case 4:
                 {
+                    if (GUI.Button(rect, BuildConfig.ExportToStreamingAssets ? "已启用" : "已禁用", GEStyle.toolbarbutton))
+                        BuildConfig.ExportToStreamingAssets = !BuildConfig.ExportToStreamingAssets;
+
+                    break;
+                }
+
+                case 5:
+                {
                     cell.width               = rect.width - 20;
                     BuildConfig.BuildVersion = EditorGUI.DelayedTextField(cell, BuildConfig.BuildVersion, GEStyle.ToolbarBoldLabel);
 
@@ -214,7 +222,7 @@ namespace AIO.UEditor
                     break;
                 }
 
-                case 5:
+                case 6:
                 {
                     cell.width              = rect.width - 20;
                     BuildConfig.BuildTarget = (BuildTarget)EditorGUI.EnumPopup(cell, BuildConfig.BuildTarget, GEStyle.PreDropDown);
@@ -226,7 +234,7 @@ namespace AIO.UEditor
                     break;
                 }
 
-                case 6:
+                case 7:
                     cell.width = rect.width;
                     if (BuildConfig.BuildFirstPackage)
                         EditorGUI.LabelField(cell, AssetSystem.TagsRecord, GEStyle.PreDropDown);
@@ -242,22 +250,22 @@ namespace AIO.UEditor
 
                     break;
 
-                case 7:
+                case 8:
                     cell.width                = rect.width;
                     BuildConfig.BuildPipeline = (EBuildPipeline)EditorGUI.EnumPopup(cell, BuildConfig.BuildPipeline, GEStyle.PreDropDown);
                     break;
 
-                case 8:
+                case 9:
                     cell.width                 = rect.width;
                     BuildConfig.CompressedMode = (ECompressMode)EditorGUI.EnumPopup(cell, BuildConfig.CompressedMode, GEStyle.PreDropDown);
                     break;
 
-                case 9:
+                case 10:
                     cell.width            = rect.width;
                     BuildConfig.BuildMode = (EBuildMode)EditorGUI.EnumPopup(cell, BuildConfig.BuildMode, GEStyle.PreDropDown);
                     break;
 
-                case 10:
+                case 11:
                     if (!(Tags is null) && Tags.Length > 0)
                     {
                         if (Tags.Length > 31) // 位运算最大支持31位 2^31 显示警告
@@ -282,7 +290,7 @@ namespace AIO.UEditor
 
                     break;
 
-                case 11:
+                case 12:
                     cell.width                       = rect.width;
                     BuildConfig.AutoCleanCacheNumber = EditorGUI.IntSlider(cell, BuildConfig.AutoCleanCacheNumber, 1, 20);
                     break;

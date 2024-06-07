@@ -30,6 +30,7 @@ namespace AIO.UEditor
             "输出路径",
             "生成Latest版本",
             "验证构造结构",
+            "导至StreamingAssets",
             "构建版本",
             "构建平台",
             "构建包名",
