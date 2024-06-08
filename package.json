@@ -15,7 +15,8 @@
     "url": "https://github.com/AIO-GAME/Unity.Asset.CLI.git"
   },
   "relatedPackages": {
-    "com.aio.package": "1.0.45-preview"
+    "com.aio.package": "1.0.45-preview",
+    "com.aio.runner": "1.0.0-preview"
   },
   "keywords": [
     "Asset",

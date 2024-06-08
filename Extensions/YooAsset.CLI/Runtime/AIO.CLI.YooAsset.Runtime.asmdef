@@ -4,7 +4,8 @@
     "YooAsset",
     "UniTask.YooAsset",
     "AIO.Core.Runtime",
-    "AIO.Asset.Runtime"
+    "AIO.Asset.Runtime",
+    "AIO.Unity.Runner"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

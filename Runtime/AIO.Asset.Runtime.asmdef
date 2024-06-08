@@ -1,36 +1,36 @@
 {
-  "name": "AIO.Asset.Runtime",
-  "rootNamespace": "AIO",
-  "references": [
-    "UniTask",
-    "UniTask.Addressables",
-    "UniTask.DOTween",
-    "UniTask.Linq",
-    "UniTask.YooAsset",
-    "UniTask.TextMeshPro",
-    "YooAsset",
-    "AIO.Core.Runtime",
-    "com.bbbirder.injection",
-    "com.bbbirder.directattribute"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": true,
-  "overrideReferences": false,
-  "precompiledReferences": [],
-  "autoReferenced": true,
-  "defineConstraints": [],
-  "versionDefines": [
-    {
-      "name": "com.tuyoogame.yooasset",
-      "expression": "",
-      "define": "SUPPORT_YOOASSET"
-    },
-    {
-      "name": "com.cysharp.unitask",
-      "expression": "",
-      "define": "SUPPORT_UNITASK"
-    }
-  ],
-  "noEngineReferences": false
+    "name": "AIO.Asset.Runtime",
+    "references": [
+        "UniTask",
+        "UniTask.Addressables",
+        "UniTask.DOTween",
+        "UniTask.Linq",
+        "UniTask.YooAsset",
+        "UniTask.TextMeshPro",
+        "YooAsset",
+        "AIO.Core.Runtime",
+        "com.bbbirder.injection",
+        "com.bbbirder.directattribute",
+        "AIO.Unity.Runner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.tuyoogame.yooasset",
+            "expression": "",
+            "define": "SUPPORT_YOOASSET"
+        },
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "SUPPORT_UNITASK"
+        }
+    ],
+    "noEngineReferences": false
 }
