@@ -26,8 +26,9 @@
   ],
   "author": {
     "name": "AIO GAME",
-    "url": "https://github.com/AIO-GAME/Unity.Asset.CLI"
+    "url": "https://github.com/AIO-GAME"
   },
+  "type": "library",
   "dependencies": {
     "com.unity.modules.assetbundle": "1.0.0",
     "com.unity.modules.unitywebrequest": "1.0.0",
@@ -35,6 +36,5 @@
     "com.unity.modules.unitywebrequesttexture": "1.0.0",
     "com.unity.modules.unitywebrequestwww": "1.0.0",
     "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
-  },
-  "type": "library"
+  }
 }

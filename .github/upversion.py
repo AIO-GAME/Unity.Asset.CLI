@@ -1,12 +1,11 @@
-import shutil
-import time
 import json
 import os
+import shutil
 import subprocess
-from typing import Any
+import time
 
-from tqdm import tqdm
 import requests
+from tqdm import tqdm
 
 
 def get_latest_github_tag(repo_url) -> str | None:
@@ -70,7 +69,6 @@ def remove_readonly(func, path, _) -> None:
     func(path)
 
 
-# 删除文件夹
 def delete_folder(folder_path) -> None:
     try:
         if os.path.exists(folder_path):
@@ -89,12 +87,27 @@ def read_current_branch() -> str:  # 判断当前分支
             return branch.replace("* ", "")
 
 
-def read_current_version() -> str:
-    subprocess.run(['git', 'fetch', '--tags'], check=True)
-    tags = os.popen("git tag").read().split("\n")
-    # 所有标签去掉空字符串 -preview标签去掉preview 然后按照version排序 1.2.3-preview -> 1.3.0-preview
-    tags = sorted([tag.replace("-preview", "") for tag in tags if tag], key=lambda x: list(map(int, x.split("."))))
-    return tags[-1]
+def read_local_username() -> str:
+    result = subprocess.run(['git', 'config', 'user.name'], stdout=subprocess.PIPE)
+    return result.stdout.decode('utf-8').strip()
+
+
+def read_local_email() -> str:
+    result = subprocess.run(['git', 'config', 'user.email'], stdout=subprocess.PIPE)
+    return result.stdout.decode('utf-8').strip()
+
+
+def read_current_version() -> str | None:
+    try:
+        subprocess.run(['git', 'fetch', '--tags'], check=True)
+        tags = os.popen("git tag").read().split("\n")
+        if len(tags) == 0:  # 需要判断是否有标签列表
+            return None
+        # 所有标签去掉空字符串 -preview标签去掉preview 然后按照version排序 1.2.3-preview -> 1.3.0-preview
+        tags = sorted([tag.replace("-preview", "") for tag in tags if tag], key=lambda x: list(map(int, x.split("."))))
+        return tags[-1]
+    except Exception:
+        return None
 
 
 # 切换上一级目录
@@ -102,8 +115,8 @@ os.chdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 current_path = os.getcwd()
 print("当前路径: " + current_path)
 
-username = "Star fire"
-email = "xinansky99@gmail.com"
+username = read_local_username()
+email = read_local_email()
 print("用户名称: " + username)
 print("用户邮箱: " + email)
 
@@ -137,28 +150,29 @@ for step_description, step_function in tqdm(steps, desc="检查标签"):
     step_function()
 
 version = read_current_version()  # 读取当前版本号
-print("当前版本号: " + version)
-# 递增版本号
-version_list = version.split(".")
-if is_preview:
-    version_list[2] = str(int(version_list[2]) + 1) + "-preview"
+if version is None:
+    version = "1.0.0" + ("-preview" if is_preview else "")
+    new_version = "1.0.0" + ("-preview" if is_preview else "")
 else:
-    version_list[2] = str(int(version_list[2]) + 1)
-new_version = ".".join(version_list)
+    # 递增版本号
+    version_list = version.split(".")
+    if is_preview:
+        version_list[2] = str(int(version_list[2]) + 1) + "-preview"
+    else:
+        version_list[2] = str(int(version_list[2]) + 1)
+    new_version = ".".join(version_list)
+print("版本号: {0} -> {1}".format(version, new_version))
 
 # 写入新版本号
 with open("package.json", "r+") as f:
     package = json.load(f)
     current_version = package["version"]
     package["version"] = new_version
-    package["type"] = "module"
     package["relatedPackages"]["com.aio.package"] = get_latest_github_tag('https://github.com/AIO-GAME/Common.git')
     package["relatedPackages"]["com.aio.runner"] = get_latest_github_tag('https://github.com/AIO-GAME/Unity.Runner.git')
     f.seek(0)
     json.dump(package, f, indent=2)
     print("写入配置: 版本号 {0} -> {1}".format(current_version, new_version))
-    print("写入配置: 依赖库 {0} -> {1}".format("com.aio.package", package["relatedPackages"]["com.aio.package"]))
-    print("写入配置: 依赖库 {0} -> {1}".format("com.aio.runner", package["relatedPackages"]["com.aio.runner"]))
     f.close()
 
 # 上传到远程仓库 捕获异常
@@ -225,6 +239,14 @@ if len(errorList) > 0:
         print("删除失败: " + error)
 else:
     print("删除成功")
+
+# 写入新版本号
+with open("package.json", "r+") as f:
+    package = json.load(f)
+    package["type"] = "module"
+    f.seek(0)
+    json.dump(package, f, indent=2)
+    f.close()
 
 steps = [
     ("删除标签", lambda: delete_remote_tag()),

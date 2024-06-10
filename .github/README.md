@@ -100,7 +100,7 @@ openupm add com.aio.cli.asset
 
 ### 🔗 第三方参考资料和工具
 
-**Please refer to the wiki for a list of references and tools used in this package.**
+**Unity Asset CLI** 依赖于以下第三方工具和资料:
 
 |                         **Doc**                          |                     **Description**                     |
 |:--------------------------------------------------------:|:-------------------------------------------------------:|
@@ -119,13 +119,6 @@ openupm add com.aio.cli.asset
                     <img src="https://avatars.githubusercontent.com/u/45371089?v=4" width="64;" alt="xinansky"/>
                     <br />
                     <sub><b>xinansky</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/Starkappa">
-                    <img src="https://avatars.githubusercontent.com/u/155533864?v=4" width="64;" alt="Starkappa"/>
-                    <br />
-                    <sub><b>Starkappa</b></sub>
                 </a>
             </td>
 		</tr>
