@@ -3,11 +3,13 @@ import time
 import json
 import os
 import subprocess
+from typing import Any
+
 from tqdm import tqdm
 import requests
 
 
-def get_latest_github_tag(repo_url) -> str:
+def get_latest_github_tag(repo_url) -> str | None:
     # 从仓库 URL 提取用户和仓库名称
     repo_path = repo_url.split("https://github.com/")[1].replace(".git", "")
     print(f"Fetching tags from {repo_path}")
@@ -62,7 +64,6 @@ def delete_remote_tag() -> None:
         delete_local_tag(tag)
 
 
-# 处理只读文件删除问题的回调函数
 def remove_readonly(func, path, _) -> None:
     # os.chmod(path, stat.S_IWRITE)
     subprocess.run(['attrib', '-R', path], shell=True)
@@ -150,11 +151,14 @@ with open("package.json", "r+") as f:
     package = json.load(f)
     current_version = package["version"]
     package["version"] = new_version
+    package["type"] = "module"
     package["relatedPackages"]["com.aio.package"] = get_latest_github_tag('https://github.com/AIO-GAME/Common.git')
+    package["relatedPackages"]["com.aio.runner"] = get_latest_github_tag('https://github.com/AIO-GAME/Unity.Runner.git')
     f.seek(0)
     json.dump(package, f, indent=2)
     print("写入配置: 版本号 {0} -> {1}".format(current_version, new_version))
     print("写入配置: 依赖库 {0} -> {1}".format("com.aio.package", package["relatedPackages"]["com.aio.package"]))
+    print("写入配置: 依赖库 {0} -> {1}".format("com.aio.runner", package["relatedPackages"]["com.aio.runner"]))
     f.close()
 
 # 上传到远程仓库 捕获异常
@@ -247,4 +251,5 @@ steps = [
 ]
 for step_description, step_function in tqdm(steps, desc="上传标签"):
     step_function()
+
 print("升级标签版本成功")
