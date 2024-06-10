@@ -1,22 +1,11 @@
-```
- ██╗   ██╗███╗   ██╗██╗████████╗██╗   ██╗    █████╗ ███████╗███████╗███████╗████████╗
- ██║   ██║████╗  ██║██║╚══██╔══╝╚██╗ ██╔╝   ██╔══██╗██╔════╝██╔════╝██╔════╝╚══██╔══╝
- ██║   ██║██╔██╗ ██║██║   ██║    ╚████╔╝    ███████║███████╗███████╗█████╗     ██║   
- ██║   ██║██║╚██╗██║██║   ██║     ╚██╔╝     ██╔══██║╚════██║╚════██║██╔══╝     ██║   
- ╚██████╔╝██║ ╚████║██║   ██║      ██║      ██║  ██║███████║███████║███████╗   ██║    
-  ╚═════╝ ╚═╝  ╚═══╝╚═╝   ╚═╝      ╚═╝      ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝  
-```
+<p align="center"> <img src="RES/Logo.svg" width="256" height="256" alt="https://github.com/AIO-GAME"> </p>
+<p align="center" style="font-size: 24px;"> <b>Unity Asset CLI</b> </p>
 <p align="center"> <a href="README_EN.md"> English </a> | 简体中文 </p>
 <p align="center">
 <a href="https://github.com/AIO-GAME/Unity.Asset.CLI/security/policy"> <img alt="" src="https://img.shields.io/github/package-json/unity/AIO-GAME/Unity.Asset.CLI"> </a>
 <a href="https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/LICENSE.md"> <img alt="" src="https://img.shields.io/github/license/AIO-GAME/Unity.Asset.CLI"> </a>
 <a href="https://img.shields.io/github/languages/code-size/AIO-GAME/Unity.Asset.CLI"> <img alt="" src="https://img.shields.io/github/languages/code-size/AIO-GAME/Unity.Asset.CLI"> </a>
-<a href="https://github.com/AIO-GAME/Unity.Asset.CLI/issues"> <img alt="" src="https://img.shields.io/github/issues/AIO-GAME/Unity.Asset.CLI"> </a>
-</p>
-<p align="center">
-<a href="https://github.com/AIO-GAME/Unity.Asset.CLI/tags"> <img alt="" src="https://img.shields.io/github/package-json/version/AIO-GAME/Unity.Asset.CLI"> </a>
 <a href="https://openupm.com/packages/com.aio.cli.asset/"> <img alt="" src="https://img.shields.io/npm/v/com.aio.cli.asset?label=openupm&amp;registry_uri=https://package.openupm.com" /> </a>
-<a href="https://github.com/AIO-GAME/Unity.Asset.CLI"> <img alt="" src="https://img.shields.io/github/stars/AIO-GAME/Unity.Asset.CLI"> </a>
 </p>
 
 ### ⚙ 安装
@@ -51,15 +40,21 @@
 <span style="color: deepskyblue; "> <b> Unity PackageManager </b> </span>
 </summary>
 
-> openupm *中国版*
->> `Name: package.openupm.cn`
-> > `URL: https://package.openupm.cn`
-> > `Scope(s): com.aio.cli.asset`
->
-> openupm *国际版*
->> `Name: package.openupm.com`
-> > `URL: https://package.openupm.com`
-> > `Scope(s): com.aio.cli.asset`
+> open upm *中国版*
+
+````
+Name: package.openupm.cn
+URL: https://package.openupm.cn
+Scope(s): com.aio.cli.asset     
+````
+
+> open upm *国际版*
+
+ ````        
+Name: package.openupm.com
+URL: https://package.openupm.com
+Scope(s): com.aio.cli.asset
+ ````                                  
 
 </details>
 
@@ -68,14 +63,17 @@
 <span style="color: deepskyblue; "> <b> Command Line </b> </span>
 </summary>
 
-> *openupm-cli*
->> `openupm add com.aio.cli.asset`
+> *open upm-cli*
+
+````
+openupm add com.aio.cli.asset
+```` 
 
 </details>
 
 ### ⭐ 关于
 
-- **这是 Unity 的资源加载接口(CLI)包。它提供了一组命令和工具来增强效率和开发体验。**
+- **这是 Unity 的资源加载接口(CLI)包。它提供了一组命令，来增强效率和开发体验。**
 
 > [!IMPORTANT]
 > - ✅ **支持 Unity 2019.4 及以上版本**
@@ -102,7 +100,7 @@
 
 ### 🔗 第三方参考资料和工具
 
-**Please refer to the wiki for a list of references and tools used in this package.**
+**Unity Asset CLI** 依赖于以下第三方工具和资料:
 
 |                         **Doc**                          |                     **Description**                     |
 |:--------------------------------------------------------:|:-------------------------------------------------------:|
@@ -121,13 +119,6 @@
                     <img src="https://avatars.githubusercontent.com/u/45371089?v=4" width="64;" alt="xinansky"/>
                     <br />
                     <sub><b>xinansky</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/Starkappa">
-                    <img src="https://avatars.githubusercontent.com/u/155533864?v=4" width="64;" alt="Starkappa"/>
-                    <br />
-                    <sub><b>Starkappa</b></sub>
                 </a>
             </td>
 		</tr>
