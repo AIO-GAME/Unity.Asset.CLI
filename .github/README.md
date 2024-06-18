@@ -115,6 +115,13 @@ openupm add com.aio.cli.asset
 	<tbody>
 		<tr>
             <td align="center">
+                <a href="https://github.com/richard945">
+                    <img src="https://avatars.githubusercontent.com/u/128383390?v=4" width="64;" alt="richard945"/>
+                    <br />
+                    <sub><b>richard945</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/xinansky">
                     <img src="https://avatars.githubusercontent.com/u/45371089?v=4" width="64;" alt="xinansky"/>
                     <br />
