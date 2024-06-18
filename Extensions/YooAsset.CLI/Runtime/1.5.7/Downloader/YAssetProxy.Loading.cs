@@ -1,18 +1,24 @@
 ﻿#if SUPPORT_YOOASSET
 
+#region
+
 using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using UnityEngine;
 using YooAsset;
+#if UNITY_2022_1_OR_NEWER
+using Unity.Profiling;
+#endif
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+#endregion
 
 namespace AIO.UEngine.YooAsset
 {
-#if UNITY_EDITOR
-    using UnityEditor;
-#endif
-
     partial class Proxy
     {
         private static readonly AProgress Progress = new AProgress();

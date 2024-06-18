@@ -1,8 +1,18 @@
 ﻿#if SUPPORT_YOOASSET
+
+#region
+
 using System;
 using System.Diagnostics;
 using System.Linq;
 using ILogger = YooAsset.ILogger;
+
+#if UNITY_2022_1_OR_NEWER
+using Unity.Profiling;
+using UnityEngine;
+#endif
+
+#endregion
 
 namespace AIO.UEngine.YooAsset
 {
