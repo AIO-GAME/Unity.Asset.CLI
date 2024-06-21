@@ -179,7 +179,7 @@ with open("package.json", "r+") as f:
 # 上传到远程仓库 捕获异常
 if current_version != new_version:
     try:
-        subprocess.run(['git', 'pull'], check=True)
+        subprocess.run(['git', 'pull', 'origin', current_branch], check=True)
         subprocess.run(['git', 'add', 'package.json'], check=True)
         subprocess.run(['git', 'commit', '-m', f"✨ up version {current_branch} -> {new_version}"], check=True)
         subprocess.run(['git', 'push', 'origin', current_branch], check=True)

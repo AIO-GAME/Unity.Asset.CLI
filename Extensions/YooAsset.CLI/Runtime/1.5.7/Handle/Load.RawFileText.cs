@@ -131,7 +131,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
-        public override ILoaderHandle<string> LoadRawFileTextTask(string location, Action<string> cb = null)
+        public override ILoaderHandle<string> LoadRawFileTextAsync(string location, Action<string> cb = null)
             => new LoadRawFileText(location, cb);
     }
 }

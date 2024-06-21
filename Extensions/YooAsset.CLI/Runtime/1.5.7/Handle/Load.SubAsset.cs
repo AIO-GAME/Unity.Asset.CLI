@@ -16,7 +16,7 @@ namespace AIO.UEngine.YooAsset
     partial class Proxy
     {
         /// <inheritdoc />
-        public override ILoaderHandle<TObject[]> LoadSubAssetsTask<TObject>(string location, Type type, Action<TObject[]> completed = null)
+        public override ILoaderHandle<TObject[]> LoadSubAssetsAsync<TObject>(string location, Type type, Action<TObject[]> completed = null)
         {
             return new LoadSubAsset<TObject>(location, type, completed);
         }

@@ -3,7 +3,6 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Scene = UnityEngine.SceneManagement.Scene;
@@ -29,7 +28,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static TObject[] LoadSubAssets<TObject>(string location)
-        where TObject : Object => Proxy.LoadSubAssetsTask<TObject>(location, typeof(TObject)).Invoke();
+        where TObject : Object => Proxy.LoadSubAssetsAsync<TObject>(location, typeof(TObject)).Invoke();
 
         /// <summary>
         ///     同步加载子资源对象
@@ -40,7 +39,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static Object[] LoadSubAssets(string location, Type type) => Proxy.LoadSubAssetsTask<Object>(location, type).Invoke();
+        public static Object[] LoadSubAssets(string location, Type type) => Proxy.LoadSubAssetsAsync<Object>(location, type).Invoke();
 
         /// <summary>
         ///     同步加载子资源对象
@@ -50,7 +49,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static Object[] LoadSubAssets(string location) => Proxy.LoadSubAssetsTask<Object>(location, typeof(Object)).Invoke();
+        public static Object[] LoadSubAssets(string location) => Proxy.LoadSubAssetsAsync<Object>(location, typeof(Object)).Invoke();
 
         #endregion
 
@@ -66,7 +65,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static void LoadSubAssets<TObject>(string location, Action<TObject[]> completed)
-        where TObject : Object => Proxy.LoadSubAssetsTask(location, typeof(TObject), completed).Invoke();
+        where TObject : Object => Proxy.LoadSubAssetsAsync(location, typeof(TObject), completed).Invoke();
 
         /// <summary>
         ///     异步加载子资源对象
@@ -77,8 +76,8 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<TObject[]> LoadSubAssetsTask<TObject>(string location)
-        where TObject : Object => Proxy.LoadSubAssetsTask<TObject>(location, typeof(TObject));
+        public static ILoaderHandle<TObject[]> LoadSubAssetsAsync<TObject>(string location)
+        where TObject : Object => Proxy.LoadSubAssetsAsync<TObject>(location, typeof(TObject));
 
         /// <summary>
         ///     异步加载子资源对象
@@ -90,8 +89,8 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<TObject[]> LoadSubAssetsTask<TObject>(string location, Action<Object[]> completed)
-        where TObject : Object => Proxy.LoadSubAssetsTask<TObject>(location, typeof(TObject), completed);
+        public static ILoaderHandle<TObject[]> LoadSubAssetsAsync<TObject>(string location, Action<Object[]> completed)
+        where TObject : Object => Proxy.LoadSubAssetsAsync<TObject>(location, typeof(TObject), completed);
 
         /// <summary>
         ///     异步加载原生文件
@@ -104,7 +103,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadSubAssets(string location, Type type, Action<Object[]> completed) =>
-            await Proxy.LoadSubAssetsTask(location, type, completed);
+            await Proxy.LoadSubAssetsAsync(location, type, completed);
 
         /// <summary>
         ///     异步加载原生文件
@@ -116,7 +115,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadSubAssets(string location, Action<Object[]> completed) =>
-            await Proxy.LoadSubAssetsTask(location, typeof(Object), completed);
+            await Proxy.LoadSubAssetsAsync(location, typeof(Object), completed);
 
         /// <summary>
         ///     异步加载子资源对象
@@ -127,7 +126,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Object[]> LoadSubAssetsTask(string location, Type type) => Proxy.LoadSubAssetsTask<Object>(location, type);
+        public static ILoaderHandle<Object[]> LoadSubAssetsAsync(string location, Type type) => Proxy.LoadSubAssetsAsync<Object>(location, type);
 
         /// <summary>
         ///     异步加载子资源对象
@@ -139,8 +138,8 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Object[]> LoadSubAssetsTask(string location, Type type, Action<Object[]> completed) =>
-            Proxy.LoadSubAssetsTask(location, type, completed);
+        public static ILoaderHandle<Object[]> LoadSubAssetsAsync(string location, Type type, Action<Object[]> completed) =>
+            Proxy.LoadSubAssetsAsync(location, type, completed);
 
         /// <summary>
         ///     异步加载子资源对象
@@ -151,8 +150,8 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Object[]> LoadSubAssetsTask(string location, Action<Object[]> completed) =>
-            Proxy.LoadSubAssetsTask(location, typeof(Object), completed);
+        public static ILoaderHandle<Object[]> LoadSubAssetsAsync(string location, Action<Object[]> completed) =>
+            Proxy.LoadSubAssetsAsync(location, typeof(Object), completed);
 
         /// <summary>
         ///     异步加载子资源对象
@@ -162,7 +161,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Object[]> LoadSubAssetsTask(string location) => Proxy.LoadSubAssetsTask<Object>(location, typeof(Object));
+        public static ILoaderHandle<Object[]> LoadSubAssetsAsync(string location) => Proxy.LoadSubAssetsAsync<Object>(location, typeof(Object));
 
         #endregion
     }
@@ -225,7 +224,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Scene> LoadSceneTask(
+        public static ILoaderHandle<Scene> LoadSceneAsync(
             string        location,
             Action<Scene> completed,
             LoadSceneMode sceneMode   = LoadSceneMode.Single,
@@ -244,7 +243,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Scene> LoadSceneTask(
+        public static ILoaderHandle<Scene> LoadSceneAsync(
             string        location,
             LoadSceneMode sceneMode   = LoadSceneMode.Single,
             bool          suspendLoad = false,
@@ -271,8 +270,8 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<TObject> LoadAssetTask<TObject>(string location)
-        where TObject : Object => Proxy.LoadAssetTask<TObject>(location, typeof(TObject));
+        public static ILoaderHandle<TObject> LoadAssetAsync<TObject>(string location)
+        where TObject : Object => Proxy.LoadAssetAsync<TObject>(location, typeof(TObject));
 
         /// <summary>
         ///     异步加载资源对象
@@ -284,8 +283,8 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<TObject> LoadAssetTask<TObject>(string location, Action<TObject> completed)
-        where TObject : Object => Proxy.LoadAssetTask(location, typeof(TObject), completed);
+        public static ILoaderHandle<TObject> LoadAssetAsync<TObject>(string location, Action<TObject> completed)
+        where TObject : Object => Proxy.LoadAssetAsync(location, typeof(TObject), completed);
 
         /// <summary>
         ///     异步加载资源对象
@@ -296,7 +295,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Object> LoadAssetTask(string location, Type type) => Proxy.LoadAssetTask<Object>(location, type);
+        public static ILoaderHandle<Object> LoadAssetAsync(string location, Type type) => Proxy.LoadAssetAsync<Object>(location, type);
 
         /// <summary>
         ///     异步加载资源对象
@@ -308,18 +307,18 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Object> LoadAssetTask(string location, Type type, Action<Object> completed) =>
-            Proxy.LoadAssetTask(location, type, completed);
+        public static ILoaderHandle<Object> LoadAssetAsync(string location, Type type, Action<Object> completed) =>
+            Proxy.LoadAssetAsync(location, type, completed);
 
         /// <summary>
         ///     异步加载资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, CanBeNull]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<Object> LoadAssetTask(string location) => Proxy.LoadAssetTask<Object>(location, typeof(Object));
+        public static ILoaderHandle<Object> LoadAssetAsync(string location) => Proxy.LoadAssetAsync<Object>(location, typeof(Object));
 
         /// <summary>
         ///     同步加载原生文件
@@ -331,7 +330,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadAsset<TObject>(string location, Action<TObject> completed)
-        where TObject : Object => await Proxy.LoadAssetTask(location, typeof(TObject), completed);
+        where TObject : Object => await Proxy.LoadAssetAsync(location, typeof(TObject), completed);
 
         /// <summary>
         ///     同步加载原生文件
@@ -342,7 +341,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static async void LoadAsset(string location, Action<Object> completed) => await Proxy.LoadAssetTask(location, typeof(Object), completed);
+        public static async void LoadAsset(string location, Action<Object> completed) => await Proxy.LoadAssetAsync(location, typeof(Object), completed);
 
         /// <summary>
         ///     同步加载原生文件
@@ -354,7 +353,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static async void LoadAsset(string location, Type type, Action<Object> completed) => await Proxy.LoadAssetTask(location, type, completed);
+        public static async void LoadAsset(string location, Type type, Action<Object> completed) => await Proxy.LoadAssetAsync(location, type, completed);
 
         #endregion
 
@@ -370,7 +369,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static TObject LoadAsset<TObject>(string location)
-        where TObject : Object => Proxy.LoadAssetTask<TObject>(location, typeof(TObject)).Invoke();
+        where TObject : Object => Proxy.LoadAssetAsync<TObject>(location, typeof(TObject)).Invoke();
 
         /// <summary>
         ///     同步加载资源对象
@@ -381,7 +380,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static Object LoadAsset(string location, Type type) => Proxy.LoadAssetTask<Object>(location, type).Invoke();
+        public static Object LoadAsset(string location, Type type) => Proxy.LoadAssetAsync<Object>(location, type).Invoke();
 
         /// <summary>
         ///     同步加载资源对象
@@ -391,7 +390,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static Object LoadAsset(string location) => Proxy.LoadAssetTask<Object>(location, typeof(Object)).Invoke();
+        public static Object LoadAsset(string location) => Proxy.LoadAssetAsync<Object>(location, typeof(Object)).Invoke();
 
         #endregion
     }
@@ -412,7 +411,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static string LoadRawFileText(string location) => Proxy.LoadRawFileTextTask(location).Invoke();
+        public static string LoadRawFileText(string location) => Proxy.LoadRawFileTextAsync(location).Invoke();
 
         #endregion
 
@@ -427,7 +426,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static async void LoadRawFileText(string location, Action<string> completed) => await Proxy.LoadRawFileTextTask(location, completed);
+        public static async void LoadRawFileText(string location, Action<string> completed) => await Proxy.LoadRawFileTextAsync(location, completed);
 
         /// <summary>
         ///     异步加载原生文件
@@ -437,7 +436,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<string> LoadRawFileTextTask(string location) => Proxy.LoadRawFileTextTask(location);
+        public static ILoaderHandle<string> LoadRawFileTextAsync(string location) => Proxy.LoadRawFileTextAsync(location);
 
         /// <summary>
         ///     异步加载原生文件
@@ -448,7 +447,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<string> LoadRawFileTextTask(string location, Action<string> completed) => Proxy.LoadRawFileTextTask(location, completed);
+        public static ILoaderHandle<string> LoadRawFileTextAsync(string location, Action<string> completed) => Proxy.LoadRawFileTextAsync(location, completed);
 
         #endregion
     }
@@ -469,7 +468,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static byte[] LoadRawFileData(string location) => Proxy.LoadRawFileDataTask(location).Invoke();
+        public static byte[] LoadRawFileData(string location) => Proxy.LoadRawFileDataAsync(location).Invoke();
 
         #endregion
 
@@ -484,14 +483,14 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static async void LoadRawFileData(string location, Action<byte[]> completed) => await Proxy.LoadRawFileDataTask(location, completed);
+        public static async void LoadRawFileData(string location, Action<byte[]> completed) => await Proxy.LoadRawFileDataAsync(location, completed);
 
         /// <summary>
         ///     异步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static ILoaderHandle<byte[]> LoadRawFileDataTask(string location) => Proxy.LoadRawFileDataTask(location);
+        public static ILoaderHandle<byte[]> LoadRawFileDataAsync(string location) => Proxy.LoadRawFileDataAsync(location);
 
         /// <summary>
         ///     异步加载原生文件
@@ -499,7 +498,7 @@ namespace AIO
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
         [DebuggerNonUserCode, DebuggerHidden]
-        public static ILoaderHandle<byte[]> LoadRawFileDataTask(string location, Action<byte[]> completed) => Proxy.LoadRawFileDataTask(location, completed);
+        public static ILoaderHandle<byte[]> LoadRawFileDataAsync(string location, Action<byte[]> completed) => Proxy.LoadRawFileDataAsync(location, completed);
 
         #endregion
     }
@@ -524,7 +523,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static GameObject InstGameObject(string location, Transform parent) => Proxy.InstGameObjectTask(location, null, parent).Invoke();
+        public static GameObject InstGameObject(string location, Transform parent) => Proxy.InstGameObjectAsync(location, null, parent).Invoke();
 
         /// <summary>
         ///     实例预制件
@@ -537,7 +536,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static GameObject InstGameObject(string location) => Proxy.InstGameObjectTask(location).Invoke();
+        public static GameObject InstGameObject(string location) => Proxy.InstGameObjectAsync(location).Invoke();
 
         #endregion
 
@@ -557,7 +556,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void InstGameObject(string location, Transform parent, Action<GameObject> completed) =>
-            await Proxy.InstGameObjectTask(location, completed, parent);
+            await Proxy.InstGameObjectAsync(location, completed, parent);
 
         /// <summary>
         ///     实例预制件
@@ -571,7 +570,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static async void InstGameObject(string location, Action<GameObject> completed) => await Proxy.InstGameObjectTask(location, completed);
+        public static async void InstGameObject(string location, Action<GameObject> completed) => await Proxy.InstGameObjectAsync(location, completed);
 
         /// <summary>
         ///     实例预制件
@@ -585,7 +584,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<GameObject> InstGameObjectTask(string location, Transform parent) => Proxy.InstGameObjectTask(location, null, parent);
+        public static ILoaderHandle<GameObject> InstGameObjectAsync(string location, Transform parent) => Proxy.InstGameObjectAsync(location, null, parent);
 
         /// <summary>
         ///     实例预制件
@@ -598,7 +597,7 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<GameObject> InstGameObjectTask(string location) => Proxy.InstGameObjectTask(location);
+        public static ILoaderHandle<GameObject> InstGameObjectAsync(string location) => Proxy.InstGameObjectAsync(location);
 
         /// <summary>
         ///     实例预制件
@@ -612,8 +611,8 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static ILoaderHandle<GameObject> InstGameObjectTask(string location, Action<GameObject> completed) =>
-            Proxy.InstGameObjectTask(location, completed);
+        public static ILoaderHandle<GameObject> InstGameObjectAsync(string location, Action<GameObject> completed) =>
+            Proxy.InstGameObjectAsync(location, completed);
 
         #endregion
     }

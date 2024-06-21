@@ -16,14 +16,14 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public abstract ILoaderHandle<byte[]> LoadRawFileDataTask(string location, Action<byte[]> cb = null);
+        public abstract ILoaderHandle<byte[]> LoadRawFileDataAsync(string location, Action<byte[]> cb = null);
 
         /// <summary>
         ///     异步加载原生文件
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
-        public abstract ILoaderHandle<string> LoadRawFileTextTask(string location, Action<string> cb = null);
+        public abstract ILoaderHandle<string> LoadRawFileTextAsync(string location, Action<string> cb = null);
 
         /// <summary>
         ///     加载子资源对象
@@ -31,7 +31,7 @@ namespace AIO.UEngine
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         /// <param name="completed">回调</param>
-        public abstract ILoaderHandle<TObject[]> LoadSubAssetsTask<TObject>(string location, Type type, Action<TObject[]> completed = null)
+        public abstract ILoaderHandle<TObject[]> LoadSubAssetsAsync<TObject>(string location, Type type, Action<TObject[]> completed = null)
         where TObject : Object;
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace AIO.UEngine
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
         /// <param name="type">资源类型</param>
-        public abstract ILoaderHandle<TObject> LoadAssetTask<TObject>(string location, Type type, Action<TObject> completed = null)
+        public abstract ILoaderHandle<TObject> LoadAssetAsync<TObject>(string location, Type type, Action<TObject> completed = null)
         where TObject : Object;
 
         /// <summary>
@@ -65,6 +65,6 @@ namespace AIO.UEngine
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
         /// <param name="parent">父位置</param>
-        public abstract ILoaderHandle<GameObject> InstGameObjectTask(string location, Action<GameObject> completed = null, Transform parent = null);
+        public abstract ILoaderHandle<GameObject> InstGameObjectAsync(string location, Action<GameObject> completed = null, Transform parent = null);
     }
 }

@@ -26,7 +26,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.Shader LoadShader(string location)
-            => Proxy.LoadAssetTask<UnityEngine.Shader>(location, typeof(UnityEngine.Shader)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.Shader>(location, typeof(UnityEngine.Shader)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.Shader"/>
@@ -38,7 +38,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadShader(string location, Action<UnityEngine.Shader> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.Shader>(location, typeof(UnityEngine.Shader), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.Shader>(location, typeof(UnityEngine.Shader), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Shader"/>
@@ -49,7 +49,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Shader> LoadShaderTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.Shader>(location, typeof(UnityEngine.Shader));
+            =>  Proxy.LoadAssetAsync<UnityEngine.Shader>(location, typeof(UnityEngine.Shader));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Shader"/>
@@ -61,7 +61,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Shader> LoadShaderTask(string location, Action<UnityEngine.Shader> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.Shader>(location, typeof(UnityEngine.Shader), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.Shader>(location, typeof(UnityEngine.Shader), completed);
 
        #endregion
 
@@ -76,7 +76,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.AudioClip LoadAudioClip(string location)
-            => Proxy.LoadAssetTask<UnityEngine.AudioClip>(location, typeof(UnityEngine.AudioClip)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.AudioClip>(location, typeof(UnityEngine.AudioClip)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.AudioClip"/>
@@ -88,7 +88,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadAudioClip(string location, Action<UnityEngine.AudioClip> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.AudioClip>(location, typeof(UnityEngine.AudioClip), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.AudioClip>(location, typeof(UnityEngine.AudioClip), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.AudioClip"/>
@@ -99,7 +99,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.AudioClip> LoadAudioClipTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.AudioClip>(location, typeof(UnityEngine.AudioClip));
+            =>  Proxy.LoadAssetAsync<UnityEngine.AudioClip>(location, typeof(UnityEngine.AudioClip));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.AudioClip"/>
@@ -111,7 +111,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.AudioClip> LoadAudioClipTask(string location, Action<UnityEngine.AudioClip> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.AudioClip>(location, typeof(UnityEngine.AudioClip), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.AudioClip>(location, typeof(UnityEngine.AudioClip), completed);
 
        #endregion
 
@@ -126,7 +126,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.TextAsset LoadTextAsset(string location)
-            => Proxy.LoadAssetTask<UnityEngine.TextAsset>(location, typeof(UnityEngine.TextAsset)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.TextAsset>(location, typeof(UnityEngine.TextAsset)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.TextAsset"/>
@@ -138,7 +138,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadTextAsset(string location, Action<UnityEngine.TextAsset> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.TextAsset>(location, typeof(UnityEngine.TextAsset), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.TextAsset>(location, typeof(UnityEngine.TextAsset), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.TextAsset"/>
@@ -149,7 +149,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.TextAsset> LoadTextAssetTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.TextAsset>(location, typeof(UnityEngine.TextAsset));
+            =>  Proxy.LoadAssetAsync<UnityEngine.TextAsset>(location, typeof(UnityEngine.TextAsset));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.TextAsset"/>
@@ -161,7 +161,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.TextAsset> LoadTextAssetTask(string location, Action<UnityEngine.TextAsset> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.TextAsset>(location, typeof(UnityEngine.TextAsset), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.TextAsset>(location, typeof(UnityEngine.TextAsset), completed);
 
        #endregion
 
@@ -176,7 +176,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.Material LoadMaterial(string location)
-            => Proxy.LoadAssetTask<UnityEngine.Material>(location, typeof(UnityEngine.Material)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.Material>(location, typeof(UnityEngine.Material)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.Material"/>
@@ -188,7 +188,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadMaterial(string location, Action<UnityEngine.Material> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.Material>(location, typeof(UnityEngine.Material), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.Material>(location, typeof(UnityEngine.Material), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Material"/>
@@ -199,7 +199,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Material> LoadMaterialTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.Material>(location, typeof(UnityEngine.Material));
+            =>  Proxy.LoadAssetAsync<UnityEngine.Material>(location, typeof(UnityEngine.Material));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Material"/>
@@ -211,7 +211,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Material> LoadMaterialTask(string location, Action<UnityEngine.Material> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.Material>(location, typeof(UnityEngine.Material), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.Material>(location, typeof(UnityEngine.Material), completed);
 
        #endregion
 
@@ -226,7 +226,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.AssetBundle LoadAssetBundle(string location)
-            => Proxy.LoadAssetTask<UnityEngine.AssetBundle>(location, typeof(UnityEngine.AssetBundle)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.AssetBundle>(location, typeof(UnityEngine.AssetBundle)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.AssetBundle"/>
@@ -238,7 +238,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadAssetBundle(string location, Action<UnityEngine.AssetBundle> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.AssetBundle>(location, typeof(UnityEngine.AssetBundle), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.AssetBundle>(location, typeof(UnityEngine.AssetBundle), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.AssetBundle"/>
@@ -249,7 +249,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.AssetBundle> LoadAssetBundleTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.AssetBundle>(location, typeof(UnityEngine.AssetBundle));
+            =>  Proxy.LoadAssetAsync<UnityEngine.AssetBundle>(location, typeof(UnityEngine.AssetBundle));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.AssetBundle"/>
@@ -261,7 +261,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.AssetBundle> LoadAssetBundleTask(string location, Action<UnityEngine.AssetBundle> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.AssetBundle>(location, typeof(UnityEngine.AssetBundle), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.AssetBundle>(location, typeof(UnityEngine.AssetBundle), completed);
 
        #endregion
 
@@ -276,7 +276,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.Animation LoadAnimation(string location)
-            => Proxy.LoadAssetTask<UnityEngine.Animation>(location, typeof(UnityEngine.Animation)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.Animation>(location, typeof(UnityEngine.Animation)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.Animation"/>
@@ -288,7 +288,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadAnimation(string location, Action<UnityEngine.Animation> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.Animation>(location, typeof(UnityEngine.Animation), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.Animation>(location, typeof(UnityEngine.Animation), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Animation"/>
@@ -299,7 +299,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Animation> LoadAnimationTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.Animation>(location, typeof(UnityEngine.Animation));
+            =>  Proxy.LoadAssetAsync<UnityEngine.Animation>(location, typeof(UnityEngine.Animation));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Animation"/>
@@ -311,7 +311,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Animation> LoadAnimationTask(string location, Action<UnityEngine.Animation> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.Animation>(location, typeof(UnityEngine.Animation), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.Animation>(location, typeof(UnityEngine.Animation), completed);
 
        #endregion
 
@@ -326,7 +326,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.Texture LoadTexture(string location)
-            => Proxy.LoadAssetTask<UnityEngine.Texture>(location, typeof(UnityEngine.Texture)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.Texture>(location, typeof(UnityEngine.Texture)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.Texture"/>
@@ -338,7 +338,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadTexture(string location, Action<UnityEngine.Texture> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.Texture>(location, typeof(UnityEngine.Texture), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.Texture>(location, typeof(UnityEngine.Texture), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Texture"/>
@@ -349,7 +349,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Texture> LoadTextureTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.Texture>(location, typeof(UnityEngine.Texture));
+            =>  Proxy.LoadAssetAsync<UnityEngine.Texture>(location, typeof(UnityEngine.Texture));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Texture"/>
@@ -361,7 +361,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Texture> LoadTextureTask(string location, Action<UnityEngine.Texture> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.Texture>(location, typeof(UnityEngine.Texture), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.Texture>(location, typeof(UnityEngine.Texture), completed);
 
        #endregion
 
@@ -376,7 +376,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.Texture2D LoadTexture2D(string location)
-            => Proxy.LoadAssetTask<UnityEngine.Texture2D>(location, typeof(UnityEngine.Texture2D)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.Texture2D>(location, typeof(UnityEngine.Texture2D)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.Texture2D"/>
@@ -388,7 +388,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadTexture2D(string location, Action<UnityEngine.Texture2D> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.Texture2D>(location, typeof(UnityEngine.Texture2D), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.Texture2D>(location, typeof(UnityEngine.Texture2D), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Texture2D"/>
@@ -399,7 +399,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Texture2D> LoadTexture2DTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.Texture2D>(location, typeof(UnityEngine.Texture2D));
+            =>  Proxy.LoadAssetAsync<UnityEngine.Texture2D>(location, typeof(UnityEngine.Texture2D));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Texture2D"/>
@@ -411,7 +411,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Texture2D> LoadTexture2DTask(string location, Action<UnityEngine.Texture2D> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.Texture2D>(location, typeof(UnityEngine.Texture2D), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.Texture2D>(location, typeof(UnityEngine.Texture2D), completed);
 
        #endregion
 
@@ -426,7 +426,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.Font LoadFont(string location)
-            => Proxy.LoadAssetTask<UnityEngine.Font>(location, typeof(UnityEngine.Font)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.Font>(location, typeof(UnityEngine.Font)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.Font"/>
@@ -438,7 +438,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadFont(string location, Action<UnityEngine.Font> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.Font>(location, typeof(UnityEngine.Font), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.Font>(location, typeof(UnityEngine.Font), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Font"/>
@@ -449,7 +449,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Font> LoadFontTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.Font>(location, typeof(UnityEngine.Font));
+            =>  Proxy.LoadAssetAsync<UnityEngine.Font>(location, typeof(UnityEngine.Font));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Font"/>
@@ -461,7 +461,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Font> LoadFontTask(string location, Action<UnityEngine.Font> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.Font>(location, typeof(UnityEngine.Font), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.Font>(location, typeof(UnityEngine.Font), completed);
 
        #endregion
 
@@ -476,7 +476,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.Mesh LoadMesh(string location)
-            => Proxy.LoadAssetTask<UnityEngine.Mesh>(location, typeof(UnityEngine.Mesh)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.Mesh>(location, typeof(UnityEngine.Mesh)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.Mesh"/>
@@ -488,7 +488,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadMesh(string location, Action<UnityEngine.Mesh> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.Mesh>(location, typeof(UnityEngine.Mesh), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.Mesh>(location, typeof(UnityEngine.Mesh), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Mesh"/>
@@ -499,7 +499,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Mesh> LoadMeshTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.Mesh>(location, typeof(UnityEngine.Mesh));
+            =>  Proxy.LoadAssetAsync<UnityEngine.Mesh>(location, typeof(UnityEngine.Mesh));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.Mesh"/>
@@ -511,7 +511,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.Mesh> LoadMeshTask(string location, Action<UnityEngine.Mesh> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.Mesh>(location, typeof(UnityEngine.Mesh), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.Mesh>(location, typeof(UnityEngine.Mesh), completed);
 
        #endregion
 
@@ -526,7 +526,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static UnityEngine.GameObject LoadGameObject(string location)
-            => Proxy.LoadAssetTask<UnityEngine.GameObject>(location, typeof(UnityEngine.GameObject)).Invoke();
+            => Proxy.LoadAssetAsync<UnityEngine.GameObject>(location, typeof(UnityEngine.GameObject)).Invoke();
 
         /// <summary>
         /// 异步回调加载 <see cref="UnityEngine.GameObject"/>
@@ -538,7 +538,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static async void LoadGameObject(string location, Action<UnityEngine.GameObject> completed)
-            => await Proxy.LoadAssetTask<UnityEngine.GameObject>(location, typeof(UnityEngine.GameObject), completed);
+            => await Proxy.LoadAssetAsync<UnityEngine.GameObject>(location, typeof(UnityEngine.GameObject), completed);
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.GameObject"/>
@@ -549,7 +549,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.GameObject> LoadGameObjectTask(string location)
-            =>  Proxy.LoadAssetTask<UnityEngine.GameObject>(location, typeof(UnityEngine.GameObject));
+            =>  Proxy.LoadAssetAsync<UnityEngine.GameObject>(location, typeof(UnityEngine.GameObject));
 
         /// <summary>
         /// 异步加载 <see cref="UnityEngine.GameObject"/>
@@ -561,7 +561,7 @@ namespace AIO
         [HideInCallstack]
 #endif
         public static ILoaderHandle<UnityEngine.GameObject> LoadGameObjectTask(string location, Action<UnityEngine.GameObject> completed)
-            =>  Proxy.LoadAssetTask<UnityEngine.GameObject>(location, typeof(UnityEngine.GameObject), completed);
+            =>  Proxy.LoadAssetAsync<UnityEngine.GameObject>(location, typeof(UnityEngine.GameObject), completed);
 
        #endregion
 

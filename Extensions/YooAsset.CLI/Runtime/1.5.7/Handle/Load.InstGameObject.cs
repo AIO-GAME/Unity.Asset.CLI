@@ -105,7 +105,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
-        public override ILoaderHandle<GameObject> InstGameObjectTask(string location, Action<GameObject> completed = null, Transform parent = null)
+        public override ILoaderHandle<GameObject> InstGameObjectAsync(string location, Action<GameObject> completed = null, Transform parent = null)
         {
             return new InstGameObject(location, completed, parent);
         }
