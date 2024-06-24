@@ -105,7 +105,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
-        public override ILoaderHandle<TObject> LoadAssetTask<TObject>(string location, Type type, Action<TObject> completed = null) =>
+        public override ILoaderHandle<TObject> LoadAssetAsync<TObject>(string location, Type type, Action<TObject> completed = null) =>
             new LoadAsset<TObject>(location, type, completed);
     }
 }

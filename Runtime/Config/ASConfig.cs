@@ -1,18 +1,21 @@
-﻿#if UNITY_EDITOR
+﻿#region
+
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
 #endif
 
+#endregion
+
 namespace AIO.UEngine
 {
-    using System;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Linq;
-    using UnityEngine;
-
     [Description("资源系统配置"), Serializable]
     [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
-    public class ASConfig : ScriptableObject
+    public class ASConfig : ScriptableObject<ASConfig>
     {
         /// <summary>
         ///     资源加载模式
@@ -154,49 +157,6 @@ namespace AIO.UEngine
 #endif
 
         #region static
-
-#if UNITY_EDITOR
-        private static ASConfig instance;
-#endif
-
-        private static ASConfig GetResource() { return Resources.LoadAll<ASConfig>(nameof(ASConfig)).FirstOrDefault(item => item); }
-
-        /// <summary>
-        ///     获取本地资源包地址
-        /// </summary>
-        public static ASConfig GetOrCreate()
-        {
-#if UNITY_EDITOR
-            if (!instance)
-            {
-                foreach (var item in AssetDatabase
-                                     .FindAssets("t:ASConfig", new[] { "Assets", })
-                                     .Select(AssetDatabase.GUIDToAssetPath)
-                                     .Select(AssetDatabase.LoadAssetAtPath<ASConfig>)
-                                     .Where(item => item))
-                {
-                    instance = item;
-                    break;
-                }
-
-                if (!instance)
-                {
-                    instance          = CreateInstance<ASConfig>();
-                    instance.ASMode   = EASMode.Editor;
-                    instance.Packages = Array.Empty<AssetsPackageConfig>();
-                    var resourcesDir = Path.Combine(Application.dataPath, "Resources");
-                    if (!Directory.Exists(resourcesDir)) Directory.CreateDirectory(resourcesDir);
-                    AssetDatabase.CreateAsset(instance, "Assets/Resources/ASConfig.asset");
-                    AssetDatabase.SaveAssets();
-                }
-            }
-
-            if (!instance) throw new Exception("Not found ASConfig.asset ! Please create it !");
-            return instance;
-#else
-            return GetResource();
-#endif
-        }
 
         /// <summary>
         ///     获取本地资源包配置

@@ -130,7 +130,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
-        public override ILoaderHandle<byte[]> LoadRawFileDataTask(string location, Action<byte[]> cb = null)
+        public override ILoaderHandle<byte[]> LoadRawFileDataAsync(string location, Action<byte[]> cb = null)
             => new LoadRawFileData(location, cb);
     }
 }
