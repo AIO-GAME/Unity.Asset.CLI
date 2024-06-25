@@ -7,6 +7,7 @@ using UnityEngine;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 [assembly: InternalsVisibleTo("AIO.CLI.YooAsset.Editor")]
+[assembly: UnityAPICompatibilityVersion("2019.4.0", true)]
 
 #endregion
 
