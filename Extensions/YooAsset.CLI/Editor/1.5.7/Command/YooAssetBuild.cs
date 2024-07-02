@@ -44,7 +44,7 @@ namespace AIO.UEditor.CLI
             if (Enum.IsDefined(typeof(ECopyBuildInFileOption), buildArgs.CopyBuildInFileOption))
                 buildArgs.CopyBuildInFileOption = ECopyBuildInFileOption.None;
 
-            if (Enum.IsDefined(typeof(ECompressOption), buildArgs.CompressOption))
+            if (Enum.IsDefined(typeof(ECompressMode), buildArgs.CompressOption))
                 buildArgs.CompressOption = ECompressMode.LZ4;
 
             if (Enum.IsDefined(typeof(EBuildPipeline), buildArgs.BuildPipeline))
