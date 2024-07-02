@@ -28,7 +28,7 @@
     "name": "AIO GAME",
     "url": "https://github.com/AIO-GAME"
   },
-  "type": "library",
+  "type": "module",
   "dependencies": {
     "com.unity.modules.assetbundle": "1.0.0",
     "com.unity.modules.unitywebrequest": "1.0.0",
