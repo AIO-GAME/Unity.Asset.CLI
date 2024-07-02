@@ -100,10 +100,11 @@ namespace AIO.UEditor
             Config.Packages[0].IsDefault = true;
         }
 
-        void IAssetPage.EventMouseDown(in Event evt)                     => ViewConfig.ContainsDragStretch(evt, ViewRect.DragStretchType.Horizontal);
-        void IAssetPage.EventMouseUp(in   Event evt)                     => ViewConfig.CancelDragStretch();
-        void IAssetPage.EventMouseDrag(in Event evt)                     => ViewConfig.DraggingStretch(evt, ViewRect.DragStretchType.Horizontal);
-        void IAssetPage.EventKeyUp(in     Event evt, in KeyCode keyCode) { }
+        void IAssetPage.EventMouseDown(in Event evt) => ViewConfig.ContainsDragStretch(evt, ViewRect.DragStretchType.Horizontal);
+        void IAssetPage.EventMouseUp(in   Event evt) => ViewConfig.CancelDragStretch();
+        void IAssetPage.EventMouseDrag(in Event evt) => ViewConfig.DraggingStretch(evt, ViewRect.DragStretchType.Horizontal);
+
+        void IAssetPage.EventKeyUp(in Event evt, in KeyCode keyCode) { }
 
         void IAssetPage.EventKeyDown(in Event evt, in KeyCode keyCode)
         {
@@ -285,12 +286,14 @@ namespace AIO.UEditor
                 GUI.Label(cell,
 #if UNITY_ANDROID
                           $"编辑器 : Application.streamingAssetsPath/{Config.RuntimeRootDirectory}"
-#elif UNITY_STANDALONE_WIN
-                          $"编辑器 : {EHelper.Path.Project}/{Config.RuntimeRootDirectory}"
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+                            $"编辑器 : {EHelper.Path.Project}/{Config.RuntimeRootDirectory}"
 #elif UNITY_IPHONE || UNITY_IOS
-                          $"编辑器 : Application.streamingAssetsPath/{Config.RuntimeRootDirectory}"
+                            $"编辑器 : Application.streamingAssetsPath/{Config.RuntimeRootDirectory}"
 #elif UNITY_WEBGL
-                          $"编辑器 : Application.streamingAssetsPath/{Config.RuntimeRootDirectory}"
+                            $"编辑器 : Application.streamingAssetsPath/{Config.RuntimeRootDirectory}"
+#else
+                            "Not Support"
 #endif
                         , GEStyle.HeaderLabel);
             }
@@ -302,7 +305,7 @@ namespace AIO.UEditor
                 GUI.Label(cell, string.Format("运行时 : {0}/{1}",
 #if UNITY_ANDROID
                                               "Application.persistentDataPath"
-#elif UNITY_STANDALONE_WIN
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
                                               "Application.streamingAssetsPath"
 #elif UNITY_IPHONE || UNITY_IOS
                                               "Application.persistentDataPath"
