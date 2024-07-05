@@ -25,4 +25,14 @@
 [Ll]ogs/
 [Bb]in/
 [Pp]ackages/
-[Vv]env/
+[Vv]env//.chglog/*
+*.yaml
+*.yml
+/.github/API_USAGE/*
+/.github/ISSUE_TEMPLATE/*
+/.github/PULL_REQUEST_TEMPLATE/*
+/.github/Template/*
+/.github/workflows/*
+/.github/*.py
+/.github/*.sh
+/.github/*.bat
