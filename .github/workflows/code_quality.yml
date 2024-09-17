@@ -23,7 +23,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}  # 检查实际的pull请求提交，而不是合并提交
           fetch-depth: 0 # 拉请求分析需要完整的历史记录
       - name: 🧬 Qodana Scan
-        uses: JetBrains/qodana-action@v2023.3
+        uses: JetBrains/qodana-action@v2024.2
         with:
           pr-mode: false
         env:
