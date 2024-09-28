@@ -29,8 +29,7 @@ namespace AIO.UEditor
                 if (Instance.ShowAssetDetail) Instance.ViewDetailList.DraggingStretch(evt, ViewRect.DragStretchType.Horizontal);
             }
 
-            bool IAssetPage.Shortcut(Event evt) =>
-                evt.control && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Keypad4 || evt.keyCode == KeyCode.Alpha4);
+            bool IAssetPage.Shortcut(Event evt) => evt.control && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Keypad4 || evt.keyCode == KeyCode.Alpha4);
 
             public void Dispose()
             {
@@ -50,52 +49,41 @@ namespace AIO.UEditor
             private Dictionary<(int, int), string[]>                     TagDisplays;
             private Dictionary<(int, int), ConcurrentBag<AssetDataInfo>> DataDic;
 
-            public void OnDrawHeader(Rect rect)
+            private Rect OnDrawGroup(Rect rect)
             {
-                if (Data.Packages.Length == 0 ||
-                    DisplayPackages is null ||
-                    DisplayPackages.Length == 0) return;
-
-                var width = rect.width;
-                rect.x     = 0;
-                rect.width = 100;
-
-                EditorGUI.BeginChangeCheck();
+                using var scope = new EditorGUI.ChangeCheckScope();
                 Data.CurrentPackageIndex = EditorGUI.Popup(rect, Data.CurrentPackageIndex, DisplayPackages, GEStyle.PreDropDown);
 
-                if (!Data.IsValidGroup()) return;
+                if (!Data.IsValidGroup()) return rect;
 
-                var PName = DisplayPackages[Data.CurrentPackageIndex];
-                if (!DisplayGroupNames.ContainsKey(PName))
-                    DisplayGroupNames[PName] = GetGroupDisPlayNames(Data.CurrentPackage.Groups);
+                var package = DisplayPackages[Data.CurrentPackageIndex];
+                if (!DisplayGroupNames.ContainsKey(package))
+                    DisplayGroupNames[package] = GetGroupDisPlayNames(Data.CurrentPackage.Groups);
 
-                if (Data.CurrentGroupIndex >= DisplayGroupNames[PName].Length)
-                    Data.CurrentGroupIndex = DisplayGroupNames[PName].Length - 1;
+                if (Data.CurrentGroupIndex >= DisplayGroupNames[package].Length)
+                    Data.CurrentGroupIndex = DisplayGroupNames[package].Length - 1;
 
                 rect.x                 += rect.width;
-                Data.CurrentGroupIndex =  EditorGUI.Popup(rect, Data.CurrentGroupIndex, DisplayGroupNames[PName], GEStyle.PreDropDown);
+                Data.CurrentGroupIndex =  EditorGUI.Popup(rect, Data.CurrentGroupIndex, DisplayGroupNames[package], GEStyle.PreDropDown);
 
-                if (!Data.IsValidCollect())
+                if (!Data.IsValidCollect() || !scope.changed) return rect;
+                if (!DataDic.ContainsKey((Data.CurrentPackageIndex, Data.CurrentGroupIndex)))
+                    UpdateDataCollector(Data.CurrentPackageIndex, Data.CurrentGroupIndex);
+                else
                 {
-                    EditorGUI.EndChangeCheck();
-                    return;
+                    PageValues.Clear();
+                    PageValues.Add(DataDic[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]);
+                    PageValues.PageIndex = 0;
+                    TreeViewQueryAsset.Reload(PageValues);
                 }
 
-                if (EditorGUI.EndChangeCheck())
-                {
-                    if (!DataDic.ContainsKey((Data.CurrentPackageIndex, Data.CurrentGroupIndex)))
-                        UpdateDataCollector(Data.CurrentPackageIndex, Data.CurrentGroupIndex);
-                    else
-                    {
-                        PageValues.Clear();
-                        PageValues.Add(DataDic[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)]);
-                        PageValues.PageIndex = 0;
-                        TreeViewQueryAsset.Reload(PageValues);
-                    }
-                }
+                return rect;
+            }
 
-                EditorGUI.BeginChangeCheck();
-                var collectors = CollectorDisplays[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)];
+            private Rect OnDrawCollector(Rect rect)
+            {
+                using var scope      = new EditorGUI.ChangeCheckScope();
+                var       collectors = CollectorDisplays[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)];
                 if (collectors.Length > 0)
                 {
                     rect.x     += rect.width;
@@ -151,17 +139,30 @@ namespace AIO.UEditor
                 }
                 else DisplayTagsIndex = 0;
 
-                if (EditorGUI.EndChangeCheck())
+                if (!scope.changed) return rect;
+                PageValues.Clear();
+                lock (DataDic)
                 {
-                    PageValues.Clear();
-                    lock (DataDic)
-                    {
-                        PageValues.Add(DataDic[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Where(data => !FilterData(data)));
-                    }
-
-                    PageValues.PageIndex = 0;
-                    TreeViewQueryAsset.Reload();
+                    PageValues.Add(DataDic[(Data.CurrentPackageIndex, Data.CurrentGroupIndex)].Where(data => !FilterData(data)));
                 }
+
+                PageValues.PageIndex = 0;
+                TreeViewQueryAsset.Reload();
+
+                return rect;
+            }
+
+            public void OnDrawHeader(Rect rect)
+            {
+                if (Data.Packages.Length == 0 ||
+                    DisplayPackages is null ||
+                    DisplayPackages.Length == 0) return;
+
+                var width = rect.width;
+                rect.x     = 0;
+                rect.width = 100;
+                rect       = OnDrawGroup(rect);
+                rect       = OnDrawCollector(rect);
 
                 rect.x     += rect.width + 3;
                 rect.width =  width - 30 - rect.x - (PageValues.Count <= 0 ? 0 : 190);
@@ -173,6 +174,7 @@ namespace AIO.UEditor
 
                 rect.x     = width - 30;
                 rect.width = 30;
+
                 if (GUI.Button(rect, Instance.GC_REFRESH, GEStyle.TEtoolbarbutton))
                 {
                     Instance.SelectAsset            = null;

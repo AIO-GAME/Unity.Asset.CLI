@@ -135,20 +135,23 @@ namespace AIO.UEditor
         {
             if (item.Type == EAssetCollectItemType.MainAssetCollector)
             {
+                int status;
                 var list = AssetCollectRoot.GetOrCreate().CurrentGroup.Collectors.GetDisPlayNames();
                 if (list.Length > 31)
                 {
-                    AssetPageLook.DisplayCollectorsIndex = 0;
+                    status = 0;
                     for (var i = 0; i < list.Length; i++)
+                    {
                         if (list[i] == item.CollectPath)
                         {
-                            AssetPageLook.DisplayCollectorsIndex = i + 1;
+                            status = i + 1;
                             break;
                         }
+                    }
                 }
                 else
                 {
-                    var status = 1;
+                    status = 1;
                     foreach (var collector in list)
                     {
                         if (collector != item.CollectPath)
@@ -157,11 +160,12 @@ namespace AIO.UEditor
                             continue;
                         }
 
-                        AssetPageLook.DisplayCollectorsIndex = status;
                         break;
                     }
                 }
+
                 AssetWindow.OpenPage<AssetPageLook.Collect>();
+                AssetPageLook.DisplayCollectorsIndex = status;
                 return;
             }
 
