@@ -79,19 +79,21 @@ namespace AIO.UEngine.YooAsset
 
             private TaskAwaiter<TObject> AwaiterGeneric;
 
+            private AssetOperationHandle Operation;
+
             private async Task<TObject> GetTask()
             {
-                var operation = Instance.HandleGet<AssetOperationHandle>(Address);
-                if (operation is null)
+                Operation = Instance.HandleGet<AssetOperationHandle>(Address);
+                if (Operation is null)
                 {
                     var package = await Instance.AutoGetPackageTask(Address);
                     if (package is null) return null;
-                    operation = package.LoadAssetAsync(Address, AssetType);
-                    if (!await operation.CheckTask()) return null;
-                    Instance.HandleAdd(Address, operation);
+                    Operation = package.LoadAssetAsync(Address, AssetType);
+                    if (!await Operation.CheckTask()) return null;
+                    Instance.HandleAdd(Address, Operation);
                 }
 
-                return operation?.GetAssetObject<TObject>();
+                return Operation?.GetAssetObject<TObject>();
             }
 
             protected override TaskAwaiter<TObject> CreateAsync()
@@ -105,8 +107,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
-        public override ILoaderHandle<TObject> LoadAssetAsync<TObject>(string location, Type type, Action<TObject> completed = null) =>
-            new LoadAsset<TObject>(location, type, completed);
+        public override ILoaderHandle<TObject> LoadAssetAsync<TObject>(string location, Type type, Action<TObject> completed = null) => new LoadAsset<TObject>(location, type, completed);
     }
 }
 

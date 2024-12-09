@@ -19,9 +19,9 @@ namespace AIO.UEditor
     [Serializable]
     [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#asset-system-%E5%B7%A5%E5%85%B7%E8%AF%B4%E6%98%8E")]
 #if UNITY_2021_1_OR_NEWER
-    [Icon("Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
+    [Icon("Packages/com.aio.cli.asset/Resources/Editor/Icon/pencils.png")]
 #else
-    [ScriptIcon(IconRelative = "Packages/com.aio.package/Resources/Editor/Setting/icon_interests.png")]
+    [ScriptIcon(IconRelative = "Packages/com.aio.cli.asset/Resources/Editor/Icon/pencils.png")]
 #endif
     public partial class AssetCollectRoot : ScriptableObject
     {

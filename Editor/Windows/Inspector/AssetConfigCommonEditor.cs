@@ -31,8 +31,14 @@ namespace AIO.UEditor
 
             HeaderIcon = AssetPreview.GetMiniThumbnail(ASConfig);
             UpdateRecordQueue();
-            PackageNames     = ACConfig.GetNames() ?? Array.Empty<string>();
-            PackageNameIndex = PackageNames.ToList().IndexOf(ABConfig.PackageName);
+            PackageNames = ACConfig.GetNames() ?? Array.Empty<string>();
+            if (PackageNames.Length > 0)
+            {
+                PackageNameIndex = PackageNames.ToList().IndexOf(ABConfig.PackageName);
+                if (PackageNameIndex == -1) PackageNameIndex = 0;
+                ABConfig.PackageName = PackageNames[PackageNameIndex];
+            }
+            else PackageNameIndex = -1;
         }
 
         public void OnGUI()
@@ -467,8 +473,8 @@ namespace AIO.UEditor
                                                     AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(ASConfig));
 
                             if (GELayout.Button("Upload FTP", GSValue))
-                                AHandle.FTP.Create("", "", "")
-                                       .UploadFile(
+                                AHandle.FTP.Create("", "", "").
+                                        UploadFile(
                                                    AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                         }
                     }
