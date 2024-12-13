@@ -1,8 +1,9 @@
 #if UNITASK_YOOASSET_SUPPORT && UNITASK_SUPPORT
 using System;
+using UnityEngine;
 using YooAsset;
 using static Cysharp.Threading.Tasks.Internal.Error;
-
+[assembly: UnityAPICompatibilityVersion("2019.4.0", true)]
 namespace Cysharp.Threading.Tasks
 {
     public static class AsyncOperationBaseExtensions

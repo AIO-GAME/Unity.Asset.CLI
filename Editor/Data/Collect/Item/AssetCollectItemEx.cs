@@ -14,8 +14,8 @@ namespace AIO.UEditor
                     where item.Type == EAssetCollectItemType.MainAssetCollector
                     where !string.IsNullOrEmpty(item.CollectPath)
                     select item.CollectPath
-                ).Distinct()
-                 .ToArray();
+                ).Distinct().
+                  ToArray();
         }
     }
 }

@@ -37,9 +37,9 @@ namespace AIO.UEditor
         private static string[] DisplayCollectors; // 列表:收集器
         private static string[] DisplayTypes;      // 列表:类型
 
-        public static int DisplayTypeIndex;            // 当前选择包类型索引
-        public static int DisplayCollectorsIndex = -1; // 当前选择收集器索引
-        public static int DisplayTagsIndex;            // 当前标签列表索引
+        public static int DisplayTypeIndex;                          // 当前选择包类型索引
+        public static int DisplayCollectorsIndex { get; set; } = -1; // 当前选择收集器索引
+        public static int DisplayTagsIndex;                          // 当前标签列表索引
 
         private readonly GUIContent GC_CLEAR;
         private readonly GUIContent GC_DEL;
@@ -615,10 +615,7 @@ namespace AIO.UEditor
         private static string[] GetGroupDisPlayNames(ICollection<AssetCollectGroup> groups)
         {
             var page = groups.Count > 15;
-            return groups.Select(t => t.Name)
-                         .Where(groupName => !string.IsNullOrEmpty(groupName))
-                         .Select(groupName => page ? string.Concat(char.ToUpper(groupName[0]), '/', groupName) : groupName)
-                         .ToArray();
+            return groups.Select(t => t.Name).Where(groupName => !string.IsNullOrEmpty(groupName)).Select(groupName => page ? string.Concat(char.ToUpper(groupName[0]), '/', groupName) : groupName).ToArray();
         }
 
         private static string[] GetCollectorDisPlayNames(IList<string> collectors)

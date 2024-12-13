@@ -150,7 +150,7 @@ namespace AIO.UEditor
             if (!Instance)
             {
                 EditorApplication.ExecuteMenuItem(MENU_WINDOW);
-                return default;
+                return default(T);
             }
 
             Instance.PageIndex = Instance.Pages.IndexOf(Instance.Pages.FirstOrDefault(p => p is T));

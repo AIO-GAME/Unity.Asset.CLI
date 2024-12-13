@@ -1,9 +1,11 @@
 ﻿#if SUPPORT_YOOASSET
 
 using System.Linq;
+using UnityEngine;
 using UnityEngine.Scripting;
 using YooAsset;
 
+[assembly: UnityAPICompatibilityVersion("2019.4.0", true)]
 [assembly: Preserve]
 #if UNITY_2018_3_OR_NEWER
 [assembly: AlwaysLinkAssembly]

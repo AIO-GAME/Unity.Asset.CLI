@@ -31,9 +31,14 @@ namespace AIO.UEditor
 
             HeaderIcon = AssetPreview.GetMiniThumbnail(ASConfig);
             UpdateRecordQueue();
-            PackageNames = ACConfig.GetNames();
-            if (PackageNames is null) PackageNames = Array.Empty<string>();
-            PackageNameIndex = PackageNames.ToList().IndexOf(ABConfig.PackageName);
+            PackageNames = ACConfig.GetNames() ?? Array.Empty<string>();
+            if (PackageNames.Length > 0)
+            {
+                PackageNameIndex = PackageNames.ToList().IndexOf(ABConfig.PackageName);
+                if (PackageNameIndex == -1) PackageNameIndex = 0;
+                ABConfig.PackageName = PackageNames[PackageNameIndex];
+            }
+            else PackageNameIndex = -1;
         }
 
         public void OnGUI()
@@ -81,7 +86,7 @@ namespace AIO.UEditor
 #if UNITY_2021_1_OR_NEWER
                             AssetDatabase.SaveAssetIfDirty(ACConfig);
 #else
-                        AssetDatabase.SaveAssets();
+                            AssetDatabase.SaveAssets();
 #endif
                             if (EditorUtility.DisplayDialog("保存", "保存成功", "确定")) AssetDatabase.Refresh();
                         }
@@ -135,13 +140,14 @@ namespace AIO.UEditor
         #region ASBuildConfigEditor
 
         private AssetBuildConfig ABConfig;
-        private bool             FoldoutABConfig  = true;
-        private int              PackageNameIndex = 0;
+        private bool             FoldoutABConfig = true;
+        private int              PackageNameIndex;
 
         private void OnDrawABConfig()
         {
             GUILayout.Space(5);
             using (GELayout.Vertical(GEStyle.TEBoxBackground))
+            {
                 if (ABConfig)
                 {
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
@@ -159,14 +165,18 @@ namespace AIO.UEditor
                             EditorApplication.ExecuteMenuItem(AssetWindow.MENU_WINDOW);
                         }
 
-                        if (GUILayout.Button("构建", GEStyle.toolbarbutton)) AssetProxyEditor.BuildArt(ABConfig);
+                        if (GUILayout.Button("构建", GEStyle.toolbarbutton))
+                        {
+                            AssetProxyEditor.BuildArt(ABConfig);
+                            GUIUtility.ExitGUI();
+                            return;
+                        }
                     }
 
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                     {
                         EditorGUILayout.LabelField("构建平台", GTOptions.Width(125));
-                        ABConfig.BuildTarget =
-                            (BuildTarget)EditorGUILayout.EnumPopup(ABConfig.BuildTarget, GEStyle.TEToolbarDropDown);
+                        ABConfig.BuildTarget = (BuildTarget)EditorGUILayout.EnumPopup(ABConfig.BuildTarget, GEStyle.TEToolbarDropDown);
                     }
 
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
@@ -185,8 +195,7 @@ namespace AIO.UEditor
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                     {
                         EditorGUILayout.LabelField("压缩模式", GTOptions.Width(125));
-                        ABConfig.CompressedMode =
-                            (ECompressMode)EditorGUILayout.EnumPopup(ABConfig.CompressedMode, GEStyle.TEToolbarDropDown);
+                        ABConfig.CompressedMode = (ECompressMode)EditorGUILayout.EnumPopup(ABConfig.CompressedMode, GEStyle.TEToolbarDropDown);
                     }
 
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
@@ -201,9 +210,15 @@ namespace AIO.UEditor
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
                     {
                         EditorGUILayout.LabelField("构建资源包名称", GTOptions.Width(125));
-                        EditorGUI.BeginChangeCheck();
                         PackageNameIndex = EditorGUILayout.Popup(PackageNameIndex, PackageNames, GEStyle.PreDropDown);
-                        if (EditorGUI.EndChangeCheck()) ABConfig.PackageName = ACConfig.GetNames()[PackageNameIndex];
+                        using (var scope = new EditorGUI.ChangeCheckScope())
+                        {
+                            if (scope.changed)
+                            {
+                                var temp = ACConfig.GetNames();
+                                ABConfig.PackageName = temp.Length > PackageNameIndex ? temp[PackageNameIndex] : string.Empty;
+                            }
+                        }
                     }
 
                     using (new EditorGUILayout.HorizontalScope(GEStyle.Toolbar))
@@ -271,6 +286,7 @@ namespace AIO.UEditor
                         if (GUILayout.Button("Create", GEStyle.toolbarbuttonRight)) Selection.activeObject = AssetBuildConfig.GetOrCreate();
                     }
                 }
+            }
         }
 
         #endregion
@@ -457,8 +473,8 @@ namespace AIO.UEditor
                                                     AssetSystem.SequenceRecordQueue.GET_REMOTE_PATH(ASConfig));
 
                             if (GELayout.Button("Upload FTP", GSValue))
-                                AHandle.FTP.Create("", "", "")
-                                       .UploadFile(
+                                AHandle.FTP.Create("", "", "").
+                                        UploadFile(
                                                    AssetSystem.SequenceRecordQueue.LOCAL_PATH);
                         }
                     }
