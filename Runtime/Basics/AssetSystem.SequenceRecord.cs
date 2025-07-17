@@ -237,8 +237,7 @@ namespace AIO
             /// </summary>
             public Task DownloadTask(string URL)
             {
-                var handle = AHelper.HTTP.Download(GET_REMOTE_PATH(URL), LOCAL_PATH, true);
-                return handle.WaitAsync();
+                return AHelper.Http.DownloadAsync(GET_REMOTE_PATH(URL), LOCAL_PATH, true);
             }
 
             /// <summary>

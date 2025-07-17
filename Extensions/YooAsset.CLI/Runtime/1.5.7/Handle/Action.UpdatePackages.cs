@@ -78,7 +78,7 @@ namespace AIO.UEngine.YooAsset
             string content;
             try
             {
-                content = AHelper.HTTP.Get(remote, Encoding.UTF8);
+                content = AHelper.Http.Get(remote, Encoding.UTF8);
             }
             catch (Exception)
             {
@@ -93,7 +93,7 @@ namespace AIO.UEngine.YooAsset
                 item.IsLatest = item.Version == "Latest"; // 如果使用Latest则认为是最新版本 同时需要获取最新版本号
                 if (!item.IsLatest) continue;
                 var url  = GetPackageManifestVersionUrl(config, item);
-                var temp = AHelper.HTTP.Get(url, Encoding.UTF8);
+                var temp = AHelper.Http.Get(url, Encoding.UTF8);
                 if (string.IsNullOrEmpty(temp))
                 {
                     AssetSystem.LogError($"{url} Request failed");
@@ -124,7 +124,7 @@ namespace AIO.UEngine.YooAsset
             string content;
             try
             {
-                content = await AHelper.HTTP.GetAsync(remote, Encoding.UTF8);
+                content = await AHelper.Http.GetAsync(remote, Encoding.UTF8);
             }
             catch (Exception e)
             {
@@ -140,7 +140,7 @@ namespace AIO.UEngine.YooAsset
                 item.IsLatest = item.Version == "Latest"; // 如果使用Latest则认为是最新版本 同时需要获取最新版本号
                 if (!item.IsLatest) continue;
                 var url  = GetPackageManifestVersionUrl(config, item);
-                var temp = await AHelper.HTTP.GetAsync(url, Encoding.UTF8);
+                var temp = await AHelper.Http.GetAsync(url, Encoding.UTF8);
                 if (string.IsNullOrEmpty(temp))
                 {
                     AssetSystem.LogError($"{url} Request failed");
