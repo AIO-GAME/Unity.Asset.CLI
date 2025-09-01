@@ -12,17 +12,17 @@ namespace AIO
     partial class AssetSystem
     {
         /// <summary>
-        ///     是否允许流量下载
+        /// 是否允许流量下载
         /// </summary>
         public static bool AllowReachableCarrier { get; set; }
 
         /// <summary>
-        ///     主下载器
+        /// 主下载器
         /// </summary>
         private static IASNetLoading _DownloadHandle { get; set; }
 
         /// <summary>
-        ///     主下载器
+        /// 主下载器
         /// </summary>
         public static IASNetLoading DownloadHandle
         {
@@ -35,57 +35,57 @@ namespace AIO
         }
 
         /// <summary>
-        ///     当前主下载器事件
+        /// 当前主下载器事件
         /// </summary>
         public static IDownlandAssetEvent DownloadEvent => DownloadHandle?.Event;
 
         /// <summary>
-        ///     下载器状态
+        /// 下载器状态
         /// </summary>
         public static EProgressState DownloadState => DownloadHandle?.State ?? EProgressState.Finish;
 
         /// <summary>
-        ///     判断当前网络环境是否为流量
+        /// 判断当前网络环境是否为流量
         /// </summary>
         /// <returns></returns>
         public static bool IsWifi =>
             Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork;
 
         /// <summary>
-        ///     判断当前网络环境是否为无网络
+        /// 判断当前网络环境是否为无网络
         /// </summary>
         public static bool IsNoNet =>
             Application.internetReachability == NetworkReachability.NotReachable;
 
         /// <summary>
-        ///     判断当前网络环境是否为流量
+        /// 判断当前网络环境是否为流量
         /// </summary>
         public static bool IsNetReachable =>
             Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork;
 
         /// <summary>
-        ///     运行时 内置文件目录
+        /// 运行时 内置文件目录
         /// </summary>
         /// <remarks>
-        ///     (Application.streamingAssetsPath)/RuntimeRootDirectory
+        /// (Application.streamingAssetsPath)/RuntimeRootDirectory
         /// </remarks>
         public static string BuildInRootDirectory { get; internal set; }
 
         /// <summary>
-        ///     运行时 缓存文件目录
+        /// 运行时 缓存文件目录
         /// </summary>
         /// <remarks>
-        ///     (Application.persistentDataPath)/RuntimeRootDirectory
+        /// (Application.persistentDataPath)/RuntimeRootDirectory
         /// </remarks>
         public static string SandboxRootDirectory { get; internal set; }
 
         /// <summary>
-        ///     运行平台
+        /// 运行平台
         /// </summary>
         public static RuntimePlatform Platform => Application.platform;
 
         /// <summary>
-        ///     平台名称 字符串
+        /// 平台名称 字符串
         /// </summary>
         /// <returns></returns>
         public static string PlatformNameStr
@@ -144,16 +144,16 @@ namespace AIO
         }
 
         /// <summary>
-        ///     队列暂停中
+        /// 队列暂停中
         /// </summary>
         /// <remarks>
-        ///     Ture: 暂停中
-        ///     False: 没有暂停
+        /// Ture: 暂停中
+        /// False: 没有暂停
         /// </remarks>
         internal static bool StatusStop { get; set; }
 
         /// <summary>
-        ///     下载器是否重置
+        /// 下载器是否重置
         /// </summary>
         internal static bool HandleReset { get; set; }
     }

@@ -7,6 +7,7 @@ using AIO.UEngine;
 #if UNITY_2022_1_OR_NEWER
 using UnityEngine;
 #endif
+
 #endregion
 
 namespace AIO
@@ -17,7 +18,7 @@ namespace AIO
         private static readonly Dictionary<string, string> LocalPathCache = new Dictionary<string, string>(64);
 
         /// <summary>
-        ///     是否需要从远端更新下载
+        /// 是否需要从远端更新下载
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
@@ -31,7 +32,7 @@ namespace AIO
         }
 
         /// <summary>
-        ///     检查资源是否有效
+        /// 检查资源是否有效
         /// </summary>
         /// <param name="location">资源定位地址</param>
         /// <returns>Ture:有效 False:无效</returns>
@@ -39,13 +40,10 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static bool CheckLocationValid(string location)
-        {
-            return Proxy.CheckLocationValid(SettingToLocalPath(location));
-        }
+        public static bool CheckLocationValid(string location) { return Proxy.CheckLocationValid(SettingToLocalPath(location)); }
 
         /// <summary>
-        ///     是否已经加载
+        /// 是否已经加载
         /// </summary>
         /// <param name="location">寻址地址</param>
         /// <returns>Ture 已经加载 False 未加载</returns>
@@ -53,13 +51,10 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
-        public static bool IsAlreadyLoad(string location)
-        {
-            return Proxy.AlreadyLoad(SettingToLocalPath(location));
-        }
+        public static bool IsAlreadyLoad(string location) { return Proxy.AlreadyLoad(SettingToLocalPath(location)); }
 
         /// <summary>
-        ///     根据设置 获取资源定位地址
+        /// 根据设置 获取资源定位地址
         /// </summary>
         /// <param name="location">资源定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]

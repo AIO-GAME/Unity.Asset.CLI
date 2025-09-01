@@ -15,6 +15,7 @@ using UnityEngine;
 #if UNITY_2022_1_OR_NEWER
 using Unity.Profiling;
 #endif
+
 #endregion
 
 namespace AIO
@@ -22,7 +23,7 @@ namespace AIO
     partial class AssetSystem
     {
         /// <summary>
-        ///     获取序列记录
+        /// 获取序列记录
         /// </summary>
         /// <param name="record">记录</param>
         [DebuggerNonUserCode, DebuggerHidden, Conditional("UNITY_EDITOR")]
@@ -38,7 +39,7 @@ namespace AIO
         #region Nested type: SequenceRecord
 
         /// <summary>
-        ///     资源包记录序列
+        /// 资源包记录序列
         /// </summary>
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
@@ -46,7 +47,7 @@ namespace AIO
         public struct SequenceRecord
         {
             /// <summary>
-            ///     资源GUID Key
+            /// 资源GUID Key
             /// </summary>
             public string GUID
             {
@@ -61,18 +62,18 @@ namespace AIO
             private string _GUID;
 
             /// <summary>
-            ///     资源包名
+            /// 资源包名
             /// </summary>
             public string PackageName;
 
             /// <summary>
-            ///     设置资源包名
+            /// 设置资源包名
             /// </summary>
             /// <param name="packageName">资源包名</param>
             public void SetPackageName(string packageName) { PackageName = packageName; }
 
             /// <summary>
-            ///     资源包寻址路径
+            /// 资源包寻址路径
             /// </summary>
             /// <param name="assetPath">资源路径</param>
             public void SetAssetPath(string assetPath)
@@ -82,38 +83,38 @@ namespace AIO
             }
 
             /// <summary>
-            ///     设置寻址路径
+            /// 设置寻址路径
             /// </summary>
             /// <param name="guid">资源GUID</param>
             public void SetGUID(string guid) { _GUID = guid; }
 
             /// <summary>
-            ///     资源包寻址路径
+            /// 资源包寻址路径
             /// </summary>
             public string Location;
 
             /// <summary>
-            ///     资源路径
+            /// 资源路径
             /// </summary>
             public string AssetPath;
 
             /// <summary>
-            ///     记录时间
+            /// 记录时间
             /// </summary>
             public DateTime Time;
 
             /// <summary>
-            ///     记录大小
+            /// 记录大小
             /// </summary>
             public long Bytes;
 
             /// <summary>
-            ///     记录数量
+            /// 记录数量
             /// </summary>
             public int Count;
 
             /// <summary>
-            ///     是否为空
+            /// 是否为空
             /// </summary>
             public bool IsNull =>
                 string.IsNullOrEmpty(AssetPath) ||
@@ -145,12 +146,12 @@ namespace AIO
             }
 
             /// <summary>
-            ///     自动激活序列记录
+            /// 自动激活序列记录
             /// </summary>
             public bool Enable { get; }
 
             /// <summary>
-            ///     序列记录大小
+            /// 序列记录大小
             /// </summary>
             public long Size => Records?.Sum(record => record.Bytes) ?? 0;
 
@@ -208,7 +209,7 @@ namespace AIO
             #endregion
 
             /// <summary>
-            ///     更新本地序列记录
+            /// 更新本地序列记录
             /// </summary>
             public void UpdateLocal()
             {
@@ -227,21 +228,18 @@ namespace AIO
             }
 
             /// <summary>
-            ///     是否存在本地序列记录
+            /// 是否存在本地序列记录
             /// </summary>
             /// <returns>Ture:存在</returns>
             public bool ExistsLocal() { return File.Exists(LOCAL_PATH); }
 
             /// <summary>
-            ///     下载序列记录
+            /// 下载序列记录
             /// </summary>
-            public Task DownloadTask(string URL)
-            {
-                return AHelper.Http.DownloadAsync(GET_REMOTE_PATH(URL), LOCAL_PATH, true);
-            }
+            public Task DownloadTask(string URL) { return AHelper.Http.DownloadAsync(GET_REMOTE_PATH(URL), LOCAL_PATH, true); }
 
             /// <summary>
-            ///     下载序列记录
+            /// 下载序列记录
             /// </summary>
             public IEnumerator DownloadCo(string URL)
             {
@@ -255,7 +253,7 @@ namespace AIO
             }
 
             /// <summary>
-            ///     保存序列记录
+            /// 保存序列记录
             /// </summary>
             public void Save()
             {
@@ -272,10 +270,7 @@ namespace AIO
 
             public bool ContainsAssetPath(string assetPath) { return Records.Exists(record => record.AssetPath == assetPath); }
 
-            public bool ContainsAssetPath(string assetPath, string packageName)
-            {
-                return Records.Exists(record => record.AssetPath == assetPath && record.PackageName == packageName);
-            }
+            public bool ContainsAssetPath(string assetPath, string packageName) { return Records.Exists(record => record.AssetPath == assetPath && record.PackageName == packageName); }
 
             public bool RemoveGUID(string guid)
             {
@@ -297,7 +292,7 @@ namespace AIO
             }
 
             /// <summary>
-            ///     序列记录路径
+            /// 序列记录路径
             /// </summary>
             public static string LOCAL_PATH
             {

@@ -19,7 +19,7 @@ namespace AIO
         #region 同步加载子资源对象
 
         /// <summary>
-        ///     同步加载子资源对象
+        /// 同步加载子资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">可寻址路径</param>
@@ -31,7 +31,7 @@ namespace AIO
         where TObject : Object => Proxy.LoadSubAssetsAsync<TObject>(location, typeof(TObject)).Invoke();
 
         /// <summary>
-        ///     同步加载子资源对象
+        /// 同步加载子资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="type">子对象类型</param>
@@ -42,7 +42,7 @@ namespace AIO
         public static Object[] LoadSubAssets(string location, Type type) => Proxy.LoadSubAssetsAsync<Object>(location, type).Invoke();
 
         /// <summary>
-        ///     同步加载子资源对象
+        /// 同步加载子资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
@@ -56,7 +56,7 @@ namespace AIO
         #region 异步加载原生文件
 
         /// <summary>
-        ///     异步加载子资源对象
+        /// 异步加载子资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
@@ -68,7 +68,7 @@ namespace AIO
         where TObject : Object => Proxy.LoadSubAssetsAsync(location, typeof(TObject), completed).Invoke();
 
         /// <summary>
-        ///     异步加载子资源对象
+        /// 异步加载子资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">可寻址路径</param>
@@ -80,7 +80,7 @@ namespace AIO
         where TObject : Object => Proxy.LoadSubAssetsAsync<TObject>(location, typeof(TObject));
 
         /// <summary>
-        ///     异步加载子资源对象
+        /// 异步加载子资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">可寻址路径</param>
@@ -93,7 +93,7 @@ namespace AIO
         where TObject : Object => Proxy.LoadSubAssetsAsync<TObject>(location, typeof(TObject), completed);
 
         /// <summary>
-        ///     异步加载原生文件
+        /// 异步加载原生文件
         /// </summary>
         /// <param name="type">子对象类型</param>
         /// <param name="location">可寻址路径</param>
@@ -106,7 +106,7 @@ namespace AIO
             await Proxy.LoadSubAssetsAsync(location, type, completed);
 
         /// <summary>
-        ///     异步加载原生文件
+        /// 异步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
@@ -118,7 +118,7 @@ namespace AIO
             await Proxy.LoadSubAssetsAsync(location, typeof(Object), completed);
 
         /// <summary>
-        ///     异步加载子资源对象
+        /// 异步加载子资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="type">子对象类型</param>
@@ -129,7 +129,7 @@ namespace AIO
         public static ILoaderHandle<Object[]> LoadSubAssetsAsync(string location, Type type) => Proxy.LoadSubAssetsAsync<Object>(location, type);
 
         /// <summary>
-        ///     异步加载子资源对象
+        /// 异步加载子资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="type">子对象类型</param>
@@ -142,7 +142,7 @@ namespace AIO
             Proxy.LoadSubAssetsAsync(location, type, completed);
 
         /// <summary>
-        ///     异步加载子资源对象
+        /// 异步加载子资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
@@ -154,7 +154,7 @@ namespace AIO
             Proxy.LoadSubAssetsAsync(location, typeof(Object), completed);
 
         /// <summary>
-        ///     异步加载子资源对象
+        /// 异步加载子资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
@@ -175,7 +175,7 @@ namespace AIO
         #region 异步加载
 
         /// <summary>
-        ///     异步加载场景
+        /// 异步加载场景
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
@@ -195,7 +195,7 @@ namespace AIO
         ) => await Proxy.LoadSceneTask(location, completed, sceneMode, suspendLoad, priority);
 
         /// <summary>
-        ///     异步加载场景
+        /// 异步加载场景
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="sceneMode">场景加载模式</param>
@@ -213,7 +213,7 @@ namespace AIO
         ) => await Proxy.LoadSceneTask(location, null, sceneMode, suspendLoad, priority);
 
         /// <summary>
-        ///     异步加载场景
+        /// 异步加载场景
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
@@ -233,7 +233,7 @@ namespace AIO
         ) => Proxy.LoadSceneTask(location, completed, sceneMode, suspendLoad, priority);
 
         /// <summary>
-        ///     异步加载场景
+        /// 异步加载场景
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="sceneMode">场景加载模式</param>
@@ -262,7 +262,7 @@ namespace AIO
         #region 异步加载
 
         /// <summary>
-        ///     异步加载资源对象
+        /// 异步加载资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">可寻址路径</param>
@@ -274,7 +274,7 @@ namespace AIO
         where TObject : Object => Proxy.LoadAssetAsync<TObject>(location, typeof(TObject));
 
         /// <summary>
-        ///     异步加载资源对象
+        /// 异步加载资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">可寻址路径</param>
@@ -287,7 +287,7 @@ namespace AIO
         where TObject : Object => Proxy.LoadAssetAsync(location, typeof(TObject), completed);
 
         /// <summary>
-        ///     异步加载资源对象
+        /// 异步加载资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="type">资源类型</param>
@@ -298,7 +298,7 @@ namespace AIO
         public static ILoaderHandle<Object> LoadAssetAsync(string location, Type type) => Proxy.LoadAssetAsync<Object>(location, type);
 
         /// <summary>
-        ///     异步加载资源对象
+        /// 异步加载资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="type">资源类型</param>
@@ -311,7 +311,7 @@ namespace AIO
             Proxy.LoadAssetAsync(location, type, completed);
 
         /// <summary>
-        ///     异步加载资源对象
+        /// 异步加载资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
@@ -321,7 +321,7 @@ namespace AIO
         public static ILoaderHandle<Object> LoadAssetAsync(string location) => Proxy.LoadAssetAsync<Object>(location, typeof(Object));
 
         /// <summary>
-        ///     同步加载原生文件
+        /// 同步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
@@ -333,7 +333,7 @@ namespace AIO
         where TObject : Object => await Proxy.LoadAssetAsync(location, typeof(TObject), completed);
 
         /// <summary>
-        ///     同步加载原生文件
+        /// 同步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
@@ -344,7 +344,7 @@ namespace AIO
         public static async void LoadAsset(string location, Action<Object> completed) => await Proxy.LoadAssetAsync(location, typeof(Object), completed);
 
         /// <summary>
-        ///     同步加载原生文件
+        /// 同步加载原生文件
         /// </summary>
         /// <param name="type">资源类型</param>
         /// <param name="location">可寻址路径</param>
@@ -360,7 +360,7 @@ namespace AIO
         #region 同步加载
 
         /// <summary>
-        ///     同步加载资源对象
+        /// 同步加载资源对象
         /// </summary>
         /// <typeparam name="TObject">资源类型</typeparam>
         /// <param name="location">可寻址路径</param>
@@ -372,7 +372,7 @@ namespace AIO
         where TObject : Object => Proxy.LoadAssetAsync<TObject>(location, typeof(TObject)).Invoke();
 
         /// <summary>
-        ///     同步加载资源对象
+        /// 同步加载资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="type">资源类型</param>
@@ -383,7 +383,7 @@ namespace AIO
         public static Object LoadAsset(string location, Type type) => Proxy.LoadAssetAsync<Object>(location, type).Invoke();
 
         /// <summary>
-        ///     同步加载资源对象
+        /// 同步加载资源对象
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
@@ -404,7 +404,7 @@ namespace AIO
         #region 同步加载
 
         /// <summary>
-        ///     同步加载原生文件
+        /// 同步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
@@ -418,7 +418,7 @@ namespace AIO
         #region 异步加载
 
         /// <summary>
-        ///     异步加载原生文件
+        /// 异步加载原生文件
         /// </summary>
         /// <param name="completed">回调</param>
         /// <param name="location">可寻址路径</param>
@@ -429,7 +429,7 @@ namespace AIO
         public static async void LoadRawFileText(string location, Action<string> completed) => await Proxy.LoadRawFileTextAsync(location, completed);
 
         /// <summary>
-        ///     异步加载原生文件
+        /// 异步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
@@ -439,7 +439,7 @@ namespace AIO
         public static ILoaderHandle<string> LoadRawFileTextAsync(string location) => Proxy.LoadRawFileTextAsync(location);
 
         /// <summary>
-        ///     异步加载原生文件
+        /// 异步加载原生文件
         /// </summary>
         /// <param name="completed">回调</param>
         /// <param name="location">可寻址路径</param>
@@ -461,7 +461,7 @@ namespace AIO
         #region 同步加载
 
         /// <summary>
-        ///     同步加载原生文件
+        /// 同步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
@@ -475,7 +475,7 @@ namespace AIO
         #region 异步加载
 
         /// <summary>
-        ///     异步加载原生文件
+        /// 异步加载原生文件
         /// </summary>
         /// <param name="completed">回调</param>
         /// <param name="location">可寻址路径</param>
@@ -486,14 +486,14 @@ namespace AIO
         public static async void LoadRawFileData(string location, Action<byte[]> completed) => await Proxy.LoadRawFileDataAsync(location, completed);
 
         /// <summary>
-        ///     异步加载原生文件
+        /// 异步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         [DebuggerNonUserCode, DebuggerHidden]
         public static ILoaderHandle<byte[]> LoadRawFileDataAsync(string location) => Proxy.LoadRawFileDataAsync(location);
 
         /// <summary>
-        ///     异步加载原生文件
+        /// 异步加载原生文件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
@@ -512,12 +512,12 @@ namespace AIO
         #region 同步实例化
 
         /// <summary>
-        ///     实例预制件
+        /// 实例预制件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="parent">父级节点</param>
         /// <returns>
-        ///     <see cref="UnityEngine.GameObject" />
+        /// <see cref="UnityEngine.GameObject" />
         /// </returns>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
@@ -526,11 +526,11 @@ namespace AIO
         public static GameObject InstGameObject(string location, Transform parent) => Proxy.InstGameObjectAsync(location, null, parent).Invoke();
 
         /// <summary>
-        ///     实例预制件
+        /// 实例预制件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <returns>
-        ///     <see cref="UnityEngine.GameObject" />
+        /// <see cref="UnityEngine.GameObject" />
         /// </returns>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
@@ -543,13 +543,13 @@ namespace AIO
         #region 异步实例化
 
         /// <summary>
-        ///     实例预制件
+        /// 实例预制件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="parent">父级节点</param>
         /// <param name="completed">回调</param>
         /// <returns>
-        ///     <see cref="UnityEngine.GameObject" />
+        /// <see cref="UnityEngine.GameObject" />
         /// </returns>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
@@ -559,12 +559,12 @@ namespace AIO
             await Proxy.InstGameObjectAsync(location, completed, parent);
 
         /// <summary>
-        ///     实例预制件
+        /// 实例预制件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
         /// <returns>
-        ///     <see cref="UnityEngine.GameObject" />
+        /// <see cref="UnityEngine.GameObject" />
         /// </returns>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
@@ -573,12 +573,12 @@ namespace AIO
         public static async void InstGameObject(string location, Action<GameObject> completed) => await Proxy.InstGameObjectAsync(location, completed);
 
         /// <summary>
-        ///     实例预制件
+        /// 实例预制件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="parent">父级节点</param>
         /// <returns>
-        ///     <see cref="UnityEngine.GameObject" />
+        /// <see cref="UnityEngine.GameObject" />
         /// </returns>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
@@ -587,11 +587,11 @@ namespace AIO
         public static ILoaderHandle<GameObject> InstGameObjectAsync(string location, Transform parent) => Proxy.InstGameObjectAsync(location, null, parent);
 
         /// <summary>
-        ///     实例预制件
+        /// 实例预制件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <returns>
-        ///     <see cref="UnityEngine.GameObject" />
+        /// <see cref="UnityEngine.GameObject" />
         /// </returns>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER
@@ -600,12 +600,12 @@ namespace AIO
         public static ILoaderHandle<GameObject> InstGameObjectAsync(string location) => Proxy.InstGameObjectAsync(location);
 
         /// <summary>
-        ///     实例预制件
+        /// 实例预制件
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
         /// <returns>
-        ///     <see cref="UnityEngine.GameObject" />
+        /// <see cref="UnityEngine.GameObject" />
         /// </returns>
         [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
 #if UNITY_2022_1_OR_NEWER

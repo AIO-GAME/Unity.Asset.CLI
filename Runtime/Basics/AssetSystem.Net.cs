@@ -11,9 +11,9 @@ namespace AIO
     partial class AssetSystem
     {
         /// <summary>
-        ///     检测网络请求
+        /// 检测网络请求
         /// </summary>
-        /// <returns>Ture:成功 False:异常</returns>
+        /// <returns>Ture : 成功 | False : 异常</returns>
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -67,9 +67,7 @@ namespace AIO
             using (var uwr = UnityWebRequestTexture.GetTexture(url))
             {
                 await uwr.SendWebRequest();
-                cb?.Invoke(LoadCheckNet(uwr)
-                               ? DownloadHandlerTexture.GetContent(uwr)
-                               : null);
+                cb?.Invoke(LoadCheckNet(uwr) ? DownloadHandlerTexture.GetContent(uwr) : null);
             }
         }
 
@@ -163,7 +161,7 @@ namespace AIO
         #region CO
 
         /// <summary>
-        ///     网上加载图片
+        /// 网上加载图片
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>
@@ -179,7 +177,7 @@ namespace AIO
         }
 
         /// <summary>
-        ///     网上加载精灵
+        /// 网上加载精灵
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="rect">矩形</param>
@@ -197,7 +195,7 @@ namespace AIO
         }
 
         /// <summary>
-        ///     网上加载AB
+        /// 网上加载AB
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>
@@ -213,7 +211,7 @@ namespace AIO
         }
 
         /// <summary>
-        ///     网上加载音频
+        /// 网上加载音频
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="audioType">音频类型</param>
@@ -230,7 +228,7 @@ namespace AIO
         }
 
         /// <summary>
-        ///     网上加载文本
+        /// 网上加载文本
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>
@@ -246,7 +244,7 @@ namespace AIO
         }
 
         /// <summary>
-        ///     网上加载流数据
+        /// 网上加载流数据
         /// </summary>
         /// <param name="url">网址</param>
         /// <param name="cb">回调</param>

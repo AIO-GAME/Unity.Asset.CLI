@@ -12,7 +12,7 @@ namespace AIO
     partial class AssetSystem
     {
 #if UNITY_EDITOR
-        private const string BASE_FORMAT           = "<b><color=#9575CD>[ASSET]</color></b>";
+        private const string BASE_FORMAT           = "<b><color=#9575CD>[RES]</color></b>";
         private const string BASE_LOG_FORMAT       = BASE_FORMAT + "<b><color=#B3E5FC>[Log]</color></b>";
         private const string BASE_EXCEPTION_FORMAT = BASE_FORMAT + "<b><color=#E91E63>[Exception]</color></b>";
         private const string BASE_WARNING_FORMAT   = BASE_FORMAT + "<b><color=#FFC107>[Warning]</color></b>";
