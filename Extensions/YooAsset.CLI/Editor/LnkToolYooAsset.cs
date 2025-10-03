@@ -11,7 +11,7 @@ namespace AIO.UEditor.CLI
     /// </summary>
     public static class LnkToolYooAsset
     {
-        [LnkTools(Tooltip = "YooAsset Collector", IconResource = "Editor/Icon/Yooasset")]
+        [LnkTools(Tooltip = "YooAsset Collector", IconRelative = @"Packages\com.aio.cli.asset\Editor\Resources\Icon\Yooasset.png")]
         public static void OpenWindow() { EditorApplication.ExecuteMenuItem("YooAsset/AssetBundle Collector"); }
     }
 }

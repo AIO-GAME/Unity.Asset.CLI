@@ -8,7 +8,7 @@ namespace AIO.UEditor
 {
     partial class AssetWindow
     {
-        [LnkTools(Tooltip = "AIO 资源管理工具", IconResource = "Editor/Icon/Asset", ShowMode = ELnkShowMode.Toolbar)]
+        [LnkTools(Tooltip = "AIO 资源管理工具", IconRelative = @"Packages\com.aio.cli.asset\Editor\Resources\Icon\Asset.png", ShowMode = ELnkShowMode.Toolbar)]
         public static void OpenWindow() => EditorApplication.ExecuteMenuItem(MENU_WINDOW);
 
         public const string MENU_WINDOW = AssetsEditorSetting.MENU_ROOT + "Window";
@@ -101,7 +101,6 @@ namespace AIO.UEditor
         private static void Initialize()
         {
             if (!AssetsEditorSetting.AutoConversionConfig) return;
-            EditorQuit();
             EditorApplication.playModeStateChanged -= EditorQuit;
             EditorApplication.playModeStateChanged += EditorQuit;
         }

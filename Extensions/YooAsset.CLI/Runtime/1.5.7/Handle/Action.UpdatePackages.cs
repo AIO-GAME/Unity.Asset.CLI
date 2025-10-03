@@ -19,43 +19,28 @@ namespace AIO.UEngine.YooAsset
         {
             if (string.IsNullOrEmpty(content))
             {
-#if UNITY_EDITOR
-                throw new Exception($"{remote} Request failed");
-#else
                 AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
                 AssetSystem.LogError($"{remote} Request failed");
                 packages = Array.Empty<AssetsPackageConfig>();
                 return false;
-#endif
             }
 
             try
             {
                 packages = AHelper.Json.Deserialize<AssetsPackageConfig[]>(content);
             }
-#if UNITY_EDITOR
-            catch (Exception e)
-            {
-                throw new Exception($"ASConfig Remote Version Parsing Json Failure : {e}");
-            }
-#else
             catch (Exception)
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionParsingJsonFailure);
                 packages = Array.Empty<AssetsPackageConfig>();
                 return false;
             }
-#endif
 
             if (packages is null || packages.Length == 0)
             {
-#if UNITY_EDITOR
-                throw new ArgumentNullException($"Please set the ASConfig Packages configuration");
-#else
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 packages = Array.Empty<AssetsPackageConfig>();
                 return false;
-#endif
             }
 
             return true;
@@ -64,7 +49,7 @@ namespace AIO.UEngine.YooAsset
         private static string GetPackageManifestVersionUrl(ASConfig config, AssetsPackageConfig item) => $"{config.URL}/{AssetSystem.PlatformNameStr}/{item.Name}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
 
         /// <summary>
-        ///     更新资源包列表
+        /// 更新资源包列表
         /// </summary>
         private static bool UpdatePackagesRemoteSync(ASConfig config)
         {
@@ -134,7 +119,6 @@ namespace AIO.UEngine.YooAsset
             }
 
             if (!CheckPackages(remote, content, out config.Packages)) return false;
-
             foreach (var item in config.Packages)
             {
                 item.IsLatest = item.Version == "Latest"; // 如果使用Latest则认为是最新版本 同时需要获取最新版本号
@@ -305,7 +289,8 @@ namespace AIO.UEngine.YooAsset
                         break;
                 }
 
-                Awaiter.OnCompleted(() => Result = Awaiter.GetResult());
+                var awaiter = Awaiter;
+                Awaiter.OnCompleted(() => { Result = awaiter.GetResult(); });
                 return Awaiter;
             }
 

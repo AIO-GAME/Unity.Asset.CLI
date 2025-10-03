@@ -8,14 +8,15 @@ using UnityEngine;
 
 namespace AIO.UEditor
 {
+#if UNITY_2021_1_OR_NEWER
+    [Icon(
+#else
+    [ScriptIcon(IconRelative =
+#endif
+             "Packages/com.aio.cli.asset/Editor/Resources/Icon/pencils.png")]
     [Serializable]
     [Description("资源打包配置")]
     [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/ToolWindow.md#-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7-")]
-#if UNITY_2021_1_OR_NEWER
-    [Icon("Packages/com.aio.cli.asset/Resources/Editor/Icon/pencils.png")]
-#else
-    [ScriptIcon(IconRelative = "Packages/com.aio.cli.asset/Resources/Editor/Icon/pencils.png")]
-#endif
     public partial class AssetBuildConfig : ScriptableObject
     {
         private static AssetBuildConfig _instance;
@@ -90,7 +91,7 @@ namespace AIO.UEditor
 
             _instance                 = CreateInstance<AssetBuildConfig>();
             _instance.BuildOutputPath = Path.Combine(EHelper.Path.Project, "Bundles");
-            AssetDatabase.CreateAsset(_instance, "Assets/Editor/ASBuildConfig.asset");
+            AssetDatabase.CreateAsset(_instance, "Assets/Editor/Temp/ASBuildConfig.asset");
             AssetDatabase.SaveAssets();
 
             return _instance;

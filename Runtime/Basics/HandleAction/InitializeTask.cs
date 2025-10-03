@@ -166,7 +166,8 @@ namespace AIO
 
         protected override void OnCompleted()
         {
-            if (!IsValidate) throw new Exception("Initialize Error");
+            if (!IsValidate) AssetSystem.LogError("Asset System Initialize Failed");
+            IsDone = true;
         }
 
         protected override void OnReset() { IsValidate = !AssetSystem.IsInitialized; }

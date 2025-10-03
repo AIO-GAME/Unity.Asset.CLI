@@ -11,19 +11,11 @@ namespace AIO
 {
     partial class AssetSystem
     {
-#if UNITY_EDITOR
-        private const string BASE_FORMAT           = "<b><color=#9575CD>[RES]</color></b>";
-        private const string BASE_LOG_FORMAT       = BASE_FORMAT + "<b><color=#B3E5FC>[Log]</color></b>";
-        private const string BASE_EXCEPTION_FORMAT = BASE_FORMAT + "<b><color=#E91E63>[Exception]</color></b>";
-        private const string BASE_WARNING_FORMAT   = BASE_FORMAT + "<b><color=#FFC107>[Warning]</color></b>";
-        private const string BASE_ERROR_FORMAT     = BASE_FORMAT + "<b><color=#F44336>[Error]</color></b>";
-#else
-        private const string BASE_FORMAT = "[ASSET]";
-        private const string BASE_LOG_FORMAT = BASE_FORMAT + "[Log]";           
-        private const string BASE_EXCEPTION_FORMAT = BASE_FORMAT + "[Exception]";
-        private const string BASE_WARNING_FORMAT = BASE_FORMAT + "[Warning]";
-        private const string BASE_ERROR_FORMAT = BASE_LOG_FORMAT + "[Error]";
-#endif
+        private const string BASE_FORMAT           = "<b><color=#9575CD>【RES】</color></b>";
+        private const string BASE_LOG_FORMAT       = "<color=#B3E5FC>{0}</color>";
+        private const string BASE_EXCEPTION_FORMAT = "<color=#E91E63>{0}</color>";
+        private const string BASE_WARNING_FORMAT   = "<color=#FFC107>{0}</color>";
+        private const string BASE_ERROR_FORMAT     = "<color=#F44336>{0}</color>";
 
         #region LogWarning
 
@@ -43,7 +35,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.LogFormat(LogType.Warning, $"{string.Intern(BASE_WARNING_FORMAT)} {format}", args);
+                Debug.unityLogger.LogFormat(LogType.Warning, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_WARNING_FORMAT, format)}", args);
         }
 
         /// <summary>
@@ -58,7 +50,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.Log(LogType.Warning, $"{string.Intern(BASE_WARNING_FORMAT)} {message}");
+                Debug.unityLogger.Log(LogType.Warning, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_WARNING_FORMAT, message)}");
         }
 
         #endregion
@@ -81,9 +73,9 @@ namespace AIO
             if (Parameter.OutputLog)
 #endif
 #if UNITY_EDITOR
-                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_EXCEPTION_FORMAT)} {exception}");
+                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_EXCEPTION_FORMAT, exception)}");
 #else
-                Debug.unityLogger.LogException(new Exception($"{BASE_EXCEPTION_FORMAT} {exception}"));
+                Debug.unityLogger.LogException(new Exception($"{BASE_FORMAT} {string.Format(BASE_EXCEPTION_FORMAT, exception)}"));
 #endif
         }
 
@@ -102,7 +94,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_EXCEPTION_FORMAT)} {exception}");
+                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_EXCEPTION_FORMAT, exception)}");
         }
 
         /// <summary>
@@ -121,7 +113,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.LogFormat(LogType.Error, $"{string.Intern(BASE_EXCEPTION_FORMAT)} {format}", args);
+                Debug.unityLogger.LogFormat(LogType.Error, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_EXCEPTION_FORMAT, format)}", args);
         }
 
         #endregion
@@ -143,7 +135,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.Log(LogType.Log, $"{string.Intern(BASE_LOG_FORMAT)} {message}");
+                Debug.unityLogger.Log(LogType.Log, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_LOG_FORMAT, message)}");
         }
 
         /// <summary>
@@ -162,7 +154,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.LogFormat(LogType.Log, $"{string.Intern(BASE_LOG_FORMAT)} {format}", args);
+                Debug.unityLogger.LogFormat(LogType.Log, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_LOG_FORMAT, format)}", args);
         }
 
         #endregion
@@ -184,7 +176,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_ERROR_FORMAT)} {message}");
+                Debug.unityLogger.Log(LogType.Error, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_ERROR_FORMAT, message)}");
         }
 
         /// <summary>
@@ -203,7 +195,7 @@ namespace AIO
 #else
             if (Parameter.OutputLog)
 #endif
-                Debug.unityLogger.LogFormat(LogType.Error, $"{string.Intern(BASE_ERROR_FORMAT)} {format}", args);
+                Debug.unityLogger.LogFormat(LogType.Error, $"{string.Intern(BASE_FORMAT)} {string.Format(BASE_ERROR_FORMAT, format)}", args);
         }
 
         #endregion

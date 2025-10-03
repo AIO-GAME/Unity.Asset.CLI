@@ -20,11 +20,7 @@ namespace AIO
             _Exception = ex;
             if (OnException is null)
             {
-#if UNITY_EDITOR
-                LogException($"Asset System Exception : {ex}");
-#else
-                throw new Exception($"Asset System Exception : {ex}");
-#endif
+                LogError($"Asset System Exception : {ex}");
             }
             else
             {
