@@ -3,12 +3,14 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
-    public partial class Proxy
+    partial class Proxy
     {
+        [Preserve]
         private T HandleGet<T>(in string location)
         where T : OperationHandleBase
         {
@@ -17,6 +19,7 @@ namespace AIO.UEngine.YooAsset
                 : null;
         }
 
+        [Preserve]
         private void HandleAdd<T>(in string location, T operation)
         where T : OperationHandleBase
         {
@@ -25,27 +28,29 @@ namespace AIO.UEngine.YooAsset
             {
                 ReleaseOperationHandle(ReferenceOPHandle[location]);
                 ReferenceOPHandle[location] = null;
-                AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), location);
+                       AssetSystem.LOG.I(string.Intern("Free Asset Handle Release : {0}"), location);
             }
 
             ReferenceOPHandle[location] = operation;
         }
 
+        [Preserve]
         public override void HandleFree(string location)
         {
             if (ReferenceOPHandle.TryGetValue(location, out var operation))
             {
                 ReleaseOperationHandle(operation);
                 ReferenceOPHandle.Remove(location);
-                AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), location);
+                       AssetSystem.LOG.I(string.Intern("Free Asset Handle Release : {0}"), location);
             }
         }
 
         /// <summary>
-        ///     资源回收（卸载引用计数为零的资源）
+        /// 资源回收（卸载引用计数为零的资源）
         /// </summary>
         /// <param name="packageName">指定包名</param>
         /// <param name="isForce">是否强制回收</param>
+        [Preserve]
         public void UnloadUnusedAssets(string packageName, bool isForce = false)
         {
             if (!Dic.TryGetValue(packageName, out var value)) return;
@@ -54,10 +59,11 @@ namespace AIO.UEngine.YooAsset
                 Runner.StartCoroutine(UnloadUnusedAssetsCo, (Action<AsyncOperation>)delegate
                 {
                     value.Package.UnloadUnusedAssets();
-                    AssetSystem.LogFormat(string.Intern("Free Asset Handle Release : {0}"), packageName);
+                           AssetSystem.LOG.I(string.Intern("Free Asset Handle Release : {0}"), packageName);
                 });
         }
 
+        [Preserve]
         public override void UnloadUnusedAssets(bool isForce = false)
         {
             if (isForce)
@@ -67,20 +73,23 @@ namespace AIO.UEngine.YooAsset
             }
             else
             {
-                ReferenceOPHandle.Where(pair => !pair.Value.IsValid)
-                                 .Where(pair => pair.Value.Status != EOperationStatus.Succeed)
-                                 .Where(pair => pair.Value.Status != EOperationStatus.Processing)
-                                 .Select(pair => pair.Key)
-                                 .ToList()
-                                 .ForEach(item => ReferenceOPHandle.Remove(item));
-                Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
-                {
-                    foreach (var value in Dic.Values)
-                        value.Package.UnloadUnusedAssets();
-                }));
+                ReferenceOPHandle.Where(pair => !pair.Value.IsValid).
+                                  Where(pair => pair.Value.Status != EOperationStatus.Succeed).
+                                  Where(pair => pair.Value.Status != EOperationStatus.Processing).
+                                  Select(pair => pair.Key).
+                                  ToList().
+                                  ForEach(item => ReferenceOPHandle.Remove(item));
+                Runner.StartCoroutine(UnloadUnusedAssetsCo(OnCompleted));
             }
         }
 
+        [Preserve]
+        private void OnCompleted(AsyncOperation operation)
+        {
+            foreach (var package in Dic.Values) package.Package.UnloadUnusedAssets();
+        }
+
+        [Preserve]
         private static IEnumerator UnloadUnusedAssetsCo(Action<AsyncOperation> completed)
         {
             var operation = Resources.UnloadUnusedAssets();
@@ -88,6 +97,7 @@ namespace AIO.UEngine.YooAsset
             yield return operation;
         }
 
+        [Preserve]
         private static void ReleaseOperationHandle(OperationHandleBase operation)
         {
             if (!operation.IsValid) return;

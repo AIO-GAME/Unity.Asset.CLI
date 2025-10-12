@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using AIO.UEngine;
+using UnityEngine.Scripting;
 #if UNITY_2022_1_OR_NEWER
 using UnityEngine;
 #endif
@@ -22,6 +23,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -37,6 +39,7 @@ namespace AIO
         /// <param name="location">资源定位地址</param>
         /// <returns>Ture:有效 False:无效</returns>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -48,6 +51,7 @@ namespace AIO
         /// <param name="location">寻址地址</param>
         /// <returns>Ture 已经加载 False 未加载</returns>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -58,6 +62,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif

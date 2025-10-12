@@ -1,6 +1,7 @@
 ﻿#region
 
 using System.ComponentModel;
+using UnityEngine.Scripting;
 
 #endregion
 
@@ -9,6 +10,7 @@ namespace AIO.UEngine
     /// <summary>
     ///     资源事件类型
     /// </summary>
+    [Preserve]
     public enum EASEventType
     {
         /// <summary>

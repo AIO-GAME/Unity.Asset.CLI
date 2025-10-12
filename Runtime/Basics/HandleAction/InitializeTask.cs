@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace AIO
 {
@@ -13,6 +15,7 @@ namespace AIO
     using UnityEditor;
 #endif
 
+    [Preserve]
     internal static class ASHandleActionInitializeTask
     {
         public static IOperationAction Create<T>(T proxy, ASConfig config)
@@ -29,10 +32,8 @@ namespace AIO
 #if UNITY_EDITOR
                 if (assembly.FullName.Contains("Editor")) continue;
 #endif
-                foreach (var type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract).Where(type => proxyType.IsAssignableFrom(type)))
                 {
-                    if (type.IsAbstract) continue;
-                    if (proxyType.IsAssignableFrom(type) == false) continue;
                     AssetSystem.Proxy = (ASProxy)Activator.CreateInstance(type);
                     break;
                 }
@@ -42,7 +43,7 @@ namespace AIO
         }
     }
 
-    [StructLayout(LayoutKind.Auto)]
+    [StructLayout(LayoutKind.Auto)] [Preserve]
     internal partial class OperationActionInitializeTask<T> : OperationAction
     where T : ASProxy
     {
@@ -145,21 +146,27 @@ namespace AIO
             {
                 Config.Check();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                AssetSystem.LogError(e.ToString());
                 AssetSystem.ExceptionEvent(ASException.ASConfigCheckError);
+                IsValidate = false;
+                return;
             }
 
-            if (AssetSystem._Exception != ASException.None)
+            try
             {
+                await Proxy.Initialize();
+            }
+            catch (Exception e)
+            {
+                AssetSystem.LogError(e.ToString());
+                AssetSystem.ExceptionEvent(ASException.AssetProxyInitializeError);
                 IsValidate = false;
+                return;
             }
 
-            await Proxy.Initialize();
-            if (AssetSystem._Exception != ASException.None)
-            {
-                IsValidate = false;
-            }
+            IsValidate = true;
         }
 
         #endregion
@@ -207,6 +214,7 @@ namespace AIO
 #else
                 Path.Combine(Application.persistentDataPath, config.RuntimeRootDirectory);
 #endif
+
             AssetSystem.Proxy     = Proxy  = proxy;
             AssetSystem.Parameter = Config = config;
         }

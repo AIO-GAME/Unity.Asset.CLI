@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 #endregion
 
@@ -16,6 +17,7 @@ namespace AIO
         ///    获取资源包配置
         /// </summary>
         /// <returns></returns>
+        [Preserve]
         public static string GetPackageVersionDefault() { return Proxy.GetPackageVersionDefault(); }
 
         /// <summary>
@@ -23,6 +25,7 @@ namespace AIO
         /// </summary>
         /// <param name="tag">资源标签</param>
         /// <returns>寻址列表</returns>
+        [Preserve]
         public static ICollection<string> GetAddressByTag(string tag) { return Proxy.GetAddressByTag(new[] { tag }); }
 
         /// <summary>
@@ -30,6 +33,7 @@ namespace AIO
         /// </summary>
         /// <param name="tag">资源标签</param>
         /// <param name="tags">资源标签</param>
+        [Preserve]
         public static ICollection<string> GetAddressByTag(string tag, params string[] tags) { return Proxy.GetAddressByTag(tags.Append(tag)); }
 
         /// <summary>
@@ -37,11 +41,13 @@ namespace AIO
         /// </summary>
         /// <param name="tags">资源标签</param>
         /// <returns>寻址列表</returns>
+        [Preserve]
         public static ICollection<string> GetAddressByTag(IEnumerable<string> tags) { return Proxy.GetAddressByTag(tags); }
 
         /// <summary>
         /// 获取是否有读取权限
         /// </summary>
+        [Preserve]
         public static bool GetHasReadPermission()
         {
 #if UNITY_EDITOR
@@ -69,6 +75,7 @@ namespace AIO
         /// <summary>
         /// 获取是否有写入权限
         /// </summary>
+        [Preserve]
         public static bool GetHasWritePermission()
         {
 #if UNITY_EDITOR
@@ -99,14 +106,15 @@ namespace AIO
 #endif
 
 #if UNITY_WEBGL
-        // [System.Runtime.InteropServices.DllImport("__Internal")]
-        // private static extern long _WEBGL_GetFreeDiskSpace();
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern long _WEBGL_GetFreeDiskSpace();
 #endif
 
         /// <summary>
         /// 获取可用磁盘空间
         /// </summary>
         /// <returns>剩余空间字节数</returns>
+        [Preserve]
         public static long GetAvailableDiskSpace()
         {
             try

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Scripting;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,7 +14,7 @@ using UnityEditor;
 
 namespace AIO.UEngine
 {
-    [Description("资源系统配置"), Serializable]
+    [Description("资源系统配置"), Serializable, Preserve]
     [HelpURL("https://github.com/AIO-GAME/Unity.Asset.CLI/blob/main/.github/API_USAGE/Config.md#-aiouengineasconfig---%E8%B5%84%E6%BA%90%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE-")]
 #if UNITY_2021_1_OR_NEWER
     [Icon(
@@ -159,7 +160,6 @@ namespace AIO.UEngine
                 return _SequenceRecord;
             }
         }
-
 #endif
 
         #region static

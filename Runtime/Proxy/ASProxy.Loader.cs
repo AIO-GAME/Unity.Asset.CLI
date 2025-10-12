@@ -3,6 +3,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Scripting;
 using Object = UnityEngine.Object;
 
 #endregion
@@ -16,6 +17,7 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
+        [Preserve]
         public abstract ILoaderHandle<byte[]> LoadRawFileDataAsync(string location, Action<byte[]> cb = null);
 
         /// <summary>
@@ -23,6 +25,7 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="cb">回调</param>
+        [Preserve]
         public abstract ILoaderHandle<string> LoadRawFileTextAsync(string location, Action<string> cb = null);
 
         /// <summary>
@@ -31,6 +34,7 @@ namespace AIO.UEngine
         /// <param name="location">资源的定位地址</param>
         /// <param name="type">子对象类型</param>
         /// <param name="completed">回调</param>
+        [Preserve]
         public abstract ILoaderHandle<TObject[]> LoadSubAssetsAsync<TObject>(string location, Type type, Action<TObject[]> completed = null)
         where TObject : Object;
 
@@ -42,6 +46,7 @@ namespace AIO.UEngine
         /// <param name="sceneMode">场景加载模式</param>
         /// <param name="suspendLoad">场景加载到90%自动挂起</param>
         /// <param name="priority">优先级</param>
+        [Preserve]
         public abstract ILoaderHandle<Scene> LoadSceneTask(
             string        location,
             Action<Scene> completed   = null,
@@ -56,6 +61,7 @@ namespace AIO.UEngine
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
         /// <param name="type">资源类型</param>
+        [Preserve]
         public abstract ILoaderHandle<TObject> LoadAssetAsync<TObject>(string location, Type type, Action<TObject> completed = null)
         where TObject : Object;
 
@@ -65,6 +71,7 @@ namespace AIO.UEngine
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
         /// <param name="parent">父位置</param>
+        [Preserve]
         public abstract ILoaderHandle<GameObject> InstGameObjectAsync(string location, Action<GameObject> completed = null, Transform parent = null);
     }
 }

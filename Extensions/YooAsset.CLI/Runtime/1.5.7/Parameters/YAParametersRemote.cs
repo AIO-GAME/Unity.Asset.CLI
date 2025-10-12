@@ -1,8 +1,10 @@
 ﻿#if SUPPORT_YOOASSET
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
+    [Preserve]
     internal class YAParametersRemote : YAssetParameters
     {
         /// <summary>

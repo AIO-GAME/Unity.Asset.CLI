@@ -2,11 +2,13 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 #endregion
 
 namespace AIO.UEngine
 {
+    [Preserve]
     public enum ECompressMode
     {
         [InspectorName("Uncompressed")]
@@ -19,6 +21,7 @@ namespace AIO.UEngine
         LZ4,
     }
 
+    [Preserve]
     [Serializable]
     public class AssetsPackageConfig
     {

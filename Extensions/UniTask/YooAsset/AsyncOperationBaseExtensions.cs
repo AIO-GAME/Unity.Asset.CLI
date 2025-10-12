@@ -1,18 +1,22 @@
 #if UNITASK_YOOASSET_SUPPORT && UNITASK_SUPPORT
 using System;
 using UnityEngine;
+using UnityEngine.Scripting;
 using YooAsset;
 using static Cysharp.Threading.Tasks.Internal.Error;
 [assembly: UnityAPICompatibilityVersion("2019.4.0", true)]
 namespace Cysharp.Threading.Tasks
 {
+    [Preserve]
     public static class AsyncOperationBaseExtensions
     {
+        [Preserve]
         public static UniTask.Awaiter GetAwaiter(this AsyncOperationBase handle)
         {
             return ToUniTask(handle).GetAwaiter();
         }
 
+        [Preserve]
         public static UniTask ToUniTask(this AsyncOperationBase handle,
             IProgress<float> progress = null,
             PlayerLoopTiming timing = PlayerLoopTiming.Update)
@@ -35,7 +39,8 @@ namespace Cysharp.Threading.Tasks
             );
         }
 
-        sealed class AsyncOperationBaserConfiguredSource : 
+        [Preserve]
+        sealed class AsyncOperationBaserConfiguredSource :
             IUniTaskSource,
             IPlayerLoopItem,
             ITaskPoolNode<AsyncOperationBaserConfiguredSource>

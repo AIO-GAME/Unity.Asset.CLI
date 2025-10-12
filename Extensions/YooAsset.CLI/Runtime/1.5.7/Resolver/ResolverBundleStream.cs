@@ -1,9 +1,11 @@
 ﻿#if SUPPORT_YOOASSET
 
 using System.IO;
+using UnityEngine.Scripting;
 
 namespace AIO.UEngine
 {
+    [Preserve]
     public class ResolverBundleStream : FileStream
     {
         private const byte KEY = 64;

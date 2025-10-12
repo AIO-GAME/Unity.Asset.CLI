@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
 using YooAsset;
 
 #endregion
@@ -14,6 +15,7 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         private class LoadRawFileText : YLoaderHandle<string>
         {
             public LoadRawFileText(string location, Action<string> completed) : base(location, typeof(string), completed) { }
@@ -96,10 +98,7 @@ namespace AIO.UEngine.YooAsset
 
             #region Task
 
-            private void OnCompletedTaskGeneric()
-            {
-                Result = AwaiterGeneric.GetResult();
-            }
+            private void OnCompletedTaskGeneric() { Result = AwaiterGeneric.GetResult(); }
 
             private TaskAwaiter<string> AwaiterGeneric;
 
@@ -131,6 +130,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
+        [Preserve]
         public override ILoaderHandle<string> LoadRawFileTextAsync(string location, Action<string> cb = null)
             => new LoadRawFileText(location, cb);
     }

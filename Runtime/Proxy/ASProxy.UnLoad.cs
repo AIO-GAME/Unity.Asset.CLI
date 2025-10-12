@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEngine.Scripting;
 
 #endregion
 
@@ -14,18 +15,21 @@ namespace AIO.UEngine
         ///     资源回收（卸载引用计数为零的资源）
         /// </summary>
         /// <param name="isForce">强制回收所有资源</param>
+        [Preserve]
         public abstract void UnloadUnusedAssets(bool isForce = false);
 
         /// <summary>
         ///     释放资源句柄
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
         public abstract void HandleFree(string location);
 
         /// <summary>
         ///     释放资源句柄
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
         public virtual void HandleFree(IEnumerable<string> locations)
         {
             foreach (var location in locations) HandleFree(location);
@@ -35,6 +39,7 @@ namespace AIO.UEngine
         ///     释放资源句柄
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
         public virtual void HandleFree(IList<string> locations)
         {
             foreach (var location in locations) HandleFree(location);
@@ -45,18 +50,21 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">可寻址路径</param>
         /// <param name="completed">回调</param>
+        [Preserve]
         public abstract IOperationAction UnloadSceneTask(string location, Action completed = null);
 
         /// <summary>
         ///     清理包裹未使用的缓存文件
         /// </summary>
         /// <param name="completed">回调</param>
+        [Preserve]
         public abstract IOperationAction<bool> ClearUnusedCacheTask(Action<bool> completed = null);
 
         /// <summary>
         ///     清理包裹全部缓存文件
         /// </summary>
         /// <param name="completed">回调</param>
+        [Preserve]
         public abstract IOperationAction<bool> ClearAllCacheTask(Action<bool> completed = null);
     }
 }

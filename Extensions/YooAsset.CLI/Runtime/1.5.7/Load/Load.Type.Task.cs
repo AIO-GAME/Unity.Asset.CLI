@@ -1,18 +1,20 @@
 ﻿#if SUPPORT_YOOASSET
 
+using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         private async Task<ResPackage> AutoGetPackageTask(string location)
         {
             PackageDebug(LoadType.Async, location);
-            foreach (var package in Dic.Values)
+            foreach (var package in Dic.Values.Where(package => package.CheckLocationValid(location)))
             {
-                if (!package.CheckLocationValid(location)) continue;
                 if (AssetSystem.IsWhite(location)) return package;
 
                 if (package.IsNeedDownloadFromRemote(location))
@@ -20,7 +22,7 @@ namespace AIO.UEngine.YooAsset
                     var info = package.GetAssetInfo(location);
                     if (info is null)
                     {
-                        AssetSystem.LogException($"无法获取资源信息 {location}");
+                        AssetSystem.LOG.Exception($"无法获取资源信息 {location}");
                         return null;
                     }
 
@@ -28,8 +30,7 @@ namespace AIO.UEngine.YooAsset
                     await WaitTask(operation, info);
                     if (operation.Status != EOperationStatus.Succeed)
                     {
-                        AssetSystem.LogException(
-                            $"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                        AssetSystem.LOG.Exception($"资源获取失败 [{package.PackageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                         return null;
                     }
                 }
@@ -40,17 +41,17 @@ namespace AIO.UEngine.YooAsset
                 return package;
             }
 
-            AssetSystem.LogException($"资源查找失败 [auto : {location}]");
+            AssetSystem.LOG.Exception($"资源查找失败 [auto : {location}]");
             return null;
         }
 
-
+        [Preserve]
         private async Task<ResPackage> AutoGetPackageTask(string packageName, string location)
         {
             PackageDebug(LoadType.Async, packageName, location);
             if (!Dic.TryGetValue(packageName, out var package))
             {
-                AssetSystem.LogException($"目标资源包不存在 [{packageName} : {location}]");
+                AssetSystem.LOG.Exception($"目标资源包不存在 [{packageName} : {location}]");
                 return null;
             }
 
@@ -61,7 +62,7 @@ namespace AIO.UEngine.YooAsset
                 var info = package.GetAssetInfo(location);
                 if (info is null)
                 {
-                    AssetSystem.LogException($"无法获取资源信息 [{packageName} : {location}]");
+                    AssetSystem.LOG.Exception($"无法获取资源信息 [{packageName} : {location}]");
                     return null;
                 }
 
@@ -69,8 +70,8 @@ namespace AIO.UEngine.YooAsset
                 await WaitTask(operation, info);
                 if (operation.Status != EOperationStatus.Succeed)
                 {
-                    AssetSystem.LogException(
-                        $"资源获取失败 [{packageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
+                    AssetSystem.LOG.Exception(
+                                  $"资源获取失败 [{packageName} : {package.GetPackageVersion()}] {location} -> {operation.Error}");
                     return null;
                 }
             }
@@ -79,7 +80,7 @@ namespace AIO.UEngine.YooAsset
 #endif
             if (package.CheckLocationValid(location)) return package;
 
-            AssetSystem.LogException($"[{packageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+            AssetSystem.LOG.Exception($"[{packageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
             return null;
         }
     }

@@ -1,8 +1,11 @@
+using UnityEngine.Scripting;
+
 namespace AIO
 {
     /// <summary>
     ///     资源异常枚举
     /// </summary>
+    [Preserve]
     public enum ASException
     {
         /// <summary></summary>
@@ -96,6 +99,11 @@ namespace AIO
         /// <c>English</c>
         /// <code> Abnormal configuration check parameters! </code>
         ASConfigCheckError,
+
+        /// <summary>
+        /// 初始化失败
+        /// </summary>
+        AssetProxyInitializeError,
 
         /// <summary></summary>
         /// <c>中文</c>

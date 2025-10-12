@@ -1,8 +1,10 @@
 ﻿#if SUPPORT_YOOASSET
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
+    [Preserve]
     public abstract class YAssetParameters
     {
         protected YAssetParameters(EPlayMode mode, ASConfig config) : this(mode)

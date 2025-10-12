@@ -3,11 +3,13 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
 
 #endregion
 
 namespace AIO
 {
+    [Preserve]
     internal class ASDownloaderEmpty : AOperation, IASDownloader
     {
         public ASDownloaderEmpty(DownlandAssetEvent dEvent) { Event = dEvent; }

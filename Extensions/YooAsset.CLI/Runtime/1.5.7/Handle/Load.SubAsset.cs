@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
 using YooAsset;
 using Object = UnityEngine.Object;
 
@@ -16,11 +17,13 @@ namespace AIO.UEngine.YooAsset
     partial class Proxy
     {
         /// <inheritdoc />
+        [Preserve]
         public override ILoaderHandle<TObject[]> LoadSubAssetsAsync<TObject>(string location, Type type, Action<TObject[]> completed = null)
         {
             return new LoadSubAsset<TObject>(location, type, completed);
         }
 
+        [Preserve]
         private class LoadSubAsset<TObject> : YLoaderHandle<TObject[]>
         where TObject : Object
         {

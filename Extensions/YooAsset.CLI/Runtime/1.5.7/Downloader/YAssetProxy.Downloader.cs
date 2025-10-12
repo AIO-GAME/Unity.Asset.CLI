@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
+    [Preserve]
     partial class Proxy
     {
+        [Preserve]
         public override IASDownloader GetDownloader(DownlandAssetEvent dEvent = default)
         {
             var packages = AssetSystem.PackageConfigs;
@@ -29,6 +32,7 @@ namespace AIO.UEngine.YooAsset
 
         #region Nested type: YASDownloader
 
+        [Preserve]
         private class AssetDownloader : AOperation, IASDownloader
         {
             /// <summary>
@@ -64,10 +68,10 @@ namespace AIO.UEngine.YooAsset
                 OnReadPermissionNot   = iEvent.OnReadPermissionNot;
 
                 if (Event.OnProgress is null)
-                    Event.OnProgress = info => AssetSystem.Log(info.ToString());
+                    Event.OnProgress = info => AssetSystem.LOG.I(info.ToString());
 
                 if (Event.OnComplete is null)
-                    Event.OnComplete = info => AssetSystem.Log(info.ToString());
+                    Event.OnComplete = info => AssetSystem.LOG.I(info.ToString());
             }
 
             #region IASDownloader Members
@@ -121,11 +125,7 @@ namespace AIO.UEngine.YooAsset
                 if (diskSpace < endValue) // 检查磁盘空间是否足够
                 {
                     State = EProgressState.Fail;
-                    if (OnDiskSpaceNotEnough is null)
-                        throw new SystemException(
-                                                  $"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
-                    AssetSystem.LogException(
-                                             $"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
+                    AssetSystem.LOG.Exception($"Out of disk space : {diskSpace.ToConverseStringFileSize()} < {endValue.ToConverseStringFileSize()}");
                     OnDiskSpaceNotEnough.Invoke(Report);
                     return false;
                 }
@@ -266,7 +266,7 @@ namespace AIO.UEngine.YooAsset
             private void OnStartDownloadFileCallback(string filename, long sizeBytes)
             {
                 CurrentInfo = $"Resource download : [{filename}:{sizeBytes}]";
-                AssetSystem.Log($"Resource download : [{filename}:{sizeBytes}]");
+                AssetSystem.LOG.I($"Resource download : [{filename}:{sizeBytes}]");
             }
 
             private void OnDownloadError(string filename, string error)
@@ -274,7 +274,7 @@ namespace AIO.UEngine.YooAsset
                 var ex = new SystemException($"{filename} : {error}");
                 if (Event.OnError is null) throw ex;
                 Event.OnError.Invoke(ex);
-                AssetSystem.LogError($"Resource download failure : [{filename} -> {error}]");
+                AssetSystem.LOG.E($"Resource download failure : [{filename} -> {error}]");
             }
 
             protected override void OnPause()
@@ -409,7 +409,7 @@ namespace AIO.UEngine.YooAsset
                     }
 
                     State = EProgressState.Fail;
-                    AssetSystem.LogException("校验本地资源完整性失败");
+                    AssetSystem.LOG.Exception("校验本地资源完整性失败");
                     var ex = new SystemException($"[{pair.Key} -> {pair.Value.Error}]");
                     if (Event.OnError is null) throw ex;
                     Event.OnError.Invoke(ex);
@@ -447,7 +447,7 @@ namespace AIO.UEngine.YooAsset
                     }
 
                     State = EProgressState.Fail;
-                    AssetSystem.LogException("校验本地资源完整性失败");
+                    AssetSystem.LOG.Exception("校验本地资源完整性失败");
                     var ex = new SystemException($"[{pair.Key} -> {pair.Value.Error}]");
                     if (Event.OnError is null) throw ex;
                     Event.OnError.Invoke(ex);

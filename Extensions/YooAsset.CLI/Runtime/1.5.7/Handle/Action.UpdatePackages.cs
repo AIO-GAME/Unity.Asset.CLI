@@ -7,20 +7,22 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
+using UnityEngine.Scripting;
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
         /// <inheritdoc />
-        public override IOperationAction<bool> UpdatePackagesTask(ASConfig config, Action<bool> completed = null) { return new ActionUpdatePackages(config, completed); }
+        public override IOperationAction<bool> UpdatePackagesTask(ASConfig config, Action<bool> completed = null) => new ActionUpdatePackages(config, completed);
 
+        [Preserve]
         private static bool CheckPackages(string remote, string content, out AssetsPackageConfig[] packages)
         {
             if (string.IsNullOrEmpty(content))
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
-                AssetSystem.LogError($"{remote} Request failed");
+                AssetSystem.LOG.E($"{remote} Request failed");
                 packages = Array.Empty<AssetsPackageConfig>();
                 return false;
             }
@@ -46,11 +48,13 @@ namespace AIO.UEngine.YooAsset
             return true;
         }
 
+        [Preserve]
         private static string GetPackageManifestVersionUrl(ASConfig config, AssetsPackageConfig item) => $"{config.URL}/{AssetSystem.PlatformNameStr}/{item.Name}/{item.Version}/PackageManifest_{item.Name}.version?t={DateTime.Now.Ticks}";
 
         /// <summary>
         /// 更新资源包列表
         /// </summary>
+        [Preserve]
         private static bool UpdatePackagesRemoteSync(ASConfig config)
         {
             if (string.IsNullOrEmpty(config.URL))
@@ -81,7 +85,7 @@ namespace AIO.UEngine.YooAsset
                 var temp = AHelper.Http.Get(url, Encoding.UTF8);
                 if (string.IsNullOrEmpty(temp))
                 {
-                    AssetSystem.LogError($"{url} Request failed");
+                    AssetSystem.LOG.E($"{url} Request failed");
 #if !UNITY_EDITOR
                     AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
 #endif
@@ -97,6 +101,7 @@ namespace AIO.UEngine.YooAsset
         /// <summary>
         ///     更新资源包列表
         /// </summary>
+        [Preserve]
         private static async Task<bool> UpdatePackagesRemoteTask(ASConfig config)
         {
             if (string.IsNullOrEmpty(config.URL))
@@ -105,7 +110,7 @@ namespace AIO.UEngine.YooAsset
                 return false;
             }
 
-            var    remote = $"{config.URL}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
+            var    remote = $"{config.URL.TrimEnd('/')}/Version/{AssetSystem.PlatformNameStr}.json?t={DateTime.Now.Ticks}";
             string content;
             try
             {
@@ -114,7 +119,7 @@ namespace AIO.UEngine.YooAsset
             catch (Exception e)
             {
                 AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
-                AssetSystem.LogError($"{remote} Request failed : {e}");
+                AssetSystem.LOG.E($"{remote} Request failed : {e}");
                 return false;
             }
 
@@ -127,7 +132,7 @@ namespace AIO.UEngine.YooAsset
                 var temp = await AHelper.Http.GetAsync(url, Encoding.UTF8);
                 if (string.IsNullOrEmpty(temp))
                 {
-                    AssetSystem.LogError($"{url} Request failed");
+                    AssetSystem.LOG.E($"{url} Request failed");
 #if !UNITY_EDITOR
                     AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
 #endif
@@ -189,10 +194,11 @@ namespace AIO.UEngine.YooAsset
         }
 
 #endif
+        [Preserve]
         private static bool UpdatePackagesLocal(ASConfig config)
         {
-            var temp =
-                AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>($"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json");
+            var path = $"{AssetSystem.BuildInRootDirectory}/Version/{AssetSystem.PlatformNameStr}.json";
+            var temp = AHelper.IO.ReadJsonUTF8<AssetsPackageConfig[]>(path);
             if (temp != null)
             {
                 config.Packages = temp;
@@ -208,6 +214,7 @@ namespace AIO.UEngine.YooAsset
             return true;
         }
 
+        [Preserve]
         private static IEnumerator UpdatePackagesRemoteCoroutine(ASConfig config, Action<bool> cb)
         {
             if (string.IsNullOrEmpty(config.URL))
@@ -244,7 +251,7 @@ namespace AIO.UEngine.YooAsset
                         var temp = uwr.downloadHandler.text;
                         if (string.IsNullOrEmpty(temp))
                         {
-                            AssetSystem.LogError($"{url} Request failed");
+                            AssetSystem.LOG.E($"{url} Request failed");
 #if !UNITY_EDITOR
                             AssetSystem.ExceptionEvent(ASException.ASConfigRemoteUrlRemoteVersionRequestFailure);
 #endif
@@ -260,6 +267,7 @@ namespace AIO.UEngine.YooAsset
             cb.Invoke(true);
         }
 
+        [Preserve]
         private class ActionUpdatePackages : OperationAction<bool>
         {
             private ASConfig config { get; }
@@ -289,8 +297,11 @@ namespace AIO.UEngine.YooAsset
                         break;
                 }
 
-                var awaiter = Awaiter;
-                Awaiter.OnCompleted(() => { Result = awaiter.GetResult(); });
+                Awaiter.OnCompleted(() =>
+                {
+                    Result = Awaiter.GetResult();
+                    IsDone = true;
+                });
                 return Awaiter;
             }
 
@@ -317,6 +328,7 @@ namespace AIO.UEngine.YooAsset
                 }
 
                 InvokeOnCompleted();
+                IsDone = true;
             }
 
             /// <inheritdoc />

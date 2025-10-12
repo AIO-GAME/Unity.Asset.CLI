@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
 using YooAsset;
 
 #endregion
@@ -14,6 +15,7 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         private class LoadRawFileData : YLoaderHandle<byte[]>
         {
             public LoadRawFileData(string location, Action<byte[]> completed) : base(location, typeof(byte[]), completed) { }
@@ -47,8 +49,8 @@ namespace AIO.UEngine.YooAsset
                     AssetPath = operation.GetRawFilePath();
                     Result    = operation.GetRawFileData();
                 }
-         
-                IsDone    = true;
+
+                IsDone = true;
             }
 
             #endregion
@@ -82,12 +84,13 @@ namespace AIO.UEngine.YooAsset
                     Instance.HandleAdd(Address, operation);
                 }
 
-      
+
                 if (operation != null)
                 {
                     AssetPath = operation.GetRawFilePath();
                     Result    = operation.GetRawFileData();
                 }
+
                 InvokeOnCompleted();
             }
 
@@ -95,10 +98,7 @@ namespace AIO.UEngine.YooAsset
 
             #region Task
 
-            private void OnCompletedTaskGeneric()
-            {
-                Result = AwaiterGeneric.GetResult();
-            }
+            private void OnCompletedTaskGeneric() { Result = AwaiterGeneric.GetResult(); }
 
             private TaskAwaiter<byte[]> AwaiterGeneric;
 
@@ -130,6 +130,7 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
+        [Preserve]
         public override ILoaderHandle<byte[]> LoadRawFileDataAsync(string location, Action<byte[]> cb = null)
             => new LoadRawFileData(location, cb);
     }

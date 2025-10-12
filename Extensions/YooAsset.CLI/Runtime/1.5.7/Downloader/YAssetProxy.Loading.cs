@@ -7,6 +7,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Scripting;
 using YooAsset;
 #if UNITY_2022_1_OR_NEWER
 using Unity.Profiling;
@@ -21,8 +22,10 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         private static readonly AProgress Progress = new AProgress();
 
+        [Preserve]
         private static void WaitNotReachable(AssetInfo location)
         {
             if (AssetSystem.DownloadEvent.OnNetReachableNot is null)
@@ -34,6 +37,7 @@ namespace AIO.UEngine.YooAsset
             AssetSystem.DownloadEvent.OnNetReachableNot.Invoke(Progress);
         }
 
+        [Preserve]
         private static void WaitReachableViaCarrierDataNetwork(AssetInfo location)
         {
             if (AssetSystem.DownloadEvent.OnNetReachableCarrier is null)
@@ -46,6 +50,7 @@ namespace AIO.UEngine.YooAsset
             AssetSystem.DownloadEvent.OnNetReachableCarrier.Invoke(Progress, AllowReachableCarrier);
         }
 
+        [Preserve]
         private static async Task WaitTask(DownloaderOperation operation, AssetInfo location)
         {
             if (DownloaderOperations.TryGetValue(location.AssetPath, out var downloaderOperation))
@@ -84,6 +89,7 @@ namespace AIO.UEngine.YooAsset
             DownloaderOperations.Remove(location.AssetPath);
         }
 
+        [Preserve]
         private static void AllowReachableCarrier()
         {
             AssetSystem.AllowReachableCarrier = true;
@@ -91,6 +97,7 @@ namespace AIO.UEngine.YooAsset
             AssetSystem.HandleReset           = false;
         }
 
+        [Preserve]
         private static IEnumerator WaitCO(DownloaderOperation operation, AssetInfo location)
         {
             if (DownloaderOperations.TryGetValue(location.AssetPath, out var downloaderOperation))
@@ -129,6 +136,7 @@ namespace AIO.UEngine.YooAsset
                 loading.RegisterEvent(location, operation);
         }
 
+        [Preserve]
         private static DownloaderOperation CreateDownloaderOperation(ResPackage package, AssetInfo location)
         {
             return DownloaderOperations.TryGetValue(location.AssetPath, out var operation)

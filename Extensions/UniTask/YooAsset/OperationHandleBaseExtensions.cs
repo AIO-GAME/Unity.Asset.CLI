@@ -5,18 +5,22 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using UnityEngine.Scripting;
 using YooAsset;
 using static Cysharp.Threading.Tasks.Internal.Error;
 
 namespace Cysharp.Threading.Tasks
 {
+    [Preserve]
     public static class OperationHandleBaseExtensions
     {
+        [Preserve]
         public static UniTask.Awaiter GetAwaiter(this OperationHandleBase handle)
         {
             return ToUniTask(handle).GetAwaiter();
         }
 
+        [Preserve]
         public static UniTask ToUniTask(this OperationHandleBase handle,
             IProgress<float> progress = null,
             PlayerLoopTiming timing = PlayerLoopTiming.Update)
@@ -39,6 +43,7 @@ namespace Cysharp.Threading.Tasks
             );
         }
 
+        [Preserve]
         sealed class OperationHandleBaserConfiguredSource : IUniTaskSource,
             IPlayerLoopItem,
             ITaskPoolNode<OperationHandleBaserConfiguredSource>

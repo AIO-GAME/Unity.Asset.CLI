@@ -1,5 +1,6 @@
 ﻿#if SUPPORT_YOOASSET
 using System.IO;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -7,6 +8,7 @@ namespace AIO.UEngine.YooAsset
     /// <summary>
     ///     内置文件查询服务类
     /// </summary>
+    [Preserve]
     public class ResolverQueryServices : IBuildinQueryServices
     {
         #region IBuildinQueryServices Members

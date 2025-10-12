@@ -7,6 +7,7 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
+using UnityEngine.Scripting;
 using YooAsset;
 
 #endregion
@@ -16,6 +17,7 @@ namespace AIO.UEngine.YooAsset
     partial class Proxy
     {
         /// <inheritdoc />
+        [Preserve]
         public override ILoaderHandle<Scene> LoadSceneTask(
             string        location,
             Action<Scene> completed   = null,
@@ -24,6 +26,7 @@ namespace AIO.UEngine.YooAsset
             int           priority    = 100
         ) => new LoadScene(location, completed, sceneMode, suspendLoad, priority);
 
+        [Preserve]
         private class LoadScene : YLoaderHandle<Scene>
         {
             private LoadSceneMode sceneMode   { get; set; }
@@ -45,10 +48,7 @@ namespace AIO.UEngine.YooAsset
 
             #region Sync
 
-            protected override void CreateSync()
-            {
-                Runner.StartCoroutine(CreateCoroutine);
-            }
+            protected override void CreateSync() { Runner.StartCoroutine(CreateCoroutine); }
 
             #endregion
 
@@ -75,7 +75,7 @@ namespace AIO.UEngine.YooAsset
                     }
                     else
                     {
-                        AssetSystem.LogException($"场景配置 异常错误 : {package.PackageName} {Address} {sceneMode}");
+                        AssetSystem.LOG.E($"场景配置 异常错误 : {package.PackageName} {Address} {sceneMode}");
                         Result = SceneManager.GetActiveScene();
                         InvokeOnCompleted();
                     }
@@ -86,10 +86,7 @@ namespace AIO.UEngine.YooAsset
 
             #region Task
 
-            private void OnCompletedTaskGeneric()
-            {
-                Result = AwaiterGeneric.GetResult();
-            }
+            private void OnCompletedTaskGeneric() { Result = AwaiterGeneric.GetResult(); }
 
             private TaskAwaiter<Scene> AwaiterGeneric;
 
@@ -101,7 +98,7 @@ namespace AIO.UEngine.YooAsset
                 var package = await Instance.AutoGetPackageTask(Address);
                 if (package is null)
                 {
-                    AssetSystem.LogExceptionFormat("场景配置 异常错误:{0} {1}", Address, sceneMode);
+                    AssetSystem.LOG.E("场景配置 异常错误:{0} {1}", Address, sceneMode);
                     return SceneManager.GetActiveScene();
                 }
 
@@ -113,7 +110,7 @@ namespace AIO.UEngine.YooAsset
                     return operation.SceneObject;
                 }
 
-                AssetSystem.LogExceptionFormat("加载场景 资源异常:{0} {1} {2}", package.PackageName, Address, sceneMode);
+                AssetSystem.LOG.E("加载场景 资源异常:{0} {1} {2}", package.PackageName, Address, sceneMode);
                 return SceneManager.GetActiveScene();
             }
 

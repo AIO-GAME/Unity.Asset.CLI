@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using UnityEngine.Scripting;
 
 #endregion
 
@@ -8,21 +9,24 @@ namespace AIO
 {
     partial class AssetSystem
     {
+        [Preserve]
         internal static ASException _Exception;
 
         /// <summary>
         ///     系统初始化异常
         /// </summary>
+        [Preserve]
         public static event Action<ASException> OnException;
 
         /// <summary>
         ///     重置下载器
         /// </summary>
+        [Preserve]
         public static void ResetDownloadHandle()
         {
             HandleReset = true;
             if (DownloadHandle != null) DownloadHandle.Cancel();
-            var temp = Proxy.GetLoadingHandle();
+            var temp   = Proxy.GetLoadingHandle();
             var dEvent = DownloadEvent;
             if (dEvent != null)
             {

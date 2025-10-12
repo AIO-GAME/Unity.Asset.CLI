@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Scripting;
 using YooAsset;
 
 #endregion
@@ -14,6 +15,7 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         private class ActionUnloadScene : OperationAction
         {
             private readonly string               _location;
@@ -36,7 +38,7 @@ namespace AIO.UEngine.YooAsset
                 yield return Resources.UnloadUnusedAssets();
 
                 ReleaseOperationHandle(_handle);
-                AssetSystem.LogFormat("Free Scene Handle Release : {0}", _location);
+                AssetSystem.LOG.I("Free Scene Handle Release : {0}", _location);
                 InvokeOnCompleted();
             }
 
@@ -47,11 +49,10 @@ namespace AIO.UEngine.YooAsset
                 Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
                 {
                     ReleaseOperationHandle(_handle);
-                    AssetSystem.LogFormat("Free Scene Handle Release : {0}", _location);
+                    AssetSystem.LOG.I("Free Scene Handle Release : {0}", _location);
                     IsDone = true;
                 }));
             }
-
 
             protected override TaskAwaiter CreateAsync()
             {
@@ -61,7 +62,7 @@ namespace AIO.UEngine.YooAsset
                     Runner.StartCoroutine(UnloadUnusedAssetsCo(_ =>
                     {
                         ReleaseOperationHandle(_handle);
-                        AssetSystem.LogFormat("Free Scene Handle Release : {0}", _location);
+                        AssetSystem.LOG.I("Free Scene Handle Release : {0}", _location);
                         InvokeOnCompleted();
                     }));
                 });
@@ -69,10 +70,8 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
-        public override IOperationAction UnloadSceneTask(string location, Action completed = null)
-        {
-            return new ActionUnloadScene(location, completed);
-        }
+        [Preserve]
+        public override IOperationAction UnloadSceneTask(string location, Action completed = null) { return new ActionUnloadScene(location, completed); }
     }
 }
 #endif

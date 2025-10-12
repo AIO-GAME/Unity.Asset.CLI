@@ -1,12 +1,14 @@
 ﻿#if SUPPORT_YOOASSET
 using System;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         public override async Task PreLoadSubAssetsTask(string location, Type type)
         {
             var operation = HandleGet<SubAssetsOperationHandle>(location);
@@ -21,6 +23,7 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
+        [Preserve]
         public override async Task PreLoadAssetTask(string location, Type type)
         {
             var operation = HandleGet<AssetOperationHandle>(location);
@@ -33,6 +36,7 @@ namespace AIO.UEngine.YooAsset
             HandleAdd(location, operation);
         }
 
+        [Preserve]
         public override async Task PreLoadRawTask(string location)
         {
             var operation = HandleGet<RawFileOperationHandle>(location);

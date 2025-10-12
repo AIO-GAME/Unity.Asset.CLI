@@ -2,12 +2,14 @@
 
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 #endregion
 
 namespace AIO.UEngine
 {
     [Description("资源加载模式")]
+    [Preserve]
     public enum EASMode
     {
         /// <summary>

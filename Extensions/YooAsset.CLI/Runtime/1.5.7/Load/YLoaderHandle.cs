@@ -2,18 +2,26 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UnityEngine.Scripting;
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         [StructLayout(LayoutKind.Auto)]
         internal abstract class YLoaderHandle<TObject> : OperationGenerics<TObject>, ILoaderHandle<TObject>
         {
-            protected string Address   { get; private set; }
-            protected Type   AssetType { get; }
+            [Preserve]
+            protected string Address { get; private set; }
+
+            [Preserve]
+            protected Type AssetType { get; }
+
+            [Preserve]
             protected string AssetPath;
 
+            [Preserve]
             protected override void OnDispose()
             {
                 if (IsValidate)
@@ -48,7 +56,7 @@ namespace AIO.UEngine.YooAsset
                 }
                 else
                 {
-                    AssetSystem.LogWarningFormat("资源地址无效: {0}", Address);
+                    AssetSystem.LOG.W("资源地址无效: {0}", Address);
                     IsDone   = true;
                     Progress = 100;
                 }
@@ -67,10 +75,7 @@ namespace AIO.UEngine.YooAsset
                 Completed += onCompleted;
             }
 
-            protected YLoaderHandle(string location, Type type) : this(location)
-            {
-                AssetType = type;
-            }
+            protected YLoaderHandle(string location, Type type) : this(location) { AssetType = type; }
 
             #endregion
 
@@ -84,9 +89,14 @@ namespace AIO.UEngine.YooAsset
 
             #region IASOperation
 
+            [Preserve]
             string ILoaderHandle.AssetPath => AssetPath;
-            string ILoaderHandle.Address   => Address;
-            Type ILoaderHandle.  AssetType => AssetType;
+
+            [Preserve]
+            string ILoaderHandle.Address => Address;
+
+            [Preserve]
+            Type ILoaderHandle.AssetType => AssetType;
 
             #endregion
         }

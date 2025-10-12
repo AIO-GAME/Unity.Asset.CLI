@@ -24,13 +24,13 @@ namespace AIO.UEngine
         #endregion
 
         /// <summary>
-        ///    资源框架初始化
+        /// 资源框架初始化
         /// </summary>
         /// <returns>Ture:成功 False:失败</returns>
         public abstract IOperationAction<bool> Initialize();
 
         /// <summary>
-        ///     更新资源包
+        /// 更新资源包
         /// </summary>
         /// <param name="config">配置文件</param>
         /// <param name="completed">完成回调</param>
@@ -38,7 +38,7 @@ namespace AIO.UEngine
         public abstract IOperationAction<bool> UpdatePackagesTask(ASConfig config, Action<bool> completed = null);
 
         /// <summary>
-        ///     是否已经加载
+        /// 是否已经加载
         /// </summary>
         /// <param name="location">寻址地址</param>
         /// <returns>

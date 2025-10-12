@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -11,6 +12,7 @@ namespace AIO.UEngine.YooAsset
     {
         #region Nested type: LoadingInfo
 
+        [Preserve]
         private class LoadingInfo : IASNetLoading, IDisposable
         {
             internal LoadingInfo()

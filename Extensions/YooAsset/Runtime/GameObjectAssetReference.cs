@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using UnityEngine.Scripting;
 using YooAsset;
 
 #if UNITY_EDITOR
@@ -38,6 +39,7 @@ public class GameObjectAssetReferenceInspector : Editor
 }
 #endif
 
+[Preserve]
 public class GameObjectAssetReference : MonoBehaviour
 {
     [HideInInspector] public string AssetGUID = "";

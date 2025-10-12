@@ -3,12 +3,14 @@
 using System;
 using System.Collections;
 using System.Linq;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         private IEnumerator AutoGetPackageCoroutine(string location, Action<ResPackage> cb)
         {
             PackageDebug(LoadType.Coroutine, location);
@@ -25,7 +27,7 @@ namespace AIO.UEngine.YooAsset
                     var info = package.GetAssetInfo(location);
                     if (info is null)
                     {
-                        AssetSystem.LogException($"无法获取资源信息 [{package.PackageName} : {location}]");
+                        AssetSystem.LOG.E($"无法获取资源信息 [{package.PackageName} : {location}]");
                         cb.Invoke(null);
                         yield break;
                     }
@@ -34,9 +36,9 @@ namespace AIO.UEngine.YooAsset
                     yield return WaitCO(operation, info);
                     if (operation.Status != EOperationStatus.Succeed)
                     {
-                        AssetSystem.LogExceptionFormat("获取远端资源失败 [{0} : {1}] {2} -> {3}",
-                                                       package.PackageName, package.GetPackageVersion(), location,
-                                                       operation.Error);
+                        AssetSystem.LOG.E("获取远端资源失败 [{0} : {1}] {2} -> {3}",
+                                          package.PackageName, package.GetPackageVersion(), location,
+                                          operation.Error);
                         cb.Invoke(null);
                         yield break;
                     }
@@ -47,16 +49,17 @@ namespace AIO.UEngine.YooAsset
                 yield break;
             }
 
-            AssetSystem.LogException($"资源查找失败 [auto : {location}]");
+            AssetSystem.LOG.Exception($"资源查找失败 [auto : {location}]");
             cb.Invoke(null);
         }
 
+        [Preserve]
         private IEnumerator AutoGetPackageCoroutine(string packageName, string location, Action<ResPackage> cb)
         {
             PackageDebug(LoadType.Coroutine, packageName, location);
             if (!Dic.TryGetValue(packageName, out var package))
             {
-                AssetSystem.LogException($"目标资源包不存在 [{packageName} : {location}]");
+                AssetSystem.LOG.Exception($"目标资源包不存在 [{packageName} : {location}]");
                 cb.Invoke(null);
                 yield break;
             }
@@ -72,7 +75,7 @@ namespace AIO.UEngine.YooAsset
                 var info = package.GetAssetInfo(location);
                 if (info is null)
                 {
-                    AssetSystem.LogException($"无法获取资源信息 [{packageName} : {location}]");
+                    AssetSystem.LOG.E($"无法获取资源信息 [{packageName} : {location}]");
                     cb.Invoke(null);
                     yield break;
                 }
@@ -81,9 +84,9 @@ namespace AIO.UEngine.YooAsset
                 yield return WaitCO(operation, info);
                 if (operation.Status != EOperationStatus.Succeed)
                 {
-                    AssetSystem.LogExceptionFormat("资源获取失败 [{0} : {1}] {2} -> {3}",
-                                                   package.PackageName, package.GetPackageVersion(), location,
-                                                   operation.Error);
+                    AssetSystem.LOG.E("资源获取失败 [{0} : {1}] {2} -> {3}",
+                                      package.PackageName, package.GetPackageVersion(), location,
+                                      operation.Error);
                     cb.Invoke(null);
                     yield break;
                 }
@@ -98,8 +101,8 @@ namespace AIO.UEngine.YooAsset
             }
             else
             {
-                AssetSystem.LogException(
-                    $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
+                AssetSystem.LOG.Exception(
+                                          $"[{package.PackageName} : {package.GetPackageVersion()}] 传入地址验证无效 {location}");
                 cb.Invoke(null);
             }
         }

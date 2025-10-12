@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using UnityEngine.Scripting;
 using ILogger = YooAsset.ILogger;
 
 #if UNITY_2022_1_OR_NEWER
@@ -22,30 +23,36 @@ namespace AIO.UEngine.YooAsset
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
 #endif
+        [Preserve]
         internal class YALogger : ILogger
         {
 #if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
-            public void Log(string message) { AssetSystem.Log(message); }
+            [Preserve]
+            public void Log(string message) { AssetSystem.LOG.I(message); }
 #if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
-            public void Warning(string message) { AssetSystem.LogWarning(message); }
+            [Preserve]
+            public void Warning(string message) { AssetSystem.LOG.W(message); }
 #if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
-            public void Error(string message) { AssetSystem.LogError(message); }
+            [Preserve]
+            public void Error(string message) { AssetSystem.LOG.E(message); }
 #if UNITY_2022_1_OR_NEWER
             [HideInCallstack]
 #endif
             [IgnoreConsoleJump]
-            public void Exception(Exception exception) { AssetSystem.LogException(exception); }
+            [Preserve]
+            public void Exception(Exception exception) { AssetSystem.LOG.Exception(exception); }
         }
 
+        [Preserve]
         private enum LoadType
         {
             Sync,
@@ -53,67 +60,58 @@ namespace AIO.UEngine.YooAsset
             Async
         }
 
-#if UNITY_EDITOR
 #if UNITY_2022_1_OR_NEWER
-        [IgnoredByDeepProfiler]
+        [IgnoredByDeepProfiler, HideInCallstack]
 #endif
-        private string GetLocation(string location)
-        {
-            return (from asset in Dic.Values
-                    where asset.CheckLocationValid(location)
-                    select asset.GetAssetInfo(location)).FirstOrDefault()
-                                                        ?.AssetPath;
-        }
-
-#if UNITY_2022_1_OR_NEWER
-        [IgnoredByDeepProfiler]
-#endif
+        [DebuggerHidden]
         private string GetType(LoadType type)
         {
             switch (type)
             {
                 case LoadType.Sync:
-                    return "<b><color=#AF7AC5>[Sync]</color></b> Load ";
+                    return "<b><color=#AF7AC5>【同步】</color></b> ";
                 case LoadType.Coroutine:
-                    return "<b><color=#F7DC6F>[Coroutine]</color></b> Load ";
+                    return "<b><color=#F7DC6F>【协程】</color></b> ";
                 case LoadType.Async:
-                    return "<b><color=#B3E5FC>[Async]</color></b> Load ";
+                    return "<b><color=#B3E5FC>【异步】</color></b> ";
                 default:
-                    return $"[{type}] Load ";
+                    return $"【{type}】 ";
             }
         }
 
 #endif
 
-        [Conditional("DEBUG")]
-        [IgnoreConsoleJump]
+#if UNITY_EDITOR
+
 #if UNITY_2022_1_OR_NEWER
-        [IgnoredByDeepProfiler]
-        [HideInCallstack]
+        [IgnoredByDeepProfiler, HideInCallstack]
 #endif
-        private void PackageDebug(LoadType type, string location)
+        [DebuggerHidden]
+        private string GetLocation(string location)
         {
 #if UNITY_EDITOR
-            AssetSystem.Log($"{type} : [auto : {location}] -> {GetLocation(location)}");
+            return (from asset in Dic.Values
+                    where asset.CheckLocationValid(location)
+                    select asset.GetAssetInfo(location)).FirstOrDefault()?.
+                                                         AssetPath;
 #else
-            AssetSystem.LogFormat("{0} : [auto : {1}]", type, location);
+            return location;
 #endif
         }
 
-        [Conditional("DEBUG")]
-        [IgnoreConsoleJump]
+        [IgnoreConsoleJump, DebuggerHidden]
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
         [HideInCallstack]
 #endif
-        private void PackageDebug(LoadType type, string packageName, string location)
-        {
-#if UNITY_EDITOR
-            AssetSystem.Log($"Load {type} : [{packageName} : {location}] -> {GetLocation(location)}");
-#else
-            AssetSystem.LogFormat("{0} : [{1} : {2}]", type.ToString(), packageName, location);
+        private void PackageDebug(LoadType type, string location) { AssetSystem.LOG.I($"{GetType(type)} : [auto : {location}] -> {GetLocation(location)}"); }
+
+        [IgnoreConsoleJump, DebuggerHidden]
+#if UNITY_2022_1_OR_NEWER
+        [IgnoredByDeepProfiler]
+        [HideInCallstack]
 #endif
-        }
+        private void PackageDebug(LoadType type, string packageName, string location) { AssetSystem.LOG.I($"Load {GetType(type)} : [{packageName} : {location}] -> {GetLocation(location)}"); }
     }
 }
 #endif

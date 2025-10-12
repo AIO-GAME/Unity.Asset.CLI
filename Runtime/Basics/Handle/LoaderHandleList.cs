@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UnityEngine.Scripting;
 
 namespace AIO
 {
+    [Preserve]
     [StructLayout(LayoutKind.Auto)]
     internal abstract class LoaderHandleList<TObject>
         : OperationGenericsList<TObject>,

@@ -7,6 +7,7 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Scripting;
 using YooAsset;
 
 #endregion
@@ -15,6 +16,7 @@ namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
+        [Preserve]
         private class InstGameObject : YLoaderHandle<GameObject>
         {
             private Transform parent { get; set; }
@@ -105,10 +107,8 @@ namespace AIO.UEngine.YooAsset
         }
 
         /// <inheritdoc />
-        public override ILoaderHandle<GameObject> InstGameObjectAsync(string location, Action<GameObject> completed = null, Transform parent = null)
-        {
-            return new InstGameObject(location, completed, parent);
-        }
+        [Preserve]
+        public override ILoaderHandle<GameObject> InstGameObjectAsync(string location, Action<GameObject> completed = null, Transform parent = null) { return new InstGameObject(location, completed, parent); }
     }
 }
 #endif

@@ -1,25 +1,33 @@
 ﻿#if SUPPORT_YOOASSET
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Scripting;
 using YooAsset;
 
-[assembly: UnityAPICompatibilityVersion("2019.4.0", true)]
-[assembly: Preserve]
-#if UNITY_2018_3_OR_NEWER
-[assembly: AlwaysLinkAssembly]
-#endif
-
 namespace AIO.UEngine.YooAsset
 {
+    /// <summary>
+    /// 资源加载管理器
+    /// </summary>
     [IgnoreConsoleJump(true)]
     public partial class Proxy : ASProxy
     {
+        [Preserve]
         private static Proxy Instance;
 
-        public Proxy() { Instance = this; }
+        public Proxy()
+        {
+            Instance                 = this;
+            InitializationOperations = new List<InitializationOperation>();
+            ReferenceOPHandle        = new Dictionary<string, OperationHandleBase>();
+            DownloaderOperations     = new Dictionary<string, DownloaderOperation>(64);
+            Dic                      = new Dictionary<string, ResPackage>();
+        }
 
+        [Preserve]
         public override void Dispose()
         {
             if (IsInitialize == false) return;
@@ -35,32 +43,56 @@ namespace AIO.UEngine.YooAsset
             YooAssets.Destroy();
         }
 
+        [Preserve]
         public override bool AlreadyLoad(string location) { return ReferenceOPHandle.ContainsKey(location); }
 
+        [Preserve]
         public override bool CheckNeedDownloadFromRemote(string location)
         {
             if (AssetSystem.Parameter.ASMode != EASMode.Remote) return false;
-            return (
-                from package in Dic.Values
-                where package.CheckLocationValid(location)
-                select package.IsNeedDownloadFromRemote(location)
-            ).FirstOrDefault();
+            return (from package in Dic.Values
+                    where package.CheckLocationValid(location)
+                    select package.IsNeedDownloadFromRemote(location)
+                ).FirstOrDefault();
         }
 
-        public override bool CheckLocationValid(string location) { return Dic.Values.Any(asset => asset.CheckLocationValid(location)); }
+        [Preserve]
+        public override bool CheckLocationValid(string location)
+        {
+            try
+            {
+                return Dic.Values.Any(package => package.CheckLocationValid(location));
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
+        [Preserve]
         public bool CheckLocationValid(string location, out string assetPath)
         {
-            foreach (var asset in Dic.Values.Where(asset => asset.CheckLocationValid(location)))
+            try
             {
-                assetPath = asset.GetAssetInfo(location).AssetPath;
-                return true;
-            }
+                foreach (var assetInfo in Dic.Values.
+                                              Where(package => package.CheckLocationValid(location)).
+                                              Select(package => package.GetAssetInfo(location)))
+                {
+                    assetPath = assetInfo.AssetPath;
+                    return true;
+                }
 
-            assetPath = string.Empty;
-            return false;
+                assetPath = string.Empty;
+                return false;
+            }
+            catch
+            {
+                assetPath = string.Empty;
+                return false;
+            }
         }
 
+        [Preserve]
         public override IASNetLoading GetLoadingHandle() { return new LoadingInfo(); }
     }
 }

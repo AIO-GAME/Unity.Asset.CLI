@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEngine.Scripting;
 
 #endregion
 
@@ -13,6 +14,7 @@ namespace AIO.UEngine
         ///     获取下载器
         /// </summary>
         /// <returns></returns>
+        [Preserve]
         public abstract IASDownloader GetDownloader(DownlandAssetEvent progress = default(DownlandAssetEvent));
 
         #region 资源信息
@@ -22,6 +24,7 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
         public abstract bool CheckNeedDownloadFromRemote(string location);
 
         /// <summary>
@@ -29,6 +32,7 @@ namespace AIO.UEngine
         /// </summary>
         /// <param name="tags">资源标签</param>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
         public abstract string[] GetAddressByTag(IEnumerable<string> tags);
 
         /// <summary>
@@ -37,12 +41,14 @@ namespace AIO.UEngine
         /// <param name="location">资源的定位地址</param>
         /// <returns>Ture:有效</returns>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
         public abstract bool CheckLocationValid(string location);
 
         /// <summary>
         ///     获取本地包裹的版本信息
         /// </summary>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
         public abstract string GetPackageVersionDefault();
 
         #endregion

@@ -1,4 +1,5 @@
 ﻿#if SUPPORT_YOOASSET
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine
@@ -6,6 +7,7 @@ namespace AIO.UEngine
     /// <summary>
     ///     nameof(DeliveryQueryServices)
     /// </summary>
+    [Preserve]
     public class ResolverDeliveryQueryServices : IDeliveryQueryServices
     {
         #region IDeliveryQueryServices Members

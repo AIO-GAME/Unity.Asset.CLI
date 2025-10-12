@@ -1,4 +1,5 @@
 ﻿#if SUPPORT_YOOASSET
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -6,6 +7,7 @@ namespace AIO.UEngine.YooAsset
     /// <summary>
     ///     离线模式
     /// </summary>
+    [Preserve]
     internal class YAParametersLocal : YAssetParameters
     {
         public YAParametersLocal() : base(EPlayMode.OfflinePlayMode) { Parameters = GetParameters(); }

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEngine.Scripting;
 #if UNITY_2022_1_OR_NEWER
 using UnityEngine;
 #endif
@@ -20,6 +21,7 @@ namespace AIO
         /// </summary>
         /// <param name="tag">资源标签</param>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -33,6 +35,7 @@ namespace AIO
         /// </summary>
         /// <param name="isForce">强制回收所有资源</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -43,6 +46,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源地址</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -53,6 +57,7 @@ namespace AIO
         /// </summary>
         /// <param name="locations">资源定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -66,6 +71,7 @@ namespace AIO
         /// </summary>
         /// <param name="tags">资源标签</param>
         [DebuggerNonUserCode, DebuggerHidden]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -84,6 +90,7 @@ namespace AIO
         /// <param name="location">资源定位地址</param>
         /// <param name="complete">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -95,6 +102,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -107,6 +115,7 @@ namespace AIO
         /// <param name="location">资源定位地址</param>
         /// <param name="complete">回调</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -118,6 +127,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源定位地址</param>
         [DebuggerNonUserCode, DebuggerHidden, ProfilerScope]
+        [Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using AIO.UEngine;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Scripting;
 #if UNITY_2022_1_OR_NEWER
 using Unity.Profiling;
 #endif
@@ -44,11 +45,13 @@ namespace AIO
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler]
 #endif
+        [Preserve]
         public struct SequenceRecord
         {
             /// <summary>
             /// 资源GUID Key
             /// </summary>
+            [Preserve]
             public string GUID
             {
                 get
@@ -59,23 +62,27 @@ namespace AIO
                 }
             }
 
+            [Preserve]
             private string _GUID;
 
             /// <summary>
             /// 资源包名
             /// </summary>
+            [Preserve]
             public string PackageName;
 
             /// <summary>
             /// 设置资源包名
             /// </summary>
             /// <param name="packageName">资源包名</param>
+            [Preserve]
             public void SetPackageName(string packageName) { PackageName = packageName; }
 
             /// <summary>
             /// 资源包寻址路径
             /// </summary>
             /// <param name="assetPath">资源路径</param>
+            [Preserve]
             public void SetAssetPath(string assetPath)
             {
                 AssetPath = assetPath;
@@ -86,36 +93,43 @@ namespace AIO
             /// 设置寻址路径
             /// </summary>
             /// <param name="guid">资源GUID</param>
+            [Preserve]
             public void SetGUID(string guid) { _GUID = guid; }
 
             /// <summary>
             /// 资源包寻址路径
             /// </summary>
+            [Preserve]
             public string Location;
 
             /// <summary>
             /// 资源路径
             /// </summary>
+            [Preserve]
             public string AssetPath;
 
             /// <summary>
             /// 记录时间
             /// </summary>
+            [Preserve]
             public DateTime Time;
 
             /// <summary>
             /// 记录大小
             /// </summary>
+            [Preserve]
             public long Bytes;
 
             /// <summary>
             /// 记录数量
             /// </summary>
+            [Preserve]
             public int Count;
 
             /// <summary>
             /// 是否为空
             /// </summary>
+            [Preserve]
             public bool IsNull =>
                 string.IsNullOrEmpty(AssetPath) ||
                 string.IsNullOrEmpty(GUID);
@@ -131,11 +145,15 @@ namespace AIO
 
         #region Nested type: SequenceRecordQueue
 
+        [Preserve]
         public class SequenceRecordQueue : IDisposable, ICollection<SequenceRecord>
         {
             private const string FILE_NAME = "ASSETRECORD.json";
 
-            private List<SequenceRecord>               Records;
+            [Preserve]
+            private List<SequenceRecord> Records;
+
+            [Preserve]
             private Dictionary<string, SequenceRecord> RecordCacheGuid;
 
             public SequenceRecordQueue(bool enable = false)
@@ -148,15 +166,19 @@ namespace AIO
             /// <summary>
             /// 自动激活序列记录
             /// </summary>
+            [Preserve]
             public bool Enable { get; }
 
             /// <summary>
             /// 序列记录大小
             /// </summary>
+            [Preserve]
             public long Size => Records?.Sum(record => record.Bytes) ?? 0;
 
+            [Preserve]
             public SequenceRecord this[int index] => Records[index];
 
+            [Preserve]
             public SequenceRecord this[string guid] => Records.Find(record => record.GUID == guid);
 
             #region ICollection<SequenceRecord> Members
@@ -211,6 +233,7 @@ namespace AIO
             /// <summary>
             /// 更新本地序列记录
             /// </summary>
+            [Preserve]
             public void UpdateLocal()
             {
                 Records.Clear();
@@ -231,16 +254,19 @@ namespace AIO
             /// 是否存在本地序列记录
             /// </summary>
             /// <returns>Ture:存在</returns>
+            [Preserve]
             public bool ExistsLocal() { return File.Exists(LOCAL_PATH); }
 
             /// <summary>
             /// 下载序列记录
             /// </summary>
+            [Preserve]
             public Task DownloadTask(string URL) { return AHelper.Http.DownloadAsync(GET_REMOTE_PATH(URL), LOCAL_PATH, true); }
 
             /// <summary>
             /// 下载序列记录
             /// </summary>
+            [Preserve]
             public IEnumerator DownloadCo(string URL)
             {
                 yield return NetLoadStringCO(GET_REMOTE_PATH(URL), data =>
@@ -255,6 +281,7 @@ namespace AIO
             /// <summary>
             /// 保存序列记录
             /// </summary>
+            [Preserve]
             public void Save()
             {
                 if (Records is null) return;
@@ -266,24 +293,31 @@ namespace AIO
                 AHelper.IO.WriteJsonUTF8(LOCAL_PATH, Records);
             }
 
+            [Preserve]
             public bool ContainsGUID(string guid) { return RecordCacheGuid.ContainsKey(guid); }
 
+            [Preserve]
             public bool ContainsAssetPath(string assetPath) { return Records.Exists(record => record.AssetPath == assetPath); }
 
+            [Preserve]
             public bool ContainsAssetPath(string assetPath, string packageName) { return Records.Exists(record => record.AssetPath == assetPath && record.PackageName == packageName); }
 
+            [Preserve]
             public bool RemoveGUID(string guid)
             {
                 Records.RemoveAll(record => record.GUID == guid);
                 return RecordCacheGuid.Remove(guid);
             }
 
+            [Preserve]
             public bool RemoveAssetPath(string assetPath) { return Records.RemoveAll(record => record.AssetPath == assetPath) > 0; }
 
             #region static
 
+            [Preserve]
             public static string GET_REMOTE_PATH(ASConfig config) { return GET_REMOTE_PATH(config.URL); }
 
+            [Preserve]
             public static string GET_REMOTE_PATH(string URL)
             {
                 return string.IsNullOrEmpty(URL)
@@ -294,6 +328,7 @@ namespace AIO
             /// <summary>
             /// 序列记录路径
             /// </summary>
+            [Preserve]
             public static string LOCAL_PATH
             {
                 get

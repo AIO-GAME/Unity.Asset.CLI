@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using UnityEngine.Scripting;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.Shader"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -33,7 +34,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -44,7 +45,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.Shader"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -56,7 +57,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -71,7 +72,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.AudioClip"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -83,7 +84,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -94,7 +95,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.AudioClip"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -106,7 +107,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -121,7 +122,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.TextAsset"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -133,7 +134,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -144,7 +145,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.TextAsset"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -156,7 +157,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -171,7 +172,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.Material"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -183,7 +184,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -194,7 +195,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.Material"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -206,7 +207,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -221,7 +222,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.AssetBundle"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -233,7 +234,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -244,7 +245,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.AssetBundle"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -256,7 +257,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -271,7 +272,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.Animation"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -283,7 +284,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -294,7 +295,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.Animation"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -306,7 +307,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -321,7 +322,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.Texture"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -333,7 +334,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -344,7 +345,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.Texture"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -356,7 +357,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -371,7 +372,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.Texture2D"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -383,7 +384,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -394,7 +395,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.Texture2D"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -406,7 +407,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -421,7 +422,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.Font"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -433,7 +434,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -444,7 +445,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.Font"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -456,7 +457,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -471,7 +472,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.Mesh"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -483,7 +484,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -494,7 +495,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.Mesh"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -506,7 +507,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -521,7 +522,7 @@ namespace AIO
         /// 同步加载 <see cref="UnityEngine.GameObject"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -533,7 +534,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -544,7 +545,7 @@ namespace AIO
         /// 异步加载 <see cref="UnityEngine.GameObject"/>
         /// </summary>
         /// <param name="location">资源的定位地址</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif
@@ -556,7 +557,7 @@ namespace AIO
         /// </summary>
         /// <param name="location">资源的定位地址</param>
         /// <param name="completed">回调</param>
-        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope]
+        [DebuggerNonUserCode, DebuggerHidden, MethodImpl(MethodImplOptions.AggressiveInlining), ProfilerScope, Preserve]
 #if UNITY_2022_1_OR_NEWER
         [HideInCallstack]
 #endif

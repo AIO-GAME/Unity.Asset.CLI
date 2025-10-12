@@ -1,6 +1,7 @@
 ﻿#if SUPPORT_YOOASSET
 using System;
 using System.IO;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -8,6 +9,7 @@ namespace AIO.UEngine.YooAsset
     /// <summary>
     ///     资源文件解密服务类
     /// </summary>
+    [Preserve]
     public class ResolverDecryptionServices : IDecryptionServices
     {
         #region IDecryptionServices Members

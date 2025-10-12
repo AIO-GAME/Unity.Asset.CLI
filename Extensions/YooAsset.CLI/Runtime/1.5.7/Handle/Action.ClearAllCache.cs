@@ -7,6 +7,7 @@ using System.Collections;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
 using YooAsset;
 
 #endregion
@@ -16,11 +17,13 @@ namespace AIO.UEngine.YooAsset
     partial class Proxy
     {
         /// <inheritdoc />
+        [Preserve]
         public override IOperationAction<bool> ClearAllCacheTask(Action<bool> completed = null)
         {
             return new ActionClearAllCache(completed);
         }
 
+        [Preserve]
         private class ActionClearAllCache : OperationAction<bool>
         {
             public ActionClearAllCache(Action<bool> completed) : base(completed) { }

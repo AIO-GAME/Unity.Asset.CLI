@@ -7,6 +7,7 @@ using System.Collections;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
 using YooAsset;
 
 #endregion
@@ -16,11 +17,10 @@ namespace AIO.UEngine.YooAsset
     partial class Proxy
     {
         /// <inheritdoc />
-        public override IOperationAction<bool> ClearUnusedCacheTask(Action<bool> completed = null)
-        {
-            return new ActionClearUnusedCache(completed);
-        }
+        [Preserve]
+        public override IOperationAction<bool> ClearUnusedCacheTask(Action<bool> completed = null) { return new ActionClearUnusedCache(completed); }
 
+        [Preserve]
         private class ActionClearUnusedCache : OperationAction<bool>
         {
             public ActionClearUnusedCache(Action<bool> completed) : base(completed) { }
@@ -40,7 +40,7 @@ namespace AIO.UEngine.YooAsset
                 }
                 catch (Exception e)
                 {
-                    AssetSystem.LogException(e);
+                    AssetSystem.LOG.Exception(e);
                     return false;
                 }
 
@@ -49,10 +49,7 @@ namespace AIO.UEngine.YooAsset
 
             private TaskAwaiter<bool> Awaiter;
 
-            private void OnCompletedTask()
-            {
-                Result = Awaiter.GetResult();
-            }
+            private void OnCompletedTask() { Result = Awaiter.GetResult(); }
 
             /// <inheritdoc />
             protected override TaskAwaiter<bool> CreateAsync()
@@ -81,10 +78,7 @@ namespace AIO.UEngine.YooAsset
             }
 
             /// <inheritdoc />
-            protected override void CreateSync()
-            {
-                Runner.StartCoroutine(CreateCoroutine);
-            }
+            protected override void CreateSync() { Runner.StartCoroutine(CreateCoroutine); }
         }
     }
 }

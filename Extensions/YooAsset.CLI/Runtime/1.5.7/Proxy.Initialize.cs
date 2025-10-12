@@ -1,6 +1,7 @@
 ﻿#if SUPPORT_YOOASSET
 using System;
 using System.Collections.Generic;
+using UnityEngine.Scripting;
 using YooAsset;
 
 namespace AIO.UEngine.YooAsset
@@ -12,25 +13,30 @@ namespace AIO.UEngine.YooAsset
     partial class Proxy
     {
         /// <summary>
-        ///     获取内置查询服务
+        /// 获取内置查询服务
         /// </summary>
+        [Preserve]
         public static event Func<IBuildinQueryServices> EventQueryServices;
 
         /// <summary>
-        ///     获取内置查询服务
+        /// 获取内置查询服务
         /// </summary>
+        [Preserve]
         public static event Func<IDeliveryQueryServices> EventDeliveryQueryServices;
 
         /// <summary>
-        ///     获取远程查询服务
+        /// 获取远程查询服务
         /// </summary>
+        [Preserve]
         public static event Func<AssetsPackageConfig, IRemoteServices> EventRemoteServices;
 
         /// <summary>
-        ///     获取参数配置
+        /// 获取参数配置
         /// </summary>
+        [Preserve]
         public static event Func<ResPackage, YAssetParameters> EventParameter;
 
+        [Preserve]
         private static YAssetParameters GetParameter(ResPackage package)
         {
             YAssetParameters parameter;
@@ -77,63 +83,59 @@ namespace AIO.UEngine.YooAsset
             return parameter;
         }
 
+        [Preserve]
         private void Initialize_Internal()
         {
             if (IsInitialize) return;
 
-#if UNITY_WEBGL // 此处为了适配WX小游戏，因为WX小游戏不支持WebGL缓存
-            YooAssets.SetCacheSystemDisableCacheOnWebGL();
-#endif
-
-            YooAssets.Initialize(new YALogger());
-            YooAssets.SetOperationSystemMaxTimeSlice(AssetSystem.Parameter.AsyncMaxTimeSlice);
             if (AssetSystem.PackageConfigs is null)
             {
-                AssetSystem.LogError("AssetSystem PackageConfigs is null");
+                       AssetSystem.LOG.E("AssetSystem PackageConfigs is null");
                 AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
                 return;
             }
 
-            if (EventParameter is null) EventParameter = GetParameter;
-            var capacity                               = AssetSystem.PackageConfigs.Count;
-            InitializationOperations = new List<InitializationOperation>(capacity);
-            ReferenceOPHandle        = new Dictionary<string, OperationHandleBase>();
-            DownloaderOperations     = new Dictionary<string, DownloaderOperation>(64);
-            Dic                      = new Dictionary<string, ResPackage>(capacity);
+#if UNITY_WEBGL // 此处为了适配WX小游戏，因为WX小游戏不支持WebGL缓存
+            YooAssets.SetCacheSystemDisableCacheOnWebGL();
+#endif
+            YooAssets.Initialize(new YALogger());
+            YooAssets.SetOperationSystemMaxTimeSlice(AssetSystem.Parameter.AsyncMaxTimeSlice);
 
-            foreach (var item in AssetSystem.PackageConfigs)
+
+            if (EventParameter is null) EventParameter = GetParameter;
+            foreach (var config in AssetSystem.PackageConfigs)
             {
-                var package = new ResPackage(item);
+                var package = new ResPackage(config);
                 if (package.Config.IsDefault)
                 {
                     DefaultPackage     = package;
-                    DefaultPackageName = item.Name;
+                    DefaultPackageName = config.Name;
                 }
 
-                if (Dic.ContainsKey(item.Name))
+                if (Dic.ContainsKey(config.Name))
                 {
-                    AssetSystem.LogErrorFormat("Asset Package Name Repeat : {0}", item.Name);
+                           AssetSystem.LOG.E($"Asset Package Name Repeat : {config.Name}");
                     continue;
                 }
-
-                Dic[item.Name] = package;
 
                 var parameters = EventParameter.Invoke(package);
                 if (parameters is null)
                 {
                     AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
-                    AssetSystem.LogException($"AssetSystem {package.Config.Name} Parameter is null");
+                           AssetSystem.LOG.E($"AssetSystem {package.Config.Name} Parameter is null");
+                    continue;
                 }
 
                 var operation = package.InitializeAsync(parameters);
                 if (operation is null)
                 {
                     AssetSystem.ExceptionEvent(ASException.ASConfigPackagesIsNull);
-                    AssetSystem.LogExceptionFormat("{Load} -> {0}", package.Config);
+                           AssetSystem.LOG.E($"Load Error -> {package.Config}");
                     continue;
                 }
 
                 InitializationOperations.Add(operation);
+                Dic[config.Name] = package;
             }
         }
     }

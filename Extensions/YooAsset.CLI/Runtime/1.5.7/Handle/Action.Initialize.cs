@@ -1,30 +1,36 @@
 ﻿#if SUPPORT_YOOASSET
 using System.Collections;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UnityEngine.Scripting;
+using YooAsset;
 
 namespace AIO.UEngine.YooAsset
 {
     partial class Proxy
     {
         /// <inheritdoc />
-        public override IOperationAction<bool> Initialize() { return new ActionInitialize(); }
+        [Preserve]
+        public override IOperationAction<bool> Initialize() => new ActionInitialize();
 
+        [Preserve]
         private class ActionInitialize : OperationAction<bool>
         {
             private async Task<bool> InitializeTask()
             {
                 Instance.Initialize_Internal();
-#if UNITY_WEBGL
-                foreach (var operation in InitializationOperations) await operation;
-#else
-                await Task.WhenAll(Instance.InitializationOperations.Select(operation => operation.Task));
-#endif
+                foreach (var operation in Instance.InitializationOperations)
+                {
+                    await operation.Task;
+                    if (operation.Status != EOperationStatus.Succeed)
+                    {
+                        AssetSystem.LOG.E($"Initialize Operation {operation.Status} | {operation.Error}");
+                    }
+                }
+
                 return true;
             }
 
-            /// <inheritdoc />
             protected override TaskAwaiter<bool> CreateAsync()
             {
                 var awaiter = InitializeTask().GetAwaiter();
@@ -32,7 +38,6 @@ namespace AIO.UEngine.YooAsset
                 return awaiter;
             }
 
-            /// <inheritdoc />
             protected override IEnumerator CreateCoroutine()
             {
                 Instance.Initialize_Internal();
@@ -40,7 +45,6 @@ namespace AIO.UEngine.YooAsset
                 InvokeOnCompleted();
             }
 
-            /// <inheritdoc />
             protected override void CreateSync()
             {
                 Instance.Initialize_Internal();
