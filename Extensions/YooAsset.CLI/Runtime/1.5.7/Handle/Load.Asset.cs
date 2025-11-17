@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Scripting;
 using YooAsset;
 using Object = UnityEngine.Object;
@@ -24,7 +25,7 @@ namespace AIO.UEngine.YooAsset
 
             #region Sync
 
-            protected override void CreateSync()
+            protected override async void CreateSync()
             {
                 var operation = Instance.HandleGet<AssetOperationHandle>(Address);
                 if (operation is null)
@@ -44,8 +45,11 @@ namespace AIO.UEngine.YooAsset
 
             #region Coroutine
 
+            private Lazy<WaitForEndOfFrame> waitForEndOfFrame = new Lazy<WaitForEndOfFrame>(() => new WaitForEndOfFrame());
+
             protected override IEnumerator CreateCoroutine()
             {
+                while (!AssetSystem.IsInitialized) yield return waitForEndOfFrame.Value;
                 var operation = Instance.HandleGet<AssetOperationHandle>(Address);
                 if (operation is null)
                 {
@@ -85,6 +89,8 @@ namespace AIO.UEngine.YooAsset
 
             private async Task<TObject> GetTask()
             {
+                // 等待初始化完毕
+                while (!AssetSystem.IsInitialized) await Task.Yield();
                 Operation = Instance.HandleGet<AssetOperationHandle>(Address);
                 if (Operation is null)
                 {

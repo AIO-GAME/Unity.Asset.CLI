@@ -1,4 +1,5 @@
 ﻿#if SUPPORT_YOOASSET
+using System;
 using System.IO;
 using AIO.UEngine;
 using UnityEngine;
@@ -112,14 +113,17 @@ namespace AIO.UEditor.CLI
                 var collector = Instance.GetByName(info.Item1)?.GetByGroupName(info.Item2)?.GetByPath(data.CollectPath);
                 if (collector is null) return false;
 
-                var mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : Config.ASMode;
+                EASMode mode;
+                try { mode = Application.isPlaying ? AssetSystem.Parameter.ASMode : Config.ASMode; }
+                catch { mode = EASMode.Editor; }
+
                 if (mode == EASMode.Editor &&
-                    collector.LoadType == EAssetLoadType.Runtime)
-                    return false;
+                    collector.LoadType == EAssetLoadType.Runtime
+                   ) return false;
 
                 if (mode != EASMode.Editor &&
-                    collector.LoadType == EAssetLoadType.Editor)
-                    return false;
+                    collector.LoadType == EAssetLoadType.Editor
+                   ) return false;
 
                 if (!Collectors.ContainsKey(collector))
                 {

@@ -84,22 +84,8 @@ namespace AIO.UEngine.YooAsset
                 {
                     if (parameters.Parameters is EditorSimulateModeParameters parameter)
                     {
-                        try
-                        {
-                            Debug.unityLogger.logEnabled       = false;
-                            parameter.SimulateManifestFilePath = EditorSimulateModeHelper.SimulateBuild(Config.Name);
-                        }
-                        catch
-                        {
-                            // ignored
-                        }
-
-                        Debug.unityLogger.logEnabled = true;
-                        if (string.IsNullOrEmpty(parameter.SimulateManifestFilePath))
-                        {
-                            var rp = $"/{AssetSystem.Parameter.RuntimeRootDirectory}/{EditorUserBuildSettings.activeBuildTarget}/{Config.Name}/Simulate/PackageManifest_{Config.Name}_Simulate.bytes";
-                            parameter.SimulateManifestFilePath = Application.dataPath.Replace("/Assets", rp);
-                        }
+                        var rp = $"/{AssetSystem.Parameter.RuntimeRootDirectory}/{EditorUserBuildSettings.activeBuildTarget}/{Config.Name}/Simulate/PackageManifest_{Config.Name}_Simulate.bytes";
+                        parameter.SimulateManifestFilePath = Application.dataPath.Replace("/Assets", rp);
                     }
 
                     break;

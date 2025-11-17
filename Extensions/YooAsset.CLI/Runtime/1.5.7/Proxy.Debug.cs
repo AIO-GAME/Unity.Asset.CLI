@@ -79,10 +79,6 @@ namespace AIO.UEngine.YooAsset
             }
         }
 
-#endif
-
-#if UNITY_EDITOR
-
 #if UNITY_2022_1_OR_NEWER
         [IgnoredByDeepProfiler, HideInCallstack]
 #endif
@@ -104,7 +100,7 @@ namespace AIO.UEngine.YooAsset
         [IgnoredByDeepProfiler]
         [HideInCallstack]
 #endif
-        private void PackageDebug(LoadType type, string location) { AssetSystem.LOG.I($"{GetType(type)} : [auto : {location}] -> {GetLocation(location)}"); }
+        private void PackageDebug(LoadType type, string location) { AssetSystem.LOG.I($"{GetType(type)} : [AUTO : {location}] -> {GetLocation(location)}"); }
 
         [IgnoreConsoleJump, DebuggerHidden]
 #if UNITY_2022_1_OR_NEWER
